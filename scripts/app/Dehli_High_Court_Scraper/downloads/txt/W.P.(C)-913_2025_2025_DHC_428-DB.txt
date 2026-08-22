@@ -1,0 +1,74 @@
+$~38
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+     Date of decision: 24.01.2025
+
++ 	W.P.(C) 913/2025 & CM APPL. 4525/2025
+
+	JITENDER SINGH				.....Petitioner
+				Through:	Mr. Himanshu Gatuam, Adv.
+				versus
+	UNION OF INDIA  AND ORS			.....Respondents
+Through:	Mr. Ajay Jain, SPC with Mr. Shriram Tiwary, Mr. Swetabh Sharma. Ms. Bijay Lakshmi, Mr. M.N. Mishra, Mr. Manoj Gautam, Mr. Krishna Sharma, Ms. Harshita Batra, Advs. for R-1 to R-5/UOI.
+	Mr. Raj Kumar, A.C., Mr. P. Devenda, S.I., Mr. Amit Kumar, S.I. and Mr. Rahul Sinha, S.I. for C.I.S.F.
+CORAM:
+HON'BLE MR. JUSTICE NAVIN CHAWLA
+HON�BLE MR. JUSTICE MANOJ JAIN
+NAVIN CHAWLA, J. (ORAL) 
+1. This petition has been filed by the petitioner, challenging the Report dated 14.12.2024 of the Review Medical Examination (RME), which has declared the petitioner �unfit� for appointment to the post of Assistant Sub Inspector (ASI) (Executive) under the Limited Departmental Competitive Examination (LDCE)-2022, with the following observations:
+�BRIEF OF REVIEW MEDICAL EXAMINATION AND FINDING THEREOF BOARD EXAMINED �INDIVIDUAL IS A CASE OF LARGE CALCIFICATION IN THE LEFT MID LOWER ZONE LUNG. ALSO REFER TO MEDICAL SPECIALIST FOR EXPERT OPINION COHO ADVICE CT SCAN CHEST WHEN REVEALED THERE IS A LARGE CALCIFIED PLAQUE (OPACITY) NOTED AT MID LEFT PLEURA SIZE MEASURING APPROXIMATELY 37X15X15. AS PER UNIFORM GUIDELINES S. NO. 10 INVESTIGATIONS PARA C XII ANY OPACITY > 1 CM DIAMETER IS DISQUALIFICATION. HENCE RME BOARD DECLARED HIM UNFIT�
+
+2. The learned counsel for the petitioner draws our attention to clause 10(c)(xii) of the Guidelines for �Recruitment Medical Examination in Central Armed Police Forces (CAPFs) and Assam Rifles� as on May 2015, to contend that the said clause merely provides for a clinical examinations, including a Chest X-Ray, however, this in itself is not a ground for disqualifying a candidate from appointment. He submits that, as far as the disqualification is concerned, it is contained in clause XV of the Guidelines, which reads as follows:
+�XV. EXAMINATION OF LUNGS, PLEURA & MEDIASTINUM
+Following are the cause of rejection
+1. Evidence of Asthma, including reactive airway disease, exercise-induced bronchospasm or asthmatic bronchitis, reliably diagnosed (Reliable diagnostic criteria may include any of the following elements: substantiated history of cough, wheeze etc.
+2. Evidence of bronchitis, acute or chronic.
+3. Evidence of bronchiectasis.
+4. Evidence of pleurisy with effusion within last 2 years.
+5. Tuberculosis
+(a) Evidence of active tuberculosis in any form or location is unfit.
+(b) Cases of treated tuberculosis along with normal pulmonary functions will be accepted as fit.�
+                                                                        
+3. He submits that until and unless the candidate is found to be suffering from any one of the conditions, which are mentioned in paragraph- XV of the Guidelines, which have been reproduced hereinabove, the candidate cannot be declared as �unfit� for appointment. He submits that in the present case, the RME has not reached a conclusion that the petitioner is suffering from any one of the conditions which are mentioned in paragraph XV of the Guidelines, and therefore, the petitioner cannot be disqualified on the basis of its report.
+4. The learned counsel for the petitioner submits that post his rejection, the petitioner has got himself examined even at the National Institute of Tuberculosis & Respiratory Diseases, Sri Aurobindo Marg, New Delhi, which has stated in its report that though there is a calcified opacity in the left lower zone, however, there is no evidence of active disease at present.
+5. Issue notice.
+6. Notice is accepted by Mr. Ajay Jain, the learned counsel on behalf of the respondents. He submits that clause 10(c)(xii) of the Guidelines clearly provides that �any opacity in the lung field more than 1 cm in diameter� appearing in a Chest X-ray, would be a ground for disqualification.
+7. The learned counsel for the respondents submits that the RME had also obtained an opinion from the medical expert before declaring the petitioner �unfit� for appointment.
+8. We have considered the submissions made by the learned counsels for the parties. Clause 10(c)(xii) of the Guidelines reads as under:
+
+�10. INVESTIGATIONS:
+xxxxx
+c) Chest X-ray PA
+xxxxx
+xii) Any opacity in the lung field more than 1 cm in diameter.�
+
+9. A reading of the above would show that in a chest X-ray, if the opacity in the lung field is found to be more than 1 cm in diameter, this would be a valid ground for rejection of a candidate. Though, it is under the heading of �investigations�, the investigation must culminate in a result. If the result is a finding of opacity in the lung field of more than 1 cm in diameter, this would be a ground for rejection. 
+10. Clause XV of the Guidelines, which has been relied upon by the learned counsel for the petitioner, also gives the medical conditions on which the petitioner may be declared unfit for an appointment. The two provisions are independent of each other and do no overrule or undermine the other provisions of the Guidelines, including clause 10(c)(xii) thereof. The Medical Guidelines give a generic description of various medical conditions which may lead to a candidate being declared medically unfit for appointment. These conditions are neither meant to be exhaustive nor overriding each other.  
+11. In any case, the RME had taken the opinion of a medical expert, and based upon the same, declared the petitioner unfit for appointment.
+12. It is well settled law that medical opinion of the Medical Boards, unless found to be rendered in violation of Rules or without following the prescribed procedure, or found to have ignored the opinion of the experts, or to be suffering from other legal infirmity, should not be lightly interfered with.
+13. In the present case, we do not see any reason being made out by the petitioner to interfere with such finding of the Medical Boards.
+14. As far as the submission of the learned counsel for the petitioner that the petitioner is already working with the respondent/CISF and has not been found to be unfit, the Supreme Court in Pavnesh Kumar v. UOI & Ors., 2023 SCC OnLine SC 1583 has rejected a similar submission, while observing as under: 
+�12.�The above submission of the counsel is�ex-facie�bereft of merit as the appellant was never declared medically fit for the post of Sub-Inspector (GD) pursuant to his candidature for the said post through LDCE. The appellant had undergone routine annual medical check-up as a constable and was declared in medical category SHAPE-I, which was the eligibility condition for applying to the post of Sub-Inspector (GD) through LDCE. The appellant was never declared medically fit in the process of selection for the post of Sub-Inspector (GD). The appellant may have qualified stage-I to stage-IV of the process of examination but never qualified stage-V which consisted of the detailed medical examination. The said detailed medical examination as per the call letter referred to above was done only on 23.12.2019 and not on any earlier date. In the said detailed medical examination the appellant was declared unfit which decision was upheld by the review medical examination by the board of three members despite appellant having undergone a minor surgery for the cure of medical deficiencies pointed out earlier. The medical examination of the appellant conducted on 16.12.1999 was a routine annual examination which declared him in medical category SHAPE-I. It was not a part of examination process for selection to the post of Sub-Inspector (GD) through LDCE. The appellant never successfully qualified all the five stages of examination as advertised for the selection to the post of Sub-Inspector (GD) through LDCE.
+13.�It was next contended that the appointment through LDCE is like fast-track promotion and is not a fresh appointment. Therefore, recruitment rules and guidelines applicable to the normal mode of promotion would have been applied and not any different medical standards.
+14.�No doubt appointment to a higher post of an incumbent working on lower post is in the form of an accelerated promotion but it cannot be equated with normal mode of promotion. This is evident from the advertisement itself which in unequivocal terms states that applications are invited for selection to the post of Sub-Inspector (GD) in BSF through LDCE. The very fact that the applications were invited for selection to the post of Sub-Inspector (GD) connotes that it was not a normal promotion rather selection to the higher post from amongst the eligible candidates working on the lower post. Thus, the submission that the normal rules of promotion or medical examination ought to have been applied, is not acceptable.
+15.�This apart, selection was to be conducted in terms of the advertisement. The scheme of the selection contained in the advertisement categorically provided clearing of the examination in all the five stages which included detailed medical examination. This was independent and in addition of the eligibility condition that a candidate must possess the medical category SHAPE-I while working on the lower post.
+16.�Additionally, a distinction has to be drawn between a normal promotion and promotion by selection through LDCE. Promotion by selection through LDCE�vis-�-vis competitive examination is a facility or a chance given for out of their promotion without waiting for the normal course of promotion. It in effect is selection through competitive examination within the limited category of candidates and cannot be equated with normal promotion. This being the position, the argument that regular promotion criteria had to be applied with regard to medical fitness even in the matter of selection through LDCE is not acceptable.�
+
+15. In view of the above, we find no merit in the present petition. The same is, accordingly, dismissed. The pending application also stands dismissed.
+
+
+NAVIN CHAWLA, J
+
+
+
+
+
+MANOJ JAIN, J
+JANUARY 24, 2025/sds/DG
+				Click here to check corrigendum, if any
+
+                                                                        
+
+
+W.P.(C) 913/2025						    Page 2 of 7
+
+

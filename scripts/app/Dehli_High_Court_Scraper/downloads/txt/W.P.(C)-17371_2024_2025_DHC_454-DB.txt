@@ -1,0 +1,134 @@
+$~6
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%				 	            Date of Decision: 20.01.2025
++ 	W.P.(C) 17371/2024
+	PROPERTY PLUS REALTORS			.....Petitioner
+				Through:	Mr. Deepak Kapoor, Advocate 
+
+				versus
+
+	UNION OF INDIA  & ORS.				.....Respondents
+Through:	Mr. Sanjay Kumar, SSC, Ms. Monica Benjamin and Ms. Easha Kadian, JSCs
+CORAM:
+HON'BLE THE ACTING CHIEF JUSTICE
+HON'BLE MR. JUSTICE TUSHAR RAO GEDELA
+VIBHU BAKHRU, J. (ORAL)
+1. The petitioner has filed the present petition, inter alia, praying as under:-
+(a) �Issue a writ of certiorari, or any other appropriate writ, Order or direction quashing the Impugned Order dated 17.10.2024 passed by the Respondent no.3 under section 271DA of the Income Tax Act, 1961(�The Act�) and all proceedings emanating therefrom including demand notice dated 17.10.2024 u/s 156 of the Act and the Show Cause Notices U/s 271DA dated 09.09.2024 and 27.09.2024 relating to AY 2022-23
+
+(b)  Pass any other Order/(s) that this Hon�ble Court may deem fit and proper in the facts and circumstances of the case herein and in the interest of justice.�
+
+2. The petitioner is a partnership firm constituted on 20.12.2017 and at the material time was engaged in a business of acting as real estate brokers. It is stated that the petitioner had acted for various real estate companies including Gaursons Group of Companies (hereafter the Gaursons Group).
+3. On 02.03.2022, a search was conducted under Section 132 of the Income Tax Act, 1961 (hereafter the Act) in the premises of the entities comprising the Gaursons Group and other related persons. Simultaneously, a search was also conducted in the premises of the petitioner as well as in the premises of its constituted partners.
+4. The petitioner filed his return for the relevant assessment year (AY) 2022-23 after the search was conducted. The said return was taken up for scrutiny and the proceedings culminated in an assessment order dated 28.03.2024. The net profit of the assessee was determined at Rs. 22,29,92,302/- against a returned income of Rs. 9,77,91,650/-. In addition, the Assessing Officer (AO) also decided that the penalty proceedings be initiated in respect of the cash allegedly received by the petitioner.
+5. Paragraph 14.17, 14.18 and 14.19 of the assessment order are relevant and are set out below:
+�14.17 Further, I am satisfied that this is a fit case for initiation of penalty proceedings, hence, penalty proceedings U/s 271AAB(1A)(b) of the IT Act, 1961, is being initiated separately on the above issue for undisclosed income.
+
+14.18 Further, I am satisfied that this is a fit case for initiation of penalty proceedings u/s 271AAD(1)(ii) of the Act, and hence, penalty proceedings u/s 271AAD(1)(i) & (ii) of the Act are being initiated separately in this case for false entry as well as omission of entry in the books of accounts which is relevant for computation of total income of the assessee.	
+
+14.19 Further, separate reference is being sent to the office of Addl. CIT-Central Range-04, Delhi for initiation of penalty proceedings U/s 269ST of the IT Act, 1961, in this case on the issue of cash receipts by the assessee.�
+
+6. Accordingly, the AO made a reference to the Additional Commissioner of Income Tax on 08.04.2024 for initiation of penalty proceedings under Section 269ST of the Act, read with 271DA of the Act. A copy of the said reference letter dated was handed over to the court during the course of proceedings by the learned counsel for the Revenue. The same is set out below.
+�OFFICE OF THE 
+DY. COMMISSIONER OF INCOME TAX 
+CENTRAL CIRCLE-15, NEW DELHI 
+Room No. 245, ARA Centre, E-2, Jhandewalan Extn., New Delhi-110055. Ph: 011-23593441.
+
+F. No. DCIT/CC-15/2024-25/42			Date: 08/04/2024
+
+To.,
+
+	The Addl. Commissioner of Income Tax, 
+	Central Range-4, 
+	New Delhi.
+
+Respected Sir,
+
+Sub: Reference for initiation of penalty u/s 269ST r.w.s 271DA of the I.T Act, 1961, for cash received more than Rs. 2,00,000- reg.
+
+Kindly refer to the above stated subject.
+
+2	During the assessment proceedings u/s 143(3) of the Income Tax Act, 1961 in the following case, it is found that assessee has received cash more than Rs. 2,00,000/- in respect of transaction relating to one event during the assessment year 2022-23, therefore assessee has violated provisions of Section 269ST of the I. T. Act, 1961:
+
+Sr.No.Name of AssesseePANA.Y.1.M/s Property Plus RealtorsAATFP6793Q2022-232.M/s Property Plus RealtorsAATFP6793Q2019-20
+3 	Detailed discussion with regard to the nature and quantification of the evidences which are related to violation of provisions of Section 269ST of the I. T. Act, 1961 has been made in the assessment order, copy of the same is being provided for the kind reference. Further, relevant part of seized material that has been relied upon in the case of the assessee is being provided in the soft copy in a pendrive.
+
+4 	Since the amount of cash received is more than Rs. 2,00,000/- in respect of transaction relating to one event, therefore, information is being shared with your office for initiation of penalty u/s 269ST r.w.s 271DA in the above case.
+
+5 	Submitted for necessary action at your end.
+
+							      Yours faithfully, 
+Sd/-
+(Mohit Garg)
+Dy. Commissioner of Income Tax, 
+Central Circle-15, New Delhi�
+
+7. Respondent no.3 did not take any immediate steps on receipt of the said reference. However, on 09.09.2024 the concerned authority issued a notice under Section 274 read with Section 271DA of the Act calling upon the petitioner to show cause why penalty not be imposed under Section 271DA of the Act. Additionally, the petitioner was also called upon to appear before the concerned officer personally or through duly authorized representative, on 19.09.2024.
+8. The said show cause notice was followed by another notice dated 27.09.2024 once again calling upon the petitioner to appear before the concerned officer personally or through a duly representative, on 29.09.2024, and show cause why an order imposing penalty under Section 271DA of the Act not be passed.
+9. Thereafter, on 17.10.2024, the concerned authority passed the impugned order. 
+10. The limited question which falls for consideration of this court is whether the impugned order is beyond the period of limitation as prescribed in 275(1)(c) of the Act. The said provision is set out below:
+	275. Bar of Limitation for imposing penalties. - (1) No order imposing a penalty under this Chapter shall be passed-
+	(a) ***
+	(b) ***
+	(c) in any other case, after the expiry of financial year in which the 	proceedings, in the course of which action for the imposition of 	penalty has been initiated are completed or six months from the end 	of the month in which action for imposition of penalty is initiated, 	whichever period expires later.
+
+11. In our view, the controversy sought to be raised is no longer res integra and is squarely covered by the decisions of this court in Principal Commissioner of Income Tax v. JKD Capital & Finlease Ltd.: 2015 SCC OnLine Del 14476 and Commissioner of Income Tax (TDS)-2 Delhi v. Turner General Entertainment Networks India Pvt. Ltd: 2024 SCC OnLine Del 7760. The said question is also covered in the petitioner�s own case for AY 2021-22 captioned Property Plus Realtors Vs. Union of India & Ors: W.P.(C) 15716/2024 decided on 20.11.2024. 
+12. In the Commissioner of Income Tax Vs. Turner General Entertainment Network India Pvt. Ltd.: 2024 SCC OnLine Del 7760, this court had following the earlier decision in Principal of Commissioner of Income Tax v . JKD Capital & Finlease Ltd.:2015: 378 ITR 613 Del held that the initiation of proceedings for imposition of penalty clearly refers the date on which the first introductory step for such action is taken. The court held that the reference made for initiation of penalty under Section 269ST of the Act is required to be considered as the first step. The relevant extract of the said decision is set out below.
+�15. The word �initiated� is a past tense of the word �initiate�. The Shorter Oxford English Dictionary defines the word �initiate� as under:
+�to begin, commence, enter upon, to introduce, set going, originate.�
+
+16. In Webster�s Third New International Dictionary, the word �initiate� has, inter alia, been defined thus:
+�to begin or set going: make a beginning of: perform or facilitate the first actions, steps, or stages of:�
+
+17. The Words and Phrases (Permanent Edition) defines �initiate� to mean:
+�an introductory step or action, a first move; beginning; start, and to initiate as meaning � to commence.�
+
+18. In Om Prakash Jaiswal v. D.K. Mittal & Anr.: (2000) 3 SCC 171, the Supreme Court had considered the meaning of the expression �initiate any proceedings for contempt� by referring to the dictionary meaning of the said word. It is relevant to refer to paragraph 10 of the said decision, which is set out below:
+�10. The expression�"initiate any proceedings for contempt� is not defined in the Act. Words and Phrases (Permanent Edition) defines �initiate� to mean � an introductory step or action, a first move; beginning; start, and �to initiate� as meaning to commence. Black's Law Dictionary (6th  Edn.) defines �initiate� to mean commence; start; originate; introduce; inchoate. In section 20, the word �initiate� qualifies �any proceedings for contempt�. It is not the initiation of just any proceedings; the proceedings initiated have to be proceedings for contempt.�
+
+19. The expression �action for imposition of penalty is initiated� must, thus, clearly refers to the date on which the first introductory step for such action is taken, it must necessarily mean the start of such action. It must mean the commencement of action for imposition of penalty. As noted above, the AO had found that it was the admitted case that the assessee had defaulted in deduction of TDS, which it was obliged to do. It had, accordingly, made a reference to the learned JCIT. This was obviously for the purposes of imposition of penalty. The reference, thus, clearly marked the first step for initiation of action for imposition of penalty. The Show Cause Notice issued subsequently was to provide the assessee an opportunity to show cause why penalty not be imposed.
+
+20. In the given context, this was in the beginning of the action for imposition of penalty. The same had commenced earlier with the AO determining that there was a cause for such imposition.�
+
+13. The learned counsel appearing for the petitioner submits that the date for initiation of penalty must be considered as the date on which the assessment order was passed. He submits that the decision to initiate the proceedings under Section 269ST of the Act has been taken by the AO at the time of passing of the assessment order and the same is also recorded in the said order. He submits that the delay in making reference for any such initiation cannot extend the period of limitation as prescribed under Section 275(1)(c) of the Act. He also referred to the decision of a Coordinate Bench of this court in Principal Commissioner of Income Tax (Central-II) v. Thapar Homes Ltd.: 2023 SCC OnLine Del 7020 and drew the attention of this court to the following passages from the said decision:
+
+�18. The proceedings were initiated under Section 271AAA, and Section 271D as well the impugned penalty order confined itself to Section 271E. A careful perusal of the Section 271E would show that if the loan was deposited, and the specified advance was repaid by an assessee in violation of the provisions contained in Section 269T, then assessee becomes liable to pay penalty. The penalty which can be imposed by the concerned officer would be the sum equal to the amount of loan or deposit for the specified advance so repaid. This provision has been made in sub-section 1 of section 271E. Sub-Section 2 of section 271E provides that the penalty imposable under subsection 1 of the said section shall be imposed by the Joint Commissioner.
+
+19. It is based on the language of sub-section 2 of section 271E that Mr. Kumar argues that the AO could not have triggered the penalty proceedings and hence, the limitation would commence, as prescribed, only from the date when the JCIT issued the notice.
+
+20. Therefore, based on this line of argument, Mr. Kumar says that the limitation in this case expired only on 31.12.2011, and since the penalty order was passed on 30.12.2011, it was within the prescribed period of limitation, as being the latter of the two dates, as indicated in Section 275 (1) (c) of the Act.
+
+21. In our view, this argument, if accepted, would lead to absurdity, the reason being that once the appellant/revenue decides to trigger penalty proceedings against the respondent/assessee, it is incumbent upon them to keep an eye on the limitation period prescribed under Section 275 (1)(c) of the Act.
+
+22. If the limitation period is connected to when the concerned officer issues notice, then the appellant/revenue can extend the period of limitation, way beyond the timeline prescribed in Section 275 (1)(c). 23. We are clearly of the view that the notice issued by the JCIT on 13.06.2011 could not have extended the period of limitation, as prescribed under Section 275 (1)(c) of the Act.
+
+23. We are clearly of the view that the notice issued by the JCIT on 13.06.2011 could not have extended the period of limitation, as prescribed under Section 275 (1)(c) of the Act.
+
+24. In this case, what is required to be brought to the forefront is that the AO had taken prior approval of the ACIT, who is equal in rank to the JCIT, before triggering the penalty proceedings. Thus, although the decision to initiate penalty proceedings is found embedded in the assessment order dated 31.12.2010 and approval to frame the assessment order was given prior to the said date, the notice was issued only on 13.06.2011.
+25. Even though this may be an additional factor in this particular case, our reasons for holding the limitation period as prescribed under Section 275 (1)(c) of the Act had expired latest by 30.06.2011, is not confined only to this aspect of the matter. The appellant/revenue, as noticed above, cannot extend the period of limitation by deciding at its whim and fancy when the notice has to be issued. The notice under Section 274 should have been issued before the period of limitation, as discussed above.�
+
+14. It is submitted that in the present case as well the decision to initiate the penalty proceedings must be considered as embedded in the assessment order dated 28.03.2024. 
+15. He submits that the decision to make a reference after nine days, that is, on 08.04.2024, would not extend the period of limitation. He also pointed out that since the case is a search case, the assessment order was also passed with the approval of the concerned Income Tax Authority � Addl. CIT, who is competent to conclude the penalty proceedings under Section 269ST of the Act. He thus submits that the period of limitation must be reckoned from the date of the assessment order and not from the date on which the reference was made for initiation of such proceedings.
+16. We are not persuaded to accept the aforesaid contention. A plain language of Section 275(1)(c) of the Act indicates that the time limit for completion of the action for imposition of penalty is to be reckoned from:
+ (a) the end of the financial year in which the proceedings, in the course of which action for the imposition of penalty has been initiated are completed; or 
+(b) six months from the end of the month in which action for imposition of penalty is initiated, whichever expires later. 
+17. Undoubtedly in the present case, the proceedings during the course of which decision for that proceedings for levy of penalty under Section 269ST of the Act should be initiated, had taken place during the financial year 2023-24 as it is reflected in the assessment order dated 28.03.2024. However, the assessment order clearly reflects that the penalty proceedings are being initiated separately. The order records that �separate reference is being sent to the office of Addl. CIT-Central Range-04, Delhi for initiation of penalty proceedings U/s 269ST of the IT Act, 1961�. The AO has done so by making a reference on 08.04.2024. Thus, clearly the period of six months is required to be reckoned from the date of the reference, that is, from 08.04.2024 as that is the period which expires later than the end of the financial year in which the proceedings, during the course of which the decision was taken to initiate the penalty proceedings, were completed.
+18. Having stated the above, there is merit in the petitioner�s contention that the date of initiation of the penalty proceedings cannot be extended arbitrarily and indefinitely. Clearly in cases where there is an inordinate delay in initiation of the proceedings, it would be necessary to examine whether the period of limitation would stand extended on account of such delay. It is settled law that in cases where no limitation period is mentioned for acts to be done, the same are required to be done within a reasonable period. (See State of Punjab & Ors. vs. Bhatinda District Cooperative Milk Producers Union Ltd.: (2007) 11 SCC 363).
+19. Thus, in cases where the initiation of the penalty proceedings are inordinately and inexplicably delayed beyond a reasonable period, the said issue may rise for consideration. However, in the present case no such issue arises for consideration of this court as the penalty proceedings were initiated within a period of eleven days of the culmination of the assessment proceedings whereas the decision to make a reference for initiation of the penalty proceedings was taken. We are unable to accept that this period can be termed as unreasonable. 
+20. In view of the above, we do not find any merit in the present petition. The same is accordingly dismissed.
+21. The petitioner has also filed an appeal against the impugned order. We clarify that this order will not preclude the petitioner from pursuing all other grounds, except that the impugned order has been passed beyond the period of limitation stipulated under Section 275(1)(c) of the Act, in the appellate proceedings.
+
+VIBHU BAKHRU, ACJ
+
+TUSHAR RAO GEDELA, J
+JANUARY 20, 2025
+Ms/yrj
+
+					Click here to check corrigendum, if any
+
+
+
+		
+W.P.(C) 17371/2024		                                                                               		   Page 1 of 1
+
+

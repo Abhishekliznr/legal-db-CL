@@ -1,0 +1,118 @@
+$~8
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%				                       Date of decision: 8th January, 2025
+	I.A. 44420/2024
+	In
++ 	CS(COMM) 87/2020
+
+	SYNGENTA LIMITED AND ANR.				.....Plaintiffs
+Through:	Mr Adarsh Ramanujan, Mr. Parth Singh, Mr Saif Rahman Ansari, Mr Vivek Kumar and Ms Surabhi Mahajan, Mr. Parth Singh, Advocates.
+				versus
+	GSP CROP SCIENCE PRIVATE LIMITED		     .....Defendant
+Through:	Mr. G. Nataraj, Mr. Shashikant Yadav and Mr. Rahul Bhujbal, Advocates
+
+CORAM:
+HON'BLE MR. JUSTICE AMIT BANSAL
+AMIT BANSAL, J. (Oral)
+
+I.A. 44420/2024 (under Section 151 of the CPC)
+1. This application has been filed on behalf of the plaintiffs seeking a direction to the defendant to comply with the Terms of Reference (hereinafter referred to as �ToR�) and provide access to the Tier-II Confidentiality Club member of the plaintiffs to the information shared under serial no. 1-8 of the ToR, by the defendant with the Scientific Advisor appointed by the Court. 
+2. The plaintiffs have initiated the present suit concerning infringement of two process patents granted in favour of the plaintiffs, being Indian Patent No. 278868 titled �Processes for the preparation of AZOXYSTROBIN using DABCO as a catalyst and novel intermediates used in the processes� and Indian Patent No. 271751 titled �Preparation of AZOXYSTROBIN� (hereinafter, �suit patents�). The suit patents are essentially process patents which relate to the technology of manufacture of the active ingredient �AZOXYSTROBIN�, a fungicide sold by the plaintiffs under the brand name �AMISTAR��.  
+3. Along with the suit, an interim injunction application being I.A. 2554/2020 was filed by the plaintiffs seeking to restrain the defendant from selling products that infringe the suit patents. 
+4. In the order passed by this Court on 16th February 2024, it was recorded that the counsel for the parties have principally agreed to the appointment of a Scientific Advisor for deciding the interim injunction application. Accordingly, both the counsel were directed to file a detailed ToR for the Scientific Advisor.
+5. This Court vide order dated 19th July, 2024 requested the Director of IIT, Delhi to identify a Scientific Advisor. The ToR mutually agreed between the plaintiffs and the defendant were recorded in the said order. 
+6. Some of the relevant features of the ToR for the purposes of the present application are mentioned below:
+a) Serial no. 11 delineated the sample collection process. 
+b) Serial no. 12 provided the testing protocols. 
+c) Serial no. 13 stated that the Tier-II members of the Confidentiality Club are entitled to receive copies of records collected during the inspections. 
+d) Serial no. 14 provided that the costs will be shared.
+e) Serial no. 15 provided for constitution of a two-tier Confidentiality Club of which Tier-I would comprise Scientific Advisor and two external counsel of each party and Tier-II would comprise members of Tier-I Confidentiality Club and two party representatives of each party.
+7. Pursuant to the aforesaid order, the plaintiffs nominated Dr. Alan Whitton as a part of the Tier � II Confidentiality Club. Dr. Alan Whitton is the co-inventor of the two suit patents and was employed as the process chemist of the plaintiffs� group company based in Grangemouth, UK.  
+8. Thereafter, the Scientific Advisor visited the defendant�s plant on 6th and 7th September, 2024. The inspection team consisted of the Scientific Advisor accompanied by the plaintiffs� counsel, defendant�s counsel and Dr. Alan Whitton.
+9. It is the case of the plaintiffs that Dr. Alan Whitton was denied access to the documents collected by the Scientific Advisor. 
+10. Accordingly, the present application has been filed by the plaintiffs seeking a direction to the defendant to provide access to the aforesaid records in accordance with the ToR. 
+11. The application has been opposed on behalf of the defendant. Mr. Guruswamy Nataraj, Advocate appearing on behalf of the defendant submits that the present application as filed under Section 151 of the Code of Civil Procedure, 1908 (�CPC�) is not maintainable. It is further submitted that by seeking access to the aforesaid documents, the plaintiffs are seeking a roving and fishing enquiry to ascertain the information which is neither relevant nor pertinent to the plaintiffs� process. Mr. Natraj further submits that the information and documents of which access is sought would include information with regard to the supplier records of the defendant along with other proprietary and confidential information relating to technical features and knowhow followed by the defendant.
+12.  Mr. Natraj submits that the plaintiffs have not stated as to what the Tier-II Confidentiality Club member of the plaintiffs will do with the information and documents. Furthermore, disclosure or access of the defendant�s confidential documents to a party resident abroad and to a Tier-II Confidentiality Club representative of the plaintiffs, who is not even under the control of the plaintiffs would result in a high risk of leakage as well as misuse and would be against the protection provided under Section 104 A of the Patents Act, 1970 (hereinafter �the Act�).
+13. I have heard the counsel for the parties. 
+14. As regards the objection taken by Mr. Nataraj with regard to the maintainability of the present application, the said application has not been filed for production of documents. The application has been filed seeking compliance of the mutually agreed ToR as recorded in the order passed by this Court on 19th July, 2024. Therefore, in my view, the application as filed under Section 151 of CPC would be maintainable. 
+15. At this juncture, it may be appropriate to set out the relevant parts of the ToR recorded by this Court on 19th July, 2024:
+S. No. Proposed Consolidated reference for Scientific Advisor
+11Sample collection: 
+a. Please collect 3 (three) sealed samples of DroneX manufactured in years 2016-current from Defendant facility if available, to be resealed again in the presence of Scientific Advisor, along with supporting documentation. 
+b. Please collect 3 (three) sealed samples of Azoxystrobin technical manufactured and/or obtained from third party by Defendant in years 2016-current from Defendant facility if available, to be resealed again in the presence of Scientific Advisor, along with supporting documentation. 
+c. Please collect 3 (three) sealed samples of methyl methoxyacrylate manufactured and/or obtained from third party by Defendant in years 2016-current from Defendant facility(ies) if available, to be resealed again in the presence of Scientific Advisor, along with supporting documentation. 
+d. Please collect 3 (three) sealed samples of Difenoconazole manufactured in years 2016-current from Defendant facility(ies) if available, to be resealed again in the presence of Scientific Advisor, along with supporting documentation. 
+e. Please collect 7 (seven) sealed samples of Defendant product DroneX presently in custody of Plaintiff along with supporting documentation such as invoices and verify intact seal of the product samples. Two (2) of such sealed samples and copies of all such documentation including invoices and photographs of packaging/label shall be provided to the Plaintiff�s and Defendant�s Counsel respectively for them to do their respective testing. The remaining 3 (three) sealed samples shall be utilized by the Scientific Advisor for Testing agreed in S.No. 12 below.12Testing: 
+a. Send all sealed samples, collected in S. No. 11 above, of DroneX, Azoxystrobin technical, methyl methoxyacrylate, and Difenoconazole along with Amistar of Plaintiff for testing to an independent NABL accredited laboratory in India (lab identity not to be shared with Plaintiff or Defendant or their respective counsel). 
+b. Direct the lab to test for the presence of M515, M339, and M698 in each of the samples, and quantification of the same. 
+c. Direct the lab to use: 
+c1.     the testing protocol as provided by the Plaintiff, shared with the Scientific Advisor - a copy of such testing protocol and all relevant information also to be provided only to members of the Tier 1 of the Confidentiality Club in advance of the actual testing. 
+c2.      the testing protocol as provided by the Defendant, shared with the Scientific Advisor - a copy of such testing protocol and all relevant information also to be provided only to members of the Tier 1 of the Confidentiality Club in advance of the actual testing. 
+d.       Direct the lab to use sample of AMISTAR (Plaintiff�s product) as reference standard, as provided by the Plaintiff, to test for presence of M515, M339, and M698.
+13Record collection: 
+
+a.   Collect and retain copies of all records and documents (paper and/or computer records) verified by the Scientific Advisor in a sealed cover (as related to DroneX, Azoxystrobin technical, methyl methoxyacrylate, and Difenoconazole manufacturing and/or procurement by Defendant in years 2017-current), open to member(s) of confidentiality club and for use only for purpose of the present Suit. 
+14Costs: 
+To be shared equally. 15 
+Confidentiality and misc. 
+a) All documents, information, records or samples sought under these Terms of Reference shall be disclosed under the aegis of a two-tier confidentiality club: 
+
+Tier-I Confidentiality Club comprising: 
+(i) Scientific Advisor 
+(ii) Upto 2 (two) external counsel of each party 
+
+Tier-II Confidentiality Club comprising: 
+(i) Members of Tier-I Confidentiality Club 
+(ii) Upto 2 (two) party representatives of each party in accordance with Rule 19 of the Delhi High Court Intellectual Property Division Rules, 2022. 
+
+b. All persons are subject to confidentiality and to provide appropriate affidavits of confidentiality to be filed in the Suit. 
+
+c. Tier-II Confidentiality Club members can accompany the Scientific Advisor to the Defendant�s premises for the purposes mentioned above 
+
+d. In case members of Tier-I Confidentiality Club are of the view that the confidential information is required to be shared with members of Tier-II Confidentiality Club for the purpose of taking appropriate instructions, it shall be done by written mutual consent and in the absence/refusal of such written mutual consent, the respective party shall be required to move an appropriate application before the Court seeking such permission(s). 
+
+16. From the reading of the aforesaid ToR, it is clear that where the parties specifically wanted the information/documents to be restricted to members of Tier-I of the Confidentiality Club, it was specifically provided. Serial no. 12 (c1) and (c2) of the ToR, in relation to testing protocols, specifically provides that the information pertaining thereto would only be accessible to members of Tier-I of the Confidentiality Club. 
+17. In contrast, serial no. 13 of ToR states that records and documents verified by the Scientific Advisor in a sealed cover shall be open to the members of the Confidentiality Club with a caveat that the confidential information shall be used only for the purposes of the present suit. In the aforesaid clause, there is no limitation or restriction with regard to the aforesaid information/documents being confined to Tier-I members of the Confidentiality Club. 
+18. Mr. Nataraj relies upon 15(d) of the ToR to submit that confidential information of the defendant can be shared with the members of Tier-II only if the members of the Tier-I are of the view that the said information/documents should be shared with Tier-II members and the same shall be done by the written mutual consent. In the event, such mutual consent is not given, the respective party would be required to move an appropriate application before the Court seeking such permission. 
+19. The limitation imposed in serial no. 15(d) of the ToR is only in respect of �confidential information� of the defendant. During the course of the hearing, I inquired from the counsel for the defendant as to what information/documents would constitute �confidential information� of the defendant. 
+20. The counsel replied that the defendant�s �confidential information� would include the entire records and documents that were shared with the Scientific Advisor including the supplier records of the defendant.  
+21. I am of the opinion that in view of what is categorically provided in serial no. 13 of the ToR, members of the Confidentiality Club in Tier-II cannot be denied access to the records and documents as stated therein. It cannot be denied that the aforesaid ToR were jointly provided by the parties/ their respective counsel. If the defendant had any concerns about sharing its records and documents (paper and/or computer records), it should have been specifically provided in the serial no. 13 of the ToR, like it has been provided in serial no. 12. 
+22. Therefore, I am of the view that Tier-II confidentiality member would be entitled to records in serial no. 1 to 8 except the details of the supplier records of the defendant. 
+23. Mr. Adarsh Ramanujan, counsel appearing on behalf of the plaintiffs submits that the only representative of the plaintiffs in the Tier-II of the Confidentiality Club is Dr. Alan Whitton, who was a former employee of the plaintiffs but now works as an independent contractor.
+24. The credentials of the plaintiffs� aforesaid representative comply with the requirements under Rule 11 of High Court of Delhi Rules Governing Patent Suits, 2022. According to the said rule, the nominated representative should be a person who is not in charge of, or active in, the day-to-day business operations and management of the respective parties so as to maintain the integrity of the information so disclosed. The aforesaid rule is set out below:
+�(i) At any stage in a proceeding, the Court may constitute a confidentiality club or adopt such measures as appropriate, consisting of lawyers (external & in-house), experts as also nominated representatives of the parties, for the preservation and exchange of confidential information filed before the Court including documents, as per the Delhi High Court (Original Side) Rules, 2018.
+Such nominated representatives of the parties, appointed to the Club, may inter alia, be persons who are not in charge of, or active in, the day-to-day business operations and management of the respective parties so as to maintain the integrity of the information so disclosed. 
+The members so constituting the Club shall be bound to desist from disclosing, sharing or utilizing, including to third parties, the confidential or sensitive information that they may access, or become privy to, in the course of proceedings; 
+(ii) The Court may, upon a request made by way of an application, direct the redaction of such information (including documents) it deems to be confidential;�
+(Emphasis supplied)
+25. This position has been reiterated by a Coordinate Bench of this Court in the Interdigital Technology Corporation & Ors. v. Guangdong Oppo Mobile Telecommunications Corp. Ltd ., CS(COMM) 692/2021,  wherein the parameters for constitution of the Confidentiality Club have been discussed. The relevant paragraphs are set out below:
+�51. In the context of SEPs such confidentiality clubs should ideally only consist of external counsel and external experts. It obviously should not consist of those persons, who can take advantage of information in deriving benefit for their own employers/entities, whom they represent, during negotiations so as to get a competitive edge. The entire purpose of constituting a confidentiality club would be completely defeated if employees engaged in negotiations with those very parties, whose agreements have been disclosed, are permitted to view those agreements and utilize information to derive competitive advantage in future negotiations, either with the same party or other unconnected parties. It could also result in disclosure of such information consciously or unconsciously to third parties, in the course of negotiations.
+�.                                                �.                                                   �.
+55. As can be seen from the above provisions, they do not contemplate the appointment of in-house employees or lawyers, and the reason is not far to seek. In-house employees, including legal managers and general counsels, are bound by their contracts with their employers, which may dictate specific operational roles within the company. The conditions of service for such employees could effectively be modified or amended by the terms prescribed by the Court when establishing the confidentiality club. Therefore, the usual practice is to exclude any in-house employees. Furthermore, even if in-house lawyers are included, they possess a certain measure of understanding in terms of how Court orders should be implemented. However, such an expectation cannot be held for employees who are directly involved in commercial licensing negotiations for licenses. Thus, in-house employees actively engaged in negotiations ought to ideally be excluded from the constitution of the confidentiality club to maintain the integrity of confidential information and third party information.�
+(Emphasis supplied)
+26. Mr. Alan Whitton is no longer an in-house employee of the plaintiffs and hence, is not contractually bound by the plaintiffs. He is also not involved in the day-day business operations and management of the plaintiffs. Therefore, no prejudice would be caused to the defendant if the aforesaid information is shared with him.  
+27. In compliance with the Chapter VII Rule 17 of the Delhi High Court (Original Side) Rules, 2018, Dr. Alan Whitton has filed an affidavit. The relevant extracts are set out below: 
+�3. I undertake to not to disclose the information/documents to anyone outside the Confidentiality Club and use the aforesaid Confidential Information only for the purposes of my analysis, except for the information/documents available in the public domain.
+4.	By virtue of being a member of Confidentiality Club, I shall keep all the information/documents to which I am privy confidential.
+5. I also agree that my obligation to comply with the above will survive during the present proceedings.�
+(Emphasis supplied)
+28. The aforesaid undertaking adequately addresses the concerns of the defendant with regard to possibility of leakage. Dr. Alan Whitton shall remain strictly bound by the terms of the affidavit filed by it as well as the Chapter VII Rule 17 and Annexure-F of the Delhi High Court (Original Side) Rules, 2018. It is reiterated that the information of which access is given to him shall be used only for the purposes of his analysis in the context of the present suit and this information shall not be shared by him with any employee or official of the plaintiffs.
+29. As regards the objection taken by Mr. Natraj with respect to Section 104 A of the Act, a reference may be made to the order passed by this Court in the present suit on 30th March 2022. The relevant extracts of the said order are set out below: 
+�5. In addition, considering that this is a process patent, since the Plaintiff�s case is that the Defendant's process is infringing and reliance is placed on a technical report, the onus would now be on the Defendant to show that its process is not infringing. Accordingly, the Defendant is also permitted to place on record the process which the Defendant uses, with a copy to the Plaintiff.�
+(Emphasis supplied)
+30. Therefore, I am unable to agree with the submission of the defendant that sharing of such information/documents with Dr. Alan Whitton would violate Section 104 A of the Act. 
+31. Yet another objection has been taken on behalf of the defendant that plaintiffs have failed to explain as to how the sharing of this confidential information with tier-II members would be of use to the plaintiffs. The answer to this is provided in the affidavit filed by Dr. Alan Whitton wherein he has stated that he would use the information/documents for his analysis. Based on Dr. Alan Whitton�s analysis, the plaintiffs would be in a position to make submissions in support of its application for grant of interim injunction.
+32. Consequently, the defendant is directed to supply information/documents pertaining to serial no. 1 to 8 of ToR to the nominated representative of the plaintiffs in Tier-II of the Confidentiality Club. The defendant shall be at liberty to redact the names of the suppliers of the defendant company. 
+33. At the request of Mr. Natraj, two (2) weeks� time is given to the defendant to supply the aforesaid information/ documents. 
+34. The application stands disposed of. 
+
+
+
+AMIT BANSAL, J
+JANUARY 08, 2025
+PB
+                                                                        
+
+CS(COMM) 87/2020		Page 2 of 2
+
+

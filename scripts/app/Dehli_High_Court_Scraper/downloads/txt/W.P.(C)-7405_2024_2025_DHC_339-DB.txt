@@ -1,0 +1,102 @@
+$~35
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%				 	                Date of Decision: 15.01.2025
++ 	W.P.(C) 7405/2024 & CM APPL. 30922/2024
+	ABHINAV JINDAL
+.....Petitioner
+Through:	Dr Kapil Goel, Mr. Sandeep Goel, Advs.
+Versus 
+	ASSISTANT COMMISSIONER OF INCOME TAX CIRCLE 52 1
+.....Respondent
+Through:	Mr. Sanjay Kumar, SSC, Ms. Monica Benjamin, JSC, Ms. Easha Kadian, JSC.
+CORAM:
+HON'BLE THE ACTING CHIEF JUSTICE
+HON'BLE MR. JUSTICE TUSHAR RAO GEDELA
+
+VIBHU BAKHRU, ACJ. 
+1. The petitioner has filed the present petition, inter alia, impugning a notice dated 31.03.2024 issued by respondent no.1/ Assessing Officer (hereafter the AO) under Section 148A(b) of the Income Tax Act, 1961 (hereafter the Act); the order dated 23.04.2024 passed under Section 148A(d) of the Act; notice dated 24.04.2024 issued under Section 148 of the Act in respect of the assessment year (AY) 2016-17. 
+2. It is the petitioner�s case that the impugned notice dated 24.04.2024 issued under Section 148 of the Act has been passed beyond the period of limitation.  
+3. After some arguments, it is apparent that the controversy involved is covered in favour of the petitioner by a decision of this court in Manju Somani v. Income Tax Officer Ward-70(1) & Ors: Neutral Citation: 2024:DHC:5411-DB.
+4. We also consider it apposite to refer to the following passages of the decision of the Supreme Court in Union of India & Ors. v. Rajeev Bansal: 2024 SCC OnLine SC 2693 whereby the said view has been upheld.
+�46. The ingredients of the proviso could be broken down for analysis as follows: (i) no notice under Section 148 of the new regime can be issued at any time for an assessment year beginning on or before 1 April 2021; (ii) if it is barred at the time when the notice is sought to be issued because of the �time limits specified under the provisions of� 149(1)(b) of the old regime. Thus, a notice could be issued under Section 148 of the new regime for assessment year 2021-2022 and before only if the time limit for issuance of such notice continued to exist under Section 149(1)(b) of the old regime. 
+***				 	*** 				*** 
+49. The first proviso to Section 149(1)(b) requires the determination of whether the time limit prescribed under Section 149(1)(b) of the old regime continues to exist for the assessment year 2021-2022 and before. Resultantly, a notice under Section 148 of the new regime cannot be issued if the period of six years from the end of the relevant assessment year has expired at the time of issuance of the notice. This also ensures that the new time limit of ten years prescribed under Section 149(1)(b) of the new regime applies prospectively. For example, for the assessment year 2012-2013, the ten year period would have expired on 31 March 2023, while the six year period expired on 31 March 2019. Without the proviso to Section 149(1)(b) of the new regime, the Revenue could have had the power to reopen assessments for the year 2012-2013 if the escaped assessment amounted to Rupees fifty lakhs or more. The proviso limits the retrospective operation of Section 149(1)(b) to protect the interests of the assesses.� 
+
+5. In the present case the notice under Section 148 of the Act could have been issued for a maximum period of six years from the end of the relevant assessment year. The said period had expired on 31.03.2023. Notwithstanding the same, Mr. Rai, the learned counsel for the Revenue submits that the impugned notices and order should be considered within the specified time as in the earlier round this court had stayed the proceedings. He submits that the benefit of the stay granted by the court in Abhinav Jindal v. Assistant Commissioner of Income Tax Circle 52(1) Delhi, W.P.(C) 1006/2023 is required to be construed in favor of the Revenue.  According to him, the time period during which the said petition was pending before this court is required to be excluded for the purposes of computing limitation. 
+6. We find no merit in the aforesaid contention. The AO, prior to issuing the impugned notice, had issued a notice dated 22.06.2021 under Section 148 of the Act. The said notice was faulted as the same was issued under the statutory regime as existing prior to 01.04.2021. Subsequently the Supreme Court had, in exercise of its power under Article 142 of the Constitution of India directed that the notices issued under Section 148 of the Act under the old regime, but after 01.04.2021, be construed as notices under Section 148A(b) of the Act. The said order passed in Union of India and Ors. v. Ashish Agarwal: (2023) 1 SCC 617, is directed to be applicable PAN India in respect of all such notices irrespective of whether any challenge against the said notices was subsisting at the relevant time. Additionally, the Revenue was also directed to furnish the material to the assessee on which such notices were premised. 
+7. Following the directions issued by the Supreme Court, the AO had supplied the material to the petitioner. After considering the petitioner�s response, the AO passed an order dated 27.07.2022 under Section 148(A)(d) of the Act and issued a notice dated 27.07.2022 under Section 148 of the Act in respect of AY 2016-17. The aforesaid notice dated 27.07.2022 was challenged by the petitioner in W.P.(C) 1006/2023 and by an order dated 27.01.2023, the operation of the said notice was stayed.  
+8. The petitioner�s challenge to the said notice was, inter alia, founded on the basis that it had been issued without the necessary mandatory approvals. The said issue is decided by this court in a batch of matters, including the petition filed by the petitioner [WP(C) 1006/2023], in Twylight Infrastructure Pvt. Ltd. v. Income Tax Officer Ward 25(3) Delhi & Ors.: Neutral Citation No. 2024:DHC:259-DB. The relevant extract of the said decision is set out below:
+�6. A faint argument is made on behalf of the revenue that the approval of the specified authority is not mandatory, which, in our opinion, is in the teeth of the provisions of the Act. In this behalf, the old Section 151 and the amended version of the provision (after Finance Act 2021) are made reference to. 
+6.1. For the sake of convenience, the provisions of Sections 148, 149 and 151, before and after amendment are extracted hereafter:
+Prior to Finance Act 2021 
+�148. (1) Before making the assessment, reassessment or recomputation under section 147, the Assessing Officer shall serve on the assessee a notice requiring him to furnish within such period, as may be specified in the notice, a return of his income or the income of any other person in respect of which he is assessable under this Act during the previous year corresponding to the relevant assessment year, in the prescribed form and verified in the prescribed manner and setting forth such other particulars as may be prescribed; and the provisions of this Act shall, so far as may be, apply accordingly as if such return were a return required to be furnished under section139 : 
+Provided that in a case� 
+(a) where a return has been furnished during the period commencing on the 1st day of October, 1991 and ending on the 30th day of September, 2005 in response to a notice served under this section, and 
+(b) subsequently a notice has been served under sub-section (2) of section 143 after the expiry of twelve months specified in the proviso to sub-section (2) of section 143, as it stood immediately before the amendment of said subsection by the Finance Act, 2002 (20 of 2002) but before the expiry of the time limit for making the assessment, re-assessment or recomputation as specified in sub-section (2) of section 153, every such notice referred to in this clause shall be deemed to be a valid notice: 
+Provided further that in a case�
+(a) where a return has been furnished during the period commencing on the 1st day of October, 1991 and ending on the 30th day of September, 2005, in response to a notice served under this section, and 
+(b) subsequently a notice has been served under clause (ii) of sub-section (2) of section 143 after the expiry of twelve months specified in the proviso to clause (ii) of sub-section (2) of section 143, but before the expiry of the time limit for making the assessment, reassessment or recomputation as specified in sub-section (2) of section 153, every such notice referred to in this clause shall be deemed to be a valid notice�. 
+xxx 			xxx 				xxx
+149. (1) No notice under section 148 shall be issued for the relevant assessment year,� 
+(a) if four years have elapsed from the end of the relevant assessment year, unless the case falls under clause (b) or clause (c); 
+(b) if four years, but not more than six years, have elapsed from the end of the relevant assessment year unless the income chargeable to tax which has escaped assessment amounts to or is likely to amount to one lakh rupees or more for that year; 
+(c) if four years, but not more than sixteen years, have elapsed from the end of the relevant assessment year unless the income in relation to any asset (including financial interest in any entity) located outside India, chargeable to tax, has escaped assessment�.
+xxx 			xxx 				xxx
+151. (1) No notice shall be issued under section 148 by an Assessing Officer, after the expiry of a period of four years from the end of the relevant assessment year, unless the Principal Chief Commissioner or Chief Commissioner or Principal Commissioner or Commissioner is satisfied, on the reasons recorded by the Assessing Officer, that it is a fit case for the issue of such notice. 
+(2) In a case other than a case falling under sub-section (1), no notice shall be issued under section 148 by an Assessing Officer, who is below the rank of Joint Commissioner, unless the Joint Commissioner is satisfied, on the reasons recorded by such Assessing Officer, that it is a fit case for the issue of such notice.
+(3) For the purposes of sub-section (1) and sub-section (2), the Principal Chief Commissioner or the Chief Commissioner or the Principal Commissioner or the Commissioner or the Joint Commissioner, as the case may be, being satisfied on the reasons recorded by the Assessing Officer about fitness of a case for the issue of notice under section 148, need not issue such notice himself.� 
+Post Finance Act 2021 
+�148. Before making the assessment, reassessment or recomputation under section 147, and subject to the provisions of section 148A, the Assessing Officer shall serve on the assessee a notice, along with a copy of the order passed, if required, under clause (d) of section 148A, requiring him to furnish within such period, as may be specified in such notice, a return of his income or the income of any other person in respect of which he is assessable under this Act during the previous year corresponding to the relevant assessment year, in the prescribed form and verified in the prescribed manner and setting forth such other particulars as may be prescribed; and the provisions of this Act shall, so far as may be, apply accordingly as if such return were a return required to be furnished under section 139:
+Provided that no notice under this section shall be issued unless there is information with the Assessing Officer which suggests that the income chargeable to tax has escaped assessment in the case of the assessee for the relevant assessment year and the Assessing Officer has obtained prior approval of the specified authority to issue such notice�
+xxx 			xxx 				xxx
+149. (1) No notice under section 148 shall be issued for the relevant assessment year� 
+(a) if three years have elapsed from the end of the relevant assessment year, unless the case falls under clause (b); 
+(b) if three years, but not more than ten years, have elapsed from the end of the relevant assessment year unless the Assessing Officer has in his possession books of account or other documents or evidence which reveal that the income chargeable to tax, represented in the form of asset, which has escaped assessment amounts to or is likely to amount to fifty lakh rupees or more for that year� 
+xxx 			xxx				xxx
+151. Specified authority for the purposes of section 148 and section 148A shall be,� 
+(i) Principal Commissioner or Principal Director or Commissioner or Director, if three years or less than three years have elapsed from the end of the relevant assessment year; 
+(ii) Principal Chief Commissioner or Principal Director General or where there is no Principal Chief Commissioner or Principal Director General, Chief Commissioner or Director General, if more than three years have elapsed from the end of the relevant assessment year...�
+[Emphasis is ours]
+7. A careful perusal of the above extract would show that after amendment, Section 151 has been split and the part which enjoins that the approval of the specified authority is mandatory stands embedded in the first proviso to Section 148. 
+7.1. The concerned specified authorities, depending on the applicable timeframe, are adverted to in Section 151 of the Act. 
+8. The first proviso to Section 148 and Section 151, when read conjointly, demonstrate the untenability of the submission made on behalf of the revenue.
+ 9. We may also note that in Ganesh Dass Khanna, we were considering the provision of Section 149 of the Act and have taken the view that since the escaped income was less than Rs.50,00,000/-, the time limit as prescribed in Section 149(1)(a) of the Act would apply. 
+10. As indicated above, the specified authority changes depending on the time limit prescribed in Section 151 of the Act. It is on this account that there is linkage between ruling rendered in Ganesh Dass Khanna and the instant matters.
+11. It may also be noted that in Ganesh Dass Khanna, we had recorded the stand of the revenue that the issue concerning limitation and the specified authority are �intertwined�. For convenience, the relevant part of the judgement is extracted hereafter:
+�24. On behalf of the revenue, the following broad submissions were made:�
+ �(viii) Both under the unamended 1961 Act and amended 1961 Act, the issue concerning limitation is inextricably intertwined with two aspects:
+ (a) First, the rank of the authority granting approval/sanction for triggering reassessment proceedings. 
+(b) Second, the quantum of income which has escaped assessment.� 
+[Emphasis is ours]
+12. Clearly, the revenue advanced the argument of interlinkage between limitation and the ascertainment of the specified authority due to the plain language of the amended Section 151 of the Act. Section 151, when read alongside the first proviso to Section 148, brings the aspect of inextricable linkage to the fore. 
+12.1. Clauses (i) and (ii) of Section 151 of the amended Act (which has been extracted hereinabove) clearly specify the authority whose approval can trigger the reassessment proceedings. Thus, if three (3) years or less have elapsed from the end of the relevant AY, the specified authority who would grant approval for initiation of reassessment proceedings will be the Principal Commissioner or Principal Director or Commissioner or Director. However, if more than three (3) years from the end of the relevant AY have elapsed, the specified authority for according approval for reassessment shall be the Principal Chief Commissioner or Principal Director General or, where there is no Principal Chief Commissioner or Principal Director General, Chief Commissioner or Director General. 
+12.2. That the approval is mandatory is plainly evident on perusal of the first proviso appended to Section 148 of the Act. the said proviso, at the risk of repetition, reads as follows: 
+��Provided that no notice under this section shall be issued unless there is information with the Assessing Officer which suggests that the income chargeable to tax has escaped assessment in the case of the assessee for the relevant assessment year and the Assessing Officer has obtained prior approval of the specified authority to issue such notice�.� 
+12.3. In these cases, there is no dispute that although three (3) years had elapsed from of the end of the relevant AY, the approval was sought from authorities specified in clause (i), as against clause (ii) of Section 151. 
+12.4. Before us, the counsel for the revenue continue to hold this position. The only liberty that they seek is that if, based on the judgement in Ganesh Dass Khanna, the impugned orders and notices are set aside, liberty be given to the revenue to commence reassessment proceedings afresh. 
+13. Therefore, having regard to the aforesaid, the impugned notices and orders in each of the above-captioned writ petitions are quashed on the ground that there is no approval of the specified authority, as indicated in Section 151(ii) of the Act. The direction is issued with the caveat that the revenue will have liberty to take steps, if deemed necessary, albeit as per law. 
+14. Needless to add, the rights and contentions of both the sides will remain open, in the event the revenue triggers reassessment proceedings. 
+15. The above-captioned writ petitions are disposed of, in the aforesaid terms. 
+16. Consequently, the pending applications shall stand closed. 
+17. Parties will act based on the digitally signed copy of the order.�
+							[emphasis added]
+
+9. In Twylight Infrastructure Pvt. Ltd. v. Income Tax Officer Ward 25(3) Delhi & Ors. (supra) this court allowed the petition filed by the petitioner being W.P.(C) No. 1006/2023 on 05.01.2024 and set aside the notice dated 26.07.2022.
+10. It is apparent from the above that the notice issued under Section 148 of the Act in the earlier round was set aside on the ground that the AO had not followed the mandatory requirement of seeking an approval from the competent authority.  
+11. Clearly, the fact that the petitioner had succeeded in its challenge to the said notice cannot be a ground for exclusion of the period spent by the assessee in pursuing the said litigation.  The time spent by the petitioner in pursuing the challenge can neither be excluded nor can be claimed as resulting in extension of the period of limitation.  
+12. The Revenue is required to take all necessary steps for initiation of the assessment proceedings within the period of limitation. This would obviously mean proper steps in accordance with law. The fact that the Revenue had not taken the steps in accordance with law cannot possibly be construed as a factor in favour of the Revenue for extending the limitation as stipulated under Section 149 of the Act. Plainly, there was no court order impeding the Revenue from issuing a notice under Section 148 of the Act, in accordance with law.
+13. In view of the above, we reject the contention that the period of limitation as stipulated under Section 149(1) of the Act stood extended by virtue of the proceedings initiated by the orders passed in W.P.(C) 1006/2023. 
+14. In view of the above, the present petition is allowed and the notice dated 31.03.2024 issued by respondent no.1/ AO under Section 148A(b) of the Act; the order dated 23.04.2024 passed under Section 148A(d) of the Act; notice dated 24.04.2024 issued under Section 148 of the Act in respect of the AY 2016-17 are set aside.  
+
+
+
+VIBHU BAKHRU, ACJ
+
+
+TUSHAR RAO GEDELA, J
+JANUARY 15, 2025/nk
+
+
+W.P.(C) No.7405/2024					Page 2 of 2
+
+

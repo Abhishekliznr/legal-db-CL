@@ -1,0 +1,1032 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><title>
+	JUDGEMENTs BY JUDGEMENT DATE
+</title><meta content="Patna High Court" name="Description"><meta name="author" content="Amit Kumar 1"><meta content="judiciary,legal, India, Patna, laws, legal system, national, india, asia, cause list,amit, judgement" name="Keywords"><meta content="Copyright of the content belongs to the High Court of the Judicature at Patna. Copyright of the code belongs Patna High Court. 2013, All the rights reserved." name="Copyrights">
+    <script nonce="" src="../libs/jquery-3.7.1/jquery-3.7.1.min.js" type="text/javascript"></script>
+    <script nonce="" src="../libs/jquery-ui-1.14.1.custom/jquery-ui.min.js" type="text/javascript"></script>
+    <script nonce="" src="../libs/datatable/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script nonce="" src="../libs/datatable/date-dd-MMM-yyyy.js" type="text/javascript"></script>
+
+    <script nonce="" src="../Scripts/ddlevelsmenu.js" type="text/javascript"></script>
+    
+    <script nonce="" src="../Scripts/ThemeSwitcher.js" type="text/javascript"></script>
+
+    <link href="../libs/jquery-ui-1.14.1.custom/jquery-ui.css" rel="stylesheet" type="text/css"><link href="../libs/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"><link href="../libs/datatable/jquery.dataTables.min.css" rel="stylesheet" type="text/css"><link href="../Styles/menu.css?4" rel="stylesheet" type="text/css"><link href="../Styles/TableCSSCode.css" rel="stylesheet" type="text/css"><link href="../styles/tables.css" rel="stylesheet" type="text/css"><link href="../Styles/Site.css?d=1" rel="stylesheet" type="text/css"><link href="../Styles/paging.css?1" rel="stylesheet" type="text/css"><link href="../Styles/Common.css" rel="stylesheet" type="text/css"><link href="../Styles/upgraded/phc.css?3" rel="stylesheet"><link href="../Styles/upgraded/accessibility.css" rel="stylesheet">
+
+    <script nonce="" src="../libs/flatpickr/flatpickr.min.js" type="text/javascript"></script>
+    <script nonce="" src="../libs/flatpickr/PopCalendarCSP_DRP.js" type="text/javascript"></script>
+    <link href="../libs/flatpickr/flatpickr.min.css" rel="stylesheet"><link href="../libs/flatpickr/light.css" rel="stylesheet">
+    
+    <script nonce="" type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var $txt = $("#ctl00_txtSearch");
+
+            $txt.autocomplete({
+
+                minLength: 2,
+                delay: 300,
+
+                source: function (request, response) {
+                    $.ajax({
+                        type: "POST",
+                        url: "../services/search.asmx/GetSuggestion",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: JSON.stringify({ term: request.term }),
+
+                        success: function (res) {
+                            // alert(res);
+                            response($.map(res.d, function (item) {
+                                return {
+                                    label: item.Label,
+                                    url: item.TargetUrl
+                                };
+                            }));
+                        }
+                    });
+                },
+
+                select: function (event, ui) {
+                    event.preventDefault();
+                    if (ui.item.url != null)
+                        window.location.href = ui.item.url;
+                    else
+                        window.location.href = "/search/" + ui.item.label;
+                }
+            });
+        });
+    </script>
+    <script nonce="" type="text/javascript">
+
+        function PlaySound(id) {
+
+            document.getElementById(id).play();
+
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".audio")
+                .forEach(function (el) {
+                    el.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        PlaySound('ctl00_MainContent_captchaaudio');
+                    });
+                });
+        });
+    </script>
+    <script nonce="" type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+
+            document.querySelectorAll(".rbl-bootstrap input[type='radio']")
+                .forEach(rb => {
+                    rb.addEventListener("change", function () {
+
+
+                        const uniqueName = rb.name;   // ASP.NET gives same name to the group
+
+                        __doPostBack(uniqueName, "");
+                    });
+                });
+
+
+
+            document.querySelectorAll(".csp-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+
+                    const target = btn.dataset.event;
+                    const cmd = btn.dataset.cmd || "";
+                    const arg = btn.dataset.arg || "";
+
+                    __doPostBack(target, arg);
+                });
+            });
+
+
+            document.querySelectorAll(".form-select-autopostback").forEach(ddl => {
+                ddl.addEventListener("change", function () {
+                    const uniqueName = ddl.name;   // ASP.NET unique ID/name
+                    __doPostBack(uniqueName, "");
+                });
+            });
+            document.querySelectorAll(".autopostback").forEach(ctl => {
+                ctl.addEventListener("change", function () {
+                    const uniqueName = ctl.name;   // ASP.NET unique ID/name
+                    __doPostBack(uniqueName, "");
+                });
+            });
+
+            document.querySelectorAll(".csp-check input[type='checkbox']").forEach(cb => {
+                cb.addEventListener("change", function () {
+                    __doPostBack(cb.name, "");
+                });
+            });
+
+        });
+
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll("input, textarea").forEach(el => {
+                el.setAttribute("autocomplete", "off");
+                el.setAttribute("autocorrect", "off");
+                el.setAttribute("spellcheck", "false");
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var btn = document.getElementById("ctl00_btnFontLarge");
+
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Enter" && document.activeElement !== btn) {
+                    e.preventDefault();
+                }
+            });
+            var btn = document.getElementById("ctl00_btnFontNormal");
+
+            var buttons = document.querySelectorAll(".SubmitButton");
+
+            if (buttons.length !== 1) {
+
+                document.addEventListener("keydown", function (e) {
+
+                    if (e.key === "Enter") {
+                        var active = document.activeElement;
+
+                        // allow textarea
+                        if (active && active.tagName === "TEXTAREA") return;
+
+                        e.preventDefault();
+                    }
+
+                });
+
+                return;
+            }
+
+            var btn = buttons[0];
+
+            document.querySelectorAll("input[type='text'], input[type='password'], input[type='email']")
+                .forEach(function (input) {
+
+                    input.addEventListener("keydown", function (e) {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            btn.click();
+                        }
+
+                    });
+
+                });
+
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var txt = document.getElementById("ctl00_txtSearch");
+            var btn = document.getElementById("ctl00_btnSearch");
+
+            if (txt && btn) {
+                txt.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        btn.click();
+                    }
+                });
+            }
+
+        });
+    </script>
+    <script nonce="" type="text/javascript"> $(document).ready(function () {changeFontSize(''); }); </script></head>
+<body>
+    <form name="aspnetForm" method="post" action="./date" id="aspnetForm">
+<div>
+<input type="hidden" name="__LASTFOCUS" id="__LASTFOCUS" value="" autocomplete="off" autocorrect="off" spellcheck="false">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" autocomplete="off" autocorrect="off" spellcheck="false">
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" autocomplete="off" autocorrect="off" spellcheck="false">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="Xhcuusl/Yx75sWCPEcZr4lQR5OG9I+yfU8PMXOUWn3Wr/eFjSWSXBdlZnV9ywEKgOGitcLsoSHld+a6qnLXOlBL4sNt4/5aYG0+74MsyGu82J2Ng4o6VVRhWd+1YhfpqOHJpWk7wboR4mbKtHNS590VtWuqkbAwEpk5DBVEU/ZkOZNdD84pDCiTJmE57XwRqqk9IX78KqCRdU7u1tJm6ZyMiOQbnBprXU5nqDhy7r94ZUVk6j3LKZBqzQ3REHUfefv1XO+fGBa8e8s4aPXkdBbpJNAYAj/vaJwG6oWHtUedc52XgbQr0+dCTjuSWFZd3ulvXrz+vZTrvsvdIs2KjafgdFV+V3zLfcplq/JF1dtUuk20tA6EVChz6KkvJrot21HwFiwil9qJwWdw6+QkgodO/upvVl8Gf8w+pehre5vA1QUoZ7cH6qQUXIryHGDaevqqKAFbxomp6HtAkWqdoUb/WoZNpj2aDXzXf04NgK2pKcaYLV89IVo/lISHwRiOQ/+YLoZB8C+RyCJ0qMZ//SbQpdgsS+XvgkPMbJsMB2Gx21mTkbubegSq3CHgfWRSyeT30x5tqgWdHzJNEJpisRiLFZTcNr2iemaEwM532IfObRHx0VshfV4pL4r23+hiNdA6kI0I8tUBGrl1Sw4NqAQ==" autocomplete="off" autocorrect="off" spellcheck="false">
+</div>
+
+<script nonce="" type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['aspnetForm'];
+if (!theForm) {
+    theForm = document.aspnetForm;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script nonce="" src="/WebResource.axd?d=A6YYDgWKIQzwmAMiCWy8sInV_eyx9GQ0XGTcQok5LIh-kOwu52Wk8rVwt8uI15p8z-bor1qJ7eLv-Qh9icHZDmFVHPWp5CtjMi-O2oJZqzU1&amp;t=639198962985262796" type="text/javascript"></script>
+
+
+<script nonce="" src="/WebResource.axd?d=uSX17IXZDMDDRyGz7PtacRXdTbAfTPgjrNErdK2GVx0Kzg-3ftz09vUuXaa2IsMqGcmY9xBkelw6AVcS00aB_wrFH6y4tpTfijX30JrQv901&amp;t=639198962985262796" type="text/javascript"></script>
+        <div class="page">
+            <div class="AccessibilityHeader">
+                <a href="#divMainContent">Skip to main content</a> &nbsp;&nbsp;||&nbsp;&nbsp;
+            <a id="ctl00_HyperLink52" href="../screenreader.aspx">Screen Reader Access</a>
+                &nbsp;&nbsp;||&nbsp; Text Size<input type="submit" name="ctl00$btnFontLarge" value="A+" id="ctl00_btnFontLarge" class="fontSize" formnovalidate="" autocomplete="off" autocorrect="off" spellcheck="false">
+                |              
+                <input type="submit" name="ctl00$btnFontNormal" value="A-" id="ctl00_btnFontNormal" class="fontSize" formnovalidate="" autocomplete="off" autocorrect="off" spellcheck="false">
+                &nbsp;||&nbsp;Select Theme
+            <input type="submit" name="ctl00$btnDark" value="A" id="ctl00_btnDark" class="fontColorDark" formnovalidate="" autocomplete="off" autocorrect="off" spellcheck="false">
+                <input type="submit" name="ctl00$btnNormal" value="A" id="ctl00_btnNormal" class="fontColorNormal" formnovalidate="" autocomplete="off" autocorrect="off" spellcheck="false">
+            </div>
+            <div class="header align-right">
+                <img id="ctl00_Image5" src="/Images/IndianFlag.gif" alt="Flag" class="mt-10px mr-10px">
+            </div>
+            <div class="fixedmenu">
+                <table width="100%" cellspacing="0">
+                    <tbody><tr>
+                        <td align="right" class="clear topscroll1">
+                            <table cellspacing="0" class="TopMenuSP1">
+                                <tbody><tr>
+                                    <td>
+                                        <div id="Div12" class="mattblackmenu1">
+                                            <ul>
+                                                <li>
+                                                    <a id="ctl00_HyperLink1" rel="ddsubmenutop1" href="../">Home</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div id="ddtopmenubar4" class="mattblackmenu">
+                                            <ul>
+                                                <li><a href="#" rel="ddsubmenutop4">About Us</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div id="MenuCalendar" class="mattblackmenu">
+                                            <ul>
+                                                <li>
+                                                    <a id="ctl00_HyperLink5" href="../calendarm">Calendar</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div id="ddtopmenubar1" class="mattblackmenu">
+                                            <ul>
+
+                                                <li>
+                                                    <a id="ctl00_HyperLink34" href="../causelist/home">Cause List</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div id="ddtopmenubar2" class="mattblackmenu">
+                                            <ul>
+                                                <li>
+                                                    <a id="ctl00_HyperLink16" rel="ddsubmenutop1" href="../it_activities">I.T. Activities</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div id="ddtopmenubar3" class="mattblackmenu">
+                                            <ul>
+                                                <li>
+                                                    <a id="ctl00_HyperLinkVirtualCourt" href="../efiling">
+                                                        E-Filing Guide
+                                                   
+                                                    </a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div id="Div9" class="mattblackmenusearch">
+                                            <ul>
+                                                <li class="valign-middle">
+
+                                                    <input name="ctl00$txtSearch" type="text" id="ctl00_txtSearch" class="form-control ui-autocomplete-input" placeholder="Search" autocomplete="off" aria-label="Search Text" autocorrect="off" spellcheck="false">
+                                                    <button id="ctl00_btnSearch" type="button" data-event="ctl00$btnSearch" data-cmd="Search" class="csp-btn img-btn valign-middle"><img src="../Images/search.png" class="w-20px" alt=""></button>
+
+
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody></table>
+                        </td>
+                    </tr>
+                </tbody></table>
+            </div>
+            <div class="pageBody">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    <tbody><tr>
+                        <td valign="top" class="leftPart">
+                            <div>
+
+                                <div id="ctl00_Menu1" class="markermenu">
+                                    <ul>
+
+                                        <li><a href="../judge/MzA3-lHeo2kp7fiM=" rel="ddsubmenuside5">Hon'ble The Acting Chief Justice</a> </li>
+
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Menu2" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink3" rel="ddsubmenuside5" href="../judges/">Hon'ble Judges</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Menu3" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink6" rel="ddsubmenuside5" href="../Judges_esc">Hon'ble Judges Elevated to Supreme Court</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Menu4" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink7" rel="ddsubmenuside5" href="../retired_cj">Former Chief Justices</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuT" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink231" rel="ddsubmenuside5" href="../judges_t">Hon'ble Judges Elevated/ Transferred to Other High Courts</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuFT" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink23" rel="ddsubmenuside5" href="../judges_ft">Former Judges Transferred/ Elevated as Chief Justice</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuRet" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink8" rel="ddsubmenuside5" href="../judges_ret">Retired Judges</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuConst" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink17" rel="ddsubmenuside5" href="../Constitutions_of_benches">Constitutions of Benches/ Roster</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div4" class="markermenu">
+                                    <ul>
+                                        <li>
+
+
+
+                                            <a href="../getpdffile/TElTVF9DT01NSVRURUUucGRm-uhT7RJQTAVs=">List of Hon'ble Committees</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div13" class="markermenu">
+                                    <ul>
+                                        <li>
+
+
+
+                                            <a href="../getpdffile/TElTVF9FTVBBTkVMTEVEX0hPU1BJVEFMUy5wZGY=-li3PGVdq7mI=?-8584148625943286074">Empanelled Hospitals</a>
+
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div11" class="markermenu">
+                                    <ul>
+                                        <li>
+
+
+
+                                            <a href="../Annual_Report">Annual Report
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div17" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink41" class="new-item" href="../republicday">Republic Day 2026
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div3" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink19" href="../judicialorders/hindi">हिंदी में अनुवादित निर्णय/आदेश</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div id="ctl00_Menu7" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink9" rel="ddsubmenuside5" href="../officers_of_registry">Officers of Registry</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ddsidemenubarSJO" class="markermenu">
+                                    <ul>
+                                        <li><a href="#" rel="ddsubmenusideSJO">State Judicial Officers</a></li>
+                                    </ul>
+                                </div>
+                                <div id="ddsidemenubarsleave" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink21" href="../leave/login">Leave Management System for Judicial Officers</a>
+
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Menu8" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink12" rel="ddsubmenuside5" href="../online_display_board" target="_blank">Online Display Board</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div6" class="markermenu">
+                                    <ul>
+                                        <li>
+
+                                            <a id="ctl00_HyperLink22" rel="ddsubmenuside5" href="../hybrid/list" target="_blank">Virtual Hybrid Hearing</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ddsidemenubarejustice" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink10" rel="ddsubmenuside5" href="../jc/ejusticeclock" target="_blank">e-Justice Clock</a>
+
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ddsidemenubaresewa" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink1220" rel="ddsubmenuside5" href="../esewa" target="_blank">e-Sewa Kendra</a>
+
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Menu9" class="markermenu">
+                                    <ul>
+                                        <li>
+
+                                            <a id="ctl00_HyperLink4" rel="ddsubmenuside5" href="../EPASS">
+                                                e-Pass For Advocates
+                                           
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div id="ddsidemenubar3" class="markermenu">
+                                    <ul>
+                                        <li><a href="#" rel="ddsubmenuside3">Right to Information Act</a></li>
+                                    </ul>
+                                </div>
+                                <div id="ddsidemenubarerti" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink20" rel="ddsubmenuside5" href="../erti" target="_blank">RTI Online Portal </a>
+
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ddsidemenubarecc" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink42" class="new-item" rel="ddsubmenuside5" href="../eccopy" target="_blank">ई-सत्यापित प्रतिलिपि</a>
+
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div id="ddsidemenubar2" class="markermenu">
+                                    <ul>
+                                        <li><a href="#" rel="ddsubmenuside2">Downloads</a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div2" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink2" rel="ddsubmenuside5" href="../apk/phc-4.0.apk" target="_blank">Download Latest Mobile APP (Android)</a>
+                                            </li>
+                                    </ul>
+                                </div>
+                                 <div id="ctl00_Div18" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink40" class="new-item" href="../FCSC/" target="_blank">
+                                                Family Court Sensitization Committee Portal
+                                            </a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Divsuvas15" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink38" class="new-item" href="../suvas/" target="_blank">
+                                                Suvas Cell Portal
+                                            </a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div7" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink26" href="../ILR/search/">
+                                                e-ILR (Patna Series)
+                                            </a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div8" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink28" href="../ehcr/">
+                                                e-PHCR
+                                            </a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuECourt" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink25" href="../ecourts_ph3">
+                                                E Courts Project
+                                            </a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Menu12" class="markermenu">
+                                    <ul>
+                                        <li>
+
+                                            <a id="ctl00_HyperLink54" href="../hclsc" target="_blank">Patna High Court Legal Services Committee, Patna</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Menu13" class="markermenu">
+                                    <ul>
+                                        <li>
+
+                                            <a id="ctl00_HyperLink55" rel="ddsubmenuside5" href="../bslsa">Bihar State Legal Services Authority</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div14" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink30" rel="ddsubmenuside5" href="http://bja.bihar.gov.in">Bihar Judicial Academy</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div16" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink35" rel="ddsubmenuside5" href="../jjs">Juvenile Justice Monitoring Committee</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div id="ctl00_Div1" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink18" rel="ddsubmenuside5" href="../POSH">
+                                                Prevention of Sexual Harassment Committee
+                                         
+                                            </a>
+
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuRules" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink11" href="../notices/rules">High Court Rules</a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuRecruitment" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink14" href="../notices/recruitments">
+                                                Recruitments                                
+                                            </a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuTenders" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink13" href="../notices/tenders">
+                                                Tenders
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div5" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink29" href="../ediary_login">
+                                            E-Diary</a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuLibrary" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink377" href="../library">
+                                           Library Catalogue
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuLeave" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink51" href="../leave_details">
+                                                Leave Details
+                                         
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div15" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink39" class="new-item" href="../compensation" target="_blank">
+                                                Compensation Cases Dashboard 
+                                               
+
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuComCourt" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink32" href="../com_court_statistics">
+                                            Statistics Related to Commercial Court, Commercial Division and Commercial Appellate
+                                            Division of the High Courts(Amendment) Ordinance 2018
+                                            </a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuCCR" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink53" href="../case_clearance_rate">
+                                           Case Clearance Rate (C.C.R.)
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuSearch" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink31" href="../notices/search">Search in Notices and Notifications</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_Div10" class="markermenu">
+                                    <ul>
+                                        <li>
+
+
+
+                                            <a href="../getpdffile/U0NIRU1FX0xBV19BU1NJU1RBTlQucGRm-wCBUcgcp5rw=">Scheme for Law Assistants</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuVC" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink33" href="../courts_through_vc">Courts through VC </a></li>
+                                    </ul>
+                                </div>
+                                <div class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink24" href="http://joams.patnahighcourt.gov.in/MPsMLAsReports">M.P./M.L.A. Cases</a></li>
+                                    </ul>
+                                </div>
+                                <div class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink27" href="../login">Login</a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_MenuContactUs" class="markermenu">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink122" href="../contactus">Contact Us</a></li>
+                                    </ul>
+                                </div>
+                                <div id="ctl00_DivMap" class="markermenu-map">
+                                    <ul>
+                                        <li>
+                                            <a id="ctl00_HyperLink50" href="https://ecourts.gov.in/ecourts2.0//?p=dist_court/bihar&amp;app_token=c1f437dc50f1ba8c863200c69367a13b7a3f2e6c1707d86e080e6a2b3fa4191b">
+                                                
+                                                  <img id="ctl00_Image2" src="../Images/bihar.png" alt="Bihar">
+                                            </a>
+                                            <br>
+                                            <span id="ctl00_Label1">Link to District Courts through Map</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td valign="top">
+                            <div id="divMainContent">
+                                
+    <table width="100%" class="CSSTableGeneratorView">
+        <tbody><tr>
+            <td align="left">
+                <table width="100%">
+                    <tbody><tr>
+                        <td class="HeaderCurv">
+                            <center>
+                                <strong>JUDGEMENTs BY JUDGEMENT DATE</strong></center>
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table class="HeaderCurv" width="100%">
+                    <tbody><tr>
+                        <td>
+                            <label for="ctl00_MainContent_txtFrom" id="ctl00_MainContent_Label9">Date</label>
+                        </td>
+
+                        <td>
+                            <input name="ctl00$MainContent$txtFrom" type="text" value="01-Aug-2025" maxlength="12" id="ctl00_MainContent_txtFrom" class="form-control flatpickr-input" required="" placeholder="From" autocomplete="off" autocorrect="off" spellcheck="false">
+                            <span class="popcal-placeholder" data-calendarid="pcFrom" data-controlid="ctl00_MainContent_txtFrom" data-pairwith="ctl00_MainContent_txtTo" data-format="dd-MMM-yyyy"></span>
+                        </td>
+                        <td>
+                            <input name="ctl00$MainContent$txtTo" type="text" value="02-Aug-2025" maxlength="12" id="ctl00_MainContent_txtTo" class="form-control flatpickr-input" required="" placeholder="To" autocomplete="off" autocorrect="off" spellcheck="false">
+                            <span class="popcal-placeholder" data-calendarid="pcTo" data-controlid="ctl00_MainContent_txtTo" data-fromid="ctl00_MainContent_txtFrom" data-format="dd-MMM-yyyy"></span>
+                        </td>
+
+
+
+                    </tr>
+                    <tr>
+                        <td>&nbsp;
+                        </td>
+                        <th align="left" colspan="2">
+                            <label for="ctl00_MainContent_txtCaptcha" id="ctl00_MainContent_Label4">Enter code as shown in picture</label>
+
+                        </th>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="2">
+                            <table class="captcha">
+                                <tbody><tr>
+                                    <td>
+                                        <img class="HeaderCurv" src="/captcha" alt="Captcha">
+
+                                    </td>
+                                    <td>
+                                        <input name="ctl00$MainContent$txtCaptcha" type="text" value="6t7" maxlength="3" id="ctl00_MainContent_txtCaptcha" class="form-control" required="" autocomplete="off" autocorrect="off" spellcheck="false">
+
+                                    </td>
+                                    <td>
+                                        <img class="audio" src="../images/audio.png" alt="Play CAPTCHA Audio">
+                                        <audio src="/captcha/audio/MDIx-CO8reEzN--am1--pI=" id="ctl00_MainContent_captchaaudio" type="audio/wav" preload="none">
+                                            Audio not supported.</audio>
+
+                                    </td>
+                                    <td>
+                                        <input type="submit" name="ctl00$MainContent$btnSeach" value="Show" id="ctl00_MainContent_btnSeach" class="ui-button" autocomplete="off" autocorrect="off" spellcheck="false"></td>
+                                </tr>
+                            </tbody></table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="3">
+                            <span id="ctl00_MainContent_lblMsg" class="text-red">You have entered wrong code, pls. try with different code...</span>
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td class="CSSTableGeneratorViewGrid">
+            
+                    <div>
+
+</div>
+               
+            </td>
+        </tr>
+    </tbody></table>
+
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <center>
+                                <div class="footer">
+                                    This Application is developed and managed by Programmers Team, Hon'ble Patna High
+                                Court. Email : <strong>hcpat-bih[at]nic.in</strong>
+                                    <br>
+                                    <b>Copyright © Patna High Court 2013. All rights reserved. </b>
+                                </div>
+                            </center>
+                        </td>
+                    </tr>
+                </tbody></table>
+            </div>
+        </div>
+         <input type="button" name="ctl00$Button1" value="" onclick="javascript:__doPostBack('ctl00$Button1','')" id="ctl00_Button1" class="d-none" autocomplete="off" autocorrect="off" spellcheck="false">
+    
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="0BB3D640" autocomplete="off" autocorrect="off" spellcheck="false">
+	<input type="hidden" name="__SCROLLPOSITIONX" id="__SCROLLPOSITIONX" value="0" autocomplete="off" autocorrect="off" spellcheck="false">
+	<input type="hidden" name="__SCROLLPOSITIONY" id="__SCROLLPOSITIONY" value="0" autocomplete="off" autocorrect="off" spellcheck="false">
+	<input type="hidden" name="__VIEWSTATEENCRYPTED" id="__VIEWSTATEENCRYPTED" value="" autocomplete="off" autocorrect="off" spellcheck="false">
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/hq6kE1OcYpkbml6OY3KhTIULxQT2ik8UlaCNGp6sMShSzL9ywUEk3K2B01+B4u8fsBKY+TNGVXucV9YUQ6Tmjut4IiDxyEnxs+RytARqh1G0gaiA8/EzubGkEHJWdJrX1Wybt4Wktzdk5HPRlAcrTnEyKUzB09bs8NVE1W4VY/qLCQbGuqFxJjJmZaoVSdE2Mp/PJXvEaBj+JaSvuF1UxAxs0r55E6OYXFjGD0PH9AFhyzHD+3I6UVQjIArL/MsP3IfUNfjFuqUtNecNV5rlvYy3aTE8s5GfphOQApbDaanh4cZf8LeKIjbWmHQDNW/yj1Kzoncuo/0O0lkwSPDiNlpm9xAHbr5BrWPr1JCNvLSKZ3vQj2LmIOOeS/zPMR7uxQz0wQEL1ONogN2MgHmcQ==" autocomplete="off" autocorrect="off" spellcheck="false">
+</div>
+
+<script nonce="" type="text/javascript">
+//<![CDATA[
+
+theForm.oldSubmit = theForm.submit;
+theForm.submit = WebForm_SaveScrollPositionSubmit;
+
+theForm.oldOnSubmit = theForm.onsubmit;
+theForm.onsubmit = WebForm_SaveScrollPositionOnSubmit;
+
+theForm.oldOnLoad = window.onload;
+window.onload = WebForm_RestoreScrollPosition;
+WebForm_AutoFocus('ctl00_MainContent_txtCaptcha');//]]>
+</script>
+</form>
+    <script nonce="" type="text/javascript">
+        ddlevelsmenu.setup("ddsidemenubar2", "sidebar")
+        ddlevelsmenu.setup("ddsidemenubar3", "sidebar")
+        ddlevelsmenu.setup("ddsidemenubarSJO", "sidebar")
+        ddlevelsmenu.setup("ddtopmenubar4", "topbar")
+    </script>
+
+    
+    
+    
+
+    
+
+    <div id="dialog" class="dialog">
+    </div>
+   
+
+
+<div class="flatpickr-calendar animate" tabindex="-1"><div class="flatpickr-months"><span class="flatpickr-prev-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z"></path></svg></span><div class="flatpickr-month"><div class="flatpickr-current-month"><select class="flatpickr-monthDropdown-months" aria-label="Month" tabindex="-1"><option class="flatpickr-monthDropdown-month" value="0" tabindex="-1">January</option><option class="flatpickr-monthDropdown-month" value="1" tabindex="-1">February</option><option class="flatpickr-monthDropdown-month" value="2" tabindex="-1">March</option><option class="flatpickr-monthDropdown-month" value="3" tabindex="-1">April</option><option class="flatpickr-monthDropdown-month" value="4" tabindex="-1">May</option><option class="flatpickr-monthDropdown-month" value="5" tabindex="-1">June</option><option class="flatpickr-monthDropdown-month" value="6" tabindex="-1">July</option><option class="flatpickr-monthDropdown-month" value="7" tabindex="-1">August</option><option class="flatpickr-monthDropdown-month" value="8" tabindex="-1">September</option><option class="flatpickr-monthDropdown-month" value="9" tabindex="-1">October</option><option class="flatpickr-monthDropdown-month" value="10" tabindex="-1">November</option><option class="flatpickr-monthDropdown-month" value="11" tabindex="-1">December</option></select><div class="numInputWrapper"><input class="numInput cur-year" type="number" tabindex="-1" aria-label="Year" autocomplete="off" autocorrect="off" spellcheck="false"><span class="arrowUp"></span><span class="arrowDown"></span></div></div></div><span class="flatpickr-next-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z"></path></svg></span></div><div class="flatpickr-innerContainer"><div class="flatpickr-rContainer"><div class="flatpickr-weekdays"><div class="flatpickr-weekdaycontainer">
+      <span class="flatpickr-weekday">
+        Sun</span><span class="flatpickr-weekday">Mon</span><span class="flatpickr-weekday">Tue</span><span class="flatpickr-weekday">Wed</span><span class="flatpickr-weekday">Thu</span><span class="flatpickr-weekday">Fri</span><span class="flatpickr-weekday">Sat
+      </span>
+      </div></div><div class="flatpickr-days" tabindex="-1"><div class="dayContainer"><span class="flatpickr-day prevMonthDay" aria-label="July 27, 2025" tabindex="-1">27</span><span class="flatpickr-day prevMonthDay" aria-label="July 28, 2025" tabindex="-1">28</span><span class="flatpickr-day prevMonthDay" aria-label="July 29, 2025" tabindex="-1">29</span><span class="flatpickr-day prevMonthDay" aria-label="July 30, 2025" tabindex="-1">30</span><span class="flatpickr-day prevMonthDay" aria-label="July 31, 2025" tabindex="-1">31</span><span class="flatpickr-day selected" aria-label="August 1, 2025" tabindex="-1">1</span><span class="flatpickr-day" aria-label="August 2, 2025" tabindex="-1">2</span><span class="flatpickr-day" aria-label="August 3, 2025" tabindex="-1">3</span><span class="flatpickr-day" aria-label="August 4, 2025" tabindex="-1">4</span><span class="flatpickr-day" aria-label="August 5, 2025" tabindex="-1">5</span><span class="flatpickr-day" aria-label="August 6, 2025" tabindex="-1">6</span><span class="flatpickr-day" aria-label="August 7, 2025" tabindex="-1">7</span><span class="flatpickr-day" aria-label="August 8, 2025" tabindex="-1">8</span><span class="flatpickr-day" aria-label="August 9, 2025" tabindex="-1">9</span><span class="flatpickr-day" aria-label="August 10, 2025" tabindex="-1">10</span><span class="flatpickr-day" aria-label="August 11, 2025" tabindex="-1">11</span><span class="flatpickr-day" aria-label="August 12, 2025" tabindex="-1">12</span><span class="flatpickr-day" aria-label="August 13, 2025" tabindex="-1">13</span><span class="flatpickr-day" aria-label="August 14, 2025" tabindex="-1">14</span><span class="flatpickr-day" aria-label="August 15, 2025" tabindex="-1">15</span><span class="flatpickr-day" aria-label="August 16, 2025" tabindex="-1">16</span><span class="flatpickr-day" aria-label="August 17, 2025" tabindex="-1">17</span><span class="flatpickr-day" aria-label="August 18, 2025" tabindex="-1">18</span><span class="flatpickr-day" aria-label="August 19, 2025" tabindex="-1">19</span><span class="flatpickr-day" aria-label="August 20, 2025" tabindex="-1">20</span><span class="flatpickr-day" aria-label="August 21, 2025" tabindex="-1">21</span><span class="flatpickr-day" aria-label="August 22, 2025" tabindex="-1">22</span><span class="flatpickr-day" aria-label="August 23, 2025" tabindex="-1">23</span><span class="flatpickr-day" aria-label="August 24, 2025" tabindex="-1">24</span><span class="flatpickr-day" aria-label="August 25, 2025" tabindex="-1">25</span><span class="flatpickr-day" aria-label="August 26, 2025" tabindex="-1">26</span><span class="flatpickr-day" aria-label="August 27, 2025" tabindex="-1">27</span><span class="flatpickr-day" aria-label="August 28, 2025" tabindex="-1">28</span><span class="flatpickr-day" aria-label="August 29, 2025" tabindex="-1">29</span><span class="flatpickr-day" aria-label="August 30, 2025" tabindex="-1">30</span><span class="flatpickr-day" aria-label="August 31, 2025" tabindex="-1">31</span><span class="flatpickr-day nextMonthDay" aria-label="September 1, 2025" tabindex="-1">1</span><span class="flatpickr-day nextMonthDay" aria-label="September 2, 2025" tabindex="-1">2</span><span class="flatpickr-day nextMonthDay" aria-label="September 3, 2025" tabindex="-1">3</span><span class="flatpickr-day nextMonthDay" aria-label="September 4, 2025" tabindex="-1">4</span><span class="flatpickr-day nextMonthDay" aria-label="September 5, 2025" tabindex="-1">5</span><span class="flatpickr-day nextMonthDay" aria-label="September 6, 2025" tabindex="-1">6</span></div></div></div></div></div><div class="flatpickr-calendar animate" tabindex="-1"><div class="flatpickr-months"><span class="flatpickr-prev-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z"></path></svg></span><div class="flatpickr-month"><div class="flatpickr-current-month"><select class="flatpickr-monthDropdown-months" aria-label="Month" tabindex="-1"><option class="flatpickr-monthDropdown-month" value="0" tabindex="-1">January</option><option class="flatpickr-monthDropdown-month" value="1" tabindex="-1">February</option><option class="flatpickr-monthDropdown-month" value="2" tabindex="-1">March</option><option class="flatpickr-monthDropdown-month" value="3" tabindex="-1">April</option><option class="flatpickr-monthDropdown-month" value="4" tabindex="-1">May</option><option class="flatpickr-monthDropdown-month" value="5" tabindex="-1">June</option><option class="flatpickr-monthDropdown-month" value="6" tabindex="-1">July</option><option class="flatpickr-monthDropdown-month" value="7" tabindex="-1">August</option><option class="flatpickr-monthDropdown-month" value="8" tabindex="-1">September</option><option class="flatpickr-monthDropdown-month" value="9" tabindex="-1">October</option><option class="flatpickr-monthDropdown-month" value="10" tabindex="-1">November</option><option class="flatpickr-monthDropdown-month" value="11" tabindex="-1">December</option></select><div class="numInputWrapper"><input class="numInput cur-year" type="number" tabindex="-1" aria-label="Year" autocomplete="off" autocorrect="off" spellcheck="false"><span class="arrowUp"></span><span class="arrowDown"></span></div></div></div><span class="flatpickr-next-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z"></path></svg></span></div><div class="flatpickr-innerContainer"><div class="flatpickr-rContainer"><div class="flatpickr-weekdays"><div class="flatpickr-weekdaycontainer">
+      <span class="flatpickr-weekday">
+        Sun</span><span class="flatpickr-weekday">Mon</span><span class="flatpickr-weekday">Tue</span><span class="flatpickr-weekday">Wed</span><span class="flatpickr-weekday">Thu</span><span class="flatpickr-weekday">Fri</span><span class="flatpickr-weekday">Sat
+      </span>
+      </div></div><div class="flatpickr-days" tabindex="-1"><div class="dayContainer"><span class="flatpickr-day prevMonthDay" aria-label="July 27, 2025" tabindex="-1">27</span><span class="flatpickr-day prevMonthDay" aria-label="July 28, 2025" tabindex="-1">28</span><span class="flatpickr-day prevMonthDay" aria-label="July 29, 2025" tabindex="-1">29</span><span class="flatpickr-day prevMonthDay" aria-label="July 30, 2025" tabindex="-1">30</span><span class="flatpickr-day prevMonthDay" aria-label="July 31, 2025" tabindex="-1">31</span><span class="flatpickr-day" aria-label="August 1, 2025" tabindex="-1">1</span><span class="flatpickr-day selected" aria-label="August 2, 2025" tabindex="-1">2</span><span class="flatpickr-day" aria-label="August 3, 2025" tabindex="-1">3</span><span class="flatpickr-day" aria-label="August 4, 2025" tabindex="-1">4</span><span class="flatpickr-day" aria-label="August 5, 2025" tabindex="-1">5</span><span class="flatpickr-day" aria-label="August 6, 2025" tabindex="-1">6</span><span class="flatpickr-day" aria-label="August 7, 2025" tabindex="-1">7</span><span class="flatpickr-day" aria-label="August 8, 2025" tabindex="-1">8</span><span class="flatpickr-day" aria-label="August 9, 2025" tabindex="-1">9</span><span class="flatpickr-day" aria-label="August 10, 2025" tabindex="-1">10</span><span class="flatpickr-day" aria-label="August 11, 2025" tabindex="-1">11</span><span class="flatpickr-day" aria-label="August 12, 2025" tabindex="-1">12</span><span class="flatpickr-day" aria-label="August 13, 2025" tabindex="-1">13</span><span class="flatpickr-day" aria-label="August 14, 2025" tabindex="-1">14</span><span class="flatpickr-day" aria-label="August 15, 2025" tabindex="-1">15</span><span class="flatpickr-day" aria-label="August 16, 2025" tabindex="-1">16</span><span class="flatpickr-day" aria-label="August 17, 2025" tabindex="-1">17</span><span class="flatpickr-day" aria-label="August 18, 2025" tabindex="-1">18</span><span class="flatpickr-day" aria-label="August 19, 2025" tabindex="-1">19</span><span class="flatpickr-day" aria-label="August 20, 2025" tabindex="-1">20</span><span class="flatpickr-day" aria-label="August 21, 2025" tabindex="-1">21</span><span class="flatpickr-day" aria-label="August 22, 2025" tabindex="-1">22</span><span class="flatpickr-day" aria-label="August 23, 2025" tabindex="-1">23</span><span class="flatpickr-day" aria-label="August 24, 2025" tabindex="-1">24</span><span class="flatpickr-day" aria-label="August 25, 2025" tabindex="-1">25</span><span class="flatpickr-day" aria-label="August 26, 2025" tabindex="-1">26</span><span class="flatpickr-day" aria-label="August 27, 2025" tabindex="-1">27</span><span class="flatpickr-day" aria-label="August 28, 2025" tabindex="-1">28</span><span class="flatpickr-day" aria-label="August 29, 2025" tabindex="-1">29</span><span class="flatpickr-day" aria-label="August 30, 2025" tabindex="-1">30</span><span class="flatpickr-day" aria-label="August 31, 2025" tabindex="-1">31</span><span class="flatpickr-day nextMonthDay" aria-label="September 1, 2025" tabindex="-1">1</span><span class="flatpickr-day nextMonthDay" aria-label="September 2, 2025" tabindex="-1">2</span><span class="flatpickr-day nextMonthDay" aria-label="September 3, 2025" tabindex="-1">3</span><span class="flatpickr-day nextMonthDay" aria-label="September 4, 2025" tabindex="-1">4</span><span class="flatpickr-day nextMonthDay" aria-label="September 5, 2025" tabindex="-1">5</span><span class="flatpickr-day nextMonthDay" aria-label="September 6, 2025" tabindex="-1">6</span></div></div></div></div></div><ul id="ui-id-1" tabindex="0" class="ui-menu ui-widget ui-widget-content ui-autocomplete ui-front" style="display: none;"></ul><div role="status" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></div><iframe class="ddiframeshim" src="/blank.htm" frameborder="0"></iframe><iframe class="ddiframeshim" src="/blank.htm" frameborder="0"></iframe><div class="ddsubmenustyle" style="z-index: 2000; left: 0px; top: 0px; visibility: hidden;"><ul id="ddsubmenuside2" style="visibility: hidden;">
+        <li>
+
+            <a href="../getpdffile/TGlzdENyU3lub3BzaXMucGRm-TCrDdg6AbTw=">Criminal Appeal Synopsis Form</a>
+            <a href="../court_rules/cv/">Civil Court Rules (Volume-II) Forms</a>
+            <a href="../court_rules/cr/">Criminal Court Rules (Volume-II) Forms</a>
+
+        </li>
+
+    </ul></div><div class="ddsubmenustyle" style="z-index: 2000; left: 0px; top: 0px; visibility: hidden;"><ul id="ddsubmenuside3" style="visibility: hidden;">
+        <li>
+
+            <a href="../viewpdf/UlRJLVBIQy5wZGY=-Ve29jvLpyFU=">Patna High Court (Right to Information)
+            Rules, 2005</a>
+        </li>
+        <li>
+
+            <a href="../viewpdf/cnRpXzIwMDkucGRm-iCwA2MzFNV0=">Patna High Court RTI Rules, 2005 (Ist ammendment)
+            Rules, 2008</a>
+
+        </li>
+        <li>
+
+
+            <a href="../viewpdf/cnRpXzIwMTYucGRm-isxej0iXl4U=">Patna High Court RTI Rules, 2005 (2nd ammendment)
+            Rules, 2011</a>
+        </li>
+        <li>
+
+
+            <a href="../viewpdf/UElPQVBJTy5wZGY=-ONVvMOWaC74=">Appelate Authority - PIO / APIO</a>
+        </li>
+        <li>
+
+            <a href="../viewpdf/R1ozMC5wZGY=-TUX1ipdfmBY=">Gazette Notification No.30 dated 23/7/2014</a>
+        </li>
+        <li>
+
+            <a href="../viewpdf/R1o0NzUucGRm-wDeRghMJwPE=">Gazette Notification No.475 dated 3/6/2014</a>
+        </li>
+        <li>
+
+            <a href="../viewpdf/VVBMT0FERUQvMjcwOC5QREY=-rrGOonRFdCg=">Patna High Court (RTI) 3rd Amendment Rules, 2018.</a>
+        </li>
+        <li>
+
+            <a href="../rti_disclosure">Disclosure under Section 4</a>
+        </li>
+    </ul></div><div class="ddsubmenustyle" style="z-index: 2000; left: 0px; top: 0px; visibility: hidden;"><ul id="ddsubmenusideSJO" style="visibility: hidden;">
+        <li>
+            <a href="../officers/district_and_sessions_judges">Principal District and Sessions Judges</a>
+        </li>
+        <li>
+            <a href="../officers/addtional_district_and_sessions_judges">District and Additional Sessions Judges</a>
+        </li>
+        <li>
+            <a href="../officers/ad_hoc_adj">Ad-hoc ADJ (FTC)</a>
+        </li>
+        <li>
+            <a href="../officers/sub_judge_cum_cjm_cum_asj">Civil Judge (Sr. Div.)-Cum-Chief Judicial Magistrate</a>
+        </li>
+        <li>
+            <a href="../officers/civil_judge_sr_division">Civil Judge Sr. Division</a>
+        </li>
+        <li>
+            <a href="../officers/civil_judge_jr_division">Civil Judge Jr. Division</a>
+        </li>
+        <li>
+            <a href="../officers/sdjm">Sub Divisional Judicial Magistrate</a>
+        </li>
+        <li>
+            <a href="../officers/judicial_officer_deputation">Judicial Officers on Deputation</a>
+        </li>
+        <li>
+            <a href="../officers_judgeship_wise">Judicial Officers - Judgeship wise</a>
+        </li>
+        <li>
+            <a href="../officers/railway_magistrate">Railway Magistrate</a>
+        </li>
+        <li>
+            <a id="ctl00_HyperLink36" href="../notices/transfer_and_postings/">Court Notifications</a></li>
+        <li><a href="http://joams.patnahighcourt.gov.in" target="_blank">Judicial Officers Activities
+            Monitoring System </a></li>
+        <li>
+            <a id="ctl00_HyperLink37" href="../login">District Court Infrastructure</a></li>
+        <li>
+            <a id="ctl00_HyperLink49" href="../officers_search">Search</a>
+        </li>
+        <li>
+            <a href="../officers/all">All Officers</a>
+        </li>
+    </ul></div><div class="ddsubmenustyle" style="z-index: 2000; left: 0px; top: 0px; visibility: hidden;"><ul id="ddsubmenutop4" style="visibility: hidden;">
+        <li class="ddsubmenu w-350px">
+            <table>
+                <tbody><tr>
+                    <th>About Patna High Court
+                    </th>
+                </tr>
+                <tr>
+                    <td align="justify">The Judiciary is a distinct and independent arm of Government entrusted with judicial
+                        authority, and mandated to administer and deliver justice to the people of India.
+                        It plays a fundamental role in the promotion of law and order, human rights, social
+                        justice, morality and good governance.
+                        <br>
+                        <br>
+                        The independence of the Judiciary is guaranteed by the constitution in a number
+                        of its provisions regarding among others, the appointment, removal, salary and other
+                        conditions of service of judicial officers. The core of the Judiciary's independence
+                        is the absence of any interference for the Executive or the Legislature in judicial
+                        decisions.
+                        <br>
+                        <br>
+                        The mandate of the Judiciary is to establish and facilitate effective and efficient
+                        machinery capable of functioning as an adjudicating authority in India and of quickly
+                        administering and delivering justice and related services to the people of India.
+                        The key function of the Judiciary is therefore, the adjudication of civil and criminal
+                        cases. In addition, it interprets the constitution and gives effect to its provisions,
+                        as well as providing the expertise in interpreting of the laws. Further, the Judiciary
+                        performs other related duties in promotion of human rights, social justice and morality.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <a id="ctl00_HyperLink15" href="../AboutUs">more...</a>
+                    </td>
+                </tr>
+            </tbody></table>
+        </li>
+    </ul></div></body></html>

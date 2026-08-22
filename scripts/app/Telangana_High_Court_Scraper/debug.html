@@ -1,0 +1,218 @@
+<!DOCTYPE html><html lang="en"><head>
+  <title>EHCR</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="google-site-verification" content="WpUdbmLjgR0-xQUXmQsH7pd8AQy3HNeYwXlc_T6GBtE"> 
+  
+<meta charset="UTF-8">
+
+	<link href="jdg/css/bootstrap.min.css" rel="stylesheet">  
+	<link href="jdg/fontawesome/css/all.min.css" rel="stylesheet">
+	<link href="jdg/css/select2.min.css" rel="stylesheet">
+	<script type="text/javascript" src="jdg/js/jquery.slim.min.js"></script>
+	<script type="text/javascript" src="jdg/js/popper.min.js"></script>
+	<script type="text/javascript" src="jdg/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="jdg/js/jquery.min.js"></script>
+	<script type="text/javascript" src="jdg/js/select2.min.js"></script>
+
+<style>
+  body {
+	  /* background-image: url("img/background.jpg");
+	  background-repeat: no-repeat; 
+	  background-size: cover; */
+	}
+    .shadow-lg{
+    }
+	.btn-submit{
+	  color: #ffffff;
+	  background-color: #ca585e;
+	  border-color: #ca585e;
+	}
+	.btn-submit:hover{
+	  color: #FFFFFF;
+	  background-color: #8e373c;
+	  border-color: #8e373c;
+	}
+	.btn-custom {
+	  align-items: center;
+	  background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+	  border: 0;
+	  border-radius: 8px;
+	  box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+	  box-sizing: border-box;
+	  color: #FFFFFF;
+	  display: flex;
+	  font-family: Phantomsans, sans-serif;
+	  font-size: 20px;
+	  justify-content: center;
+	  line-height: 1em;
+	  max-width: 100%;
+	  min-width: 140px;
+	  padding: 3px;
+	  text-decoration: none;
+	  user-select: none;
+	  -webkit-user-select: none;
+	  touch-action: manipulation;
+	  white-space: nowrap;
+	  cursor: pointer;
+	}
+	
+	.btn-custom:active,
+	.btn-custom:hover {
+	  outline: 0;
+	}
+	
+	.btn-custom span {
+	  background-color: rgb(5, 6, 45);
+	  padding: 16px 24px;
+	  border-radius: 6px;
+	  width: 100%;
+	  height: 100%;
+	  transition: 300ms;
+	}
+	
+	.btn-custom:hover span {
+	  background: none;
+	}
+	
+	@media (min-width: 768px) {
+	  .btn-custom {
+	    font-size: 24px;
+	    min-width: 196px;
+	  }
+	}
+</style><style>
+	    .select2-container {
+	  display: block !important;
+	  height: calc(1.5em + .75rem + 2px) !important;
+	  padding: .375rem .75rem !important;
+	  font-size: 1rem !important;
+	  font-weight: 400 !important;
+	  line-height: 1.5 !important;
+	  color: #495057 !important;
+	  background-color: #fff !important;
+	  background-clip: padding-box !important;
+	  border: 1px solid #ced4da !important;
+	  border-radius: .25rem !important;
+	  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out !important;
+	  }
+	  .select2-container--default .select2-selection--single {
+	  border: 0 !important
+	}
+	.footer-bottom {
+		  background-color: #0c0c0c;
+		  color: #ffffff;
+		  padding: 25px 0;
+		}
+		.copyRights .copyRightsLogos {
+			padding: 0; 
+		}
+		.copyRights .copyRightsLogos li { display: inline-block; position: relative; padding: 0; }
+		.copyRights .copyRightsLogos li a { display: inline-block; padding: 7px 10px; position: relative; }
+		.copyRights .copyRightsLogos li a:after { background-color: #3f3f3f; width: 1px; height: 60px; right: -2px; top: 0; position: absolute; content: ""; }
+		.copyRights .copyRightsLogos li:last-child a:after { content: none; }
+		.copyRights .copyRightsLogos li:after { content: ""; display: none; }
+</style></head>
+  
+  
+
+
+<body>
+<header>
+        <a href="#">
+            <img src="img/eHCR.png" alt="Logo" class="logo" width="100%">
+        </a>
+	</header>
+<div class="row mt-3" id="formContainer" style="text-align: center;padding-top: 25px;">
+    <div class="col-md-6" style="float: none;margin: auto">
+      <div class="alert alert-danger">
+	    <span>Invalid captcha</span>
+	  </div>
+      <form id="form4" action="/ehcr/orderdate" method="post"><input type="hidden" name="_csrf" value="pZFbTlh7uGo2Nx1B9p-rP7FVyBiBFF_ZgT43VHoCbhf1-oOGk6Zsd2BI3VwbB3t5z7KfXYBl5Xq5LDz0uQdTMU82WyOQwrq2">
+        <div class="container-fluid">
+          <div class="row align-items-center justify-content-center h-100">
+            <div class="col-md-10 shadow-lg rounded px-4 py-5">
+              <h3>ORDERS - DATE WISE SEARCH</h3>
+      
+              <div class="row mb-3">
+                <label for="fromDate" class="col-md-4 col-form-label">FROM DATE</label>
+                <div class="col-md-3">
+                  <input type="date" class="form-control" id="fromDate" placeholder="Select date" name="fromdt" value="">
+                </div>
+      
+                <label for="toDate" class="col-md-2 col-form-label text-nowrap">TO DATE</label>
+                <div class="col-md-3">
+                  <input type="date" class="form-control" id="toDate" placeholder="Select date" name="todt" value="">
+                </div>
+              </div>      		  
+              <div class="row mb-3">
+                <label for="orderStatus" class="col-md-4 col-form-label">STATUS</label>
+                <div class="col-md-8">
+                  <select class="form-control" id="orderStatus" name="status">
+                    <option value="">Select Status</option>
+                    <option value="Y">LR(Reportable Judgements)</option>
+                    <option value="N">NLR(Non-Reportable Judgements)</option>
+                    <option value="B">BOTH</option>
+                  </select>
+                </div>
+              </div>
+      		  <div class="row mb-3">
+                <label class="col-md-4 col-form-label">CAPTCHA</label>
+                <div class="col-md-8">
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="captcha" placeholder="Enter Captcha" maxlength="6" min="6" aria-label="Captcha" name="captcha" value="">
+                    <span class="input-group-text" id="captchaRefresh"><i class="fas fa-redo"></i></span>
+                  </div>
+                  <small id="captchaHelp" class="form-text ">Click the refresh icon to generate a new CAPTCHA.</small>
+                </div>
+              </div>
+              <img src="/ehcr/generateCaptcha" alt="Captcha" data-form="4"><br><br>
+              <button type="submit" class="btn"><img alt="submit" src="img/Submit.png" width="170px"></button>
+              <button type="button" class="btn" id="backButton"><img alt="back" src="img/Back.png" width="170px"></button>
+            </div>
+          </div>
+        </div>
+      </form>
+	</div>
+</div>
+<hr style="height:12px;border-width:0;color:gray;background-color:gray;margin-top:50px;margin-bottom: 0">
+	<footer style="background:black !important; color: white;text-align: center;">
+		<div class="footer-content justify-content-center">
+		  <div class="footer-text">
+		    <p style="font-weight: bold;font-size: 13px;">© Copyright NIC 2025. All Rights Reserved. Content owned, updated and maintained by the High Court for the State of Telangana.<br>
+		    <a href="https://tg.nic.in" title="National Informatics Centre" onclick="return confirm('You are being redirected to an external website. Please note that High Court of Telangana cannot be held responsible for external websites content &amp; privacy policies.');" target="_blank" rel="noopener noreferrer">
+		    <img src="/ehcr/img/nic_logo.png" alt="NIC Logo" height="40px"></a>  Platform is designed, developed and hosted by <a href="https://tg.nic.in" title="National Informatics Centre" onclick="return confirm('You are being redirected to an external website. Please note that High Court of Telangana cannot be held responsible for external websites content &amp; privacy policies.');" target="_blank" rel="noopener noreferrer"> National Informatics Centre</a>, MeitY, Government of India.    <a href="https://tshc.gov.in" title="High Court for the State of Telangana" target="_blank" rel="noopener noreferrer"><img src="/ehcr/img/hc_logo.jpg" alt="HCTS Logo" height="40px"></a></p>
+		  </div>
+		</div>
+	</footer>
+<script>
+	$(document).ready(function() {
+	    $('#judgeSelect').select2();
+	});
+    $(document).ready(function() {
+      // Update label text based on radio button selection
+      $('input[type="radio"][name="partyType"]').change(function() {
+        const selectedValue = $(this).val();
+        const labelText = selectedValue.toUpperCase() + ' TEXT';
+        $('#partyNameLabel').text(labelText);
+      });
+    });
+  </script>
+  <script>
+  $(document).ready(function() {
+      document.getElementById('captchaRefresh').addEventListener("click", function() {
+	  	var timestamp = new Date().getTime();
+	  	document.querySelector("img[alt='Captcha']").src = "/ehcr/generateCaptcha?t=" + timestamp;
+	  	document.getElementById("captcha").value = "";
+      });
+  	});
+     
+  </script>
+  <script>
+        document.getElementById("backButton").addEventListener("click", function() {
+            // Go back to the previous page in the browser history
+            window.location="/ehcr/";
+        });
+  </script>
+
+</body></html>
