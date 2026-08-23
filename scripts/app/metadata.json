@@ -1,0 +1,1187 @@
+[
+    {
+        "cnr": "",
+        "neutral_citation": "2026:DHC:6142-DB",
+        "case_number": {
+            "display": "LPA 578/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 578,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "29.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": "AMBAY PROPERTIES",
+                "role": "APPELLANT",
+                "party_type": "COMPANY"
+            },
+            {
+                "name": "SANJEEV PRASAD & ORS.",
+                "role": "RESPONDENT",
+                "party_type": "INDIVIDUAL"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Om Prakash Gupta",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            }
+        ],
+        "provisions": [
+            {
+                "act_name": "Constitution of India",
+                "section": "21"
+            }
+        ],
+        "constitutional_articles": [
+            "226"
+        ],
+        "outcome": {
+            "disposal_nature": "DISPOSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {},
+        "catchwords": [
+            "cheque"
+        ],
+        "subject_matter": [
+            "CONSUMER"
+        ],
+        "content": {
+            "paragraph_count": 187,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "Heard the learned counsel for the appellant. This is an application moved on behalf of the appellant seeking condonation of 79 days\u2019 delay in re-filing the appeal. Having heard the learned counsel for the appellant, the prayer made in the application is allowed. The delay of 79 days in re-filing the appeal is"
+        },
+        "confidence_score": 90.0,
+        "missing_fields": [
+            "cnr"
+        ],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-578_2026 2026_DHC_6142-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:49.818245"
+        }
+    },
+    {
+        "cnr": "DLHC010312042026",
+        "neutral_citation": "2026:DHC:6127-DB",
+        "case_number": {
+            "display": "LPA 536/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 536,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "28.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": ", CM APPL. 45347/2026 & CM APPL. 45350/2026 BANK OF BARODA",
+                "role": "APPELLANT",
+                "party_type": "BANK"
+            },
+            {
+                "name": "NEENA MITTAL & ORS.",
+                "role": "RESPONDENT",
+                "party_type": "INDIVIDUAL"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Sougat Sinha",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "R. Gayathri Manasa",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Navneet Kumar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Vishal Majumdar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Maitrayee Shrivastva",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Talib Khan",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [
+            {
+                "act_name": "2 Act",
+                "section": "1"
+            }
+        ],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISPOSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {},
+        "catchwords": [
+            "bank",
+            "fir",
+            "company",
+            "fraud"
+        ],
+        "subject_matter": [
+            "BANKING"
+        ],
+        "content": {
+            "paragraph_count": 180,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "LPA 536/2026, CM APPL. 45347/2026 & CM APPL. 45350/2026 Exemption allowed, subject to all just exceptions. This is an Application filed on behalf of the Appellant seeking condonation of delay of 69 days in filing the present Appeal. Having heard learned Counsel for the Parties and perused the"
+        },
+        "confidence_score": 100.0,
+        "missing_fields": [],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-536_2026 2026_DHC_6127-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:49.913880"
+        }
+    },
+    {
+        "cnr": "DLHC010312002026",
+        "neutral_citation": "2026:DHC:6128-DB",
+        "case_number": {
+            "display": "LPA 535/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 535,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "28.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": ", CM APPL. 45293/2026 & CM APPL. 45296/2026 BANK OF BARODA",
+                "role": "APPELLANT",
+                "party_type": "BANK"
+            },
+            {
+                "name": "ASHISH MITTAL & ORS.",
+                "role": "RESPONDENT",
+                "party_type": "INDIVIDUAL"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Sougat Sinha",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "R. Gayathri Manasa",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Navneet Kumar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Vishal Majumdar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Maitrayee Shrivastva",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Talib Khan",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISPOSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {},
+        "catchwords": [
+            "bank",
+            "fir",
+            "company",
+            "fraud"
+        ],
+        "subject_matter": [
+            "BANKING"
+        ],
+        "content": {
+            "paragraph_count": 176,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "LPA 535/2026, CM APPL. 45293/2026 & CM APPL. 45296/2026 Exemption allowed, subject to all just exceptions. This is an Application filed on behalf of the Appellant seeking condonation of delay of 26 days in filing the present Appeal. Having heard learned Counsel for the Parties and perused the"
+        },
+        "confidence_score": 90.0,
+        "missing_fields": [
+            "provisions"
+        ],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-535_2026 2026_DHC_6128-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:50.004674"
+        }
+    },
+    {
+        "cnr": "DLHC010334982026",
+        "neutral_citation": "2026:DHC:6125-DB",
+        "case_number": {
+            "display": "LPA 571/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 571,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "28.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": "& CM APPL. 48106/2026 SH. DEVENDER KUMAR",
+                "role": "APPELLANT",
+                "party_type": "INDIVIDUAL"
+            },
+            {
+                "name": "BANK OF BARODA & ORS.",
+                "role": "RESPONDENT",
+                "party_type": "BANK"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Aditi Gupta",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "(DHCLSC) Mr. Amandeep Joshi",
+                "title": "",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Lavanya Bhardwaj",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Akashdeep",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Praveena Gautam",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Rohan Bansla",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Tissy Annie Thomas",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Pawan Shukla",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISPOSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {
+            "date": "06.01.2026"
+        },
+        "catchwords": [
+            "service",
+            "bank",
+            "custody"
+        ],
+        "subject_matter": [
+            "BANKING",
+            "SERVICE"
+        ],
+        "content": {
+            "paragraph_count": 253,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "The present application has been filed on behalf of the Appellant seeking condonation of delay of 118 days in filing the present Appeal. For the reasons stated in the Application, the same stands allowed and the delay of 118 days in filing the present Appeal stands condoned. Accordingly, the Application stands disposed of."
+        },
+        "confidence_score": 90.0,
+        "missing_fields": [
+            "provisions"
+        ],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-571_2026 2026_DHC_6125-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:50.110025"
+        }
+    },
+    {
+        "cnr": "DLHC010312032026",
+        "neutral_citation": "2026:DHC:6126-DB",
+        "case_number": {
+            "display": "LPA 534/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 534,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "28.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": ", CM APPL. 45283/2026 & CM APPL. 45286/2026 BANK OF BARODA",
+                "role": "APPELLANT",
+                "party_type": "BANK"
+            },
+            {
+                "name": "VINEET GUPTA & ORS.",
+                "role": "RESPONDENT",
+                "party_type": "INDIVIDUAL"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Sougat Sinha",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "R. Gayathri Manasa",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Navneet Kumar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Vishal Majumdar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Maitrayee Shrivastva",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Amit Tiwari",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Ayushi Srivastava",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Arpan Narwal",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Kushagra Malik",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Ujjwal Tyagi",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [
+            {
+                "act_name": "2 Act",
+                "section": "1"
+            }
+        ],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISPOSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {
+            "date": "10.02.2026"
+        },
+        "catchwords": [
+            "company",
+            "bank",
+            "fir",
+            "loan",
+            "fraud"
+        ],
+        "subject_matter": [
+            "BANKING",
+            "CORPORATE"
+        ],
+        "content": {
+            "paragraph_count": 207,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "LPA 534/2026, CM APPL. 45283/2026 & CM APPL. 45286/2026 Exemption allowed, subject to all just exceptions. This is an Application filed on behalf of the Appellant seeking condonation of delay of 84 days in filing the present Appeal. Having heard learned Counsel for the Parties and perused the"
+        },
+        "confidence_score": 100.0,
+        "missing_fields": [],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-534_2026 2026_DHC_6126-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:50.214906"
+        }
+    },
+    {
+        "cnr": "",
+        "neutral_citation": "2026:DHC:6054-DB",
+        "case_number": {
+            "display": "LPA 217/2023",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 217,
+            "year": 2023
+        },
+        "dates": {
+            "pronounced_on": "23.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": "& CM APPL. 15577/2023 STATE BANK OF INDIA AND ORS",
+                "role": "APPELLANT",
+                "party_type": "BANK"
+            },
+            {
+                "name": "SURESH PURI",
+                "role": "RESPONDENT",
+                "party_type": "INDIVIDUAL"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Rajiv Kapur",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Akshit Kapur",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Riya Sood",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Madhavi Khare",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Apoorva Bhumesh",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISMISSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {
+            "date": "05.01.2023"
+        },
+        "catchwords": [
+            "loan",
+            "bank",
+            "npa",
+            "education",
+            "service"
+        ],
+        "subject_matter": [
+            "BANKING"
+        ],
+        "content": {
+            "paragraph_count": 507,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "The present Letters Patent Appeal assails the Judgment dated 05.01.2023 (\u201cImpugned Judgment\u201d) passed by the learned Single Judge in W.P. (C)12042/2018 (\u201cWrit Petition\u201d) filed by the Respondent. The Factual matrix leading to the filing of the present Appeal is as The Respondent joined the State Bank of Travancore in 1981."
+        },
+        "confidence_score": 80.0,
+        "missing_fields": [
+            "cnr",
+            "provisions"
+        ],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-217_2023 2026_DHC_6054-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:50.356533"
+        }
+    },
+    {
+        "cnr": "",
+        "neutral_citation": "2026:DHC:5968-DB",
+        "case_number": {
+            "display": "LPA 556/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 556,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "23.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": ", CM Nos.46744/2026 & 46745/2026 MAMATA SAMAJDAR",
+                "role": "APPELLANT",
+                "party_type": "INDIVIDUAL"
+            },
+            {
+                "name": "HOLY CROSS SCHOOL & ORS.",
+                "role": "RESPONDENT",
+                "party_type": "INDIVIDUAL"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Manu Beri",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Rauvek Raheja",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Nikhilesh Kumar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [
+            {
+                "act_name": "Dse Act",
+                "section": "15"
+            },
+            {
+                "act_name": "To Execute A Written Contract",
+                "section": "1"
+            },
+            {
+                "act_name": "To Execute A Written Contract",
+                "section": "2"
+            },
+            {
+                "act_name": "Dse Act Contemplates Execution Of Such A Contract",
+                "section": "15"
+            }
+        ],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISMISSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {
+            "date": "08.10.2025"
+        },
+        "catchwords": [
+            "service",
+            "contract",
+            "education",
+            "employment"
+        ],
+        "subject_matter": [
+            "SERVICE"
+        ],
+        "content": {
+            "paragraph_count": 297,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "(\u201cImpugned Order\u201d) passed in W.P.(C) 1356/2026 (\u201cWrit Petition\u201d), whereby the learned Single Judge dismissed the Writ Petition filed by the Judgment\u201d) passed by the Delhi School Tribunal (\u201cTribunal\u201d) in the appeal preferred by the Appellant under Section 15(3)(e)(iii) of the Delhi School Education Act, 1973 (\u201cDSE Act\u201d) read with the Delhi School"
+        },
+        "confidence_score": 90.0,
+        "missing_fields": [
+            "cnr"
+        ],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-556_2026 2026_DHC_5968-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:50.535163"
+        }
+    },
+    {
+        "cnr": "",
+        "neutral_citation": "2026:DHC:5904-DB",
+        "case_number": {
+            "display": "LPA 548/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 548,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "22.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": "& CM APPL. 46189/2026 THE HINDUSTAN TIMES LIMITED",
+                "role": "APPELLANT",
+                "party_type": "COMPANY"
+            },
+            {
+                "name": "RAJESHWAR PRASAD SINGH",
+                "role": "RESPONDENT",
+                "party_type": "INDIVIDUAL"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "N.B. Joshi",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Rajat Arora",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Niraj Kumar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Sourabh Mahla",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Shrey Chathly",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [
+            {
+                "act_name": "General Statute",
+                "section": "17"
+            }
+        ],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISPOSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {},
+        "catchwords": [
+            "employment",
+            "service",
+            "bank"
+        ],
+        "subject_matter": [
+            "SERVICE"
+        ],
+        "content": {
+            "paragraph_count": 289,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "This is an application seeking condonation of 14 days\u2019 delay in filing Having heard the learned counsel for the parties and perused the averments made in the application seeking condonation of delay, the prayer made therein is allowed and the delay of 14 days in filing the appeal is LPA 548/2026 & CM APPL. 46189/2026 (for stay)"
+        },
+        "confidence_score": 90.0,
+        "missing_fields": [
+            "cnr"
+        ],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-548_2026 2026_DHC_5904-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:50.674369"
+        }
+    },
+    {
+        "cnr": "",
+        "neutral_citation": "2026:DHC:5820-DB",
+        "case_number": {
+            "display": "LPA 550/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 550,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "22.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": "BHAVNA GULATI & ANR.",
+                "role": "APPELLANT",
+                "party_type": "INDIVIDUAL"
+            },
+            {
+                "name": "GOVERNMENT OF NCT OF DELHI & ANR.",
+                "role": "RESPONDENT",
+                "party_type": "GOVERNMENT"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Arjeet Gaur",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Jasbir Balhara",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Prince Sharma",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Shashi Pratap Singh",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Shagun Sabharwal",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Anamika Tyagi",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Laqshiya Saluja",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISPOSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {},
+        "catchwords": [
+            "custody",
+            "property"
+        ],
+        "subject_matter": [
+            "FAMILY"
+        ],
+        "content": {
+            "paragraph_count": 228,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "Exemption is allowed, subject to all just exceptions. Heard the learned Counsel for the Parties. For the reasons disclosed in the Application seeking condonation of delay and having heard the learned Counsel for the Parties, the delay of 106 days in filing the Appeal is hereby condoned."
+        },
+        "confidence_score": 80.0,
+        "missing_fields": [
+            "cnr",
+            "provisions"
+        ],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-550_2026 2026_DHC_5820-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:50.827895"
+        }
+    },
+    {
+        "cnr": "",
+        "neutral_citation": "2026:DHC:5969-DB",
+        "case_number": {
+            "display": "LPA 546/2026",
+            "type_code": "LPA",
+            "type_name": "Letters Patent Appeal",
+            "number": 546,
+            "year": 2026
+        },
+        "dates": {
+            "pronounced_on": "22.07.2026"
+        },
+        "court": {
+            "court_id": "DHC",
+            "name": "High Court of Delhi",
+            "type": "HIGH_COURT",
+            "state": "DL",
+            "bench_seat": "New Delhi"
+        },
+        "bench": {
+            "strength": 2,
+            "judges": [
+                {
+                    "judge_id": "devendra_kumar_upadhyaya",
+                    "name": "Devendra Kumar Upadhyaya",
+                    "role": "PRESIDING"
+                },
+                {
+                    "judge_id": "tejas_karia",
+                    "name": "Tejas Karia",
+                    "role": "COMPANION"
+                }
+            ]
+        },
+        "parties": [
+            {
+                "name": "& CM APPLs. 46124-29/2026 BANK OF BARODA",
+                "role": "APPELLANT",
+                "party_type": "BANK"
+            },
+            {
+                "name": "UNION OF INDIA & ORS.",
+                "role": "RESPONDENT",
+                "party_type": "GOVERNMENT"
+            }
+        ],
+        "advocates": [
+            {
+                "name": "Kush Sharma",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Niharika Talwan",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "APPELLANT"
+            },
+            {
+                "name": "Rajesh Kumar",
+                "title": "Mr.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "SPP",
+                "title": "",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            },
+            {
+                "name": "Mishika Pandita",
+                "title": "Ms.",
+                "designation": "Advocate",
+                "for_party_role": "RESPONDENT"
+            }
+        ],
+        "provisions": [
+            {
+                "act_name": "Indian Penal Code",
+                "section": "420"
+            }
+        ],
+        "constitutional_articles": [],
+        "outcome": {
+            "disposal_nature": "DISMISSED"
+        },
+        "reporter_citations": [],
+        "impugned_order": {
+            "date": "18.11.2025"
+        },
+        "catchwords": [
+            "fir",
+            "bank",
+            "company"
+        ],
+        "subject_matter": [
+            "BANKING",
+            "CRIMINAL"
+        ],
+        "content": {
+            "paragraph_count": 219,
+            "language": "en",
+            "is_scanned": false,
+            "summary": "The present intra court Appeal has been filed by the Appellant assailing the Judgment dated 18.11.2025 (\u201cImpugned Judgment\u201d) passed by the learned Single Judge in W.P.(C) No. 17293/2024 (\u201cWrit Petition\u201d). The Writ Petition was instituted by Respondent No. 5 seeking the \u201c(a) Issue a writ of certiorari or any other appropriate writ or"
+        },
+        "confidence_score": 90.0,
+        "missing_fields": [
+            "cnr"
+        ],
+        "source": {
+            "pdf_path": "sitting-judges-wise\\pdf\\CHIEF JUSTICE DEVENDRA KUMAR UPADHYAYA\\LPA-546_2026 2026_DHC_5969-DB.pdf",
+            "parsed_at": "2026-08-11T10:52:50.934565"
+        }
+    }
+]

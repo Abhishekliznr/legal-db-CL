@@ -1,0 +1,60 @@
+$~15
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+
+Date of decision: 16.01.2025
+
++ 	CRL.A. 271/2020
+	STATE (GNCTD)						.....Appellant
+				Through:	Mr. Ashneet Singh, APP for the State.
+	SI Arvind Verma, PS Gokulpuri.
+				versus
+
+	RINKU @ CHOLAN					.....Respondent
+Through:	Mr. Harsha Prabhakar, Adv. DHCLSC, Mr. Dhruv Chaudhary, Mr. Adeeb Ahmad and Ms. Eshita Pallavi, Advs. 
+	CORAM:
+	HON'BLE MR. JUSTICE JASMEET SINGH
+				
+
+JASMEET SINGH, J (ORAL)
+
+
+1. This is an appeal seeking setting aside/quashing part of the judgment and order dated 11.07.2018 passed by District and Sessions Judge in FIR 658/2014, PS Gokulpuri, Delhi whereby the respondent has been acquitted under section 397of IPC.
+2. The facts are that on 02.07.2014 at about 1:30 pm near Mother Diary, Main Market, Gokulpuri, Delhi, the respondent Rinku alias Cholan had caused grievous hurt to Vardan/victim by causing fracture on his left forearm while committing robbery from him of his mobile phone and keys of his scooty. It is further the case that while committing the said robbery, the respondent/accused brandished a pistol and gave a blow to the victim by the pistol butt.
+3. Charges were framed against the accused on 21.08.2015 for offences punishable under section 394/397 IPC. 
+4. The respondent pleaded not guilty and claimed trial. The prosecution examined 11 witnesses. The respondent recorded his statement under section 313 of CrPC on 29.05.2018. In his defense, no witnesses were examined by the respondent. 
+5. The learned Sessions Court convicted the appellant under section 394 IPC and sentenced the respondent/accused for 5 years rigorous imprisonment. However, the respondent was acquitted for charges under section 397 IPC.
+6. The learned Session Court while acquitting the appellant for charges under section 397 of IPC was pleased to hold (in paragraph 30) as under:-  
+�30 At the same time, the prosecution has failed to recover the pistol which the accused had allegedly used while committing the crime. Therefore, it is not established beyond reasonable doubt that accused Rinku @ Cholan had used the pistol while committing the robbery. But the accused must have used some object with the help of which he had caused fracture injury on the left hand of PW1 Vardan before fleeing away with the stolen property. Having said that, the prosecution has also failed to trace out the mobile phone and nothing has been talked about the key of the scooty. Despite the fact that the said articles were not got recovered at the instance of the accused, still it does not absolve the accused from the point of view of committing robbery from PW1 Vardan and in the process injuring him as well. The non recovery of weapon of offence and other articles do not in itself weaken the case of the prosecution in any manner whatsoever. The statement of PW1 and others are clear, cogent and trustworthy. The case of the prosecution also finds support from the statement of PW6 Dr. P. Ram, DMS, GTB Hospital, Delhi, who has proved the injuries caused on the person of PW1 to be grievous in nature.�
+
+7. I have heard learned counsels for the parties.
+8. Section 397 of IPC reads as under:-
+�397. Robbery or dacoity, with attempt to cause death or grievous hurt.�If, at the time of committing robbery or dacoity, the offender uses any deadly weapon, or causes grievous hurt to any person, or attempts to cause death or grievous hurt to any person, the imprisonment with which such offender shall be punished shall not be less than seven years.�
+9. The Hon�ble Supreme Court in Ashfaq v. State (Govt. of NCT of Delhi), (2004) 3 SCC 116 has explained the scope of applicability of section 397 IPC. The operative portion reads as under:-
+�7.�So far as the contention urged as to the applicability of Section 397 IPC and the alleged lack of proof of the necessary ingredients therefor is concerned, it proceeds, in our view, upon a misconception that unless the deadly weapon has been actually used to inflict any injury in the commission of the offence as such, the essential ingredient to attract the said provision could not be held to have been proved and substantiated. We are of the view that the said claim on behalf of the appellants proceeds upon too narrow a construction of the provision and meaning of the word �uses� found in Section 397 IPC. As a matter of fact, this Court had occasion to deal with the question in the decision reported in�Phool Kumar�v.�Delhi Admn.�[(1975) 1 SCC 797 : 1975 SCC (Cri) 336 : AIR 1975 SC 905] and it was observed as follows : (SCC p. 800, para 6)
+�6. Section 398 uses the expression �armed with any deadly weapon� and the minimum punishment provided therein is also seven years if at the time of attempting to commit robbery the offender is armed with any deadly weapon. This has created an anomaly. It is unreasonable to think that if the offender who merely attempted to commit robbery but did not succeed in committing it attracts the minimum punishment of seven years under Section 398 if he is merely armed with any deadly weapon, while an offender so armed will not incur the liability of the minimum punishment under Section 397 if he succeeded in committing the robbery. But then, what was the purport behind the use of the different words by the legislature in the two sections viz. �uses� in Section 397 and �is armed� in Section 398. In our judgment the anomaly is resolved if the two terms are given the identical meaning. There seems to be a reasonable explanation for the use of the two different expressions in the sections. When the offence of robbery is committed by an offender being armed with a deadly weapon which was within the vision of the victim so as to be capable of creating a terror in his mind, the offender must be deemed to have used that deadly weapon in the commission of the robbery. On the other hand, if an offender was armed with a deadly weapon at the time of attempting to commit a robbery, then the weapon was not put to any fruitful use because it would have been of use only when the offender succeeded in committing the robbery.�
+8.�Thus, what is essential to satisfy the word �uses� for the purposes of Section 397 IPC is the robbery being committed by an offender who was armed with a deadly weapon which was within the vision of the victim so as to be capable of creating a terror in the mind of the victim and not that it should be further shown to have been actually used for cutting, stabbing, shooting, as the case may be.�
+10. In view of the above, the rigors of section 397 will be attracted even in the circumstance when the deadly weapon was not used but the same was within the vision of the victim. 
+11. In the present case, the victim has suffered grievous injuries as per the MLC. As per the statement of PW-1, i.e. Vardan, the respondent committed robbery on gunpoint and thereafter used the butt of the pistol to injure him. The said testimony of the victim has been consistent and therefore relied upon by the learned Sessions Judge to establish the guilt of the respondent.
+12. The Co-ordinate Bench of this court in Murlidhar v. State, 2018 SCC OnLine Del 9401 has held that non-recovery of a weapon is not material for the conviction of an accused under section 397 of IPC. The operative portion reads as under:-
+�27.�This court is of the opinion that the decision of the Supreme Court in�Ashfaq�is clear and categorical that recovery of the weapon is not a necessary ingredient for a conviction under Section�397�IPC. The �Use� of the same to threaten is sufficient. The Accused in the present case clearly�USED�the knife. The same was within the vision of both the victims as per their testimony. They were terrorised and threatened due to the use of the same. They were made to part with valuables, some of which were even recovered from the house of the accused. This Court is inclined to follow the binding precedents of the Supreme Court in�Phool Kumar�and�Ashfaq, as also followed by Ld. Single Judges of this Court in�Seetal�and�Imran�to hold that recovery of the weapon is not needed for a conviction under Section�397�IPC.�
+								(Emphasis Supplied)
+
+13.  In view of the above, section 397 of IPC will be attracted in the present case when no recovery of weapon has been effectuated but grievous injury has been inflicted upon the victim/PW1.  
+14. Additionally, it is not the case where the respondent has challenged the order of conviction under section 394 of IPC to allege that a) he was not present, b) he did not brandish the pistol or use its butt and (c) that no grievous hurt was caused to the petitioner. No suggestions with that regard been given to PW-1. 
+15. For the said reasons, the part of the judgment acquitting the respondent of charges under section 397 is set aside and the accused is convicted of offence under section 397 of IPC and sentenced for Rigorous Imprisonment of 7 years. 
+16. The matter is directed to be listed before the Sessions Court for compliance of the order passed today and for undergoing remaining sentence, if any. 
+17. The sentences under section 392 IPC and section 397 shall run concurrently. 
+18. The appeal is disposed of in the abovesaid terms. 
+
+
+
+
+JASMEET SINGH, J
+JANUARY 16, 2025/NG
+(Corrected and released on 24.01.2025)
+
+
+
+CRL.A. 271/2020								  	             Page 6 of 6
+
+

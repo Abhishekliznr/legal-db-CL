@@ -1,0 +1,101 @@
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+Reserved on:  08th January, 2025
+Pronounced on: 14th January, 2025
++ 	BAIL APPLN. 2796/2024
+	MOHD. SIRAJUDEEN @ M. MOHAMED SIRAJUDEEN
+.....Petitioner
+Through:	Mr. Aravindh S., Ms. Gulshan Jahan, Mr. Murshlin Ansari and Mr. M.L. Yadav, Advocates.
+				versus
+
+	STATE (EOW SOUTH-EAST) GOVT. OF NCT OF DELHI
+.....Respondent
+				Through:	Mr. Amit Ahlawat, APP.
+						SI Gaurav, P.S. EOW.
+						Mr.  Karmveer, Adv. for complainant.
+
+	CORAM:
+	HON'BLE MR. JUSTICE SANJEEV NARULA
+				JUDGMENT
+
+SANJEEV NARULA, J.:
+
+1.	The present bail application has been filed seeking regular bail in FIR No. 0185/2017 dated 24th May, 2017, registered at P.S. Okhla Industrial Area (subsequently transferred to PS-EOW, South�East) under Sections 420/406/467/468/120-B/34 of the Indian Penal Code, 1860. 
+Factual Background
+2.	The case of the Prosecution, leading to the filing of the FIR, is summarised as follows:
+2.1	The Complainant, Intex Technologies (India) Ltd., entered into an agreement dated 18th November, 2016 with Accused No. 1, TSN Ecotech International Pvt. Ltd.,1 for the appointment of distributors to supply mobile phones and other electronic goods for online business. At the time of execution of this agreement, Mr. T.N. Mohamed Sirajdheen (Accused No. 2), Mr. Vignesh Asaithambi (Accused No. 3), and Mr. Shanmugaraj Muralisundaram (Accused No. 4) were directors of the Accused Company.
+2.2	The Complainant entered into the aforesaid agreement following the assurances given by Accused Nos. 6 and 7, who vouched for the reputation and financial credibility of Accused Nos. 1 to 4. Additionally, Accused Nos. 2 to 4 showcased their websites and claimed ownership of multiple plants and companies at various locations.
+2.3	To secure the supply of goods, Accused Nos. 2 to 4 furnished six Bank Guarantees2 totalling to INR 3 crores, purportedly signed and authenticated by Accused No.5, Pradip Kumar Sinha, the Chief Manager at SBI. Relying on these representations, as well as the BGs, the Complainant supplied products on credit terms. 
+2.4	Despite receiving goods between November 2016 and January 2017, Accused No. 1 failed to clear outstanding dues of approximately INR 3.06 crores as of 30th January 2017.
+2.5	When Accused Nos. 1 to 4 refused to settle the outstanding balance, and the Complainant invoked the BGs, SBI denied their authenticity, asserting they were forged. 
+2.6	This prompted the Complainant to file a complaint leading to registration of the impugned FIR following directions issued by the Metropolitan Magistrate, South-East, Saket Courts, under Section 156(3) of the Code of Criminal Procedure, 1908.3 The Applicant herein was not named as an Accused in the FIR. 
+3.	Subsequently, chargesheet dated 10th June, 2024 has been filed in relation to the aforementioned FIR, outlining the role of the Applicant, M. Mohamed Sirajudeen, as follows:
+(a)	The original distributor agreement was executed between the Complainant and the Accused Company on 18th November, 2016, and online distributor agreement was executed on 23rd December, 2016. 
+(b)	The Applicant was appointed as the Managing Director and authorized signatory of the Accused Company by Accused No. 2 on 01st September, 2016 on account of the illness of Accused No. 2. 
+(c)	The six SBI BGs furnished by the Accused Company to the Complainant, under the supervision of the Applicant, were found to be forged, as they were never issued by SBI Bank. 
+(d)	Payments to the Complainant were made through the ICICI Bank during the period when the Applicant was operating the Accused Company and its bank accounts. Further, the signatures of Accused No. 3 were forged and other fraudulent documents were used in the payment transactions.
+(e)	The Applicant sent an email dated 10th March, 2017 to the Complainant regarding the acceptance of the repayment amount, after the BGs were found to be forged. The said email also indicated the dispatch of the post-dated cheques in favour of the Complainant, which were later dishonoured. 
+(f)	On 09th March, 2017, the Applicant made a request to add his mobile number to the bank account of the Accused Company, while removing the previously registered mobile number. He also requested to add his email address to the said account. 
+Applicant�s Case
+4.	In light of the foregoing background, Counsel for the Applicant makes the following submissions:
+4.1	The Applicant was served a notice under Section 41A of the CrPC on 6th October, 2023, nearly six years after the registration of the FIR. On 14th January, 2024, the Investigating Officer4 visited the Applicant�s residence to obtain his signature, but did not provide a copy of the notice. Subsequently, on 14th March, 2024, the Applicant was arrested from his residence on allegations of non-cooperation with the investigation. He has been in custody since 15th March, 2024.
+4.2	The Applicant is innocent and had no role in the execution of the original distributorship agreement, between the Complainant and the Accused Company. He was just serving as an employee of the Accused Company, and was obliged to follow the instructions of Accused No. 2, the Managing Director. The Applicant has been falsely implicated by the other directors of the Accused Company, who fabricated a false Board Resolution. Furthermore, the Applicant�s name does not appear in the records of the Registrar of Companies,5 proving that he was falsely implicated by the directors of the Accused Company.
+4.3	The Applicant did not operate the bank account of the Accused Company in his capacity as the Managing Director. Furthermore, he had no involvement in the furnishing of the BGs to the Complainant. The alleged BGs were, in fact, furnished by Accused Nos. 2 to 5.
+4.4	The Applicant did not make any request to add his mobile number to the bank account of the Accused Company, as alleged in the chargesheet. The purported request, dated 9th March, 2017, is irrelevant to the timeline of events since the Accused Company�s business transactions with the Complainant occurred between 18th November, 2016, and 15th January, 2017. Thus, the alleged request has no bearing on the period in question and does not substantiate the allegations against him.
+Respondents� Case
+5.	Per contra, the APP for the State and counsel for the Complainant strongly oppose the bail application relying on the facts narrated in the chargesheet, and advance the following submissions:
+5.1	The forged BGs were provided by the Accused Company to the Complainant under the supervision of the Applicant, who played an active and integral role in the acts of forgery and cheating. The Applicant is a direct beneficiary of such financial transactions and is one of the masterminds behind the conspiracy, forgery, cheating, and other associated offences.
+5.2	The Applicant was appointed as the Managing Director of the Company and authorized to operate its bank accounts through a Board resolution dated 01st September 2016. However, no form was filed with the ROC in relation to this appointment. By virtue of the resolution, the Applicant de facto managed the affairs of the Accused Company and was designated as the authorized signatory for the bank accounts of the Company.
+5.3	The Applicant was responsible for operating the bank accounts of the Accused Company and made partial payments to the Complainant through the ICICI Bank account.
+5.4	The Applicant, acting dishonestly, failed to cooperate with the investigation, resulting in the issuance of a non-bailable warrant against him by the Court of the Chief Metropolitan Magistrate, South-East, Saket Courts, New Delhi, through an order dated 06th February, 2024. Consequently, he was arrested by the police on 14th March, 2024.
+Analysis and findings
+6.	The Court has carefully considered the contentions raised. The Applicant has been in custody since 15th March, 2024, and the investigation has concluded with the filing of the chargesheet. Consequently, there is no further requirement for custodial interrogation or detention of the Applicant for investigative purposes. It is also pertinent to note that none of the other co-accused named in the FIR have been arrested, and the chargesheet has been filed without taking them into custody. Furthermore, the evidence against the Applicant, as detailed in the chargesheet, primarily consists of documentary materials that are already on record. These allegations are largely based on his purported designation as the Managing Director of the Accused Company and the statements of the co-accused. This role is prima facie not substantiated by the records of the ROC. However, the Applicant�s defence need not be analysed at this stage, and can be examined during trial, where both parties will have opportunity to lead evidence. Furthermore, the exact role of the Applicant in operating the bank accounts of the Accused Company and furnishing forged BGs, will also have to be established by leading evidence at the stage of trial. 
+7.	It is a settled principle of law that pre-trial detention must be weighed against the deprivation of personal liberty. Undertrial prisoners must not be detained in custody for an indefinite period; bail is the rule and jail the exception. The Supreme Court, in its judgment in Sanjay Chandra v. CBI,6 emphasized that the purpose of pre-trial detention is not punitive in nature. The Court held as follows:
+�21.�In bail applications, generally, it has been laid down from the earliest times that the object of bail is to secure the appearance of the accused person at his trial by reasonable amount of bail. The object of bail is neither punitive nor preventative. Deprivation of liberty must be considered a punishment, unless it is required to ensure that an accused person will stand his trial when called upon. The courts owe more than verbal respect to the principle that punishment begins after conviction, and that every man is deemed to be innocent until duly tried and duly found guilty.
+22.�From the earliest times, it was appreciated that detention in custody pending completion of trial could be a cause of great hardship. From time to time, necessity demands that some unconvicted persons should be held in custody pending trial to secure their attendance at the trial but in such cases, �necessity� is the operative test. In this country, it would be quite contrary to the concept of personal liberty enshrined in the Constitution that any person should be punished in respect of any matter, upon which, he has not been convicted or that in any circumstances, he should be deprived of his liberty upon only the belief that he will tamper with the witnesses if left at liberty, save in the most extraordinary circumstances.
+23.�Apart from the question of prevention being the object of refusal of bail, one must not lose sight of the fact that any imprisonment before conviction has a substantial punitive content and it would be improper for any court to refuse bail as a mark of disapproval of former conduct whether the accused has been convicted for it or not or to refuse bail to an unconvicted person for the purpose of giving him a taste of imprisonment as a lesson.
+xxx
+27.�This Court, time and again, has stated that bail is the rule and committal to jail an exception. It has also observed that refusal of bail is a restriction on the personal liberty of the individual guaranteed under Article 21 of the Constitution.
+xxx
+40.�The grant or refusal to grant bail lies within the discretion of the court. The grant or denial is regulated, to a large extent, by the facts and circumstances of each particular case. But at the same time, right to bail is not to be denied merely because of the sentiments of the community against the accused. The primary purposes of bail in a criminal case are to relieve the accused of imprisonment, to relieve the State of the burden of keeping him, pending the trial, and at the same time, to keep the accused constructively in the custody of the court, whether before or after conviction, to assure that he will submit to the jurisdiction of the court and be in attendance thereon whenever his presence is required.
+xxx
+43.�There are seventeen accused persons. Statements of witnesses run to several hundred pages and the documents on which reliance is placed by the prosecution, are voluminous. The trial may take considerable time and it looks to us that the appellants, who are in jail, have to remain in jail longer than the period of detention, had they been convicted. It is not in the interest of justice that the accused should be in jail for an indefinite period. No doubt, the offence alleged against the appellants is a serious one in terms of alleged huge loss to the State exchequer, that, by itself, should not deter us from enlarging the appellants on bail when there is no serious contention of the respondent that the accused, if released on bail, would interfere with the trial or tamper with evidence. We do not see any good reason to detain the accused in custody, that too, after the completion of the investigation and filing of the charge-sheet.
+xxx
+46.�We are conscious of the fact that the accused are charged with economic offences of huge magnitude. We are also conscious of the fact that the offences alleged, if proved, may jeopardise the economy of the country. At the same time, we cannot lose sight of the fact that the investigating agency has already completed investigation and the charge-sheet is already filed before the Special Judge, CBI, New Delhi. Therefore, their presence in the custody may not be necessary for further investigation. We are of the view that the appellants are entitled to the grant of bail pending trial on stringent conditions in order to ally the apprehension expressed by CBI.�
+[Emphasis Supplied]
+
+8.	The primary purpose of pre-trial detention is to secure the presence of the accused during trial proceedings. In the absence of any material to suggest that the Applicant, if released on bail, would interfere with the trial or tamper with evidence or is flight risk, the Court finds no justification for subjecting him to prolonged deprivation of liberty. Such detention, in effect, amounts to a form of pre-conviction punishment, which is contrary to the principles of justice. The Applicant has already been in custody for approximately 10 months, and there is no indication that the trial is likely to be concluded expeditiously. Under these circumstances, requiring the Applicant to remain in custody for the entire duration of the trial would not only infringe upon his right to liberty, but also compromise his ability to effectively defend himself. Prolonged incarceration in such cases runs counter to the principles of a fair trial and proportionality.
+9.	In light of the foregoing, without delving further into the merits of the case and considering the facts and circumstances at hand, this Court is satisfied that the Applicant has made a sufficient case for the grant of regular bail. The Applicant is, therefore, directed to be released on bail on furnishing a bail bond for a sum of INR 50,000/- with one surety of the like amount to the satisfaction of the Trial Court, subject to the following terms and conditions: 
+9.1	The Applicant will not leave the country without prior permission of the Court. 
+9.2	The Applicant shall provide permanent address to the Trial Court. The Applicant shall intimate the Court by way of an affidavit and to the IO regarding any change in her residential address.	
+9.3	The Applicant shall give his mobile number to the concerned IO/SHO and shall keep his mobile phone switched on at all times. 
+9.4	The Applicant shall not take adjournment and attend the Trial Court proceedings on every date. 
+9.5	The Applicant will not leave the National Capital Region without informing the concerned IO / SHO. 
+10.	The Applicant shall not indulge in any criminal activity and shall not communicate with or come in contact with any of the prosecution witnesses, or tamper with the evidence of the case.
+11.	Needless to state, any observations concerning the merits of the case are solely for the purpose of deciding the question of grant of bail and shall not be construed as an expression of opinion on the merits of the case. 
+12.	A copy of the order be sent to the Jail Superintendent for information and necessary compliance. 
+13.	With the foregoing directions, the present application is disposed of. Pending application(s), if any, are disposed of as infructuous.
+
+
+SANJEEV NARULA, J
+JANUARY 14, 2025/ab
+
+1 �Accused Company�
+2 �BGs�
+3 �CrPC�
+4 �IO�
+5 �ROC�
+6 (2012) 1 SCC 40. 
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+
+
+
+BAIL APPLN. 2796/2024                                                                                                              Page 2 of 2
+ 
+

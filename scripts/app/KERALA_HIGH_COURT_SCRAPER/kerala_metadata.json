@@ -1,0 +1,569 @@
+{
+    "Kerala": [
+        {
+            "schema_version": "1.0",
+            "court": {
+                "court_id": "KLHC",
+                "name": "High Court of Kerala",
+                "type": "HIGH_COURT",
+                "state_code": "KL",
+                "state_name": "Kerala",
+                "bench": "Kerala High Court",
+                "bench_seat": "Ernakulam"
+            },
+            "case": {
+                "case_id": "KLHC010007192025",
+                "cnr": "KLHC010007192025",
+                "case_number": {
+                    "display": "WP(C) 220/2025",
+                    "type_code": "WP(C)",
+                    "type_name": "Writ Petition Civil",
+                    "number": 220,
+                    "year": 2025
+                },
+                "registration_date": "2025-01-05",
+                "decision": {
+                    "decision_date": "2025-01-07",
+                    "pronounced_on": "2025-01-07",
+                    "disposal_nature": "DISPOSED",
+                    "raw_disposal_nature": "DISPOSED OF"
+                },
+                "neutral_citation": "2025:KER:585",
+                "parties": [
+                    {
+                        "name": "ARAVIND P",
+                        "role": "PETITIONER",
+                        "party_type": "INDIVIDUAL"
+                    },
+                    {
+                        "name": "THE STATE OF KERALA",
+                        "role": "RESPONDENT",
+                        "party_type": "STATE"
+                    }
+                ],
+                "judges": [
+                    {
+                        "judge_id": "nnagaresh",
+                        "name": "N.NAGARESH",
+                        "role": "PRESIDING"
+                    }
+                ],
+                "advocates": [
+                    {
+                        "name": "V.A.MUHAMMED",
+                        "title": null,
+                        "designation": "Advocate",
+                        "for_party_role": "PETITIONER"
+                    },
+                    {
+                        "name": "PRESAD V.G",
+                        "title": null,
+                        "designation": "Advocate",
+                        "for_party_role": "PETITIONER"
+                    },
+                    {
+                        "name": "K.J. GAYATHRI DEVI",
+                        "title": "Smt.",
+                        "designation": "Advocate",
+                        "for_party_role": "RESPONDENT"
+                    },
+                    {
+                        "name": "G. YAMUNA",
+                        "title": "Smt.",
+                        "designation": "Advocate",
+                        "for_party_role": "RESPONDENT"
+                    },
+                    {
+                        "name": "VENUGOPAL V., SR",
+                        "title": "Sri.",
+                        "designation": "Government Pleader",
+                        "for_party_role": "RESPONDENT"
+                    }
+                ]
+            },
+            "legal_information": {
+                "acts": [],
+                "provisions": [],
+                "constitutional_articles": [],
+                "catchwords": [
+                    "petition",
+                    "education",
+                    "promotion",
+                    "writ",
+                    "service"
+                ],
+                "subject_matter": [
+                    "EDUCATION"
+                ]
+            },
+            "outcome": {
+                "disposal_nature": "DISPOSED",
+                "decision": "DISPOSED",
+                "result_text": null
+            },
+            "reporting": {
+                "status": "NOT_DETECTED",
+                "is_reported": false,
+                "reporter_citations": [],
+                "source": "HIGH_COURT_PDF"
+            },
+            "citations": {
+                "neutral_citation": "2025:KER:585",
+                "impugned_order": {
+                    "date": "2023-11-01"
+                }
+            },
+            "document": {
+                "document_type": "JUDGMENT",
+                "language": "en",
+                "is_scanned": false,
+                "paragraph_count": 204,
+                "summary": "The petitioner was appointed as UPST from 01.08.2019 against the promotion vacancy of the 8th respondent as HST (Natural Science). The appointment was approved on daily wage basis up to 31.03.2020. Later, the petitioner was appointed as UPST from 15.07.2021 against the same promotion vacancy of the 8th respondent. It was also approved from 21.10.2021, the date of passing KTET The 8th respondent was initially promoted as HST (Natural Science) from 01.11.2013 against the LWA vacancy of the 9th respondent who availed LWA from 31.10.2013 to 30.10.2018. It was approved up to 31.05.2018. The 9th respondent extended the LWA for a further period from 01.11.2018 to 31.05.2023. The 8th respondent was again promoted in the vacancy from 01.06.2018 to 31.05.2023. Its approval was granted up to 31.05.2020 since the 9th respondent rejoined duty on 01.06.2020 cancelling the As a result, the 8th respondent was reverted as UPST from 01.06.2020. This reversion and lien adjustment was made during the period of Covid-19 pandemic. At that time, Schools were not opened. Hence, both the 8th respondent and the petitioner were continued in the HSA and UPSA posts discharging the duties. On 01.06.2020, there arose a vacancy of HSA (Natural Science) due to the retirement of Smt.S.Jalaja on 31.5.2020. Hence, either the 8th respondent or the 9th respondent could be adjusted against the retirement vacancy of HSA (Natural Science) since 01.06.2020 without causing recorded retrenchment of the petitioner from the category of Besides, the permission granted to the 9th respondent to rejoin duty after cancelling the unavailed portion of LWA by 01.06.2020 when the Schools were closed due to Covid Lockdown was per se illegal. All these issues are raised before the Government. The 8th respondent also filed Revision Petition. Both of the revisions are pending. Undue delay in its consideration would cause undue hardship to the petitioner, contend the Counsel for the petitioner. Against the non-grant of...",
+                "keywords": [
+                    "petition",
+                    "education",
+                    "promotion",
+                    "writ",
+                    "service"
+                ]
+            },
+            "processing": {
+                "status": "SUCCESS",
+                "pdf_found": true,
+                "text_extracted": true,
+                "error": null
+            },
+            "source": {
+                "scraper": {
+                    "serial_no": "1",
+                    "source_page": "https://judgments.ecourts.gov.in/pdfsearch/?p=pdf_search/home&text=&captcha=pw76Nf&search_opt=ALL&fcourt_type=2&escr_flag=&proximity=&sel_lang=&app_token=6a5abe96b12d6567019e0433a458682d1c5493442873f559c928fb6ce43d903e",
+                    "pdf_source": "court/cnrorders/highcourtofkerala/orders/KLHC010007192025_1_2025-01-07.pdf#page=&search="
+                },
+                "pdf": {
+                    "pdf_url": "https://judgments.ecourts.gov.in/pdfsearch/tmp/366fde1cc798fd711010fb8a1650937439d11b6e34e30c2a1625c951b8f982dc1787054632.pdf",
+                    "pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\KERALA_HIGH_COURT_SCRAPER\\pdf\\WP(C)_220_2025_ARAVIND P Vs THE STATE OF KERALA_07-01-2025.pdf",
+                    "original_pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\KERALA_HIGH_COURT_SCRAPER\\pdf\\WP(C)_220_2025_ARAVIND P Vs THE STATE OF KERALA_07-01-2025.pdf"
+                },
+                "metadata_extraction": {
+                    "parsed_at": "2026-08-22T15:26:00.066844",
+                    "extractor_version": "1.0"
+                }
+            },
+            "quality": {
+                "confidence_score": 90.0,
+                "missing_fields": [
+                    "provisions"
+                ]
+            }
+        },
+        {
+            "schema_version": "1.0",
+            "court": {
+                "court_id": "KLHC",
+                "name": "High Court of Kerala",
+                "type": "HIGH_COURT",
+                "state_code": "KL",
+                "state_name": "Kerala",
+                "bench": "Kerala High Court",
+                "bench_seat": "Ernakulam"
+            },
+            "case": {
+                "case_id": "KLHC010846242024",
+                "cnr": "KLHC010846242024",
+                "case_number": {
+                    "display": "WP(C) 6906/2024",
+                    "type_code": "WP(C)",
+                    "type_name": "Writ Petition Civil",
+                    "number": 6906,
+                    "year": 2024
+                },
+                "registration_date": "2024-02-21",
+                "decision": {
+                    "decision_date": "2025-01-07",
+                    "pronounced_on": "2025-01-07",
+                    "disposal_nature": "CLOSED",
+                    "raw_disposal_nature": "CLOSED"
+                },
+                "neutral_citation": null,
+                "parties": [
+                    {
+                        "name": "E.M.VIJAYAN",
+                        "role": "PETITIONER",
+                        "party_type": "INDIVIDUAL"
+                    },
+                    {
+                        "name": "STATE OF KERALA",
+                        "role": "RESPONDENT",
+                        "party_type": "STATE"
+                    }
+                ],
+                "judges": [
+                    {
+                        "judge_id": "basant_balaji",
+                        "name": "BASANT BALAJI",
+                        "role": "PRESIDING"
+                    }
+                ],
+                "advocates": [
+                    {
+                        "name": "J.VISHNU",
+                        "title": null,
+                        "designation": "Advocate",
+                        "for_party_role": "PETITIONER"
+                    },
+                    {
+                        "name": "ANU BALAKRISHNAN NAMBIAR",
+                        "title": null,
+                        "designation": "Advocate",
+                        "for_party_role": "PETITIONER"
+                    },
+                    {
+                        "name": "VINAY VIJAY SHANKER",
+                        "title": null,
+                        "designation": "Advocate",
+                        "for_party_role": "PETITIONER"
+                    },
+                    {
+                        "name": "TONY AUGUSTINE",
+                        "title": "Sri.",
+                        "designation": "Advocate",
+                        "for_party_role": "RESPONDENT"
+                    },
+                    {
+                        "name": "ARAVINDAKSHAN PILLAI",
+                        "title": null,
+                        "designation": "Advocate",
+                        "for_party_role": "RESPONDENT"
+                    }
+                ]
+            },
+            "legal_information": {
+                "acts": [],
+                "provisions": [],
+                "constitutional_articles": [],
+                "catchwords": [
+                    "pension",
+                    "petition",
+                    "writ"
+                ],
+                "subject_matter": [
+                    "SERVICE"
+                ]
+            },
+            "outcome": {
+                "disposal_nature": "CLOSED",
+                "decision": "CLOSED",
+                "result_text": null
+            },
+            "reporting": {
+                "status": "NOT_DETECTED",
+                "is_reported": false,
+                "reporter_citations": [],
+                "source": "HIGH_COURT_PDF"
+            },
+            "citations": {
+                "neutral_citation": null,
+                "impugned_order": {
+                    "date": "2023-09-01"
+                }
+            },
+            "document": {
+                "document_type": "JUDGMENT",
+                "language": "en",
+                "is_scanned": false,
+                "paragraph_count": 109,
+                "summary": "The petitioner has approached this Court for a direction to pay the arrears of pension revision from 1.7.2019. Ext.P7 is the order dated 1.9.2023 implementing the revision of pension. Ext.P8 is the calculation statement regarding the arrears of pension to be paid from 1.7.2019 to 31.12.2023. The total amount as on 3.1.2024 comes to Rs.2,40,732/-. The limited relief sought now is for disbursal of the arrears of pension as stated in Ext.P8 within a time frame. The learned Government Pleader seeks time to file counter Taking into consideration of the limited prayer, I direct respondent Nos.1 to 4 to pay the arrears of pension due from 1.7.2019 till date to the petitioner within a period of three months from the date of receipt of a copy of this judgment.",
+                "keywords": [
+                    "pension",
+                    "petition",
+                    "writ"
+                ]
+            },
+            "processing": {
+                "status": "SUCCESS",
+                "pdf_found": true,
+                "text_extracted": true,
+                "error": null
+            },
+            "source": {
+                "scraper": {
+                    "serial_no": "2",
+                    "source_page": "https://judgments.ecourts.gov.in/pdfsearch/?p=pdf_search/home&text=&captcha=pw76Nf&search_opt=ALL&fcourt_type=2&escr_flag=&proximity=&sel_lang=&app_token=6a5abe96b12d6567019e0433a458682d1c5493442873f559c928fb6ce43d903e",
+                    "pdf_source": "court/cnrorders/highcourtofkerala/orders/KLHC010846242024_1_2024-03-26.pdf#page=&search="
+                },
+                "pdf": {
+                    "pdf_url": "https://judgments.ecourts.gov.in/pdfsearch/tmp/7f8c6dd386489e4524df049a593aa554df62e8c355d2e21c81c1205a66084a531787054667.pdf",
+                    "pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\KERALA_HIGH_COURT_SCRAPER\\pdf\\WP(C)_6906_2024_E.M.VIJAYAN Vs STATE OF KERALA_07-01-2025.pdf",
+                    "original_pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\KERALA_HIGH_COURT_SCRAPER\\pdf\\WP(C)_6906_2024_E.M.VIJAYAN Vs STATE OF KERALA_07-01-2025.pdf"
+                },
+                "metadata_extraction": {
+                    "parsed_at": "2026-08-22T15:26:00.101198",
+                    "extractor_version": "1.0"
+                }
+            },
+            "quality": {
+                "confidence_score": 80.0,
+                "missing_fields": [
+                    "neutral_citation",
+                    "provisions"
+                ]
+            }
+        },
+        {
+            "schema_version": "1.0",
+            "court": {
+                "court_id": "KLHC",
+                "name": "High Court of Kerala",
+                "type": "HIGH_COURT",
+                "state_code": "KL",
+                "state_name": "Kerala",
+                "bench": "Kerala High Court",
+                "bench_seat": "Ernakulam"
+            },
+            "case": {
+                "case_id": "KLHC010000292012",
+                "cnr": "KLHC010000292012",
+                "case_number": {
+                    "display": "AR.No. 23 of 2012",
+                    "type_code": "AR.No.",
+                    "type_name": "AR.No.",
+                    "number": 23,
+                    "year": 2012
+                },
+                "registration_date": "2012-06-26",
+                "decision": {
+                    "decision_date": "2025-01-07",
+                    "pronounced_on": "2025-01-07",
+                    "disposal_nature": "DISPOSED",
+                    "raw_disposal_nature": "DISPOSED OF"
+                },
+                "neutral_citation": null,
+                "parties": [
+                    {
+                        "name": "M/S. VRINDAVAN APPARTMENTS",
+                        "role": "PETITIONER",
+                        "party_type": "COMPANY"
+                    },
+                    {
+                        "name": "C.J.SUNNY",
+                        "role": "RESPONDENT",
+                        "party_type": "INDIVIDUAL"
+                    }
+                ],
+                "judges": [
+                    {
+                        "judge_id": "vchitambaresh",
+                        "name": "V.CHITAMBARESH",
+                        "role": "PRESIDING"
+                    }
+                ],
+                "advocates": [
+                    {
+                        "name": "SABU THOZHUPPADAN",
+                        "title": "Sri.",
+                        "designation": "Advocate",
+                        "for_party_role": "PETITIONER"
+                    }
+                ]
+            },
+            "legal_information": {
+                "acts": [],
+                "provisions": [],
+                "constitutional_articles": [],
+                "catchwords": [
+                    "arbitration"
+                ],
+                "subject_matter": [
+                    "ARBITRATION"
+                ]
+            },
+            "outcome": {
+                "disposal_nature": "DISPOSED",
+                "decision": "DISPOSED",
+                "result_text": null
+            },
+            "reporting": {
+                "status": "NOT_DETECTED",
+                "is_reported": false,
+                "reporter_citations": [],
+                "source": "HIGH_COURT_PDF"
+            },
+            "citations": {
+                "neutral_citation": null,
+                "impugned_order": {
+                    "date": null
+                }
+            },
+            "document": {
+                "document_type": "JUDGMENT",
+                "language": "en",
+                "is_scanned": false,
+                "paragraph_count": 42,
+                "summary": "No steps taken despite several opportunities There is no representation for the petitioner. The Arbitration Request is hence dismissed",
+                "keywords": [
+                    "arbitration"
+                ]
+            },
+            "processing": {
+                "status": "SUCCESS",
+                "pdf_found": true,
+                "text_extracted": true,
+                "error": null
+            },
+            "source": {
+                "scraper": {
+                    "serial_no": "3",
+                    "source_page": "https://judgments.ecourts.gov.in/pdfsearch/?p=pdf_search/home&text=&captcha=pw76Nf&search_opt=ALL&fcourt_type=2&escr_flag=&proximity=&sel_lang=&app_token=6a5abe96b12d6567019e0433a458682d1c5493442873f559c928fb6ce43d903e",
+                    "pdf_source": "court/cnrorders/highcourtofkerala/orders/KLHC010000292012_1_2017-12-18.pdf#page=&search="
+                },
+                "pdf": {
+                    "pdf_url": "https://judgments.ecourts.gov.in/pdfsearch/tmp/ea8f92217fd2807859287e8cf70d3cc08486cd37119e84552c2378403bdc88621787054703.pdf",
+                    "pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\KERALA_HIGH_COURT_SCRAPER\\pdf\\AR_23_2012_M_S. VRINDAVAN APPARTMENTS Vs C.J.SUNNY_07-01-2025.pdf",
+                    "original_pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\KERALA_HIGH_COURT_SCRAPER\\pdf\\AR_23_2012_M_S. VRINDAVAN APPARTMENTS Vs C.J.SUNNY_07-01-2025.pdf"
+                },
+                "metadata_extraction": {
+                    "parsed_at": "2026-08-22T15:26:00.123530",
+                    "extractor_version": "1.0"
+                }
+            },
+            "quality": {
+                "confidence_score": 80.0,
+                "missing_fields": [
+                    "neutral_citation",
+                    "provisions"
+                ]
+            }
+        },
+        {
+            "schema_version": "1.0",
+            "court": {
+                "court_id": "KLHC",
+                "name": "High Court of Kerala",
+                "type": "HIGH_COURT",
+                "state_code": "KL",
+                "state_name": "Kerala",
+                "bench": "Kerala High Court",
+                "bench_seat": "Ernakulam"
+            },
+            "case": {
+                "case_id": "KLHC010695032013",
+                "cnr": "KLHC010695032013",
+                "case_number": {
+                    "display": "WP(C) 26315/2013",
+                    "type_code": "WP(C)",
+                    "type_name": "Writ Petition Civil",
+                    "number": 26315,
+                    "year": 2013
+                },
+                "registration_date": "2013-10-28",
+                "decision": {
+                    "decision_date": "2025-01-07",
+                    "pronounced_on": "2025-01-07",
+                    "disposal_nature": "DISPOSED",
+                    "raw_disposal_nature": "DISPOSED OF"
+                },
+                "neutral_citation": null,
+                "parties": [
+                    {
+                        "name": "T.S.SUBRAMANIAN",
+                        "role": "PETITIONER",
+                        "party_type": "INDIVIDUAL"
+                    },
+                    {
+                        "name": "THE STATE OF KERALA",
+                        "role": "RESPONDENT",
+                        "party_type": "STATE"
+                    }
+                ],
+                "judges": [
+                    {
+                        "judge_id": "mohammed_nias_cp",
+                        "name": "MOHAMMED NIAS C.P",
+                        "role": "PRESIDING"
+                    }
+                ],
+                "advocates": [
+                    {
+                        "name": "REKHA C. NAIR",
+                        "title": "Smt.",
+                        "designation": "Government Pleader",
+                        "for_party_role": "RESPONDENT"
+                    }
+                ]
+            },
+            "legal_information": {
+                "acts": [],
+                "provisions": [],
+                "constitutional_articles": [],
+                "catchwords": [
+                    "petition",
+                    "writ",
+                    "possession",
+                    "land"
+                ],
+                "subject_matter": [
+                    "PROPERTY"
+                ]
+            },
+            "outcome": {
+                "disposal_nature": "DISPOSED",
+                "decision": "DISPOSED",
+                "result_text": null
+            },
+            "reporting": {
+                "status": "NOT_DETECTED",
+                "is_reported": false,
+                "reporter_citations": [],
+                "source": "HIGH_COURT_PDF"
+            },
+            "citations": {
+                "neutral_citation": null,
+                "impugned_order": {
+                    "date": "2000-10-19"
+                }
+            },
+            "document": {
+                "document_type": "JUDGMENT",
+                "language": "en",
+                "is_scanned": false,
+                "paragraph_count": 99,
+                "summary": "The prayer in the writ petition is to quash Exts.P6 and P7 orders rejecting the claim of the petitioner for assignment of the plot in his possession. Today when the matter is taken up, the learned Counsel for the petitioner submits that the petitioner has surrendered the land and also paid the arrears of rent. The above submission is recorded. It will be open to the Government to take steps in accordance with law, in case it is found that there are arrears outstanding and payable by Subject to the above, Writ Petition is disposed of.",
+                "keywords": [
+                    "petition",
+                    "writ",
+                    "possession",
+                    "land"
+                ]
+            },
+            "processing": {
+                "status": "SUCCESS",
+                "pdf_found": true,
+                "text_extracted": true,
+                "error": null
+            },
+            "source": {
+                "scraper": {
+                    "serial_no": "4",
+                    "source_page": "https://judgments.ecourts.gov.in/pdfsearch/?p=pdf_search/home&text=&captcha=pw76Nf&search_opt=ALL&fcourt_type=2&escr_flag=&proximity=&sel_lang=&app_token=6a5abe96b12d6567019e0433a458682d1c5493442873f559c928fb6ce43d903e",
+                    "pdf_source": "court/cnrorders/highcourtofkerala/orders/KLHC010695032013_1_2023-08-14.pdf#page=&search="
+                },
+                "pdf": {
+                    "pdf_url": "https://judgments.ecourts.gov.in/pdfsearch/tmp/74b71d9a8792ce4069839e9a29d99645f90d3b534b299f133dd75566745e40af1787054738.pdf",
+                    "pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\KERALA_HIGH_COURT_SCRAPER\\pdf\\WP(C)_26315_2013_T.S.SUBRAMANIAN Vs THE STATE OF KERALA_07-01-2025.pdf",
+                    "original_pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\KERALA_HIGH_COURT_SCRAPER\\pdf\\WP(C)_26315_2013_T.S.SUBRAMANIAN Vs THE STATE OF KERALA_07-01-2025.pdf"
+                },
+                "metadata_extraction": {
+                    "parsed_at": "2026-08-22T15:26:00.152225",
+                    "extractor_version": "1.0"
+                }
+            },
+            "quality": {
+                "confidence_score": 80.0,
+                "missing_fields": [
+                    "neutral_citation",
+                    "provisions"
+                ]
+            }
+        }
+    ]
+}

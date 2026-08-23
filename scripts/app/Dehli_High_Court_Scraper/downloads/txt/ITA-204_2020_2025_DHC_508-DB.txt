@@ -1,0 +1,89 @@
+$~7
+*	  IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%					  Judgment delivered on: 29.01.2025 
+
++ 	ITA 204/2020 & CM APPL. 26872/2020 (For Direction)
+	NEW DELHI TELEVISION LIMITED		.....Appellant
+Through:	Mr. Sachit Jolly, Sr. Adv. with Ms. Soumya Singh, Ms. Disha Jham & Mr. Devansh Jain, Advs.
+
+				versus
+
+ASSISTANT COMMISSIONER OF INCOME TAX CIRCLE 13 NEW DELHI & ANR.			     .....Respondents
+Through:	Mr. Indruj Singh Rai, SSC with Mr. Sanjeev Menon, Mr. Rahul Singh, JSCs, Mr. Anmol Jagga & Mr. Gaurav Kumar, Advs.
+     CORAM:
+	HON'BLE MR. JUSTICE YASHWANT VARMA
+HON'BLE MR. JUSTICE HARISH VAIDYANATHAN SHANKAR			
+
+J U D G M E N T
+
+YASHWANT VARMA, J. (Oral)
+1. New Delhi Television Limited1- the assessee is in appeal and impugns the validity of the judgment of the Income Tax Appellate Tribunal2 dated 16 June 2020. We had by our order dated 09 February 2024 admitted this appeal on the following questions of law:
+�(a) Whether, on the facts and in the circumstances of the case and in law, the Income Tax Appellate Tribunal ["ITAT"] erred in restoring the issue pertaining to the addition/adjustment made qua alleged corporate guarantee to the file of the Assessing Officer ["AO"]?
+(b) Whether on the facts and in the circumstances of the case and in law, the ITAT erred in completely ignoring the binding order dated 24 August 2017 passed by the Special Bench of the ITAT (confirmed by this Court) which held that the subject transaction was an undertaking which was short of a corporate guarantee?�
+
+For the purposes of evaluating the challenge which stands raised, we deem it appropriate to take notice of the following facts.
+2. The appeal is concerned with Assessment Year3 2008-09 and where in the course of assessment proceedings inquiries are stated to have been initiated by the Investigating Wing of the Income Tax Department in relation to certain Step-up Coupon Bonds of USD 100 Million issued by the appellant�s U.K. subsidiary M/s NDTV Networks PLC4, outside India to various investors. 
+3. On receipt of the investigation report, the Assessing Officer5 is stated to have made a reference to the Transfer Pricing Officer6 in accordance with Section 92CA of the Income Tax Act, 19617 in respect of international transactions including the issuance of those bonds alleging that the appellant had submitted a corporate guarantee in support thereof. This becomes apparent from a perusal of the letter dated 06 June 2011 which was addressed by the AO to the TPO. 
+4. The TPO, however, did not make any transfer pricing additions in respect of the alleged corporate guarantee. Upon receipt of the transfer pricing report, the AO is stated to have independently examined the issue and ultimately framed an order of assessment on 03 August 2012 after making an addition on account of the alleged guarantee fee connected with the issuance of the bonds by NNPLC in the hands of the appellant by holding it to be an international transaction as defined under Section 92B of the Act.
+5. Aggrieved by the aforesaid, the appellant is stated to have approached the Commissioner of Income Tax (Appeals)8,  which vide its order of 29 April 2014, while upholding the view as expressed by the AO, restricted the adjustment to 40% of the additions that were made. This led to the appellant as well as the Revenue approaching the Tribunal. The Tribunal is stated to have constituted a Special Bench to determine whether a corporate guarantee would constitute an international transaction. That reference came to be disposed of by the Special Bench on 23 August 2017 in the following terms:
+     �The Ld. AR submitted at the outset that the question proposed for consideration and decision before this special bench does not arise in the present appeal. He submitted that the assessee only gave an undertaking and not a corporate guarantee for the Bonds issued by its Associated Enterprise. To fortify the point, he referred to certain clauses of the Agreement. This was opposed by the Ld. DR.
+     We have extensively heard both the sides. In our opinion, the assessee only incurred an obligation by giving an undertaking, which is short of guarantee. As such, the question before the special bench - as to whether the giving of corporate guarantee is an international transaction? - does not arise in the instant appeal. This reference is accordingly returned to be placed before the Hon'ble President for taking an appropriate decision in this regard.�
+     
+6. It was pursuant to the aforesaid order that the matter came to be placed before the regular Bench of the Tribunal. It would also be pertinent to note, for the sake of completeness, that the decision of the Special Bench of the Tribunal was assailed by the respondents before this Court by way of W.P.(C) 559/2018 which came to be dismissed on 19 January 2018 in the following terms:
+     �The impugned order dated 23.8.2017 passed by the Special Bench, Income Tax Appellate Tribunal ('ITAT') in ITA No.3865/De1/2014 answers the reference made to them and directs that the matter be placed before the Hon'ble President, ITAT for taking appropriate decision, pursuant to the answer given to the reference.
+     The second impugned order passed by the Hon'ble President, ITAT dated 24.8.2017, directs that the matter be restored to the Division Bench for adjudication, in accordance with law. It also records that the Special Bench having decided the question (reference), was disbanded.
+     The cross-appeals filed by the Revenue and the Assessee, therefore, have to be now listed before the Division Bench and decided. The petitioner herein would have to await the decision of the Division Bench, and, if required, challenge the same as per the
+statute. 
+     In these circumstances, we are not inclined to issue notice in the present writ petition. We clarify that we have not commented on the merits and all issues and contentions are left open. 
+     The petition is disposed of, with no order as to costs. The pending application is also disposed of. 
+     Dasti under signature of the Court Master.�
+
+The respondents are also stated to have questioned the aforesaid judgment by way of a Special Leave Petition (Civil) Diary No. 38568/2018, which came to be dismissed by the Supreme Court on 16 November 2018. 
+7. Reverting then to the proceedings which unfolded before the Tribunal, we find that the appellant had urged that it had only given an undertaking as distinct from a corporate guarantee.  It also referred to the conclusions which had been rendered by the Special Bench in this regard and thus submitted that the additions as made by the AO would clearly not sustain. These and other submissions which were addressed stand reflected in para 46 of the order of the Tribunal and which reads as follows:-
+�46. He further referred to the fact that the special bench was constituted wherein it was submitted by the assessee that the assessee only gave an undertaking and not a corporate guarantee for the bonds issued by its associated enterprises. The assessee supported this fact by referring to certain clauses of the agreement. The special bench as per its order dated 23/8/2017 has held that after hearing extensively to both the parties, in their opinion, assessee only incurred an obligation by giving an undertaking which is short of guarantee. As such the question before the special bench as to whether the giving of corporate guarantee is an international transaction does not arise in the instant appeal. Therefore the special bench returned the finding to be placed before the President of the ITAT. He therefore submitted that when the special bench says that the assessee only incurred an obligation by giving an undertaking which is short of guarantee but not a guarantee the learned assessing officer should have accepted it and could not have proceeded to make the adjustment. He further referred to the order of the President ITAT dated 24/8/2017 wherein after taking the order of the special bench into account it was stated that the undertaking given by the assessee was not the
+corporate guarantee and when there is no corporate guarantee provided in this case the question referred to the special bench has become redundant. He further stated that the revenue as well as the assessee challenged these order of the special bench before the honourable Delhi High Court. In view of this he submitted that when the concurrent authorities have held that there is no corporate guarantee issued by the appellant in favour of its subsidiaries, the learned AO could not have made the addition by determining the arm's length price.�
+
+8. The Tribunal, however, and while examining the issue, and as would be evident from a reading of Para 62 of the order impugned before us, principally appears to have taken up for consideration the question whether the AO could have independently examined the issue of whether the alleged guarantee was an international transaction and consequential transfer pricing adjustments could have been made.  Noticing the judgment rendered by the Supreme Court in Principal Commissioner of Income Tax vs. S.G. Asia Holdings (India) Pvt. Ltd.9, it ultimately came to hold that under the statutory scheme it was only the TPO which could have undertaken that exercise and made consequential transfer pricing adjustments. It thus proceeded to remit the matter to the AO in the following terms:
+�63. In view of the above decision where the honourable Supreme Court held that in that particular case the matter ought to have been restored to the file of the assessing officer so that appropriate reference could be made to the transfer pricing Officer, we also restore the matter back to the file of the learned assessing officer so that appropriate reference could be made to the TPO. We leave all other issues open and also grant liberty to the assessee to agitate them before the learned assessing officer/TPO. The authorities below will pass an appropriate order after granting an opportunity of hearing to the assessee. Accordingly ground number three and four of the appeal of the assessee as well as ground number four of the appeal of the AO are partly allowed.�
+
+It is aggrieved by the aforesaid terms of remand which led to the filing of the instant appeal. 
+9. Mr. Jolly, learned senior counsel, who appeared for the appellant principally contended that once the Special Bench of the Tribunal had come to hold that the transaction was not a corporate guarantee, there was clearly no occasion or justification for the matter being remanded to the TPO. According to Mr. Jolly, the nature of the international transaction having already been ruled upon, there was no occasion for the matter being remitted and it was thus incumbent upon the Tribunal itself to examine the issue. 
+10. Mr. Rai, learned counsel appearing for the respondents, however, draws our attention to the conclusions which were ultimately rendered by the Special Bench and which had held that while the transaction did not answer the attributes of a corporate guarantee, it was liable to be viewed as the incurring of an obligation by giving an undertaking. Whether the incurring of an obligation by giving an undertaking would amount to an international transaction, as envisaged under Section 92B of the Act, according to Mr. Rai, is an issue which would necessarily have to be examined and evaluated by the TPO. 
+11. However, and as we view Para 63 of the order of the Tribunal, we find that the same does not render any clarity on this aspect. A bare reading of Para 63 indicates that the Tribunal�s terms of remit are couched in extremely broad terms and evidently fail to clarify that the solitary question which remained for consideration was whether the obligation incurred by giving an undertaking would amount to an international transaction and if the answer to the above be in the affirmative the consequential transfer pricing adjustments that may be warranted.  
+12. While it was suggested by Mr. Jolly that in view of the above, the matter may be examined by the Tribunal itself, we find that the same may not be the appropriate or prudent process to adopt since the authorities below would in the first instance have to firstly examine and render a finding as to whether the obligation which the Special Bench spoke of amounts to an international transaction. 
+13. In our considered opinion, therefore, the end of justice would merit that the matter being remanded to the AO with the clarification that the remit shall be confined to examining whether the undertaking of the obligation in question amounts to an international transaction, to be answered first and at the outset.  The aforesaid question would have to be examined and considered by the AO after giving an opportunity to the appellant.
+14. Mr. Rai, learned counsel representing the respondents, submits that the AO would, in light of the direction framed by the Court, undertake such an exercise and only once it comes to a conclusion that the obligation amounts to an international transaction, consider transmitting the matter to the TPO. The statement so made is recorded and accepted. 
+15. We, consequently, and for the aforesaid reasons, set aside the order of the Tribunal to the aforesaid extent. The appeal shall stand disposed of in terms of the directions referred to above. All rights and contentions of respective parties on merits are kept open.
+16. While parting with this appeal we were informed that in the absence of any order of restraint operating on this appeal, the AO had in fact transmitted the matter for the consideration of the TPO for examining whether the transaction would fall within the ambit of Section 92B of the Act and that pursuant to the above, and acting in terms of the directions framed by the Tribunal, a final order came to be passed by the TPO which led to the drawl of a draft assessment order by the AO. 
+17. We had in terms of order of 11 January 2022 provided that the aforesaid exercise would abide by the final result on the instant appeal. Since we have set aside the principal direction of remit framed by the Tribunal and a de novo exercise in liable to be undertaken by the AO, the order of the TPO as well as the draft assessment order, shall also consequently stand set aside.  
+
+YASHWANT VARMA, J.
+
+
+HARISH VAIDYANATHAN SHANKAR, J.
+JANUARY 29, 2025/kk
+1 NDTV
+2 Tribunal 
+3 AY
+4 NNPLC
+5 AO
+6 TPO
+7 Act
+8 CIT(A)
+9 (2019) 13 SCC 353
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+								             
+
+
+
+ITA 204/2020 	Page 1 of 9
+
+
+

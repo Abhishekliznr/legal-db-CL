@@ -1,0 +1,36 @@
+{
+    "Allahabad": [
+        {
+            "serial_no": "1",
+            "case_number": "BAIL/36505/2024",
+            "party_name": "KAMLESH YADAV Vs State of UP",
+            "judge": null,
+            "court": "High Court of Allahabad",
+            "bench": "Allahabad High Court",
+            "cnr": "UPHC015157942024",
+            "registration_date": "27-09-2024",
+            "decision_date": "07-01-2025",
+            "disposal_nature": null,
+            "pdf_source": "court/cnrorders/cisdb_16012018/orders/UPHC015157942024_1_2025-01-08.pdf#page=&search= ",
+            "pdf_url": "https://judgments.ecourts.gov.in/pdfsearch/tmp/ea09ff5d7b61d21514594e394f02648d9362236960d8d47e8ecc5fdb3cf4ee9c1787048553.pdf",
+            "pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\ALLAHABAD_HIGH_COURT_SCRAPER\\pdf\\BAIL_36505_2024_KAMLESH YADAV Vs State of UP_07-01-2025.pdf",
+            "source_page": "https://judgments.ecourts.gov.in/pdfsearch/?p=pdf_search/home&text=&captcha=mbaEuD&search_opt=ALL&fcourt_type=2&escr_flag=&proximity=&sel_lang=&app_token=cc6fe260b55d1cda96951428eff6a9618d64c8dac385a59f3ee08a16a3ccc6d6"
+        },
+        {
+            "serial_no": "2",
+            "case_number": "NABAIL/11926/2024",
+            "party_name": "SHIV KUMAR AND 2 OTHERS Vs STATE OF U.P. AND 3 OTHERS",
+            "judge": null,
+            "court": "High Court of Allahabad",
+            "bench": "Allahabad High Court",
+            "cnr": "UPHC016467422024",
+            "registration_date": "10-12-2024",
+            "decision_date": "07-01-2025",
+            "disposal_nature": "Dismissed on merits",
+            "pdf_source": "court/cnrorders/cisdb_16012018/orders/UPHC016467422024_1_2025-01-08.pdf#page=&search= ",
+            "pdf_url": "https://judgments.ecourts.gov.in/pdfsearch/tmp/99d77847bc5d76002c325b7d521a8bf143787d1ac253b1e743ee25d1f9e4dcb31787048588.pdf",
+            "pdf_path": "C:\\D-Drive\\HC-Scraper\\app\\ALLAHABAD_HIGH_COURT_SCRAPER\\pdf\\NABAIL_11926_2024_SHIV KUMAR AND 2 OTHERS Vs STATE OF U.P. AND 3 OTHERS_07-01-2025.pdf",
+            "source_page": "https://judgments.ecourts.gov.in/pdfsearch/?p=pdf_search/home&text=&captcha=mbaEuD&search_opt=ALL&fcourt_type=2&escr_flag=&proximity=&sel_lang=&app_token=cc6fe260b55d1cda96951428eff6a9618d64c8dac385a59f3ee08a16a3ccc6d6"
+        }
+    ]
+}

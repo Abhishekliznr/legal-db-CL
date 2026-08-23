@@ -1,0 +1,700 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>High Court of Chhattisgarh</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <link href="assets_new/img/favicon.png" rel="icon">
+        <!-- <base href=""> -->
+    <link href="assets_new/img/favicon.png" rel="icon">
+
+    <link rel="stylesheet" href="assets_new/css/cdnjs/owl.carousel.min.css">
+    <link rel="stylesheet" href="assets_new/css/cdnjs/owl.theme.default.min.css">
+    <link href="assets_new/css/all.min.css" rel="stylesheet">
+    <link href="assets_new/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="assets_new/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="assets_new/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="assets_new/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <link href="assets_new/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="assets_new/css/style.css" rel="stylesheet">
+    <link href="assets_new/css/index.css" rel="stylesheet">
+    <link href="assets_new/local/all.css" rel="stylesheet">
+    <link href="assets_new/DataTables/datatables.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary loader" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+    <!-- Navbar Start -->
+    <div class="container-fluid bg-primary sticky-top p-0">
+        <nav class="navbar navbar-expand-lg navbar-light p-0">
+            <a href="../index.php" class="navbar-brand px-2 me-0 d-flex align-items-center">
+                <img src="assets_new/img/emblem.svg" height="50px" width="50px" alt="Emblem">
+                <div class="">
+                    <h6 class="mb-0">
+                        <b>High Court Of Chhattisgarh</b><br>
+                        <span class="d-block text-white"><small><b>छत्तीसगढ
+                                    उच्च न्यायालय</b>
+                            </small></span>
+                    </h6>
+                </div>
+            </a>
+            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse p-2" id="navbarCollapse">
+                <div class="navbar-nav mx-auto flex-wrap">
+                    <!-- <a href="index.php"
+                        class="nav-item nav-link ">Home</a> -->
+                    <a href="https://highcourt.cg.gov.in" class="nav-item nav-link ">
+                        Home                    </a>
+
+                    <div class="nav-item dropdown ">
+                        <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown">Judges</a>
+                        <div class="dropdown-menu bg-primary mt-2">
+                            <a class="dropdown-item p-2" href="../judges/judges.php">Sitting Judges</a>
+                            <a href="../judges/former_cj.php" class="dropdown-item p-2">
+Former Chief Justice</a>
+                            <a href="../judges/former_judges.php" class="dropdown-item p-2">Former Judges</a>
+                        </div>
+                    </div>
+
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown">
+Registry</a>
+                        <div class="dropdown-menu bg-primary mt-2">
+                            <a class="dropdown-item p-2" href="../registry/registry_officers.php">
+Registry Officers</a>
+                            <a href="../registry/csja_officers.php" class="dropdown-item p-2">
+CSJA Officers</a>
+                        </div>
+                    </div>
+
+                    <div class="nav-item dropdown custom-dropdown">
+                        <a href="#" class="nav-link dropdown-toggle " role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            District Judiciary                        </a>
+
+                        <ul class="dropdown-menu bg-primary mt-2">
+                            <!-- Submenu -->
+                            <li>
+                                <a href="#" class="dropdown-item dropdown-toggle p-2">
+                                    District Wise                                </a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="../subcourts/disnamesr.php">All in the District</a></li>
+                                    <li><a class="dropdown-item p-2" href="../subcourts/disname.php">Regular Courts</a></li>
+                                    <li><a class="dropdown-item p-2" href="../subcourts/disnamedep.php">On Deputation</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Other menu items -->
+                            <li><a href="../subcourts/judsr.php" class="dropdown-item p-2">Seniority Wise</a></li>
+                            <li><a href="../subcourts/judalpha.php" class="dropdown-item p-2">Alphabetically</a></li>
+                            <li><a href="../subcourts/depu.php" class="dropdown-item p-2">On Deputation</a></li>
+                            <li><a href="../district_judiciary/retired_judicial_officer.php" class="dropdown-item p-2">Retired Judicial Officers</a></li>
+                            <li><a href="../district_judiciary/redressal_of_grievances.php" class="dropdown-item p-2">Redressal of Grievances by CSCDJ</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-item dropdown custom-dropdown">
+                        <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown">e-services</a>
+                        <div class="dropdown-menu bg-primary mt-2">
+                            <a href="../e_services/efiling.php" class="dropdown-item p-2">e-Filing</a>
+
+                            <!-- <li class="nav-item">
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">e-Pay Link</a>
+                                <ul class="dropdown-submenu bg-primary">
+                                    <a class="dropdown-item p-2" href="https://pay.ecourts.gov.in/epay/" target="_blank">Court Fee</a>
+                                    <a class="dropdown-item p-2" href="https://vcourts.gov.in/virtualcourt/index.php" target="_blank">Virtual Court Challan(Traffic)</a>
+                                </ul>
+                            </li> -->
+
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">e-Pay Link</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="https://pay.ecourts.gov.in/epay/" target="_blank">Court Fee</a></li>
+                                    <li> <a class="dropdown-item p-2" href="https://vcourts.gov.in/virtualcourt/index.php" target="_blank">Virtual Court Challan(Traffic)</a></li>
+
+                                </ul>
+                            </li>
+
+                            <a href="https://egatepass.cghc.nic.in/" class="dropdown-item p-2" target="_blank">E-Gate
+                                Pass</a>
+                            <a href="../e_services/vclink/vclink.php" class="dropdown-item p-2">Video Conference
+                                Call</a>
+                            <a href="../e_services/dislist_vc.php" class="dropdown-item p-2">District Video
+                                Conference Call</a>
+                            <a href="https://highcourt.cg.gov.in/LibraryHC/Library.htm" class="dropdown-item p-2" target="_blank">Library</a>
+                            <!-- <li class="nav-item">
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">e-Gazette</a>
+                                <ul class="dropdown-submenu bg-primary">
+                                    <a class="dropdown-item p-2" href="https://highcourt.cg.gov.in/download/loding_cgaztte.html" target="_blank">Central e-Gazette</a>
+                                    <a class="dropdown-item p-2" href="https://highcourt.cg.gov.in/download/loding_cg_gaztte.html" target="_blank">CG e-Gazette</a>
+                                </ul>
+                            </li> -->
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">e-Gazette</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="https://highcourt.cg.gov.in/download/loding_cgaztte.html" target="_blank">Central e-Gazette</a></li>
+                                    <li> <a class="dropdown-item p-2" href="https://highcourt.cg.gov.in/download/loding_cg_gaztte.html" target="_blank">CG e-Gazette</a></li>
+                                </ul>
+                            </li>
+                            <a href="https://highcourt.cg.gov.in/download/loding_khasra.html" class="dropdown-item p-2" target="_blank">e-Khasra</a>
+                            <a href="https://highcourt.cg.gov.in/download/loding_indiacode.html" class="dropdown-item p-2" target="_blank">India
+                                Code</a>
+                            <a href="https://legislative.gov.in/vidhi-sahitya-prakashan/" class="dropdown-item p-2" target="_blank">Vidhi Sahitya Prakashan</a>
+                            <!-- <li class="nav-item">
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">VC Coordinators</a>
+                                <ul class="dropdown-submenu bg-primary">
+                                    <a class="dropdown-item p-2" href="download/RemotePointCoordinator01.04.2022.pdf" target="_blank">Child Witness</a>
+                                    <a class="dropdown-item p-2" href="download/VCCoordinatorsCG.pdf" target="_blank">Video Conferencing Co-ordinator</a>
+                                </ul>
+                            </li> -->
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">VC Coordinators</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="../download/RemotePointCoordinator01.04.2022.pdf" target="_blank">Child Witness</a></li>
+                                    <li><a class="dropdown-item p-2" href="../download/VCCoordinatorsCG.pdf" target="_blank">Video Conferencing Co-ordinator</a></li>
+                                </ul>
+                            </li>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">e-Book</a>
+                        <div class="dropdown-menu bg-primary mt-2">
+                            <a href="../e_book/JusticeUnfoldedSagaofHighCourtofChhattisgarh.pdf" class="dropdown-item p-2" target="_blank">Justice Unfolded - Saga of High Court of Chhattisgarh</a>
+                            <a href="../e_book/DistrictCourtsofChhattisgarh.pdf" class="dropdown-item p-2" target="_blank">District Court of Chhattisgarh</a>
+                            <a href="../e_book/Legal_Glossary_final.pdf" class="dropdown-item p-2" target="_blank">Legal Glossary</a>
+                                <a href="../e_book/90DaysMediationDrive.pdf" class="dropdown-item p-2" target="_blank">A Journey of Resolution and Harmony</a>
+                        </div>
+                    </div>
+
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown">Judicial</a>
+                        <div class="dropdown-menu bg-primary mt-2">
+                            <a href="../noti/roster.php" class="dropdown-item p-2">Roster</a>
+                            <a href="https://highcourt.cg.gov.in/clists/index.php" class="dropdown-item p-2">Cause
+                                List</a>
+                            <a href="../judicial/case_status.php" class="dropdown-item p-2">Case
+                                Status</a>
+                            <a href="https://highcourt.cg.gov.in/hcbspjudgement/eilr.php" class="dropdown-item p-2" target="_blank">Judgement (AFR)</a>
+                            <a href="https://highcourt.cg.gov.in/hcbspjudgement/oj_search.php" class="dropdown-item p-2" target="_blank">Order/Judgement </a>
+                <a href="https://highcourt.cg.gov.in/hcbspjudgement/reserve_oj_search.php" class="dropdown-item p-2" target="_blank">Reserve Cases Report </a>
+                            <a href="https://highcourt.cg.gov.in/interim_order/intrimOrder.php" class="dropdown-item p-2" target="_blank">Daily Order Judgement <small>(Upto June 2015)</small></a>
+                            <a href="https://highcourt.cg.gov.in/judicial/mpmla/2026/mpmla.php" class="dropdown-item p-2">MP/MLA Cases List </a>
+                            <a href="../hcbilaspurweb/compensation_deposit.php" class="dropdown-item p-2">MACT &amp; Labour Court Compensation </a>
+                            <a href="https://highcourt.cg.gov.in/mediation/main.htm" class="dropdown-item p-2" target="_blank">Mediation </a>
+                            <a href="https://highcourt.cg.gov.in/jj/main.htm" class="dropdown-item p-2" target="_blank">Juvenile Justice</a>
+                            <a href="../judicial/FilingInstructions.pdf" class="dropdown-item p-2">Filing
+                                Instruction</a>
+                            <a href="../judicial/Std_Coun.pdf" class="dropdown-item p-2">Standing Counsel </a>
+                            <a href="../judicial/bast_practices.pdf" class="dropdown-item p-2">Best Practice </a>
+                        </div>
+                    </div>
+
+                    <div class="nav-item dropdown custom-dropdown">
+                        <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown">IT</a>
+                        <div class="dropdown-menu bg-primary mt-2">
+                            <a href="../committees/com_committee.php" class="dropdown-item p-2">Committee</a>
+                            <a href="https://ecommitteesci.gov.in/" class="dropdown-item p-2">e-Committee</a>
+                            <!-- <li class="nav-item">
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">e-Courts(C.G.)</a>
+                                <ul class="dropdown-submenu bg-primary">
+                                    <a class="dropdown-item p-2" href="download/jo_code.pdf" target="_blank">JO Code Detail</a>
+                                    <a class="dropdown-item p-2" href="download/judges/List_of_Ubuntu_Master_Trainers.pdf" target="_blank">Judges</a>
+                                    <a class="dropdown-item p-2" href="download/master_trainers_advocates.pdf" target="_blank">Advocates</a>
+                                    <a class="dropdown-item p-2" href="download/DSA.pdf" target="_blank">District System Administrator</a>
+                                    <a class="dropdown-item p-2" href="download/master_trainers_staff.pdf" target="_blank">Staff</a>
+                                </ul>
+                            </li> -->
+
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">e-Courts(C.G.)</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="../download/jo_code.pdf" target="_blank">JO Code Detail</a></li>
+                                    <li><a class="dropdown-item p-2" href="../download/judges/List_of_Ubuntu_Master_Trainers.pdf" target="_blank">Judges</a></li>
+                                    <li><a class="dropdown-item p-2" href="../download/master_trainers_advocates.pdf" target="_blank">Advocates</a></li>
+                                    <li><a class="dropdown-item p-2" href="../download/DSA.pdf" target="_blank">District System Administrator</a></li>
+                                    <li><a class="dropdown-item p-2" href="../download/master_trainers_staff.pdf" target="_blank">Staff</a></li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">NJDG</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="https://njdg.ecourts.gov.in/hcnjdg_v2/" target="_blank">High Court</a></li>
+                                    <li><a class="dropdown-item p-2" href="https://njdg.ecourts.gov.in/njdg_v3/" target="_blank">District Court</a></li>
+                                </ul>
+                            </li>
+                            <a href="https://ecourts.gov.in/ecourts_home/" class="dropdown-item p-2">e-Court</a>
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">Download</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="../download.php">Operating System</a></li>
+                                    <li><a class="dropdown-item p-2" href="../drivers.php">Drivers</a></li>
+                                    <li><a class="dropdown-item p-2" href="../apk.php">Applications/APK</a></li>
+                                    <li><a class="dropdown-item p-2" href="../manual/pages/manual.php">English Manual</a></li>
+                                    <li><a class="dropdown-item p-2" href="../manual/pages/h_manual.php">Hindi Manual</a></li>
+
+                                    <li><a class="dropdown-item p-2" href="../download/sitepreparation.pdf">Site Preparation</a></li>
+                                    <li><a class="dropdown-item p-2" href="../download/adv_req_form.pdf">Advocate Registration Form</a></li>
+                                    <li><a class="dropdown-item p-2" href="../download/forms/Civil_Forms.pdf">Civil Form</a></li>
+                                    <li><a class="dropdown-item p-2" href="../download/forms/Criminal_Forms.pdf">Criminal Form</a></li>
+
+                                </ul>
+                            </li>
+
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">Training</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="../manual/pages/manual.php">English Tutorial</a></li>
+                                    <li><a class="dropdown-item p-2" href="../manual/pages/h_manual.php">Hindi Tutorial</a></li>
+                                    <li><a class="dropdown-item p-2" href="https://www.youtube.com/watch?v=irn_qVKi2N4">Video 1</a></li>
+                                    <li><a class="dropdown-item p-2" href="https://www.youtube.com/watch?v=ZwiNRPa22cc">Video 2</a></li>
+
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">e-Services Video</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="https://www.youtube.com/watch?v=tS4wID3xpWE">Joining Virtual Court</a></li>
+                                    <li><a class="dropdown-item p-2" href="https://www.youtube.com/watch?v=9_ODRBkUggg">e-Stamping 1</a></li>
+                                    <li><a class="dropdown-item p-2" href="https://www.youtube.com/watch?v=crVgtRFsxVU">e-Stamping 2</a></li>
+                                </ul>
+                            </li>
+                            <a href="../gallery/eCourtgallery.php" class="dropdown-item p-2">e-Courts Event</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown custom-dropdown">
+                        <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown">Others</a>
+                        <div class="dropdown-menu bg-primary mt-2">
+                            <a href="../noti/officeorder.php" class="dropdown-item p-2">Office Order</a>
+                            <a href="../noti/notificationonly.php" class="dropdown-item p-2">Notification</a>
+                            <a href="../noti/information.php" class="dropdown-item p-2">Other Notice</a>
+                            <a href="../other/sale.php" class="dropdown-item p-2">Sale Notice</a>
+                            <a href="https://highcourt.cg.gov.in/online_rti/index.php" class="dropdown-item p-2">Online RTI Portal</a>
+                            <a href="../calendar/calendar.php" class="dropdown-item p-2">Yearly Calender</a>
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">Gallery</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="../gallery.php">Photo Gallery</a></li>
+                                    <li><a class="dropdown-item p-2" href="../speech.php">Speech/Article</a></li>
+                                    <li><a class="dropdown-item p-2" href="../gallery/eCourtgallery.php">e-Courts Event</a></li>
+                                    <li><a class="dropdown-item p-2" href="../gallery/Archieve.php">Archieve</a></li>
+                                </ul>
+                            </li>
+                            <a href="../asset_detail/assets/assets.pdf" class="dropdown-item p-2">Assets Detail</a>
+                            <a href="../related_links.php" class="dropdown-item p-2">Web Links</a>
+
+                        </div>
+                    </div>
+
+
+                    <div class="nav-item dropdown custom-dropdown">
+                        <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown">Information</a>
+                        <div class="dropdown-menu bg-primary mt-2">
+                            <a href="../information/rule/rule.php" class="dropdown-item p-2">Rules</a>
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">Recruitment</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="../recruit/recruithc.php">High Court Recruitment</a></li>
+                                    <li><a class="dropdown-item p-2" href="../recruit/recruitdc.php">District Court Recruitment</a></li>
+                                    <li><a class="dropdown-item p-2" href="../recruit/drt/page/recruitdrt.php">Pre/Post Retiral Recruitment</a></li>
+                                </ul>
+                            </li>
+
+
+                            <a href="../noti/tender.php" class="dropdown-item p-2">Tender</a>
+                            <a href="../statistics/sta.php" class="dropdown-item p-2">Statistical Report</a>
+                            <li>
+                                <a href="#" class="dropdown-item p-2 dropdown-toggle">NewsLetter</a>
+                                <ul class="dropdown-menu bg-primary border border-white">
+                                    <li><a class="dropdown-item p-2" href="../Newsletter/newsletter.php" target="_blank">e-Committee</a></li>
+                                    <li><a class="dropdown-item p-2" href="http://cgslsa.gov.in/NewsLetter.htm" target="_blank">SLSA Bilaspur</a></li>
+                                </ul>
+                            </li>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex">
+                    <div class="dropdown" id="accessibility-dropdown">
+                        <button class="btn btn-sm-square" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="true">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end bg-primary" aria-labelledby="dropdownMenuButton">
+                            <li class="px-3">
+                                <span class="mx-1">Theme Colors</span>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <span class="box theme_box_1" role="button" tabindex="0" data-color="#bf9456"></span>
+                                    <span class="box theme_box_2" role="button" tabindex="0" data-color="#86A39F"></span>
+                                    <span class="box theme_box_3" role="button" tabindex="0" data-color="#AA81A0"></span>
+                                    <span class="box theme_box_4" role="button" tabindex="0" data-color="rgb(157, 155, 224)"></span>
+                                    <span class="box theme_box_5" role="button" tabindex="0" data-color="rgb(10, 120, 139)"></span>
+                                    <span class="box theme_box_6" role="button" tabindex="0" data-color="#fbaaca"></span>
+                                    <span class="box theme_box_7" role="button" tabindex="0" data-color="rgb(101, 139, 132)"></span>
+                                    <span class="box theme_box_8" role="button" tabindex="0" data-color="rgb(233, 129, 129)"></span>
+                                    <span class="box theme_box_9" role="button" tabindex="0" data-color="#AF3D48"></span>
+                                    <span class="box theme_box_10" role="button" tabindex="0" data-color="rgb(231 141 52)"></span>
+                                </div>
+                            </li>
+                            <hr>
+                            <li class="px-3">
+                                <span class="mx-1">Text Size</span>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <span class="border border-white mx-1 p-1" role="button" tabindex="0" id="btn-increase">A+</span>
+                                    <span class="border border-white mx-1 p-1" role="button" tabindex="0" id="btn-decrease">A-</span>
+                                    <span class="border border-white mx-1 p-1" role="button" tabindex="0" id="btn-orig">A</span>
+                                </div>
+                            </li>
+                            <hr>
+                            <li class="px-3">
+                                <span class="mx-1">Language</span>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <span class="border border-white mx-1 p-1" id="btn-eng-lang" role="button" tabindex="0">English</span>
+                                    <span class="border border-white mx-1 p-1" id="btn-hin-lang" role="button" tabindex="0">हिन्दी</span>
+                                </div>
+                            </li>
+                            <hr>
+                            <li class="px-3">
+                                <span class="mx-1">Mode</span>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <span class=" border border-white mx-1 p-1" role="button" tabindex="0" id="btn-light-theme">Light</span>
+                                    <span class=" border border-white mx-1 p-1" role="button" tabindex="0" id="btn-dark-theme">Dark</span>
+                                </div>
+                            </li>
+                            <hr>
+                            <li class="px-3">
+                                <a href="../screen_reader_access.php"><span class="text-white">Screen Reader Access</span></a>
+
+                            </li>
+                        </ul>
+
+                    </div>
+                    <!-- <a class="btn btn-primary btn-sm-square"
+                        data-toggle="tooltip" data-placement="top"
+                        title="YouTube"
+                        href="https://www.youtube.com/@highcourtofchhattisgarh3160/videos" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a class="btn btn-primary btn-sm-square"
+                        data-toggle="tooltip" data-placement="top"
+                        title="Telegram" href="https://t.me/+WM28BXeybykzODNl" target="_blank"><i
+                            class="fab fa-telegram-plane"></i></a> -->
+                </div>
+
+            </div>
+        </nav>
+    </div>
+    <!-- Navbar End -->
+<div class="container py-3">
+        <div class="container-fluid mt-2  mb-2">
+
+        <div class="card-body">
+
+
+
+            <form class="g-3 needs-validation" novalidate="" action="oj_search.php" method="POST" id="oj-search-form">
+                <div class="mt-3">
+
+                    <div class="d-flex align-items-center gap-2">
+                        <h2 class="mb-0">Order and Judgement Search</h2>
+                        <span data-bs-toggle="tooltip" title="Filters from multiple tabs can be applied simultaneously. Each request can return up to 10,000 results.">
+                            <i class="bi bi-info-circle fs-4 text-primary"></i>
+                        </span>
+                    </div>
+                    <!-- <p>To make the tabs toggleable, add the data-toggle="tab" attribute to each link. Then add a .tab-pane class with a unique ID for every tab and wrap them inside a div element with class .tab-content.</p> -->
+                    <br>
+
+                    
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#home">Case Number</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#menu7">Filling Number</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#menu4">Date Range</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#menu1">Judge Name</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#menu2">Neutral Citation</a></li>
+
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#menu5">Party Name</a></li>
+                        <!-- <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#menu6">Hindi Judgement</a></li> -->
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="menu4" class="container tab-pane fade">
+                            <div class="row mt-4">
+                                <div class="col-md-3">
+                                    <label for="afrm" class="form-label">
+                                        From Date
+                                    </label>
+                                    <input type="date" id="afrm" name="afrm" class="form-select">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="afry" class="form-label">
+                                        To Date
+                                    </label>
+                                    <input type="date" id="afry" name="afry" class="form-select">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="menu1" class="container tab-pane fade">
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <label for="judge_name" class="form-label">
+                                        Judge Name
+                                    </label>
+
+                                    <select class="form-select" aria-label="Select Judge" id="judge_name" name="judge_name">
+                                        <option value="-1">select</option>
+                                        <option value="133">Hon'ble The Chief Justice Shri Ramesh Sinha</option><option value="16">Hon'ble Shri  Justice Sanjay K. Agrawal</option><option value="51">Hon'ble Shri Justice Sanjay Agrawal</option><option value="58">Hon'ble Shri Justice Parth Prateem Sahu</option><option value="62">Hon'ble Shri Justice Narendra Kumar Vyas</option><option value="63">Hon'ble Shri Justice Naresh Kumar Chandravanshi</option><option value="121">Hon'ble  Shri Justice Sachin Singh Rajput</option><option value="122">Hon'ble Shri Justice Rakesh Mohan Pandey</option><option value="123">Hon'ble Shri Justice Radhakishan Agrawal</option><option value="135">Hon'ble Shri Justice Sanjay Kumar Jaiswal</option><option value="136">Hon'ble Shri Justice Ravindra Kumar Agrawal</option><option value="138">Hon'ble Shri Justice Bibhu Datta Guru</option><option value="139">Hon'ble Shri Justice Amitendra Kishore Prasad</option><option value="50">Hon'ble Shri Justice Deepak Gupta</option><option value="54">Hon'ble Shri Justice Thottathil B. Radhakrishnan</option><option value="111">Hon'ble Shri Justice Ajay Kumar Tripathi</option><option value="113">Hon'ble The Chief Justice Shri P. R. Ramachandra Menon</option><option value="120">Hon'ble The Chief Justice Shri Arup Kumar Goswami</option><option value="24">Hon'ble Shri Justice Navin Sinha </option><option value="18">Hon'ble Shri Justice Inder Singh Uboweja</option><option value="53">Hon'ble Shri Justice Anil Kumar Shukla</option><option value="19">Hon'ble Shri Justice Chandra Bhushan Bajpai</option><option value="7">Hon'ble Shri Justice Pritinker Diwaker</option><option value="56">Hon'ble Shri Justice Ram Prasanna Sharma</option><option value="55">Hon'ble Shri Justice Sharad Kumar Gupta</option><option value="9">Hon'ble Shri Justice Prashant Kumar Mishra</option><option value="10">Hon'ble Shri Justice Manindra Mohan Shrivastava</option><option value="60">Hon'ble Smt. Justice Vimla Singh Kapoor</option><option value="52">Hon'ble Shri Justice Rajendra Chandra Singh Samant</option><option value="59">Hon'ble Shri Justice Gautam Chourdiya</option><option value="17">Hon'ble Shri Justice P. Sam Koshy </option><option value="57">Hon'ble Shri Justice Arvind Singh Chandel</option><option value="15">Hon'ble Shri Justice Goutam Bhaduri</option><option value="119">Hon'ble  Shri Justice Deepak Kumar Tiwari</option><option value="137">Hon'ble Shri Justice Arvind Kumar Verma</option><option value="61">Hon'ble Smt. Justice Rajani Dubey</option>                                    </select>
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="menu2" class="container tab-pane fade">
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <label for="citation_year" class="form-label">Citation Year</label>
+                                    <input type="text" class="form-control" id="citation_year" name="citation_year" placeholder="Citation Year" pattern="\d{4}" title="Please enter a valid NC year (four digits)." maxlength="4">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="citation_number" class="form-label">Citation Number</label>
+                                    <input type="number" class="form-control" id="citation_number" name="citation_number" placeholder="Citation Number" title="Please enter a valid NC number.">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="menu3" class="container tab-pane fade">
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <label for="ilr_citation_year" class="form-label">ILR Citation Year</label>
+                                    <input type="text" class="form-control" id="ilr_citation_year" name="ilr_citation_year" placeholder="ILR Citation Year" pattern="\d{4}" title="Please enter a valid ILR year (four digits)." maxlength="4">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="ilr_citation_number" class="form-label">ILR Citation Number</label>
+                                    <input type="number" class="form-control" id="ilr_citation_number" name="ilr_citation_number" placeholder="ILR Citation Number">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="home" class="container tab-pane active">
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <label for="case_type" class="form-label"> Case Type </label>
+
+                                    <select class="form-select" name="case_type" id="case_type">
+                                        <option value="">Select</option>
+                                        <option value="67">ACQA</option><option value="28">ARBA</option><option value="68">ARBAP</option><option value="69">ARBR</option><option value="13">AW</option><option value="11">CA</option><option value="20">CEA</option><option value="19">CER</option><option value="32">CESR</option><option value="34">COMA</option><option value="12">COMP</option><option value="25">CONC</option><option value="17">CONT</option><option value="57">CONTR</option><option value="41">CONTS</option><option value="1">CP</option><option value="8">CR</option><option value="50">CRA</option><option value="59">CRMP</option><option value="51">CRR</option><option value="58">CRREF</option><option value="35">CS</option><option value="71">CVLREF</option><option value="10">EA</option><option value="30">EDR</option><option value="9">EP</option><option value="5">FA</option><option value="24">FAM</option><option value="70">FA(MAT)</option><option value="18">ITA</option><option value="15">ITR</option><option value="2">LPA</option><option value="3">MA</option><option value="26">MAC</option><option value="7">MCA</option><option value="4">MCC</option><option value="21">MCCS</option><option value="22">MCP</option><option value="52">MCRC</option><option value="64">MCRCA</option><option value="65">MCRP</option><option value="49">MP</option><option value="38">MWP</option><option value="14">OD</option><option value="23">REVP</option><option value="6">SA</option><option value="33">STR</option><option value="27">TAXC</option><option value="29">TPC</option><option value="66">TPCR</option><option value="42">WA</option><option value="36">WP</option><option value="37">WP227</option><option value="46">WPC</option><option value="47">WPCR</option><option value="48">WPHC</option><option value="43">WPL</option><option value="45">WPPIL</option><option value="39">WPS</option><option value="44">WPT</option><option value="31">WTA</option><option value="16">WTR</option>                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="case_number" class="form-label"> Case Number </label>
+                                    <input type="number" class="form-control" id="case_number" name="case_number" placeholder="Case Number" maxlength="7">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="case_year" class="form-label"> Case Year </label>
+                                    <input type="text" class="form-control" id="case_year" name="case_year" placeholder="Case Year" pattern="\d{4}" title="Please enter a valid Case year (four digits)." maxlength="4">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="menu5" class="container tab-pane fade">
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <label for="party_name" class="form-label"> Party Name </label>
+                                    <input type="text" class="form-control" id="party_name" name="party_name" placeholder="Petitioner/Respondent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="menu7" class="container tab-pane fade">
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <label for="fcase_type" class="form-label"> Case Type </label>
+
+                                    <select class="form-select" name="fcase_type" id="fcase_type">
+                                        <option value="">Select</option>
+                                        <option value="67">ACQA</option><option value="28">ARBA</option><option value="68">ARBAP</option><option value="69">ARBR</option><option value="13">AW</option><option value="11">CA</option><option value="20">CEA</option><option value="19">CER</option><option value="32">CESR</option><option value="34">COMA</option><option value="12">COMP</option><option value="25">CONC</option><option value="17">CONT</option><option value="57">CONTR</option><option value="41">CONTS</option><option value="1">CP</option><option value="8">CR</option><option value="50">CRA</option><option value="59">CRMP</option><option value="51">CRR</option><option value="58">CRREF</option><option value="35">CS</option><option value="71">CVLREF</option><option value="10">EA</option><option value="30">EDR</option><option value="9">EP</option><option value="5">FA</option><option value="24">FAM</option><option value="70">FA(MAT)</option><option value="18">ITA</option><option value="15">ITR</option><option value="2">LPA</option><option value="3">MA</option><option value="26">MAC</option><option value="7">MCA</option><option value="4">MCC</option><option value="21">MCCS</option><option value="22">MCP</option><option value="52">MCRC</option><option value="64">MCRCA</option><option value="65">MCRP</option><option value="49">MP</option><option value="38">MWP</option><option value="14">OD</option><option value="23">REVP</option><option value="6">SA</option><option value="33">STR</option><option value="27">TAXC</option><option value="29">TPC</option><option value="66">TPCR</option><option value="42">WA</option><option value="36">WP</option><option value="37">WP227</option><option value="46">WPC</option><option value="47">WPCR</option><option value="48">WPHC</option><option value="43">WPL</option><option value="45">WPPIL</option><option value="39">WPS</option><option value="44">WPT</option><option value="31">WTA</option><option value="16">WTR</option>                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="fcase_number" class="form-label"> Filing Number </label>
+                                    <input type="number" class="form-control" id="fcase_number" name="fcase_number" placeholder="Filing Number">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="fcase_year" class="form-label"> Filling Year </label>
+                                    <input type="text" class="form-control" id="fcase_year" name="fcase_year" placeholder="Filing Year" pattern="\d{4}" title="Please enter a valid filling year (four digits)." maxlength="4">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-4 me-1">
+                                <img src="captcha.php" id="captcha" class="img-fluid">
+                                &nbsp;
+                                <a href="#" id="clickme">
+                                    <img src="assets_new/img/audio_icon.png" id="captcha_audio">
+                                </a>
+
+                                <a href="#" id="change-image">Change code</a>
+
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <input type="text" name="captcha" id="captcha-form" autocomplete="off" placeholder="Enter Captcha" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="submit" class="btn btn-outline-primary" name="button1" value="Submit" size="2,20">
+                                <input type="submit" class="btn btn-outline-danger" name="reset1" value="Reset" size="2,20">
+                            </div>
+                        </div>
+
+                        <div align="left" class="col-auto">
+                            <div class="row bg-transparent m-0 rounded-2">
+
+
+                                
+                            </div>
+
+                        </div>
+                    </div>
+                    
+            
+        </div></form>
+    </div>
+</div>
+
+</div>
+<!-- Footer Start -->
+<div class="container-fluid footer position-relative bg-dark text-white-50 py-5 fadeIn" data-wow-delay="0.2s">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <a href="" class="navbar-brand">
+                    <h3 class="text-primary mb-0">High Court of
+                        Chhattisgarh</h3>
+                </a>
+                <p class="text-muted">The Chhattisgarh High Court was established on 1st of
+                    November 2000 as a separate High Court for newly
+                    created State of Chhattisgarh under the Madhya
+                    Pradesh Reorganisation Act, 2000 having its
+                    jurisdiction over the territories of the state of
+                    Chhattisgarh.</p>
+                <div class="d-flex justify-content-start mt-4">
+                    <!-- <a class="btn btn-primary me-3"
+                        href="https://www.youtube.com/@highcourtofchhattisgarh3160/videos"><i class="fab fa-youtube"></i></a>
+                    <a class="btn btn-primary me-3"
+                        href="https://t.me/+WM28BXeybykzODNl"><i class="fab fa-telegram"></i></a> -->
+                    <p class="mx-2 text-muted"><i class="fab fa-youtube me-1 text-primary"></i>
+                        <a href="https://www.youtube.com/@highcourtofchhattisgarh3160/videos" class="text-primary" target="_blank">Visit Our YouTube Channel</a>
+                    </p>
+                    <p class="mx-2 text-muted"><i class="fab fa-telegram me-1 text-primary"></i>
+                        <a href="https://t.me/+WM28BXeybykzODNl" class="text-primary" target="_blank">Visit Our Telegram Channel</a>
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <p class="text-muted"><i class="fa fa-map-marker-alt me-2"></i>238W+XPH,
+                        Raipur - Bilaspur Expy, Bodri, Bilaspur,
+                        Chhattisgarh 495003</p>
+                    <p class="text-muted"><i class="fa fa-phone-alt me-2"></i>077522
+                        41040</p>
+                    <p class="text-muted"><i class="fa fa-envelope me-2"></i>
+                        highcourt[dot]cg[at]gov[dot]in</p>
+                    <p class="text-muted"><i class="fa fa-download me-2"></i>
+                        <a href="" class="text-primary">e-Gate Pass Download</a>
+                    </p>
+
+                    <!-- <p><i
+                            class="fab fa-youtube me-2"></i>
+                        <a href="" class="text-muted">Visit Our YouTube Channel</a>
+                    </p>
+                    <p><i
+                            class="fab fa-telegram me-2"></i>
+                        <a href="" class="text-muted">Telegram</a>
+                    </p> -->
+                    <!-- <div class="col-sm-6">
+                                <h5 class="text-primary mb-4">Quick Links</h5>
+                                <a class="btn btn-link" href>About Us</a>
+                                <a class="btn btn-link" href>Contact Us</a>
+                                <a class="btn btn-link" href>Our Services</a>
+                                <a class="btn btn-link" href>Terms &
+                                    Condition</a>
+                            </div>
+                            <div class="col-sm-6">
+                                <h5 class="text-primary mb-4">Popular Links</h5>
+                                <a class="btn btn-link" href>About Us</a>
+                                <a class="btn btn-link" href>Contact Us</a>
+                                <a class="btn btn-link" href>Our Services</a>
+                                <a class="btn btn-link" href>Terms &
+                                    Condition</a>
+                            </div>
+                            <div class="col-sm-12">
+                                <h5 class="text-primary mb-4">Gallery</h5>
+                            </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer End -->
+
+<!-- Copyright Start -->
+<div class="container-fluid bg-dark text-white border-top border-secondary py-4 fadeIn" data-wow-delay="0.1s">
+    <div class="container">
+        <div class="row">
+            <!-- <div
+                        class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        &copy; <a class="border-bottom" href="#">High Court of
+                            Chhattisgarh</a>, All Right Reserved.
+                    </div> -->
+            <div class="col-md-12 text-center text-muted">
+
+                Site is Designed and Maintained by High Court Computer
+                Cell Bilaspur. <a href="disclaimer.php" class="text-primary">(Disclaimer)</a><br>
+                Hosted by National Informatics Centre (NIC), Ministry of
+                Electronics &amp; Information Technology, Government of
+                India.            </div>
+        </div>
+    </div>
+</div>
+<!-- Copyright End -->
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+<!-- JavaScript Libraries -->
+
+<script src="assets_new/js/googleapis/jquery.min.js"></script>
+
+<script src="assets_new/js/cdnjs/bootstrap.bundle.min.js"></script>
+<script src="assets_new/lib/wow/wow.min.js"></script>
+<script src="assets_new/lib/easing/easing.min.js"></script>
+<script src="assets_new/lib/waypoints/waypoints.min.js"></script>
+<script src="assets_new/lib/counterup/counterup.min.js"></script>
+<script src="assets_new/lib/lightbox/js/lightbox.min.js"></script>
+<script src="assets_new/lib/owlcarousel/owl.carousel.min.js"></script>
+<!-- jQuery (necessary for Owl Carousel) -->
+<script src="assets_new/js/cdnjs/jquery.min.js"></script>
+
+<!-- Owl Carousel JS -->
+<script src="assets_new/js/cdnjs/owl.carousel.min.js"></script>
+<!-- Template Javascript -->
+<script src="assets_new/js/main.js"></script>
+<script src="assets_new/js/index.js"></script>
+<script src="assets_new/js/footer.js"></script>
+<script src="assets_new/DataTables/datatables.min.js"></script>
+<script src="assets_new/local/oj_search.js"></script>
+
+
+
+<div id="lightboxOverlay" tabindex="-1" class="lightboxOverlay" style="display: none;"></div><div id="lightbox" tabindex="-1" class="lightbox" style="display: none;"><div class="lb-outerContainer"><div class="lb-container"><img class="lb-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt=""><div class="lb-nav"><a class="lb-prev" role="button" tabindex="0" aria-label="Previous image" href=""></a><a class="lb-next" role="button" tabindex="0" aria-label="Next image" href=""></a></div><div class="lb-loader"><a class="lb-cancel" role="button" tabindex="0"></a></div></div></div><div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span><span class="lb-number"></span></div><div class="lb-closeContainer"><a class="lb-close" role="button" tabindex="0"></a></div></div></div></div></body></html>

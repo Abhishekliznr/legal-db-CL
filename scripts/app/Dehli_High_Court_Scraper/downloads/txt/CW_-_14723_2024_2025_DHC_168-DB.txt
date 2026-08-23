@@ -1,0 +1,327 @@
+*	IN  THE  HIGH  COURT  OF  DELHI  AT NEW  DELHI
+%		 		  Judgment reserved on: 13 December 2024
+            Judgment pronounced on: 15 January, 2025
+
++ 	W.P.(C) 10680/2024 & CM APPL. 43919/2024 (Stay) 
+
+	CENTRAL ELECTRICITY REGULATORY 
+     COMMISSION					.....Petitioner
+Through:	Mr. Ajay Vohra, Sr. Adv. with Mr. Vishal Kumar, Adv. 
+
+				versus
+
+THE ADDITIONAL DIRECTOR DIRECTORATE GENERAL OF GST INTELLIGENCE (DGGI) & ANR.	.....Respondents 
+
+Through:	Mr. Harpreet Singh, SSC with Ms. Suhani Mathur, Adv. 
+	Mr. Piyush Gupta, CGSC with Mr. Prateek Gupta & Mr. Atishay Jain, Advs. 
+
+
++ 	W.P.(C) 14723/2024 & CM APPL. 61848/2024 (Stay)  
+
+	DELHI ELECTRICITY REGULATORY 
+     COMMISSION					.....Petitioner
+Through:	Mr. Sujit Ghosh, Sr. Adv. with Ms. Mannat Waraich & Ms. Ananya Goswami, Advs. 
+	Mr. Anirudh Dusaj, ASC. 
+	Mr. Prashant Mehta, SC with Mr. Pranav Singh, Adv. 
+
+				versus
+
+ADDITIONAL COMMISSIONER OF CGST DELHI SOUTH COMMISSIONERATE & ORS.		.....Respondents 
+Through:	Mr. Akshay Amritanshu, SSC with Ms. Swati Mishra, Ms. Dristi Saraf & Ms. Pragya Upadhyay, Advs. 
+
+
+
+     CORAM:
+     HON'BLE MR. JUSTICE YASHWANT VARMA
+     HON'BLE MR. JUSTICE DHARMESH SHARMA 
+J U D G M E N T
+
+YASHWANT VARMA, J.
+
+CM APPL.73286/2024 (for delay of 15 days in filing Rejoinder) in
+W.P.(C) 10680/2024
+
+     Bearing in mind the disclosures made in the application, the delay of 15 days in filing a rejoinder is condoned. 
+     The application stands disposed of. 
+CM APPL.73285/2024 (for delay of 07 days in filing of Counter 
+Affidavit) in W.P.(C) 14723/2024
+ 
+     Bearing in mind the disclosures made in the application, the delay of 07 days in filing the counter affidavit is condoned. 
+     The application stands disposed of. 
+W.P.(C) 10680/2024 & CM APPL. 43919/2024 (Stay) 
+W.P.(C) 14723/2024 & CM APPL. 61848/2024 (Stay)
+
+1. The Central Electricity Regulatory Commission1 as well as the Delhi Electricity Regulatory Commission2 have petitioned this Court assailing the validity of Show Cause Notices3 dated 29 May 2024 and 23 July 2024 respectively pursuant to which the respondents have sought to call upon them to discharge liabilities emanating from the Central Goods and Services Tax Act, 20174 and the Integrated Goods and Services Tax Act, 20175 in respect of the fee received by them in the course of discharge of their regulatory functions under the Electricity Act, 20036. The respondents have sought to draw a dichotomy between the �adjudicatory� and �regulatory� functions which these two statutory bodies discharge to essentially hold that the revenue earned from the latter would be subject to tax under the CGST and IGST Acts. In order to appreciate the stand which has been taken by the respondents, it would be apposite to take note of the assertions made in the SCNs� which are impugned before us.  However, and for the sake of brevity and since both SCNs� proceed on identical lines, we propose to notice the allegations as levelled in the SCN issued to the CERC.
+2.  The respondents assert that based on intelligence which was gathered, it was found that CERC was not discharging its Goods and Services Tax7 liabilities on amounts received by it as tariff and license fee from various power utilities. It asserts that the aforesaid functions discharged by CERC would fall under �support services to electricity transmission and distribution services under Service Accounting Code8 998631� as per serial no. 466 of the Annexure to Notification No. 11/2017-Central Tax (Rate) dated 28 June 2017 read along with the Explanatory Notes to the Scheme of Classification of Services as adopted by the Central Board of Indirect Taxes and Customs9. They take the stand that the support services so rendered would be taxable as per Serial No. 24(ii) of Notification No. 8/2017-Integrated Tax (Rate) dated 28 June 2017 and thus falling within the ambit of �Support services to mining, electricity, gas and water distribution�. 
+3. While it is conceded that no GST is leviable on services by way of transmission or distribution of electricity by an electricity transmission or distribution utility and the same not being subject to tax by virtue of Serial No. 26 of Notification No. 9/2017-Integrated Tax (Rate) dated 28 June 2017, however, support services rendered in the context of electricity transmission and distribution services under SAC 998631 are taxable @18%. They thus take the view that while concededly the functions performed by the CERC are distinct and different from transmission or distribution of electricity by a utility, however, it would fall under the category of �support services� to electricity transmission and distribution service providers. They further hold that since the CERC is neither engaged in electricity transmission nor functioning as a distribution utility, it cannot claim exemption from payment of GST. 
+4. The SCNs� impugned before us appear to have been preceded by various notices which were issued by the respondents seeking to elicit the stand of the two statutory bodies. From the disclosures which were made by the CERC, the respondents had taken note of the following amounts received by it under the heads of filing fee, tariff fee, license fee, annual registration fee and miscellaneous fee. This is evident from a reading of Para 4 of the notice issued to CERC and which is reproduced hereinbelow: -
+�Whereas, it was observed from the Annual Reports uploaded by CERC on its official website- �::: Central Electricity Regulatory Commission :::(cercind.gov.in)� that CERC is majorly having its income from �Fees� collected. The amount of Income from Fee has been taken as declared under Schedule of �Income from Fee� or Schedule of �CERC Fund- Direct Income� forming part of Balance Sheet of each Financial Year and is as tabulated below (RUD- 6)-
+								     Table-I
+(Amount in Lakh)
+Financial yearFiling Fee/ Tariff FeeLicence FeeAnnual Registration FeeMiscellaneous FeeTotal Fee2019-209,793.965,981.095899.6415,932.692020-218,708.445,240.575882.5514,089.562021-229,988.065,984.6177.6977.9216128.282022-2310,180.516241.8694.3117.3216534.00Total38,670.9723,448.13288.00277.4362,684.53�
+5. The CERC appears to have taken the stand that it essentially discharges statutory functions and is thus and fundamentally not engaged in any trade or commerce. It further questioned the bifurcation that the respondents sought to make between its adjudicatory and regulatory roles. In view of the above, it took the position that absent any commercial consideration or business objective, the discharge of such statutory activities in public interest cannot be subjected to a levy under either the CGST or the IGST. 
+6. The details of the amounts received by CERC under the aforenoted heads is then again taken into consideration in Para 4.6 which is reproduced hereunder:-
+�4.6 In response to this office letter dated 14.02.2024, Mis CERC vide their office letter dated 16.04.2024 (RUD-9) informed about the legal advice received by them, stating that the regulatory functions performed by CERC, such as tariff determination and licensing, are akin to quasi-judicial activities under the Electricity Act. Consequently, these activities do not constitute a �supply� of services and are not subject to Goods and Services Tax (GST). Further, vide the said letter dated 16.04.2024 (RUD-9 Supra), M/s CERC submitted the statement showing detail of fee received by CERC and the same is as tabulated below-
+�
+7. The respondents thereafter and while bearing in consideration the words �supply� and �services� as defined have held as under: -
+�6.1. The above contention by CERC does not appear tenable on the facts that a taxable event in the GST regime is supply of goods or services or both. The term, �supply� has been inclusively defined in the Act, Section 7 of CGST Act, 2017 (hereinafter referred as the CGST Act) read with Section 2 (21) of IGST Act, 2017 (hereinafter referred as the IGST Act) define the scope of supply which reads as under:-
+(1) For the purposes of this Act, the expression - �supply� includes-
+(a) all forms of supply of goods or services or both such as sale, transfer, barter, exchange, licence, rental, lease or disposal made or agreed to be made for a consideration by person in the course or furtherance of business;
+6.1.1. Further, �services� is defined under sub-section 102 of Section 2 of CGST Act, 2017 ( as amended) read with Section 2 (24) of the IGST Act, 2017 ( as amended) which states that �services� means anything other than goods, money and securities but includes activities relating to the use of money or its conversion by cash or by any other mode, from one form, currency or denomination, to another form, currency or denomination for which a separate consideration is charged. Therefore, anything other than goods, money and securities will also include the activities of �regulating the tariff of generating companies owned or controlled by the Central Government, regulating the inter-State transmission of electricity, to issue licenses to persons to function as transmission licensee and electricity trader with respect to their inter-State operations; to levy fees for the purposes of this Act� falls under the scope of �Supply of Services�.
+6.2 Whereas, Section 2(31 )(a) of the CGST Act, 2017 (as amended) read with Section 2 (24) of the IGST Act, 2017 (as amended) states that �consideration� in relation to the supply of goods or services or both includes -any payment made or to be made, whether in money or otherwise, in respect of, in response to, or for the inducement of, the supply of goods or services or both, whether by the recipient or by any other person but shall not include any subsidy given by the Central Government or a State Government.�
+8. They have thus proceeded to hold that the supply of services by CERC would fall within the ambit of the word �consideration� as defined by Section 2(31)(a) of the CGST Act read along with Section 2(24) of the IGST Act. 
+9. Proceeding further and bearing in mind the definition of �business� as it appears in Section 2(17) of the CGST and Section and 2(24) of IGST Act, the respondents have taken the following position: -
+�6.3 Further, Business is defined under sub-section 17 of Section 2 of the CGST Act, 2017 (as amended) read with Section 2 (24) of the IGST Act, 2017 (as amended) which reads as-
+(17) �business� includes �
+(a) any trade, commerce, manufacture, profession, vocation, adventure, wager or any other similar activity, whether or not it is for a pecuniary benefit;
+(b) any activity or transaction in connection with or incidental or ancillary to sub-clause (a);
+(c) any activity or transaction in the nature of sub-clause (a), whether or not there is volume, frequency, continuity or regularity of such transaction;
+(d) supply or acquisition of goods including capital goods and services in connection with commencement or closure of business;
+(e) provision by a club, association, society, or any such body (for a subscription or any other consideration) of the facilities or benefits to its members;
+(f) admission, for a consideration, of persons to any premises;
+(g) services supplied by a person as the holder of an office which has been accepted by him in the course or furtherance of his trade, profession or vocation;
+(h) [activities of a race club including by way of totalisator or a license to book maker or activities of a licensed book maker in such club; and]
+(i) any activity or transaction undertaken by the Central Government, a State Government or any local authority in which they are engaged as public authorities;
+6.3.1. The contention of CERC in regard to non-applicability of GST on the activities carried out by them being not a commercial business activity, as fees collected by them are deposited with Government in the Public Account of India and that CERC is funded by Grants-in-Aid by the Ministry of Power, Central Government and thus having no monetary benefit does not hold good. It is evident from above that any activity performed irrespective of having a pecuniary benefit is covered under the definition of �business �. The intention of law is amply clear here as any activity or transaction undertaken by the Central Government, a State Government or any local authority in which they are engaged as public authorities are also covered under the definition of �business�. Even, activities undertaken Central Government, a State Government or any local authority are covered under the said definition of business and are not out of its ambit. Thus, the activities undertaken by CERC which is a statutory body will be considered as �business�. � 
+10. They also appear to rest and found their opinion of the two regulatory bodies being exigible to tax on a set of FAQs� issued by the CBIC to essentially hold that they cannot be viewed as being �Government� or �local authority� as contemplated in those statutes. This becomes apparent from a reading of Paras 6.4.1 and 6.4.2 and which are reproduced hereinbelow: -
+�6.4.1 CBIC has compiled and released a booklet containing 31 FAQs on GST in Government Services Sector, for assistance and guidance of the stakeholders in getting acquainted with the GST Law wherein it has been clarified that a statutory body or a regulatory body created by the Parliament or a State Legislature is neither covered under the definition of �Government� nor of a � local authority �. The relevant FAQ are as reproduced below- 
+Question 6: Would a statutory body, corporation or an authority constituted under an Act passed by the Parliament or any of the State Legislatures be regarded as �Government� or �local authority� for the purposes of the GST Acts?
+Answer: A statutory body, corporation or an authority created by the Parliament or a State Legislature is neither �Government� nor a �local authority�. Such statutory bodies, corporations or authorities are normally created by the Parliament or a State Legislature in exercise of the powers conferred under article 53{3}{b) and article 154{2}{b} of the Constitution respectively. It is a settled position of law (Agarwal Vs. Hindustan Steel AIR 1970 Supreme Court 1150) that the manpower of such statutory authorities or bodies do not become officers subordinate to the President under article 53{1) of the Constitution and similarly to the Governor under article 154(1). Such a statutory body, corporation or an authority as a juridical entity is separate from the State and cannot be regarded as the Central or a State Government and also do not fall in the definition of �local authority�. Thus, regulatory bodies and other autonomous entities would not be regarded as the government or local authorities for the purposes of the GST Acts.
+Question 10: Are various regulatory bodies formed by the Government covered under the definition of �Government�?
+Answer: No. A regulatory body, also called regulatory agency, is a public authority or a governmental body which exercises functions assigned to them in a regulatory or supervisory capacity. These bodies do not fall under the definition of Government. 
+Examples of regulatory bodies are - Competition Commission of India, Press Council of India, Directorate General of Civil Aviation, Forward Market Commission, Inland Water Supply Authority of India, Central Pollution Control Board, Securities and Exchange Board of India.
+6.4.2. Thus, in view of above, the financial consideration so received by CERC is towards a function/service rendered by them and in absence of any blanket exemption available to CERC the said services appear to be taxable under the CGST/ IGST Act, 2017. �
+
+11. They have thus come to conclude that the fee received by CERC is in respect of business and the said regulatory authority itself being liable to be construed as a business entity. Basis the aforesaid conclusion, they have observed as under: -
+�6.4.3. As the regulatory activities performed by CERC for which fee is received by them falls under the definition of �business�, therefore, CERC appears to be a business entity. Since, there is no blanket exemption from CGST/SGST/IGST for statutory body or a regulatory body in CGST Act, 2017 (as amended) or IGST Act, 2017 (as amended). Hence, CERC is liable to be registered under Section 22 of CGST Act, 2017 (as amended) read with Section 20 of IGST Act, 2017 as the money (Fee) received by CERC for implementing the activities is Rs. 6,26,84,51,254/- (Rupees Six Hundred Twenty Six Crore Eighty Four Lakh Fifty One Thousand Two Hundred and Fifty Four Only) as discussed above under Para 4.3 (Table-2) which is well over and above the prescribed limit for GST registration in Section 22 of CGST Act, 2017 ( as amended) read with Section 20 of GST Act, 2017 ( as amended).�
+12. The perceived distinction on the basis of which the respondents have proceeded and the bifurcation which according to them must be acknowledged to exist between the adjudicatory and regulatory roles of the two statutory authorities also stands highlighted in the following paragraphs of the SCN:-
+�6.5.2. From the functions performed by CERC, it appears that all the functions are regulatory in nature except the adjudicatory function provided in sub-clause (f) whereupon the Commission has the option of adjudicating the disputes between the licensees and generating companies and to refer such disputes for arbitration. The adjudicatory functions have the trappings of a Court or Tribunal and while performing adjudicatory functions, any fee levied or penalty imposed are not leviable to OST as clarified by the Tax Research Unit of Ministry of Finance, GOI in its Office Memorandum dated 30.05.2018.
+
+6.5.3. However, it�s essential to note that while most functions performed by CERC are regulatory in nature, the adjudicatory function provided in sub-clause (f) differs. This clause grants CERC the power to resolve disputes between licensees and generating companies related to functions as specified under sub clause (a) to (d) of Section 79 of the Electricity Act, 2003,but it doesn�t extend to matters related to issuing licenses (as under sub clause (e) of Section  79 of the Electricity Act, 2003) or levying fees (as under sub clause (g) of Section 79 of the Electricity Act, 2003). These regulatory tasks fall outside the purview of quasi-judicial functions and remain solely within the realm of regulatory activities. Therefore, it�s clear that the adjudicatory power of CERC is circumscribed, avoiding the trappings of a full-fledged Court, while functions like issuing licenses and fee imposition remain distinctly regulatory.
+
+xxxx				xxxx				xxxx
+7.2. However, in para 3 of the said Office Memorandum, it is clarified that CERC has other functions which are in the nature of a regulator for which fees are levied. It is immaterial whether such activities are undertaken as a statutory or mandatory requirement under the law and irrespective of whether the amount charged for such service is laid down in a statute or not, so long as the payment is made for fee charged for getting a service in return (i.e., as a quid pro quo for the service received). It is regarded as a consideration for that service and taxable irrespective of by whatever name such payment is called.� 
+
+13. The issue of taxability also appears to have been examined by the Fitment Committee as would be evident from a reading of Para 7.3 of the impugned SCN and which is extracted hereinbelow:-
+�Furthermore, Fitment Committee recommended quasi-judicial functions of CERC being no-supply under Schedule-III of the CGST Act, 2017 (as amended) and further recommended taxability on the fees levied for their regulatory functions. The same has also been agreed by GST Council in its 47th Meeting dated 28th & 29th June, 2022. Thus, in view of Office Memorandum dated 30.05.2018 issued by the Tax Research Unit, Department of Revenue, Ministry of Finance to CERC and also GST Council�s affirmation to the Fitment Committee recommendation as already discussed above, it is amply clear that the fees collected by CERC is in lieu of the regulatory functions performed by them such as regulation & determination of tariff of generating companies for inter-State transmission of electricity and also for issuing licenses to persons to function as transmission licensee and electricity trader with respect to their inter-State operations is taxable under CGST/IGST.�
+
+14. While it appears to have been urged for the consideration of the respondents that both CERC as well as DERC had all the trappings of a court and thus liable to be viewed as a �tribunal� and consequently being exempt from taxation, those contentions have also come to be negated as would be apparent from a reading of Paras 8.1, 8.2 and 8.3 which are extracted hereunder: -
+�8.1 However, it appears that CERC has selectively picked up a portion of the judgment of the Hon�ble Supreme Court which does not reflect properly in the present case and thus, it appears that the submission made by CERC is out of context inasmuch as the Commission having  the trapping of the Court is applicable only in those cases which come under the functions envisaged in Section 79(1)(f) of the Electricity Act, 2003 where the Commission adjudicates upon the disputes between the licensees, and generating companies and to  refer any dispute for arbitration. These functions are quasi-judicial functions and have the trappings of the Court as observed by the Hon�ble Supreme Court. It also appears that the Contention that CERC has the trappings of a Court is misplaced with reference to applicability of GST so far as it relates to tariff fees & license fees collected by CERC as a regulator. 
+
+8.2. The observation of the Hon�ble Supreme Court in this matter as made in para 81 of the above judgment is as under (RUD-10 Supra)� 
+
+�81. We may also look to the nature and functions performed by the State Commission. Functions of the State Commission are prescribed under Section 86 of the said Act. The enumerated functions are determination of tariff, regulation of electricity purchase and procurement process of distribution licensees, facilitating intra-state transmission, issuing licences to persons, promoting cogeneration and generation of electricity from renewable sources, levy fee, specify or enforce standards, fix trading margins. All these functions are regulatory in character rather than adjudicatory. The real adjudicatory function is only provided in sub-clause (f) whereupon the Commission has the option of adjudicating the disputes between the licensees and generating companies, or to refer such disputes to arbitration.�
+
+8.3. As per the above observation of the Hon�ble Supreme Court, the functions of the State Commission such as determination of tariff, regulation of electricity purchase and procurement process of distribution licensees, facilitating intra-state transmission, issuing licences to persons, promoting cogeneration and generation of electricity from renewable sources, levy fee, specify or enforce standards, fix trading margins are regulatory in character rather than adjudicatory and the real adjudicatory function is only provided in Section 86(1)(f). Similarly, the functions of the Central Commission viz. CERC such as to regulate the tariff of generating companies owned or controlled by the Central Government; to regulate the tariff of generating companies other than those owned or controlled by the Central Government, if such generating companies enter into or otherwise have a composite scheme for generation and sale of electricity in more than one State; to regulate the inter-State transmission of electricity; to determine tariff for inter-State transmission of electricity; to issue licenses to persons to function as transmission licensee and electricity trader with respect to their inter-State operations are regulatory in character rather than adjudicatory and the real adjudicatory function is only provided in Section 79(1)(f).�
+ 
+15. The respondents have ultimately come to hold: -
+�8.6. From the above, it transpires that the amount received by CERC towards fees collected is as a regulator in its ordinary course of functions and not as a quasi-judicial body which adjudicates upon disputes involving power generating companies and transmission licensees in terms of Section 79(1)(f) of the Electricity Act, 2003. As such, the functions performed by CERC as a regulator does not appear to have the trappings of a Court and accordingly, GST appears to be payable on the Fees collected by CERC as a regulator.
+
+xxxx				xxxx				xxxx
+
+10. Based on the above discussion under Para 9.1 to 9.4.3 and taking into consideration of the Office Memorandum dated 30.05 .2018, Fitment Committee recommendation and concurrence of GST Council to the said recommendation referred in para 7.1 & 7.2 above & the observation of the Hon�ble Supreme Court referred in para 8.2, 8.3 & 8.4 above , it appears that CERC is engaged in execution of functions prescribed in the Electricity Act, 2003 and the same appears to be a �Service� in terms of Section 2(102) of the CGST Act, 2017 read with Section 2 (24) of the IGST Act, 2017 (as amended) and as such, a �taxable supply� in terms of Section 2(108) of the CGST, 2017 read with Section 2 (24) of the IGST Act, 2017 (as amended) which is leviable to tax under the Section 9 of the CGST Act read with Section 5 of IGST Act, 2017.
+xxxx				xxxx				xxxx
+12.1. Accordingly, the service provided by CERC, so far as it relates to Fees (Tariff Fee/ Licence Fee/ Annual Registration Fee, Miscellaneous Fee) received by them, appears to be classifiable under support services to electricity transmission & distribution services with SAC 998631 and IGST chargeable thereon @18% as per sl. no. 24(ii) of Notification No. 8/2017-lntegrated Tax (Rate) dated 28.06.2017 (as amended).
+
+13. On scrutiny of �income from fee � ledger provided by CERC vide its letter dated 22.09.2023 (RUD- 8 Supra), Statement showing details of fee collected by CERC as provided vide its letter dated 16.04.2024 (RUD- 9 Supra) and further M/s CERC�s failure to provide bifurcation of fee collected by them for providing inter-state & intra-state supply of services, thus the entire supply of service made by M/s CERC has been considered to be inter-state supply and accordingly, the total amount of IGST payable under the IGST Act, 2017 has been calculated involving the period from April, 2019 to March, 2023, the same is as tabulated below-
+
+
+
+14. From the above findings, it appears that CERC failed to self-assess its tax liability correctly and thus failed to discharge its IGST liability amounting to Rs. 112,83,21,226/( Rupees One Hundred Twelve Crore Eighty Three Lakh Twenty One Thousand Two Hundred and Twenty Six only) as ascertained in para 13 (refer Table-5) above for the period from April, 2019 to March, 2023 leading to non-payment of IGST on the amount  received from the power generation, transmission & distribution utilities towards Tariff Petition Fees & License Fees which constitute a taxable supply of service under SAC 998631 with the description �support services to electricity transmission & distribution services� as per SI. N o. 466 of Annexure to Notification No. 11/2017- Central Tax (Rate) dated 28.06.2017 amended) and further read with CBIC Explanatory Notes to the Scheme of Classification of Services and as such, the same appears to be taxable as per sl. no. 24(ii) of Notification No.8/2017-Integrated Tax (Rate) dated 28.06.2017 (as amended) with the description �Support services to mining, electricity, gas and water distribution�.
+
+xxxx				xxxx				xxxx
+
+16.1 Therefore, in view of above paras, it appears that CERC has not paid the amount of tax on the consideration received from various power utilities/ licensees and therefore for these considerations, IGST of Rs. 112,83,21,226/- (Rupees One Hundred Twelve Crore Eighty Three Lakh Twenty One Thousand Two Hundred and Twenty Six only), as calculated in para 13 & 14 above, appears recoverable from CERC under Section 73(1) of the CGST Act, 20 I 7 (as amended).
+
+xxxx				xxxx				xxxx
+
+21. Now, therefore, M/s Central Electricity Regulatory Commission (CERC), 3rd & 4th Floor, Chanderlok Building, 36, Janpath, New Delhi - 110001 , are required to show cause to the Additional/Joint Commissioner of CGST, Delhi South Commissionerate, 2nd & 3rd Floor, EIL Annexe Building, Plot 2B, Bhikaji Cama Place, New Delhi-110066, within 30 days of receipt of this notice as to why: -
+(i) IGST of Rs. Rs. 112,83 ,21 ,226/- (Rupees One Hundred Twelve Crore Eighty-Three Lakh Twenty-One Thousand Two Hundred and Twenty-Six only) should not be demanded and recovered from them under Section 73(1) of the CGST Act, 2017 (as amended) read with the Section 20 of Integrated Goods & Services Tax Act, 2017 ( as amended) and;
+(ii) Interest at the appropriate rates on the amount of GST demanded at Sr. No. (i) above, should not be recovered from them, under Section 50(1) of the CGST Act, 2017 (as amended) read with Section 20 of Integrated Goods & Services Tax Act, 2017 (as amended);
+(iii) Penalty under Section 73 of the CGST Act, 2017 read with Section 122 of the CGST Act, 2017 (as amended) read with the Section 20 of the Integrated Goods & Services Tax Act, 2017 (as amended), should not be imposed upon them, for the reasons mentioned in paras 17 to 20 above.�  
+
+16. We had the benefit of the erudite submissions addressed by Mr. Vohra and Mr. Ghosh, learned senior counsels who appeared for the writ petitioners and Mr. Singh and Mr. Amritanshu, learned counsels for the respondents. For reasons which we assign and set forth hereafter we find ourselves unable to sustain the SCNs� impugned. 
+17. It becomes pertinent to note that the CGST Act imposes a tax on an inter-state supply of goods or services or both by virtue of Section 9 which reads as follows:-
+�9. Levy and collection.�(1) Subject to the provisions of sub-section (2), there shall be levied a tax called the central goods and services tax on all intra-State supplies of goods or services or both, except on the supply of alcoholic liquor for human consumption and un-denatured extra neutral alcohol or rectified spirit used for manufacture of alcoholic liquor, for human consumption, on the value determined under Section 15 and at such rates, not exceeding twenty per cent, as may be notified by the Government on the recommendations of the Council and collected in such manner as may be prescribed and shall be paid by the taxable person.
+
+(2) The central tax on the supply of petroleum crude, high speed diesel, motor spirit (commonly known as petrol), natural gas and aviation turbine fuel shall be levied with effect from such date as may be notified by the Government on the recommendations of the Council.
+
+(3) The Government may, on the recommendations of the Council, by notification, specify categories of supply of goods or services or both, the tax on which shall be paid on reverse charge basis by the recipient of such goods or services or both and all the provisions of this Act shall apply to such recipient as if he is the person liable for paying the tax in relation to the supply of such goods or services or both.
+
+(4) The Government may, on the recommendations of the Council, by notification, specify a class of registered persons who shall, in respect of supply of specified categories of goods or services or both received from an unregistered supplier, pay the tax on reverse charge basis as the recipient of such supply of goods or services or both, and all the provisions of this Act shall apply to such recipient as if he is the person liable for paying the tax in relation to such supply of goods or services or both.
+
+(5) The Government may, on the recommendations of the Council, by notification, specify categories of services the tax on intra-State supplies of which shall be paid by the electronic commerce operator if such services are supplied through it, and all the provisions of this Act shall apply to such electronic commerce operator as if he is the supplier liable for paying the tax in relation to the supply of such services:
+
+Provided that where an electronic commerce operator does not have a physical presence in the taxable territory, any person representing such electronic commerce operator for any purpose in the taxable territory shall be liable to pay tax:
+
+Provided further that where an electronic commerce operator does not have a physical presence in the taxable territory and also he does not have a representative in the said territory, such electronic commerce operator shall appoint a person in the taxable territory for the purpose of paying tax and such person shall be liable to pay tax.�
+
+18. In terms of the charging section referred to above, the tax becomes leviable on a supply of goods, services or both. The scope of the expression �supply�, which appears repeatedly in the CGST Act, is defined by Section 7 and reads thus:-
+�7. Scope of supply.� (1) For the purposes of this Act, the expression �supply� includes�
+
+(a) all forms of supply of goods or services or both such as sale, transfer, barter, exchange, licence, rental, lease or disposal made or agreed to be made for a consideration by a person in the course or furtherance of business;
+
+(aa) the activities or transactions, by a person, other than an individual, to its members or constituents or vice-versa, for cash, deferred payment or other valuable consideration.
+
+Explanation.�For the purposes of this clause, it is hereby clarified that, notwithstanding anything contained in any other law for the time being in force or any judgment, decree or order of any Court, tribunal or authority, the person and its members or constituents shall be deemed to be two separate persons and the supply of activities or transactions inter se shall be deemed to take place from one such person to another;
+
+(b) import of services for a consideration whether or not in the course or furtherance of business; and
+
+(c) the activities specified in Schedule I, made or agreed to be made without a consideration;[* * *]
+
+[* * *]
+
+(1-A) where certain activities or transactions constitute a supply in accordance with the provisions of sub-section (1), they shall be treated either as supply of goods or supply of services as referred to in Schedule II.
+
+(2) Notwithstanding anything contained in sub-section (1),�
+
+(a) activities or transactions specified in Schedule III; or
+
+(b) such activities or transactions undertaken by the Central Government, a State Government or any local authority in which they are engaged as public authorities, as may be notified by the Government on the recommendations of the Council,
+
+shall be treated neither as a supply of goods nor a supply of services.
+
+(3) Subject to the provisions of sub-sections (1), (1-A) and (2), the Government may, on the recommendations of the Council, specify, by notification, the transactions that are to be treated as�
+
+(a) a supply of goods and not as a supply of services; or
+
+(b) a supply of services and not as a supply of goods.�
+
+19. Insofar as supply of goods and services are concerned, Section 7(1)(a) stipulates that it would include within its ambit all forms of supply of goods or services or both including such as sale, transfer, barter, exchange, licence, rental, lease or disposal otherwise made or agreed to be made for a consideration by a person in the course or furtherance of business. Section 7 also brings within its fold activities or transactions of a person, other than an individual, in relation with its members or constituents.  The third limb of services which are included in the scope of supply is the import of services for a consideration whether or not in the course or furtherance of business as well as activities specified in Schedule I, even though the same may be made without a consideration. 
+20. Insofar as the facts of the present matters are concerned, it was not the case of the respondents that the regulatory function as discharged by the writ petitioners would fall within Schedule I. We are also not concerned with subjects which form part of clauses (aa) and (b) of Section 7(1). 
+21. In order to evaluate the correctness of the stands struck by the respondents it would thus be apposite at the outset to extract Schedules II and III of the CGST Act and which spell out activities which are liable to be treated as a supply of goods or services. Schedules II and III of the CGST Act read as under: -
+�SCHEDULE II
+[See Section 7]
+Activities [or Transactions] to be treated as supply of goods or supply of services
+1. Transfer
+(a) any transfer of the title in goods is a supply of goods;
+(b) any transfer of right in goods or of undivided share in goods without the transfer of title thereof, is a supply of services;
+(c) any transfer of title in goods under an agreement which stipulates that property in goods shall pass at a future date upon payment of full consideration as agreed, is a supply of goods. 
+2. Land and Building
+(a) any lease, tenancy, easement, licence to occupy land is a supply of services;
+(b) any lease or letting out of the building including a commercial, industrial or residential complex for business or commerce, either wholly or partly, is a supply of services. 
+3. Treatment or process
+Any treatment or process which is applied to another person's goods is a supply of services.
+4. Transfer of business assets 
+(a) where goods forming part of the assets of a business are transferred or disposed of by or under the directions of the person carrying on the business so as no longer to form part of those assets, such transfer or disposal is a supply of goods by the person;
+(b) where, by or under the direction of a person carrying on a business, goods held or used for the purposes of the business are put to any private use or are used, or made available to any person for use, for any purpose other than a purpose of the business, the usage or making available of such goods is a supply of services;
+(c) where any person ceases to be a taxable person, any goods forming part of the assets of any business carried on by him shall be deemed to be supplied by him in the course or furtherance of his business immediately before he ceases to be a taxable person, unless� 
+(i) the business is transferred as a going concern to another person; 
+or 
+(ii) the business is carried on by a personal representative who is deemed to be a taxable person. 
+5. Supply of services The following shall be treated as supply of services, namely:� 
+(a) renting of immovable property; 
+(b) construction of a complex, building, civil structure or a part thereof, including a complex or building intended for sale to a buyer, wholly or partly, except where the entire consideration has been received after issuance of completion certificate, where required, by the competent authority or after its first occupation, whichever is earlier. 
+Explanation.�For the purposes of this clause� 
+(1) the expression �competent authority� means the Government or any authority authorised to issue completion certificate under any law for the time being in force and in case of non-requirement of such certificate from such authority, from any of the following, namely:� 
+(i) an architect registered with the Council of Architecture constituted under the Architects Act, 1972 (20 of 1972); or 
+(ii) a chartered engineer registered with the Institution of Engineers (India); or
+(iii) a licensed surveyor of the respective local body of the city or town or village or development or planning authority; 
+(2) the expression �construction� includes additions, alterations, replacements or remodelling of any existing civil structure; 
+(c) temporary transfer or permitting the use or enjoyment of any intellectual property right; 
+(d) development, design, programming, customisation, adaptation, upgradation, enhancement, implementation of information technology software; 
+(e) agreeing to the obligation to refrain from an act, or to tolerate an act or a situation, or to do an act; and  
+(f) transfer of the right to use any goods for any purpose (whether or not for a specified period) for cash, deferred payment or other valuable consideration. 
+6. Composite supply 
+The following composite supplies shall be treated as a supply of services, namely:� 
+(a) works contract as defined in clause (119) of Section 2; and 
+(b) supply, by way of or as part of any service or in any other manner whatsoever, of goods, being food or any other article for human consumption or any drink (other than alcoholic liquor for human consumption), where such supply or service is for cash, deferred payment or other valuable consideration. 
+7. [* * *] 
+SCHEDULE III
+[See Section 7]
+Activities or transactions which shall be treated neither as a supply of goods nor a supply of services 
+1. Services by an employee to the employer in the course of or in relation to his employment. 
+2. Services by any court or Tribunal established under any law for the time being in force. 
+3. (a) the functions performed by the Members of Parliament, Members of State Legislature, Members of Panchayats, Members of Municipalities and Members of other local authorities; 
+(b) the duties performed by any person who holds any post in pursuance of the provisions of the Constitution in that capacity; or (c) the duties performed by any person as a Chairperson or a Member or a Director in a body established by the Central Government or a State Government or local authority and who is not deemed as an employee before the commencement of this clause.
+4. Services of funeral, burial, crematorium or mortuary including transportation of the deceased. 
+5. Sale of land and, subject to clause (b) of paragraph 5 of Schedule II, sale of building. 
+6. Actionable claims, other than [specified actionable claims]. 
+[7. Supply of goods from a place in the non-taxable territory to another place in the non-taxable territory without such goods entering into India. 
+8. (a) Supply of warehoused goods to any person before clearance for home consumption; 
+(b) Supply of goods by the consignee to any other person, by endorsement of documents of title to the goods, after the goods have been dispatched from the port of origin located outside India but before clearance for home consumption.] 
+[9. Activity of apportionment of co-insurance premium by the lead insurer to the co-insurer for the insurance services jointly supplied by the lead insurer and the co-insurer to the insured in co-insurance agreements, subject to the condition that the lead insurer pays the central tax, the State tax, the Union territory tax and the integrated tax on the entire amount of premium paid by the insured.
+10. Services by insurer to the reinsurer for which ceding commission or the reinsurance commission is deducted from reinsurance premium paid by the insurer to the reinsurer, subject to the condition that the central tax, the State tax, the Union territory tax and the integrated tax is paid by the reinsurer on the gross reinsurance premium payable by the insurer to the reinsurer, inclusive of the said ceding commission or the reinsurance commission.]
+Explanation [1].�For the purposes of paragraph 2, the term �court� includes District Court, High Court and Supreme Court. [Explanation 2.�For the purposes of paragraph 8, the expression 
+�warehoused goods� shall have the same meaning as assigned to it in the Customs Act, 1962.]�
+22. Whilst the supply of goods or services stands comprised in Schedule II, Schedule III to the CGST Act lists out activities which are neither liable to be treated as a supply of goods nor a supply of services. Schedule III assumes significance since one such genre is prescribed to be services rendered by a tribunal established under any law. The fact that an electricity regulatory commission acts as a �tribunal� cannot perhaps be disputed bearing in mind the judgment rendered by the Supreme Court in PTC India Ltd. v. Central Electricity Regulatory Commission10 and where the following observations appear: -
+�49.�On the above analysis of various sections of the 2003 Act, we find that the decision-making and regulation-making functions are both assigned to CERC. Law comes into existence not only through legislation but also by regulation and litigation. Laws from all three sources are binding. According to Professor Wade, �between legislative and administrative functions we have regulatory functions�. A statutory instrument, such as a rule or regulation, emanates from the exercise of delegated legislative power which is a part of administrative process resembling enactment of law by the legislature whereas a quasi-judicial order comes from adjudication which is also a part of administrative process resembling a judicial decision by a court of law. (See�Shri Sitaram Sugar Co. Ltd.�v.�Union of India�[(1990) 3 SCC 223] .)
+50.�Applying the above test, price fixation exercise is really legislative in character, unless by the terms of a particular statute it is made quasi-judicial as in the case of tariff fixation under Section 62 made appealable under Section 111 of the 2003 Act, though Section 61 is an enabling provision for the framing of regulations by CERC. If one takes �tariff� as a subject-matter, one finds that under Part VII of the 2003 Act actual determination/fixation of tariff is done by the appropriate Commission under Section 62 whereas Section 61 is the enabling provision for framing of regulations containing generic propositions in accordance with which the appropriate Commission has to fix the tariff. This basic scheme equally applies to the subject-matter �trading margin� in a different statutory context as will be demonstrated by discussion hereinbelow.
+51.�In�Narinder Chand Hem Raj�v.�Lt. Governor, H.P.�[(1971) 2 SCC 747] this Court has held that power to tax is a legislative power which can be exercised by the legislature directly or subject to certain conditions. The legislature can delegate that power to some other authority. But the exercise of that power, whether by the legislature or by the delegate will be an exercise of legislative power. The fact that the power can be delegated will not make it an administrative power or adjudicatory power. In the said judgment, it has been further held that no court can direct a subordinate legislative body or the legislature to enact a law or to modify the existing law and if courts cannot so direct, much less the tribunal, unless power to annul or modify is expressly given to it.
+52.�In�Indian Express Newspapers (Bombay) (P) Ltd.�v.�Union of India�[(1985) 1 SCC 641 : 1985 SCC (Tax) 121] this Court held that subordinate legislation is outside the purview of administrative action i.e. on the grounds of violation of rules of natural justice or that it has not taken into account relevant circumstances or that it is not reasonable. However, a distinction must be made between delegation of legislative function and investment of discretion to exercise a particular discretionary power by a statute. In the latter case, the impugned exercise of discretion may be considered on all grounds on which administrative action may be questioned such as non-application of mind, taking irrelevant matters into consideration, etc. The subordinate legislation is, however, beyond the reach of administrative law. Thus, delegated legislation�otherwise known as secondary, subordinate or administrative legislation�is enacted by the administrative branch of the Government, usually under the powers conferred upon it by the primary legislation. Delegated legislation takes a number of forms and a number of terms�rules, regulations, bye-laws, etc.; however, instead of the said labels what is of significance is the provisions in the primary legislation which, in the first place, confer the power to enact administrative legislation. Such provisions are also called as �enabling provisions�. They demarcate the extent of the administrator's legislative power, the decision-making power and the policy-making power. However, any legislation enacted outside the terms of the enabling provision will be vulnerable to judicial review and ultra vires.
+
+53.�Applying the abovementioned tests to the scheme of the 2003 Act, we find that under the Act, the Central Commission is a decision-making as well as regulation-making authority, simultaneously. Section 79 delineates the functions of the Central Commission broadly into two categories �mandatory functions and advisory functions. Tariff regulation, licensing (including inter-State trading licensing), adjudication upon disputes involving generating companies or transmission licensees fall under the head �mandatory functions� whereas advising the Central Government on formulation of National Electricity Policy and tariff policy would fall under the head �advisory functions�. In this sense, the Central Commission is the decision-making authority. Such decision-making under Section 79(1) is not dependent upon making of regulations under Section 178 by the Central Commission. Therefore, functions of the Central Commission enumerated in Section 79 are separate and distinct from functions of the Central Commission under Section 178. The former are administrative/adjudicatory functions whereas the latter are legislative.�
+23. The respondents, however, seek to discern a distinction between the adjudicatory function performed by a regulatory commission as distinguishable from what they assert to be the exercise of a power to regulate. According to the respondents, any income or receipts derived by those Commissions in the course of discharge of their regulatory function would be exigible to tax under the CGST Act. 
+24. It becomes pertinent to note that the CGST Act not only deals with the supply of goods or services per se, it also brings within its ambit composite and mixed supplies in terms of Section 8. Composite supplies are those which are spelt out and enumerated in serial 6 of Schedule II. The supply of services generically is dealt with in serial 5. Undisputedly, the regulatory function discharged by Commissions can neither be said to be akin to renting of immovable property, construction of a complex or building, temporary transfer or permissive use or enjoyment of an intellectual property right, development, design of software, transfer of the right to use goods and which are subjects enumerated in serial 5 of Schedule II. The regulatory power which is wielded by Commissions under the provisions of the Electricity Act would also not fall within the ambit of clause (e) of serial 5 and which speaks of an obligation to refrain from doing an act or toleration of an act or situation. 
+25. Of equal significance is the definition of �business� and �consideration� as it appears in the statute. Section 2(17) defines �business� as follows: -
+�2. Definitions. �In this Act, unless the context otherwise requires-
+xxxx				xxxx				xxxx
+(17) �business� includes�
+(a) any trade, commerce, manufacture, profession, vocation, adventure, wager or any other similar activity, whether or not it is for a pecuniary benefit;
+(b) any activity or transaction in connection with or incidental or ancillary to sub-clause (a);
+(c) any activity or transaction in the nature of sub-clause (a), whether or not there is volume, frequency, continuity or regularity of such transaction;
+(d) supply or acquisition of goods including capital goods and services in connection with commencement or closure of business;
+(e) provision by a club, association, society, or any such body (for a subscription or any other consideration) of the facilities or benefits to its members;
+(f) admission, for a consideration, of persons to any premises;
+(g) services supplied by a person as the holder of an office which has been accepted by him in the course or furtherance of his trade, profession or vocation;
+(h) activities of a race club including by way of totalisator or a license to book maker or activities of a licensed book maker in such club; and;
+(i) any activity or transaction undertaken by the Central Government, a State Government or any local authority in which they are engaged as public authorities;�
+
+26. The expression �consideration� is found in Section 2(31) which reads thus: -
+�2. Definitions.�In this Act, unless the context otherwise requires,�
+xxxx				xxxx				xxxx
+(31) �consideration� in relation to the supply of goods or services or both includes�
+(a) any payment made or to be made, whether in money or otherwise, in respect of, in response to, or for the inducement of, the supply of goods or services or both, whether by the recipient or by any other person but shall not include any subsidy given by the Central Government or a State Government;
+(b) the monetary value of any act or forbearance, in respect of, in response to, or for the inducement of, the supply of goods or services or both, whether by the recipient or by any other person but shall not include any subsidy given by the Central Government or a State Government:
+Provided that a deposit given in respect of the supply of goods or services or both shall not be considered as payment made for such supply unless the supplier applies such deposit as consideration for the said supply;�
+
+27. The definition clauses referred to above assume significance in light of the language employed in Section 7 and which speaks of the supply of goods, services or both provided by a person for consideration being in the course or furtherance of business. When we revert to Section 2(17), we find that the statute defines the said expression to mean any trade, commerce, manufacture, profession, vocation, adventure, wager or any other similar activity irrespective of whether it be for a pecuniary benefit or not. Clauses (b) and (c) of Section 2(17) are again coupled to clause (a). Clause (d) of Section 2(17) is concerned with the supply or acquisition of goods, while clauses (e), (f), (g) and (h) would also have no application whatsoever considering the nature of activities which are contemplated therein. 
+28. That thus leaves us to consider whether the power to regulate, as exercised, could be said to be an activity akin to trade, commerce, manufacture, profession, vocation, adventure, voyager and which are activities enumerated in Section 2(17)(a). We find ourselves unable to fathom how a power of regulation which stands statutorily vested in a Commission could be countenanced to fall within the ambit of any of those activities. It becomes pertinent to note that while Section 2(17)(i) also encompasses activities or transactions undertaken by the Central or State Governments or a local authority, the said clause too would have no application since a Commission which comes to be constituted under the Electricity Act cannot be equated with the Central or State Governments. The expression �local authority� is defined by Section 2(69) to include local bodies such as Panchayats, Municipalities, Municipal Committees, Cantonment Boards or Regional Councils and other authorities which may come to be constituted in terms of Articles 371, 371A, 371J or the Sixth Schedule to the Constitution. A Commission which is constituted under the Electricity Act would undisputedly not fall within the ken of such authorities.
+29. The word �consideration�, in our considered opinion, would necessarily have to draw colour and meaning from Section 2(31) and which speaks of payment made in respect of, in response to or for the inducement of a supply of goods.  Suffice it to note that it was not even remotely sought to be contended by the respondents that the payments in the form of fee as received by Commissions were an outcome of an inducement to supply goods or services.  
+30. More importantly we find that by virtue of Section 7, a supply would necessarily have to be of goods or services not only for consideration but more importantly in the course or furtherance of business. We have in the preceding parts of this decision clearly found that the regulatory function discharged by Commissions would clearly not fall within the scope of the word �business� as defined by Section 2(17). Thus, even if the fee so received by such Commissions were to be assumed as being consideration received, it was clearly not one obtained in the course or furtherance of business. We are thus of the considered opinion that the view as expressed by the respondents in the SCNs� impugned before us are rendered wholly arbitrary and unsustainable. 
+31. As was noted hereinbefore, Schedule III in express and unambiguous words excludes services rendered by a court or tribunal. Once that exclusion had come to be expressly incorporated, we fail to appreciate how the respondents could have undertaken an exercise to bifurcate or draw a wedge between the adjudicatory and regulatory role of Commissions. Mixed as well as composite supplies of services or goods are aspects which are duly and independently defined and explained. Even those provisions cannot possibly be interpreted or stretched so as to hold that the fees received by Commissions could have been subjected to tax. The assumption of jurisdiction in terms of the notices impugned before us is thus found to be ex facie wholly untenable. 
+32. Of significance is the respondent observing �Therefore, anything other than goods, money and securities will also include the activities of �regulating the tariff of generating companies owned or controlled by the Central Government, regulating the inter-State transmission of electricity, to issue licenses to persons to function as transmission licensee and electricity trader with respect to their inter-State operations; to levy fees for the purposes of this Act� falls under the scope of �Supply of Services� in para 6.1 of the impugned SCN.
+33. We find ourselves unable to accept, affirm or even fathom the conclusion that regulation of tariff, inter-State transmission of electricity or the issuance of license would be liable to be construed as activities undertaken or functions discharged in the furtherance of business. The respondents have clearly failed to bear in consideration the indubitable fact that even if these be functions which could be understood to be in the exercise of a regulatory function, those were being discharged by a quasi-judicial body which undoubtedly had all the trappings of a tribunal. The grant of a license to transmit or distribute is clearly not in furtherance of business or trade but in extension of the statutory obligation placed upon a Commission to regulate those subjects. 
+34. We are also of the firm opinion that even though Section 2(102) of the CGST Act defines the expression �services� to mean �anything other than goods�, the expansive reach of that definition would have to necessarily be read alongside Schedule III and which excludes services per se rendered by a court or tribunal established under any law. The provision made in Schedule III is clearly intended to insulate and exempt the functions discharged by a court or tribunal from the levy of a tax under the CGST. 
+35. The Electricity Act makes no distinction between the regulatory and adjudicatory functions which it vests in and confers upon a Commission. Those functions are placed in the hands of a quasi-judicial body enjoined to regulate and administer the subject of electricity distribution. Electricity, undoubtedly, is a natural resource which vests in the State. We have thus no hesitation in observing that the SCNs� infringe the borders of the incredible and inconceivable.
+36. That only leaves us to examine the correctness of the stand of the respondent based on the Notification dated 28 June 2017 and their assertion that the functions discharged by these Commissions would be liable to be classified under the heading �Support services to electricity, gas and water distribution� which is placed under Group Heading 99863. Suffice it to note that the notification dated 28 June 2017 notifies the rates of integrated tax of various services as falling under various chapters, sections or headings of the scheme of classification of as specified in Column 2 thereof. The scheme of classification which is alluded to would necessarily compel us to revert to the Schedules of the CGST Act by virtue of their adoption for purposes of levy of integrated tax in terms of Section 20 of the IGST Act. Since those Schedules are to mutatis mutandi apply and the scope of supply as well as composite and mixed supplies being construed accordingly, the exemption incorporated in Schedule III of the CGST Act would continue to govern and be applicable. The mere mention of support services in that notification thus would not detract from the exemption which otherwise operates and stands accorded with respect to �services by any court or Tribunal�..�.  What we seek to emphasise is that a notification would neither expand the scope of the parent entry nor can it be construed as taking away an exemption which stands granted under the CGST Act. There cannot possibly be even a cavil of doubt that a Schedule constitutes an integral part and component of the principal legislation.    
+37. Accordingly, and for all the aforesaid reasons, we allow the present writ petitions and quash the impugned SCNs dated 29 May 2024 [W.P.(C) 10680/2024] and 23 July 2024 [W.P.(C) 14723/2024].
+38. We further observe that the Order-in-Original dated 30 August 2024 in W.P.(C) 10680/2024, was, in terms of our initial interim order made subject to the outcome of the present petition. Since we have come to hold that the SCN themselves are invalid, the said order dated 30 August 2024 also cannot sustain. It too, shall consequently, stand set aside.
+
+        YASHWANT VARMA, J.
+
+	DHARMESH SHARMA, J.
+JANUARY 15 2024/RW
+1 CERC
+2 DERC
+3 SCNs 
+4 CGST Act
+5 IGST Act
+6 Electricity Act
+7 GST
+8 SAC
+9 CBIC
+10 (2010) 4 SCC 603
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+
+
+
+
+								         
+
+
+
+W.P.(C) 10680/2024 & W.P.(C) 14723/2024  	Page 1 of 33
+
+
+
+
+
+

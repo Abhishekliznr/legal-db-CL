@@ -1,0 +1,168 @@
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%						   Judgment Reserved on: 18.11.2024
+        Judgment pronounced on: 13.01.2025
+        
+     I.A. 40846/2024	
+     IN
++ 	CS(COMM) 849/2024 
+
+	GENSOL ELECTRIC VEHICLES PVT. LTD.	.....Plaintiff
+Through:	Mr. Chander M. Lall, Sr. Advocate with Ms. Swapnil Gaur, Ms. Annanya Mehan, Mr. Abhinav, Advocates. 
+				versus
+	MAHINDRA LAST MILE MOBILITY LIMITED	.....Defendant
+Through:	Mr. Rajiv Nayar, Sr. Advocate and Mr. Akhil Sibal, Sr. Advocate with Mr. Ankur Sangal, Ms. Smriti Yadav, Ms. Sucheta Roy, Ms. Amrit Sharma, Ms. Ridhie Bajaj and Ms. Sarah Haque, Advocates. 
+
+	CORAM:
+	HON�BLE MR. JUSTICE AMIT BANSAL
+				JUDGMENT		
+AMIT BANSAL, J.
+
+I.A. 40846/2024 (under Order XXXIX Rule 1 and 2 CPC)
+1.   By way of the present judgment, I shall decide the captioned application filed on behalf of the plaintiff under Order XXXIX Rule 1 and 2 of the Code of Civil Procedure, 1908 (hereinafter the �CPC�).
+2. The present suit has been filed seeking relief of permanent injunction restraining the defendant from infringing and passing off the trade mark of the plaintiff, along with other ancillary reliefs.
+3. Summons in the suit were issued on 29th September, 2024, and notice in the interim injunction application was issued on 1st October 2024. However, no ad-interim injunction order was passed in favour of the plaintiff. 
+4. The reply to the interim application was filed on behalf of the defendant on 15th October, 2024, and a rejoinder thereto has been filed by the plaintiff on 19th October, 2024.
+5. Submissions of the parties were heard on 30th September 2024, 1st October 2024, 22nd October 2024, 29th October 2024, and 18th November 2024, when the judgment was reserved.
+
+CASE SET UP BY THE PLAINTIFF
+6. The case set up by the plaintiff in the plaint is as follows:
+6.1.  The plaintiff [Gensol Electric Vehicles Pvt. Ltd.], a subsidiary of Gensol Engineering Limited, is a company incorporated in the year 2022 with the vision to accelerate electric vehicle (EV) adoption towards a sustainable future. 
+6.2. The plaintiff operates a state-of-the-art manufacturing facility designed to produce a range of electric vehicles, including shared mobility fleets, cargo vehicles, personal mobility solutions, and mini-SUVs, to cater to diverse urban mobility needs.
+6.3. Around August 2022, the plaintiff conceptualized the development of an innovative electric vehicle specifically designed for urban mobility. To bring this vision to life, the plaintiff collaborated with a third-party vendor to create a life-sized clay model of the vehicle.
+6.4. On 19th September, 2022, the plaintiff�s design team commenced internal work on the electric vehicle�s design. Upon finalization of the design, the plaintiff coined and adopted the mark �EZIO� for the vehicle. In December 2022, along with the term �EZIO�, the plaintiff, with the assistance of a third party, also created the logo .
+6.5. On 30th June, 2023, the plaintiff applied for registration of the word mark �EZIO� in Class 12 on a �proposed to be used� basis with the Trade Marks Registry. After the publication of the mark on 20th November 2023, the Trade Marks Registry granted the registration of the word mark �EZIO� in favour of the plaintiff on 19th May, 2024. The said registration is subsisting and valid till 30th June 2033.
+6.6. After obtaining requisite permissions from the Automotive Research Association of India (�ARAI�) and design registration for its vehicle, on 7th January 2024, the plaintiff tested its first electric vehicle on the roads of Pune, Maharashtra. 
+6.7. The plaintiff has provided details of the expenditure incurred in the development of the vehicle under its mark �EZIO� in paragraph 17 of the plaint.
+6.8. On 18th September, 2024, the plaintiff came across a newspaper article dated 9th September, 2024, which highlighted the defendant�s announcement of the launch of a new commercial electric four-wheeler under the mark �eZEO� /�.
+6.9. Upon further investigation, the plaintiff came across the website of the defendant, wherein the plaintiff found that the defendant had announced the launch of its Electric Vehicle under the mark �eZEO� on 3rd October, 2024.
+6.10. Subsequently, the plaintiff also discovered that the defendant had filed trade mark applications in Class 12 on �proposed to be used� basis for the word mark and device mark �ZEO� and �eZEO� on 29th August, 2024 and 10th September 2024, respectively.
+6.11. Accordingly, the present suit has been filed along with the present application seeking interim injunction.
+
+CASE SET UP BY THE DEFENDANT
+7. In the reply filed on behalf of the defendant to the interim application filed by the plaintiff for grant of interim injunction, it has been pleaded that:
+7.1. The defendant [Mahindra Last Mile Mobility Limited], a subsidiary of Mahindra and Mahindra Limited, is a public limited company engaged in the business of manufacture and sale of vehicles. The defendant has been in the market for the last twenty years through its parent company and presently holds almost 50% market share of the commercial electric vehicle market.
+7.2. The defendant is engaged in the design and manufacture of electric vehicles across various operational segments, including electric three-wheelers marketed under the brand names �Treo�, �E-Alfa�, and �Zor�, as well as an electric four-wheeler cargo vehicle under the brand �Jeeto�.
+7.3. Around April 2024, the defendant conceptualized the launch of a new commercial electric four-wheeler vehicle with features such as a high-voltage architecture for superior energy efficiency, greater range, and faster charging times, to enhance its efforts in electrifying last-mile transportation. 
+7.4. During the development phase of the proposed vehicle, the defendant bona fide coined and adopted the mark �ZEO� / �eZEO,� which is an acronym for �Zero Emission Option�.
+7.5. The defendant conducted a trademark search on the Trade Marks Registry website in April 2024 and performed market searches, which did not reveal any conflicting marks in the electric vehicle sector. After ensuring no similar marks were in existence, the defendant proceeded to adopt the mark �eZEO� and its formative marks.
+7.6.  Along with the mark �eZEO�, the defendant also uses the house mark of its parent company, �Mahindra�/   (hereinafter referred to as �the house mark�) to indicate the source of the defendant�s vehicle with the Mahindra Group.
+7.7. On account of World Electric Vehicle Day on 9th September 2024, the defendant announced the upcoming launch of its new commercial electric four-wheeler (hereinafter the �defendant�s vehicle�) under the trademarks �eZEO�/ �ZEO�. This announcement was made through a press release published on the defendant�s website and promoted on the defendant�s social media platforms which was subsequently reported by leading business newspapers. 
+7.8. The defendant is the prior user of the mark �eZEO� as the use of the said mark commenced on 9th September, 2024, whereas the plaintiff is yet to launch its vehicle in the market.  The defendant is �first in the market� in relation to the defendant�s trademarks. Moreover, the plaintiff first disclosed its marks to the public only on 25th September, 2024 which is a day before the institution of the suit.
+7.9. The plaintiff has not disclosed the date of launch of its vehicle in the market and there is no clarity as to when the same would be launched as the product of the plaintiff is still in the prototyping stage. 
+7.10. The plaintiff intends to use its marks for a two-door, three-wheeler electric passenger vehicle, while the defendant�s trademarks are associated with a four-wheeler electric commercial vehicle, catering to completely different consumer segments and purposes. These vehicles differ significantly in design, functionality, and target audience, therefore, there is no possibility of confusion or deception among consumers, traders, or the public.
+7.11. Despite this, to address the present conflict, the defendant is willing to use only �ZEO� trademark without the letter �e� and add the house mark �MAHINDRA� in respect of its vehicles. 
+
+SUBMISSIONS ON BEHALF OF THE PLAINTIFF
+8. Mr. C.M. Lall, Senior Counsel appearing on behalf of the plaintiff has made the following submissions: -
+8.1.  The use of a similar mark �ZEO� by the defendant as that of the plaintiff�s mark �EZIO� in relation to the same product, is bound to cause confusion in the market. 
+8.2.  The plaintiff publicly launched the teaser for its vehicle in January, 2024 (Page No.161-164 of the plaintiff�s documents). Even before launching the teaser, the plaintiff had taken various steps towards the launch of its vehicle. 
+8.3.  The plaintiff�s vehicle is not at a prototype stage as contended by the defendant. The plaintiff holds an ARAI certificate issued in February, 2024 and is scheduled to launch its vehicle in January, 2025. 
+8.4.  Since the use of the defendant is not prior to the registration of the plaintiff, it cannot take the defence of prior use available under Section 34 of the Trademarks Act, 1999.
+8.5.  The use of �MAHINDRA� before �ZEO� would be in the nature of added matter and would be irrelevant for the purposes of infringement. In a case based on infringement, the defendant is not required to show reputation and goodwill. 
+8.6.  The submissions on behalf of the defendant that in respect of cars, the consumers/customers are sophisticated and knowledgeable and, therefore, there would be no element of confusion even if the marks are similar, is flawed. Reliance is placed on Baker Hughes v. Hiroo Khushlani1.
+8.7.  The submission of the defendant that they are using the mark �ZEO� as a sub-brand in conjunction with a principal brand �MAHINDRA� is erroneous. Reliance in this regard is placed on V-Guard Industries Ltd v. Crompton Greaves Consumer Electrical Ltd2 and Swiss Bike Vertriebs GMBH Subsidiary of Accell Group v. Reliance Brands Limited.3
+8.8.  As regards the submission of the defendant that the plaintiff proposes to use the marks in respect of passenger vehicles and the defendant in respect of commercial vehicles, it is submitted that the defendant also proposes to launch the commercial electric vehicle as the registration granted in favour of the plaintiff is in respect of all categories of vehicles. 
+
+SUBMISSIONS ON BEHALF OF THE DEFENDANT
+9. Mr. Rajiv Nayar and Mr. Akhil Sibal, Senior Counsel appearing on behalf of the defendant, at the outset, submit that without prejudice to its rights and contentions, the defendant will only use the mark ��, and therefore, the Court should consider the application for interim injunction taking into account the aforesaid mark adopted by the defendant. He also submits that the defendant has discontinued the use of the mark �eZEO� from the time of filing of reply to the interim injunction application. Reliance in this regard is placed on the judgment of the Division Bench in Horlicks Limited v. Heinz India4
+10. In light of the aforesaid, the following other submissions are made on behalf of the defendant:
+10.1.  The adoption of the mark �ZEO/eZEO� by the defendant was completely bona-fide after conducting the search on the website of the Trademark Registry. 
+10.2. The plaintiff disclosed its trademark in the public domain only on 25th September, 2024 i.e., after the launch of the defendant�s trade mark. Hence, there was no possibility of the defendant having any information regarding the plaintiff�s trademark at the time of adoption.
+10.3. The defendant uses its house mark and logo �MAHINDRA� in all its vehicles including the subject vehicle.
+10.4. A comparison between the plaintiff�s mark and the revised mark  adopted by the defendant would show that the same are not identical. If the marks of the plaintiff and the defendant are not identical, the test of passing off has to be applied. Reliance in this regard is placed on Goenka Institute of Education and Research v. Anjani Kumar Goenka5.
+10.5. There can be no likelihood of confusion between the marks of the plaintiff and the defendant for the following reasons: -
+i. The plaintiff is yet to launch its vehicles under the trade mark �EZIO� and, therefore, there is no commercial use or reputation with respect to the said mark in the market. The plaintiff has not launched any vehicle till date and, therefore, the plaintiff does not have any established reputation for automobiles in general.
+ii. Since the defendant�s trademark contains the house mark �MAHINDRA� which is used both in the front and back of the vehicles. There is adequate added material to distinguish the two marks. The consumers purchasing cars will be discerning customers and therefore, there is no likelihood of confusion. Reliance in this regard is placed on MESO Pvt. Ltd. v. Liberty Shoes Ltd6.
+iii. The defendant�s vehicles are sold only through the defendant�s registered dealers and hence, the consumer would always know that he is purchasing the defendant�s vehicles and there would be no possibility of confusion.
+
+ANALYSIS AND FINDINGS
+11. I have heard the rival submissions and examined the material on record. 
+12. The present case along with the interim injunction application came up for hearing for the first time before this Court on 30th September, 2024. At that point of time, the grievance of the plaintiff was that the defendant was about to launch its commercial electric vehicle using the mark �eZEO�, with the launch scheduled for 3rd October, 2024.
+13. While hearing the submissions, the Court called upon the parties to explore the possibility of a settlement. At the hearing of the matter on 22nd October, 2024, the defendant, without prejudice to its rights and contentions, made a statement before the court that the defendant shall modify its mark from �eZEO� to  ��. However, this was not acceptable to the plaintiff and, therefore, detailed submissions on merits were advanced on behalf of the counsel of the parties.
+14.  In Horlicks (supra), a Division Bench of this Court has observed that while considering an application for interim injunction in a suit for injunction relating to intellectual property rights, the Courts can act on concessions or modifications suggested by the defendant. 
+15. Accordingly, I proceed on the basis of the concession/modification made on behalf of the defendant that the defendant shall use the mark  and not �eZEO� and the defendant shall be bound by the same. 
+16. A comparison between the mark of the plaintiff and the modified mark of the defendant is set out below:-
+PLAINTIFF�S TRADE MARKDEFENDANT�S TRADE MARK
+17. The defendant has modified its original mark �eZEO� in a manner so as to drop the letter �e� at the beginning and added its house mark �MAHINDRA�, pursuant to which it reads as �MAHINDRA ZEO�.  While it can be said that the earlier mark adopted by the defendant �eZEO� was almost identical to the plaintiff�s registered mark �EZIO�, after the modifications carried out by the defendant, the two marks cannot be said to be identical. Consequently, there cannot be an automatic presumption of confusion in terms of Section 29(3) read with Section 29 (2)(c) of the Trade Marks Act, 1999. The court would have to examine whether the modified mark of the defendant is likely to cause confusion in the public or result in an association with the plaintiff�s mark.
+18. The Supreme Court in F Hoffmann- La Roche v. Geoffrey Manners & Co. Ltd.7, held that the competing marks, �PROTOVIT� and �DROPOVIT�, are not deceptively similar despite sharing the last three letters. The Court reasoned that the difference in the uncommon part of the two marks, �PROTO� and �DROPO�, was sufficient to distinguish the two marks. Similarly, in Mount Mettur Pharmaceuticals Ltd v. Ortha Pharmaceutical Corporation8, a Division Bench of the Madras High Court held that the marks �ORTHO-GYNOL� and �UTO-GYNOL� were not deceptively similar. The court emphasized that, in the normal enunciation, the first two syllables of the word are most important and the accentuation would be upon the first word �ORTHO� or �UTO� and not on the second word �GYNOL�.
+19. The above reasoning was followed by a Coordinate Bench of this court in the case of CFA Institute v. Brickwork Finance Academy9 whereby the competing marks �CFA� and �BFA� were held to be dissimilar, as the first syllable in both the marks were different thereby making the whole marks, when compared, as phonetically and visually dissimilar. 
+20. In my opinion, the change effected by the defendant in its mark from �eZEO� to  �� makes the two marks visually and phonetically dissimilar so as to not cause any confusion among the public. 
+21. In Goenka Institute (supra), a Division Bench of this Court has held that even in cases of infringement, where the competing marks are not identical but only similar, then the test of passing off has to be applied. In this regard, the Division Bench placed reliance on the judgment of the Supreme Court in Ruston & Hornsby Ltd. v. Zamindara Engineering Co.10, where it was held that in case of an infringement action involving similar marks, the test of infringement is the same as in an action for passing off.  In other words, to determine the likelihood of confusion or deception arising from the similarity of marks, the same test would be applicable in the case of infringement and passing off actions.  The same view was reiterated by the Supreme Court in Ramdev Food Products (P) Ltd. v. Arvindbhai Rambhai Patel11 where the Supreme Court also laid down the test for passing off.  The relevant observations are set out below:-
+� ���..In an action for infringement where the defendant�s trade mark is identical with the plaintiff�s mark, the court will not enquire whether the infringement is such as is likely to deceive or cause confusion.  The test, therefore, is as to likelihood of confusion or deception arising from similarity of marks, and is the same both in infringement and passing-off actions.�
+      20.	The tests for passing off are : - 
+      (1)	a misrepresentation,
+      (2)	made by a trader in the course of trade,
+(3)	to prospective customers of his or ultimate consumers of goods or services supplied by him,
+(4)	which is calculated to injure the business or goodwill of another trader (in the sense that is a reasonably foreseeable consequence), and
+(5)	which causes actual damage to a business or goodwill of the trader by whom the action is brought or (in a quia timet action) will probably do so.�
+[Emphasis is mine]
+22. In light of the above, to determine the likelihood of confusion, it would be essential to assess the market presence of both the parties and their respective goodwill. It is an admitted position that the plaintiff is yet to launch its vehicle bearing the mark �EZIO� in the market. Significantly, the plaintiff has not launched any vehicle, whether commercial or otherwise, in the market till date. Consequently, it cannot be said the plaintiff has any goodwill in the market in relation to its vehicles.
+23. On the other hand, defendant is a well-known player in the field of commercial electric vehicles. The defendant has provided its sales turnover and promotional expenses incurred in the last three financial years in paragraph 6 of their reply. It is pertinent to note that in financial year 2023-24, the sales turnover of the defendant was around Rs.3,057 Crores. The defendant sells various models of electric vehicles  in the market under different marks. In addition, all the vehicles sold by the defendant uses the mark of its parent company, �Mahindra�/  in order to indicate the connection of the defendant�s vehicle with the Mahindra Group. Furthermore, the defendant�s electric vehicles are sold only through the defendant�s authorised dealers. Therefore, there cannot be any question of the defendant seeking to ride on the goodwill and reputation of the plaintiff or cause damage or injury to the goodwill or business of the plaintiff. 
+24. It is also the case of the defendant that before adopting the mark �ZEO/ eZEO�, it had conducted a trademark and Google search, and in the said search, the plaintiff�s mark �EZIO� or any other conflicting mark did not show up. In this regard, the defendant has placed on record screenshots from the portal of the Trade Mark Registry�s Public Search Portal. The possibility of the defendant copying the mark of the plaintiff is remote as the plaintiff�s mark was disclosed in the public domain only on 25th September, 2024, after the defendant had already announced the launch of its vehicle. The defendant has justified the adoption of the mark �ZEO/ eZEO� as an acronym of �Zero Emission Option� which was coined by the defendant to convey the environmental benefits of the electric vehicle.
+25. In light of the above, on a prima facie consideration, the adoption of the impugned mark by the defendant appears to be bona-fide. This is not a case where the defendant has copied the mark of the plaintiff so as to ride on the goodwill or reputation of plaintiff.  
+26. Now,  I propose to look into the aspect of likelihood of confusion among the consumers. It is settled position of law that likelihood of confusion would have to be determined in every case based on the facts and circumstances obtaining in the case, including the nature of goods and the kinds of customers.  (See: Pianotist Co.� Application, Re, (1906) 23 RPC 774). In Kerly�s Law of Trade Marks and Trade Names, Sixteenth Edition, paragraph 20-188, pages 839-840, it has been stated that goods which are either expensive or important to the purchaser are not purchased without deliberations. The relevant extract is reproduced below: 
+�Common experience shows that consumers� attention will vary depending on the kind of goods they are buying.  Not all classes of consumers will exercise the same level of care in choosing products.  Many older cases have considered this general issue, including cases going back to times when many consumers were illiterate (likely to be relevant now only in relation to goods for export or goods aimed at children).  The general principles are as follow:
+(1) It must not be assumed that a very careful or intelligent examination of the mark will be made.
+(2) But, on the other hand, it can hardly be significant that unusually stupid people, �fools or idiots�, or a �moron in a hurry� may be deceived.
+(3) If the goods are expensive or important to the purchasers and not of a kind usually selected without deliberation, and the customers generally educated persons, these are all matters to be considered.
+(4) If some parts of the mark are common, one must consider whether people who know the distinguishing characteristics of the opponents� mark would be deceived.�
+[Emphasis is mine]
+27. In Cadila Health Care Ltd. v. Cadila Pharmaceuticals Ltd12, the Supreme Court,  highlighted that one of the relevant factors to be considered for determining deceptive similarity between competing marks would be the purchaser�s education, intelligence and degree of care exercised while buying the goods. 
+28. Relying upon the aforesaid test laid down in Cadila Health Care (supra), in Khoday Distilleries Limited v. Scotch Whiskey Association13, the Supreme Court, while dealing with identical marks �PETER SCOT� in respect of whiskey, held that purchasers of Scotch whisky are unlikely to be easily misled or deceived due to their awareness and familiarity with the product. 
+29. In a recent judgment of the coordinate bench of this Court in Mountain Valley Springs India Private Limited v. Baby Forest Ayurveda Private Limited14, it was observed that in case of baby care products, the purchasers, who are parents, are very cautious, highly alert and selective in choosing the brand and products for their baby�s needs. As a result, they are unlikely to be confused, and any potential confusion would be short-lived, as parents would take the necessary steps to carefully verify and ensure the product�s suitability before making a purchase.A reference may also be made to the judgment of the Division Bench of the Bombay High Court in MESO (supra). In the said case, the plaintiff was engaged in the business of selling cosmetic products including perfumes. The defendant launched two perfumes with an identical name as that of the plaintiff, which resulted in the plaintiff filing a suit for infringement. The plea for grant of interim injunction was rejected by the Single Judge against which the plaintiff filed an appeal before the Division Bench. 
+30. The Division Bench, while dismissing the appeal,  observed that house  names used in relation to various models of perfumes are carefully considered by the consumers before making a purchase decision, to avoid any prejudice. The Division Bench further observed that to determine whether there is a likelihood of confusion, the Court has to consider the mode of purchasing the goods, the class of consumers, surrounding circumstances and the degree of similarity. The relevant observation in paragraphs 34 and 35 are set out below:-
+
+�34.�The average consumer of premium lifestyle product such as perfumes does not choose them casually. The average consumer's choice of perfume is influenced by the blends, diffusion, distillation and fragrance concentration of perfume. Thus this product is not chosen with indifference. Various brands and houses aggressively build up associations with the house and brand names. Recommendations exchanged between average consumers are generally on the house names. A discerning consumer knows there could be various perfumes in the market with names Legend, Flirt, Gentlemen, but such consumer will first go by the name of the house or a group marketing such variants.
+35.�Therefore, the defence of Liberty that use of Legend and Flirt along with its house name will not cause confusion regarding the marks of MESO has to be accepted at this stage to sustain the order of refusal of an injunction. The learned single Judge has placed conditions on Liberty in respect of disclosure of accounts, which according to us are sufficient safeguards till the disposal of the Suit.�
+[Emphasis is mine]
+
+31. The rationale of the aforesaid judgments would be even more applicable in the present case. Both the plaintiff and the defendant are engaged in the business of selling motor vehicles, which are high end products. Unlike Fast-Moving Consumer Goods (FMCG) products, motor vehicles are not purchased at supermarkets, departmental stores or online e-commerce platforms.  A customer intending to purchase a motor vehicle would not make the decision on an impulse. It would be an informed and well-thought-out decision. In the normal course, the customer would visit or approach the showroom of the car manufacturer or its authorized dealer in order to inspect the car and/or test drive the vehicle before making the decision to purchase. Additionally, in current times, prospective purchasers have ample resources at their fingertips, including the ability to perform internet searches to verify the authenticity, features and credibility of products they are buying.
+32. It is also an undisputed position that the vehicles of the defendant and the plaintiff belong to a different category and are targeted at a different segment of the public. The plaintiff�s vehicle is an electric passenger vehicle, whereas the defendant�s vehicle is an electric commercial vehicle. Naturally, their shape, size and configuration as well as prospective customers would be different. 
+33. While purchasing a motor vehicle, the name of the manufacturer becomes very important and an average consumer while deciding to purchase a motor vehicle would not only consider the model of the motor vehicle but also its manufacturer. There is an amount of brand equity, goodwill and reputation attached to the name of the manufacturer. It is a known position in the automobile industry that a model of a car is identified and recognized not only by the name of the model but also by the name of the manufacturer. It is common in the automobile trade that the cars are identified by the manufacturer�s name along with the model of the car. For instance, car models such as Mercedes E220, Toyota Camry, Honda Accord, Maruti SX4 would not be readily recognizable without the name of the manufacturing company i.e., Mercedes, Toyota, Honda, or Maruti respectively. Thus, the name of the manufacturer is of utmost importance for a consumer and becomes a distinguishing factor as the consumer would consider the manufacturer�s name and not just the car model.  
+34. Therefore, it cannot be said that �MAHINDRA� is merely a trivial or inconsequential addition. On the contrary, the inclusion of �MAHINDRA� to the mark �ZEO� makes the mark distinctive and effectively sets it apart from the mark of the plaintiff, both structurally and phonetically.
+35. Next I shall proceed to deal with judgments cited on behalf of the plaintiff.
+36. The plaintiff has relied upon the judgment in V Guard Industries (supra), and Radico Khaitan (supra) in support of its contention that if the two marks are identical, the same cannot be distinguished on the basis of a house mark being used along with the infringing mark.  There cannot be any cavil with the aforesaid proposition. However, in both the aforesaid cases, the competing marks  �PEBBLE� in case of V Guard Industries (supra) and �ELECTRA� in case of Radico Khaitan (supra), were identical marks,  whereas, in the present case, in view of the modifications made by the defendant, the two competing marks are not identical.     
+37. In Swiss Bike (supra), the two competing marks were �RALEIGH� and �RALLEYZ�, which were phonetically similar unlike the competing marks in the present case.  Further, in the said case, the plaintiff had been using the mark �RALEIGH� in multiple jurisdictions across the world since 1939. However, in this present case, the plaintiff is yet to launch its product in the market. 
+38. The plaintiff has also placed reliance on the judgment in Baker Hughes (supra), in support of its submission that the sophistication of a buyer is no guarantee against likely confusion. The plaintiffs and defendants, in the said case, entered into an agreement to form a joint venture in India and as a part of the said agreement, the defendants were allowed to use the �BAKER� mark. Thereafter, the plaintiffs sold their shares and exited the said joint venture and called upon the defendants to refrain from using the mark �BAKER�, which the defendant failed to do. In the present case, there is no connection between the plaintiff and the defendant.  Further, in Baker Hughes (supra), the plaintiff had established goodwill and reputation in its trademark in the market which led the court to observe that there may be a case of �initial user confusion� which may lead the prospective purchasers to be confused. However, in the present case, the likelihood of confusion is remote as the plaintiff has not even started selling its vehicle.  
+39. Therefore, none of the aforesaid cases cited on behalf of the plaintiff would come to the aid of the plaintiff in the present case. 
+40. In light of the discussion above, I am of the view that the plaintiff has failed to make out a prima facie case for grant of interim injunction. 
+41. Balance of convenience is also in favour of the defendant for not granting interim injunction at this stage, as the defendant has already launched its product whereas plaintiff is yet to launch its product in the market.
+42. Accordingly, I.A. 40846/2024 filed on behalf of the plaintiff under Order XXXIX Rules 1 and 2 of the CPC is dismissed. 
+43. Needless to state, any observations made herein are only for the purposes of adjudication of the present application and would have no bearing on the final outcome of the suit.
+
+CS(COMM) 849/2024
+44. List before Joint Registrar on 18th February, 2025 for completion of pleadings.
+     
+     AMIT BANSAL
+     (JUDGE)
+
+JANUARY 13, 2025
+kd
+1 1998 SCC OnLine Del 481
+2 2022 SCC OnLine Del 1593
+3 2024 SCC OnLine Del 1605
+4 2019 SCC Online Del 7580
+5 2009 SCC OnLine Del 1691
+6 2019 SCC OnLine Bom 1506
+7 (1970) 2 SCC 716
+8 1974 SCC OnLine Mad 64
+9 2020 SCC Online Del 2744
+10 (1969) 2 SCC 727
+11 (2006) 8 SCC 726
+12 (2001) 5 SCC 73
+13 (2008) 10 SCC 723
+14 2024 SCC OnLine Del 3665
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+	     	 
+
+
+CS(COMM) 849/2024					Page 1 of 1
+
+

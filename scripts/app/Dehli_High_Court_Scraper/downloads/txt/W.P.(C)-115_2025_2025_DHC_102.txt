@@ -1,0 +1,79 @@
+$~87
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%				                               Date of Decision : 08.01.2025
++ 	W.P.(C) 115/2025 and CM APPL.436/2025 (Stay)
+	MAHANAGAR TELEPHONE NIGAM LTD	          .....Petitioner
+Through:	Mr. Chandan Kumar and Mr. Vikram Sharma, Advocates. 
+				versus
+MICRO AND SMALL ENTERPRISE 
+FACILITATION COUNCIL AND OTHERS.	     .....Respondents
+Through:	Dr. Anurag Kr. Agarwal, Adv. for R-3 (through v/c)
+	CORAM:
+	HON'BLE MR. JUSTICE SACHIN DATTA
+				
+SACHIN DATTA, J. (Oral)
+CM APPL.437/2025 (Exemption)
+1. Allowed, subject to all just exceptions.
+2. Application stands disposed of.		
+W.P.(C) 115/2025
+3. The present petition assails an arbitral award dated 15.10.2024 passed pursuant to reference to arbitration under Section 18 of the MSMED Act 2006. An arbitral tribunal comprising of a sole arbitrator, was constituted pursuant to a communication dated 04.11.2022 addressed to the Coordinator, Delhi International Arbitration Centre (DIAC) which, inter alia, reads as under:
+�In accordance with the provisions of the said Act, MSEFC, District North West took up the case for conciliation proceedings in its meeting held 011 18.10.2022 and has arrived at the conclusion that both the parties do not seem to be interested for conciliation towards the disputed amount. It is felt that conciliation is not possible in this case. Therefore, the Council decided to terminate the conciliation proceedings and refer this case u/s 18(3) of the Micro, Small and Medium Enterprises Development Act, 2006 to the Delhi International Arbitration Center (DIAC) for initiating proceedings as per the Arbitration and Conciliation Act, 1996.�
+
+4.  The learned sole arbitrator appointed by the DIAC duly conducted the arbitral proceedings and rendered an arbitral award dated 15.10.2024. 
+5. The present petition has been filed on the premise that the learned arbitrator has exercised jurisdiction beyond the scope of reference. It is submitted that the scope of reference to arbitration was confined only to one running bill of the respondent no.3, whereas the scope of the arbitral proceedings was expanded much beyond the scope of reference by virtue of the prayer/s made in the statement of claim filed before the arbitral tribunal. 
+6. Learned counsel for the petitioner submits that an appropriate objection in this regard was taken before the learned sole arbitrator and also duly recorded in paragraph 109 of the award which reads as under:
+�109.	    It is submitted by the Respondent that reference dated 14.3.2022 made by the Claimant under section 18 MSME Act listed only one invoice bearing No. K.N20 15-16, dated 08.08.2018 for Rs. 55,80,311/-, the said case having been registered by MSEFC as case No. DLl061M1NWC/00724 and referred to DIAC by letter dated 04.11.2022. It is stated that the Claimant has not filed in these proceedings any other reference to the MSEFC to include any other invoice. The contention is that this being a statutory arbitration, inclusion of any other claim/invoice in these proceedings, which was not the subject matter of 14.03.2022 reference by the Claimant, is/are barred. It is also submitted that even the 14.03.2022 reference for invoice No. K.N20 15-16, dated 8.8.2018 for Rs. 55 80 311/- was barred because on the date of the said Invoice the Claimant was not registered under the MSME Act, such event happening later on 14.11.2018.�
+
+7. It is contended that the arbitral award is liable to be set aside in these proceedings as the arbitrator was completely devoid of the jurisdiction under the MSMED Act, 2006 to adjudicate the disputes that were raised in the arbitral proceedings. 
+8. The aforesaid objection/s of the petitioner have been squarely dealt with in the arbitral award in Paragraph 121, which reads as under:
+�121.    But, the argument of the Respondent that the Claimant had taken to MSEFC, by its petition dated 14.03.2022 (Ex. C-99), the dispute concerning only the 1st RA bill, dated 08.08.2018 of Rs. 55,80,31 1/- (Annexure - A - 107) or that it is only the said matter which formed the subject matter of the case registered by MSEFC in which notice was issued to the parties on 02.05.2022 (Ex. C-100) for conciliation under section 18(2) of MSME Act is fallacious. It is noted that the application was made in pre-set Online format available on web portal "MSME SAMADHAN" of MSEFC. It does appear that in column no. 6 meant to ascertain the amount alleged to be payable by the opposite party, the Claimant mentioned the sum of Rs. 55,80,311/- and in the fields meant to capture the Invoice no. and Invoice date filled the corresponding particulars of 1st RA Bill dated 08.08.2018 (Annexure - A-I07). But this does not mean the intent was to restrict the claim only to that extent. The format filled was clearly meant only to register the dispute and not to give its detailed particulars. It is not clear from any material as to whether the Claimant had the opportunity at any stage of the process before MSEFC to present its claim in full bloom. Since the process under stage of conciliation under Section 18(2) of MSME Act is generally confidential, it is to be assumed that even if such narrative had been given, the same cannot be brought out. Be that as it may, what clinches the issue in favor of the Claimant is the fact that in the registration form (Ex. C-99) submitted to MSEFC on 14.03.2022, the Claimant had referred to the Work Order (Ex. C-9) from which the claims arise. The dispute thus taken to MSEFC was over non-payment of dues under the said Work Order and not restricted only to nonpayment of one particular invoice which even otherwise would get subsumed in Invoice issued later, it being a contract which was not concluded, the work thereafter having continued, the contract being still alive and kicking, not terminated by either party till date.� 
+
+9. Thus, the impugned award clearly holds that the jurisdiction of the arbitrator extends to disputes arising under the work order in question and all the claims that were raised in the arbitral proceedings arose from the same work order. It was further held that the arbitral proceedings were not restricted only to non-payment of one particular invoice but extended to the other disputes in respect of the work order. 
+10. In the opinion of this Court, it is impermissible for the petitioner to agitate these issues in the present petition under Article 226 of the Constitution of India. The impugned award dated 15.10.2024 having been rendered by the learned sole arbitrator, and the objections as regards (lack of) jurisdiction having been rejected by the learned sole arbitrator, the appropriate remedy for the petitioner is to assail the same by taking recourse to the remedies under the Arbitration and Conciliation Act, 1996 (hereinafter �the A&C Act�). This position stands affirmed by the judgment of the Supreme Court in India Glycols Limited and Anr. v. Micro and Small Enterprises Facilitation Council, Medchal-Malkajgiri and Ors1, NBCC (India) Ltd. vs. Micro Small and Medium Enterprises Facilitation Council and Another2, State Trading Corporation of India Ltd. vs. Micro and Small Enterprises Facilitation Council and Another3 and Executive Engineer and Others vs. Bholasingh Jaiprakash Construction Ltd. and Another4
+11.  In India Glycols Limited and Anr. (supra) it has been held by the Supreme Court as under:   
+�14. Mr. Parag P Tripathi, senior counsel appearing on behalf of the appellant sought to urge that the view of the Facilitation Council to the effect that the provisions of the Limitation Act, 1963 have no application, which has been affirmed by the Division Bench in the impugned judgment, suffers from a perversity, and hence a petition under Article 226 of the Constitution ought to have been entertained. We cannot accept this submission for the simple reason that Section 18 of the MSMED Act, 2006 provides for recourse to a statutory remedy for challenging an award under the Act of 1996. However, recourse to the remedy is subject to the discipline of complying with the provisions of Section 19. The entertaining of a petition under Articles 226/227 of the Constitution, in order to obviate compliance with the requirement of pre-deposit under Section 19, would defeat the object and purpose of the special enactment which has been legislated upon by Parliament.
+
+15. For the above reasons, we affirm the decision of the Division Bench by holding that it was justified in coming to the conclusion that the petition under Articles 226/227 of the Constitution instituted by the appellant was not maintainable. Hence, it was unnecessary for the High Court, having come to the conclusion that the petition was not maintainable, to enter upon the merits of the controversy which arose before the Facilitation Council.�
+ 
+12. In NBCC (India) Ltd. (supra) it has been observed by a Division Bench of this Court as under:
+
+�14. Further, the Supreme Court in Gujarat State Civil Supplies Corporation Ltd. v. Mahakali Foods (P) Ltd. [(2023) 6 SCC 401 has categorically held that the issue of lack of inherent jurisdiction can be decided by the Arbitral Tribunal appointed under the MSMED Act, which by virtue of Section 18(3) of MSMED Act is competent to rule on its own jurisdiction as also the other issues in view of Section 16 of the Arbitration and Conciliation Act, 1996. Consequently, the sequitur is that the decision of the Arbitral Tribunal on the issue of jurisdiction would be amendable to challenge under Section 34 of the Arbitration and Conciliation Act, 1996.�
+
+13. In State Trading Corporation of India Ltd. (supra) it has been observed by a Division Bench of this Court as under:
+�13. With respect to the objection taken by the Appellant to the effect that the MSEFC does not have inherent jurisdiction to make a reference to arbitration under the provisions of MSMED Act and therefore a writ petition would be maintainable, is also misconceived. In similar facts, the Supreme Court in Gujarat State Civil Supplies Corporation Ltd. v. Mahakali Foods (P) Ltd.4 has categorically held that such an issue of lack of inherent jurisdiction can be decided by the Arbitral Tribunal appointed under the said Act, which by virtue of Section 18(3) of MSMED Act is competent to rule on its own jurisdiction as also the other issues in view of Section 16 of the Act of 1996. The sequitur is that, the decision of the Arbitral Tribunal on the issue of jurisdiction would be amendable to challenge under Section 34 of the Act of 1996.
+
+14. In light of the aforesaid judgments of the Supreme Court and more specifically the judgment India Glycols Ltd. v. MSEFC, Medchal-Malkajgiri (supra) we are of the considered opinion that the judgment of the learned Single Judge of this Court in Malani Construction Company (supra) holding that a writ petition under Article 227 of the Constitution can be maintained, is not the correct view.�
+
+14. In Executive Engineer and Others (supra), it has been held by a coordinate Bench of this Court as under:   
+�8. MSMED Act was brought in to free Micro, Small and Medium Enterprises from the plethora of laws and regulations which they had to face with their limited awareness and resources. Micro, Small and Medium Industries have emerged as a significant contributor to the economy and is primarily labour intensive. The MSMED Act was brought in to address the concerns of Micro, Small and Medium industries. Chapter V of the MSMED Act deals with delayed payments to the MSMEs. The said Chapter has been brought in to ensure that when goods or services are supplied by the MSMEs, the payments are made to these industries within time and Sections under Chapter V provides for delayed payment at higher rate of interest. The purpose of this chapter is to ensure that the MSMEs are not pushed out of business. It is felt that failure to pay for the amount of goods and services provided by these enterprises was resulting in many of the MSMEs going out of business as they do not have the might to fight with the large scale enterprises. Section 18 of the MSMED Act provides for reference of a dispute to the MSME Facilitation Council. The MSME Facilitation Council on receipt of a reference under Sub-Section 18(1) of the MSMED Act, the Council shall either itself conduct conciliation in the matter or seek the assistance of any institution or centre providing alternate dispute resolution services by making a reference to such an institution or centre, for conducting conciliation. In the present matter, prior to sending the matter to the Arbitral Tribunal, an effort for conciliation was also made and the matter was referred to the Arbitral Tribunal only after conciliation proceedings have failed. Once the matter is referred to Arbitration and an award is passed, the award can be challenged either by filing an application under Section 34 of the Arbitration Act or by filing an application under Section 19 of the MSMED Act.
+
+10. No ground has been raised in the present Writ Petition on the merits of the case as to whether the Respondent No. 1 is entitled to the amount claimed or not. Keeping in mind the objectives of the MSMED Act and also keeping in view the complete inaction on the part of the State to approach this Court during the pendency of the arbitration or taking recourse to the proceedings under Section 34 and 37 of the Arbitration Act after the Award was passed, this Court is not inclined to exercise its extraordinary jurisdiction under Article 226 of the Constitution of India to interfere with the award passed by the Arbitral Tribunal.�
+
+15. As such, this Court is not inclined to entertain the present petition, the same is accordingly dismissed with liberty to the petitioner to assail the impugned arbitral award by taking recourse to appropriate remedies, inter alia, under Section 34 of the A&C Act.  
+16. All contentions of the petitioner qua the validity/legality of the impugned award are left open to be considered in appropriate proceedings. 
+17. The present petition stands disposed of in the above terms. Pending application also stands disposed of. 
+
+
+SACHIN DATTA, J
+JANUARY 8, 2025/at
+
+1 2023 SCC OnLine SC 1852
+2 2024: DHC: 4998-DB    
+3 2024 SCC OnLine Del 979
+4 2024 SCC OnLine Del 1080
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+
+ 
+
+
+	
+W.P.(C) 115/2025	                                                                                                                                       Page 1 of 7
+
+

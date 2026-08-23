@@ -1,0 +1,100 @@
+$~83
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
++ 	W.P.(C) 6981/2017
+
+	GOVT OF NCT OF DELHI			       .....Petitioner
+Through:	Mrs. Avnish Ahlawat, Standing Counsel with Mr. Nitesh Kumar Singh, Ms. Laavanya Kaushik, Ms. Aliza Alam and Mr. Mohnish Sehrawat, Advs.
+
+				versus
+
+	HIRA LAL DUGGAL				     .....Respondent
+Through:	Mr. Avadh Bihari Kaushik, Ms. Saloni Mahajan and Mr. Rishabh Kumar, Advs.
+
+	CORAM:
+	HON'BLE MR. JUSTICE C. HARI SHANKAR
+	HON'BLE MR. JUSTICE AJAY DIGPAUL
+				ORDER (ORAL)
+%				     22.01.2025
+
+C. HARI SHANKAR, J.
+
+1. In connection with the work undertaken the respondent Hira Lal Duggal while deputed on election duty as Assistant Returning Officer, in the Municipal Corporation of Delhi1 in 2007, Election Petition 47/2007 was filed before the learned Additional District Judge, Delhi2.  The petition alleged that the respondent was guilty of having resorted to corrupt practices while on election duty, on 17 March 2007.  The respondent was, at that time, working as Superintendent Grade-I in the MCD.
+
+2. The Election Petition was disposed of by the learned ADJ vide order dated 4 June 2008, concluding that the allegations against the respondent were serious and entailed departmental and penal consequences.  
+
+3. In the interregnum, the respondent had retired on 1 February 2008.
+
+4. In connection with the incident forming subject matter of Election Petition 47/2007, disciplinary proceedings were instituted against the respondent by way of a charge sheet dated 22 March 2011.
+
+5. The respondent challenged the disciplinary proceedings before this Court by way of WP (C) 4750/2011, which was transferred to the Central Administrative Tribunal3 and renumbered TA 64/2013.
+
+6. Various grounds were taken by the respondent before the Tribunal.  However, the Tribunal has ultimately allowed the respondent�s TA on the sole ground that the charge sheet had been issued to the respondent on 22 March 2011, which was more than four years after the incident which took place on 17 March 2007, in contravention of Rule 9(2)(b)(ii)4 of the Central Civil Services (Pension) Rules 19725.
+
+7. On this basis, the Tribunal has allowed the respondent�s OA and has quashed the charge sheet and the consequent proceedings instituted against the respondent.  
+
+8. Aggrieved thereby, the GNCTD6 has approached this Court by means of the present writ petition.  
+
+9. We have heard Ms. Ahlawat, learned Counsel for the GNCTD, and Mr. Kaushik, learned Counsel for the respondent, at some length.
+
+10. Ms. Ahlawat sought to submit that, inasmuch as the charge sheet was dated 25 February 2011, it had to be treated as having been issued on the said date and that, therefore, there was no contravention of Rule 9(2)(b)(ii) of the CCS (Pension) Rules.
+
+11. The date of issuance of the charge sheet to the respondent, therefore, remains the only issue in controversy.
+
+12. The Supreme Court has, in DDA v H.C. Khurana7 examined the question of when a charge sheet could said to be issued.  Paras 14 and 15 of the judgment in H.C. Khurana may be reproduced, thus:
+�14.�	�Issue� of the charge-sheet in the context of a decision taken to initiate the disciplinary proceedings must mean, as it does, the framing of the charge-sheet and taking of the necessary action to despatch the charge-sheet to the employee to inform him of the charges framed against him requiring his explanation; and not also the further fact of service of the charge-sheet on the employee. It is so, because knowledge to the employee of the charges framed against him, on the basis of the decision taken to initiate disciplinary proceedings, does not form a part of the decision making process of the authorities to initiate the disciplinary proceedings, even if framing the charges forms a part of that process in certain situations. The conclusions of the Tribunal quoted at the end of para 16 of the decision in�Jankiraman8�which have been accepted thereafter in para 17 in the manner indicated above, do use the word �served� in conclusion No. (4), but the fact of �issue� of the charge-sheet to the employee is emphasised in para 17 of the decision. Conclusion No. (4) of the Tribunal has to be deemed to be accepted in�Jankiraman�only in this manner.
+
+15.�	The meaning of the word �issued�, on which considerable stress was laid by learned counsel for the respondent, has to be gathered from the context in which it is used. Meanings of the word �issue� given in the Shorter Oxford English Dictionary include : �to give exit to; to send forth, or allow to pass out; to let out; � to give or send out authoritatively or officially; to send forth or deal out formally or publicly; to emit, put into circulation�. The issue of a charge-sheet, therefore, means its despatch to the government servant, and this act is complete the moment steps are taken for the purpose, by framing the charge-sheet and despatching it to the government servant, the further fact of its actual service on the government servant not being a necessary part of its requirement. This is the sense in which the word �issue� was used in the expression �charge-sheet has already been�issued�to the employee�, in para 17 of the decision in�Jankiraman.�
+
+13. Thus, a charge sheet as per the Supreme Court, is issued on the date when it is despatched to the respondent.  No prior date would qualify as the date of �issue� of the charge sheet.  
+
+14. The Tribunal has noted that the charge sheet was actually sent to the respondent on 22 March 2011.  We find this to be correct, as the letter dated 22 March 2011, whereby the GNCTD had sent the charge sheet to the Head of the School, where the respondent was working, is on record.  The school forwarded the charge sheet to the respondent on 29 March 2011.
+
+15. Thus, even if one were to take the date on which the GNCTD sent the charge sheet to the School, it was more than four years after the occurrence of the incident in respect of which the respondent was charge sheeted on 17 March 2007.
+
+16. Though Ms. Ahlawat sought to contend that the petitioner came to know of the said incident only when the learned ADJ passed the order in Election Petition 47/2007 on 4 June 2008 and that, therefore, the date of issue of the charge sheet, for the purposes of Rule 9(2)(b)(ii), could not be on any earlier date, we cannot agree.  Accepting Ms. Ahlawat�s contention would require us to re-write Rule 9(2)(b)(ii) of the CCS (Pension) Rules by adding, therein, the words �or from the date on which the fact of the incident came to be known�, or some other such expression.  Decidedly, we are not empowered to do so.
+
+17. It is trite that Court cannot re-write any legislative instrument, whether plenary or subordinate9.  In Alka Ojha v Rajasthan Public Service Commission10, the principle is clearly stated, thus:
+�21.�	The judgment in�National Insurance Co. Ltd.�v.�Swaran Singh11�on which reliance was placed by Shri Rakesh K. Khanna has no bearing on the interpretation of Rule 11 read with the entries contained in the Schedule and it is not possible for this Court to rewrite the Rule so as to enable the persons holding learner's licence to compete for appointment as Motor Vehicle Sub-Inspector.�
+
+18. In that view of the matter, we are in agreement with the Tribunal that, as the charge sheet was issued to the respondent more than four years after the incident in respect of which he was charge sheeted, the issuance of the charge sheet cannot sustain the scrutiny of Rule 9(2)(b)(ii) of the CCS (Pension) Rules.  
+
+19. The Tribunal, therefore, correctly set aside the charge sheet and the consequent proceedings.
+
+20. The writ petition is, accordingly, dismissed with no orders as to costs.
+
+C. HARI SHANKAR, J.
+
+AJAY DIGPAUL, J
+	JANUARY 22, 2025
+	ar
+				Click here to check corrigendum, if any
+
+1 �MCD� hereinafter
+2 �learned ADJ� hereinafter
+3 �the Tribunal� hereinafter
+4 9. 	Right of President to withhold or withdraw pension � 
+*****
+	(2)(b)	The departmental proceedings, if not instituted while the Government servant was in service, whether before his retirement, or during his re-employment, - 
+        (i)	shall not be instituted save with the sanction of the President,
+(ii)	shall not be in respect of any event which took place more than four years before such institution, and
+(iii)	shall be conducted by such authority and in such place as the President may direct and in accordance with the procedure applicable to departmental proceedings in which an order of dismissal from service could be made in relation to the Government servant during his service.
+5 �the CCS (Pension Rules)� hereinafter
+6 Government of National Capital Territory of Delhi
+7 (1993) 3 SCC 196
+8 UOI v K.V. Jankiraman, (1991) 4 SCC 109
+9 Siddharam Satlingappa Mhetre v State of Maharashtra, (2011) 1 SCC 694
+10 (2011) 9 SCC 438
+11 (2004) 3 SCC 297
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+                                                                                      
+
+W.P.(C) 6981/2017  		Page 1 of 6
+
+

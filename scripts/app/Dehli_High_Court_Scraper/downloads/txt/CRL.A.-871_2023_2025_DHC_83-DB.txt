@@ -1,0 +1,490 @@
+$~
+*       IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
++                                                  Reserved on: 16th December, 2024
+                                                   Pronounced on: 10th January, 2025 
+                                              
++ 				CRL.A. 871/2023
+	MD HEYDAITULLAH					.....Appellant
+
+Through:	Mr. Trideep Pais,  Sr. Adv. with Mr. Kartik Murukutla, Adv.
+
+     Versus
+
+	NATIONAL INVESTIGATION AGENCY	     .....Respondent
+
+Through:	Mr. Rahul Tyagi, SPP (NIA) with Mr. Jatin, Mr. Amit Rohila and Mr. Shaurya Lamba, Advs. with Insp. Vishnu Kumar, CIO, NIA with Mr. B.P. Gautam. 
+
+	CORAM:
+	JUSTICE PRATHIBA M. SINGH
+     JUSTICE AMIT SHARMA
+        
+				JUDGMENT
+AMIT SHARMA, J.
+
+1.	The present appeal has been filed by the Appellant-Md. Heydaitullah under Section 21(4) of the National Investigation Act, 2008 (for short, �NIA Act�) read with Section 482 of the Code of Criminal Procedure, 1973, (for short, �CrPC�) assailing the impugned order dated 23.08.2023 passed by Shri Shailender Malik � ASJ-03, New Delhi District, Patiala House Courts, New Delhi in RC No. 14/2021/NIA/DLI dated 29.06.2021 under Sections 124A/153A/153B of the IPC and Sections 17/18/18-B/38/39/40 of the Unlawful Activities Prevention Act, 1967 (for short �UAPA�) registered at P.S. NIA, whereby the bail application of the Appellant was dismissed. 
+
+2.	As per the case of the prosecution certain inputs were received regarding proscribed terrorist organizations such as Islamic State of Iraq and Syria (for short, �ISIS�) running a campaign in the cyber space for radicalizing youths and carrying out terrorist activities in India and elsewhere. It is alleged that one cyber identity by the name of Qasim Saini @ Qasim Khurasani along with his associates was actively involved in creating and disseminating ISIS centric propaganda with the intention of motivating youths for taking part in violent jihad. 
+
+3.	In pursuance of the above Ministry of Home Affairs, Government of India vide Order No. 11011141/2021/NIA dated 29.06.2021 directed the NIA (i.e. Respondent) to register and investigate the aforesaid case. 
+
+4.	The case of the prosecution is that the Appellant is a close associate of co-accused Basit Kalam Siddiqui (for short, �A-12�) and had conspired to establish Sharia law in India under the flag of ISIS by waging Jihad. It is alleged that the Appellant was disseminating the ISIS ideology through the cyber space, and was spreading hatred against the Government of India by promoting enmity against Hindus on social media. It is further alleged that the Appellant had transferred funds for the cause of ISIS from his bank account. Also, various incriminating materials have been found in the electronic devices (D-201 and D-202) recovered from the Appellant during the investigation.	
+
+5.	The Appellant was arrested by the Respondent on 22.10.2022 and was chargesheeted in the present case vide second supplementary chargesheet dated 12.04.2023 for the offences punishable under Sections 17/18/38/39 of the UAPA and Sections 120-B/153-A and 153-B of the IPC. For the sake of completeness, the role ascribed to the Appellant (i.e A-13) by the Respondent in the aforesaid supplementary chargesheet filed before the learned Trial Court is as under: 
+�17.2 Role and activities/offences established against A-13: -
+
+17.2.1 Investigation revealed that A-13 was born and brought up at Village- Siswan, PS-Barharia, Dist-Siwan, Bihar. He completed his MBA in the year 2015 from Jamia Milia Islamia University, Delhi. At the time of arrest he was working in Avaya India Private limited, Global Business Park, near Guru Dronacharya Metro Station, Gurugram.
+
+17.2.2 Investigation revealed that he used to watch videos/news related to so called atrocities against the Muslim community. After watching these types of videos, his thinking turned against the Government of India and he started reading contents of proscribed terrorist organisations including ISIS on the internet. He got influenced by these thoughts and started feeling that Muslims are being oppressed everywhere. Finally, he developed inclination towards ISIS and came to a conclusion that ISIS is the only Tanzeem which follows the principle of Sharia and made up his mind to join ISIS organization. Gradually his interest in ISIS grew and he began searching for keywords such as ISIS, Jihad, Khilafa, Islamic state, Dawlah Islamia, and so on. He searched telegram groups and joined them. He was fully inclined towards ISIS ideology. He further took oath (bayath) twice in the name of "Abu Bakr Al Bagdadi" through audio shared on Telegram to work with ISIS. Daring investigation his mobile phone was seized and sent to Cert-In for examination and data was received. Various pro ISIS audios, videos, posters were recovered from his digital devices. Digital extract from the digital devices of A-13 make it evident that he was higly radicalised and was motivated by ISIS ideology. Recovery of a picture of ISIS pledge proves that he had taken the pledge of allegiance to ISIS and was an ardent member of this proscribed organization. He joined various social media groups specially on telegram to meet like minded people and had conspired to spread ISIS ideology.
+
+17.2.3 Investigation revealed that he searched and joined Telegram group "Muslim chat". During group chatting, he came in contact with one Telegram handle "wolf" and further, he was added in the telegram group �The Caravan of desert" by "wolf". After one month "wolf" shared another telegram group's link on the group of "The Caravan of Desert" and on his personal telegram ID for joining telegram group ID Al Malhamah, D@wl@tulisl@m, Sawt-al Hind Link, VOH, Mohammad Bot, Islam based department, Adam Tech world etc and he joined one telegram channel "Voices of Al-Hol Camp" by self searching on Telegram by himself.
+
+He used these accounts to keep a watch on posts regarding ISIS, and he also tried to make friends, with people of similar ideology. Telegram group Adam Tech World provides virtual numbers and he got one virtual number +33751525309 and than made telegram ID Wolf-lion. During this process, he established connection with myriad militant groups such as TRF, ISIS etc. who are fighting to remove the Government of India and want to establish reign by Islam/Dajjal. This Telegram group has tips and tricks on establishing and maintaining anonymity online.
+
+17.2.4 Investigation revealed that A-13 was the member of many pro ISIS groups. Once he received a message in Telegram group voices of Al hol camp related to donation of some money for Al-Hol Camp from telegram ID: umm_imara. In that message umm_imara shared a bank account number 0863101034295 of Canara bank in which funds had to be sent. He further sent Rs. 15000/- on 30.07.2020 through NEFT from his Yes Bank account no. 017291800001989. The same transaction is reflected in his bank statement. Further efforts to resolve the identity of ISIS Telegram entity umm_imara are being made and to resolve the identity the actual beneficiary of the amount sent by A-13. Further during scrutiny of seized mobile data it was found that A-13 was the member of Voices of Al-Hol Camp (Telegram id-1398146684) and he got motivated to donate funds for the cause of ISIS.
+
+A-13 while chatting on a telegram group Voice of Al hol camp got a message to donate money to support women and children of ISIS fighters, from a telegram user @ umm_imara. The bank account details for deposting the money was shared on the said group. A-13 as an ardent member of ISIS, decided to donate the sum of Rs 15000.
+
+During investigations, A-13 was questioned regarding the transfer of money from his bank account to the bank account shared on the telegram group Al hol Camp to help the cause of ISIS. He informed that he wanted to help the women and children of ISIS fighters, so he transferred the money. This itself proves that he is an ISIS Sympathsier. It is also corroborated by witnesses.
+
+17.2.5 Investigation revealed that the A-13 was associated with co-accused A-12 through social media applications and both were part of many Pro ISIS social media groups therein ISIS propaganda materials were shared. Some chats were found in mobile data of A-12 showing their association.
+
+Chats have been found on Telegram between A-12 having Telegram ID 5645052658 (WOLF) and A-13 having Telegram ID: 5580008391 (Wolf-Lion).
+
+Chats were found in al malhamah telegram group in which Basit and Heydaitulla were members and ISIS related contents were posted in this group.
+
+During scrutiny of mobile data of A-13 it was found that he was also member of pro ISIS telegram group ISLAM Based Department in which A-12 was also member and in this group ISIS material were shared.
+
+Social media chats of A-13 with A-12 show that they both were known to each other and they both were members of many common social media accounts where ISIS related material were circulated and ISIS ideology was discussed.
+
+17.2.6 Investigation revealed that A-13 was the member of many pro ISIS telegram groups and used to receive and share ISIS propaganda material. It is evident from evidence extracted from the digital devices of A-13 that he was highly radicalized by ISIS ideology; took oath of allegiance to ISIS; joined various social media groups where he came in contact with the like-minded people propagating and disseminating ISIS ideology, recruited people for the proscribed organisation, collected funding for the cause of ISIS, learned to make IEDS, watched videos to establish Sharia law in India under the flag of ISIS.
+
+17.2.7 Investigation further revealed that A-13 was planning to carry out bomb blasts in India with co accused A-12. He also searched and read many online and off line articles to prepare various types of explosives/IEDs & bombs. In this regard many pdf and videos were found in his seized digital devices describing methods of preparing explosives and bombs,
+
+Chats on Telegram group where A-13 was a member and the group members were sharing tutorial videos/pdf/image for preparing explosives. This establishes inclination of A-13 for preparing explosives and IEDs. In this chat A-13 is also seen proposing to have separate secret chat group on conversation.in. to avoid LEA's scrutiny.
+
+A-13 was also member of many Telegram groups dealing with guns and 3D Printing of weapons/guns. Evidence extracted from his digital devices shows Telegram groups discussing making of Guns with the help of 3D printers and also recovery of digital images, showing guns which can be easily made by 3D printers with pictorial guides to make paper cartridge.
+
+In this regard group chats found in mobile data of A-13, where he was also a group member. This group discussed about making Guns with the help of 3D printing.
+
+6.	Thereafter, the Appellant filed an application under Section 437 Cr.P.C. read with Section 43(D)(5) of UAPA seeking regular bail and the same was dismissed by the learned Trial Court vide the impugned order. 
+
+7.	Hence, the present appeal.
+
+
+SUBMISSIONS ON BEHALF OF THE APPELLANT
+
+8.	Learned Senior Counsel appearing on behalf of the Appellant submitted that the there was no evidence connecting the Appellant to any terrorist organization including ISIS.�The only allegation, which is relied upon by the prosecution, is the remittance of Rs.15,000/- from the Yes Bank account of the Appellant to one Mohd. Unais (PW-125), which is not sufficient to hold that the Appellant was either a member of any terrorist organization or had in any manner donated or contributed to any terrorist organization for furthering its cause. It is further submitted that in the initial FIR dated 29.06.2021, no accusations were made against the Appellant.� It was only after the Appellant was arrested on 20th October, 2022 that this banking transaction was relied upon and the Appellant was arrayed as a co-accused in the second supplementary chargesheet.�
+
+9.	Learned Senior Counsel appearing on behalf of the Appellant submitted that Appellant had not made any direct remittance to the lady Ms. Afa Ibrahim and the aforesaid witness i.e., Mohammad Unais, to whom the Appellant had transferred Rs. 15,000/- on 30.07.2020, had made a second remittance of equivalent Maldivian Rufiyaa (3100 MVR) to Ms. Afa Ibrahim, on the same date. Further, it is submitted that there is no material on record show that Ms. Afa Ibrahim, belonged to ISIS or that she was running any telegram group,  bearing Telegram ID: �umm_imara�. In the reply filed by the NIA, in respect of the telegram chats, the following is recorded:
+
+�..... Further during investigations of NIA case No. RC-26/2022/NIA/DLI, it emerged that one lady having Telegram account similar to "umm_imara" i.e "umm3imarah" and "ummimarah0" used to raise funds for ISIS on the name of charity work for Al-Hol Camp. This clearly establishes that the accused Md. Heydaitullah (A-13) had intentionally provided funds for ISIS.�	
+
+10.	It was argued that the aforesaid witness has also given an explanation as to the reason why the Appellant deposited Rs. 15,000/- in his account, and why the same was remitted by him to Ms. Afa Ibrahim. However, in his statement, Mohd. Unais (PW-125) does make a factual assertion that Ms. Afa Ibrahim is involved in raising funds for ISIS activities, but there exists no material to support such an assertion. It is submitted that the entire basis of the present case, which has been put up against the Appellant, cannot be on such a hearsay or a non-substantiated statement given by a witness. Further it was argued that the Respondent has not been able to proffer any proof that any message was sent by the Appellant to ISIS. Also, there was no proof that Ms. Afa Ibrahim is part of ISIS. Even the neighbour�s name at whose behest allegedly the remittance was sought by the Appellant could not be recalled by Mohd Unais during his deposition before the learned Trial Court (PW-125).
+
+11.	Insofar as the chargesheet is concerned, it was pointed out that the second supplementary chargesheet dated 12.04.2022, reflects that there was no pro ISIS material that was revealed from the investigation against the Appellant. Although, it is alleged that the two mobile phones, which were seized from the Appellant, did reveal certain documents relating to the ISIS such as pledge for joining ISIS etc., but the same would not be sufficient to show that the Appellant had, in any manner, disseminated any material relating to the ISIS. It is also submitted that the mere presence of sympathizing material in respect of ISIS would not be sufficient to show that the Appellant is guilty of the offences charged. 
+
+12.	Further it is submitted that a perusal of paragraph 17.2.1 and 17.2.7 of the second supplementary chargesheet would reflect that various allegations have been made against the Appellant. However, there is no supporting evidence provided by the prosecution with regard to the said allegations, including the allegation regarding the Appellant joining Muslim chat group on Telegram called �The Caravan of desert� or �Voices of AL-Hol Camp� as is alleged in paragraph 17.2.4 of the aforesaid chargesheet. 
+
+13.	Learned Senior Counsel appearing on behalf of the Appellant submitted that the material which was recovered from the two mobile phones of the Appellant namely (i) green black Redmi phone (D-201) and (ii) Samsung Galaxy J7 phone (D-202), showed mere existence of 455 PDF documents on the Redmi phone, without any further dissemination of the same. It was argued that this cannot show that the Appellant had been distributing or calling for any recruitment or actively participating in any ISIS activity. The data, which had been recovered from the said phones, also does not establish that the Al-Hol camp belong to the ISIS. It is submitted that at most, the allegation that can be made against the Appellant is that there was ISIS sympathizing material on both the phones. It was further argued that there was no material to show that the Appellant, in fact, took a pledge in favour of ISIS. Mere possession of such material cannot be held to be an offence, as per the settled legal decisions. 
+
+14.	Learned Senior Counsel appearing on behalf of the Appellant argued that Insofar as the group named �Caravan of desert� being related to the ISIS is concerned, the same is, in fact, an allegation, which is not supported by the screen shot, appended at page 237 of the present Appeal. It was submitted that that the telegram conversations placed on record between a co- accused, who takes the name �Wolf� and the Appellant, who goes by the name �Momin Believer� also did not show any implicating material.
+
+15.	Reliance was placed on the judgement of the Hon�ble Supreme Court in Ranjitsing Brahmajeetsing Sharma v. State of Maharashtra and Anr1., to argue that mere sympathizing with an organization is not sufficient to reject an application for bail. Further in consonance with the principles laid down by the Hon�ble Supreme Court in National Investigation Agency v. Zahoor Ahmad Shah Watali,2 (2019) 5 SCC 1, it was submitted that the allegations have to prima facie show the Appellant�s complicity in the commission of the said offence.
+
+16.	Learned Senior Counsel appearing on behalf of the Appellant also placed reliance on the judgment of the Hon�ble Supreme Court in Thwaha Fasal v. Union of India3, wherein it was held that it is imperative to establish that the accused was involved in furthering the activities of a terrorist organization and the same is an essential condition. Mere association and support to a terrorist organization cannot be held to be sufficient and active participation is required. 
+
+17.	Judgment of the Hon�ble Supreme Court in Jalaludin Khan v. Union of India4, was relied upon to argue that the connection between the Appellant and the tenant who was given the premises on rent would not show a direct connection between the Appellant and the Popular Front of India (�PFI�). It is pointed out that on the aforesaid reasoning the Hon�ble Supreme Court had granted bail to the accused in Jalaludin Khan (supra). The reference was then made to the decision of the U.S. Supreme Court in Brandenburg v. Ohio5 to argue that it is not sufficient that there is a clear and present danger unless the same is manifested in the form of lawlessness or unlawful action thereafter. In furtherance of the above it was argued that even advocacy of use of force or of law violation would not be sufficient to reject the bail except where such advocacy is directed to inciting or producing imminent illegal/violent action. It was also highlighted that Brandenburg (Supra) had been upheld by the Supreme Court in Shreya Singhal v. Union of India6.
+
+18.	Lastly, learned Senior Counsel for the Appellant submitted that that the Appellant was arrested on 20.10.2022, more than two years have passed since his arrest and charges are yet to be framed before the learned Trial Court. It was further pointed out that the Appellant had on one occasion submitted before the learned Trial Court that the framing of charge ought to be postponed till the investigation is over as per the prosecution. It was pointed out that the Appellant also satisfies the Tripod Test as he is a qualified Engineer with an MBA. He has a wife and two children and there is no propensity for him to be involved in a terrorist organization. He also does not have any previous criminal record. The use of certain objectionable terminology by themselves would not constitute a crime under UAPA. Thus, it is submitted that the test required under UAPA is not satisfied to withhold the bail of the Appellant.
+
+19.	Learned Senior Counsel has also placed reliance on the following judgments: 
+1) SC Legal Aid Committee Representing Undertrial Prisoners v. Union of India7, 
+2) Menaka Gandhi v. UOI8, 
+3) Hussainara Khatoon (I) v. Home Secy, State of Bihar9, 
+4) Hussainara Khatoon (IV) v. Home Secy, State of Bihar10, 
+5) Kadra Pahadiya v. State of Bihar11, 
+6) Raghubir Singh v. State of Bihar12, 
+7) P. Ramachandra Rao v. State of Karnataka13, 
+8) Dilawar v. State of Haryana14,
+9) State of Kerala v. Raneef15, 
+10) Umarmia v. State of Gujarat16, 
+11) UOI v. KA Najeeb17, 
+12) Angela Harish Sontakke v. State of Maharashtra18,
+13) Sagar Tatyaram Gorkhe v. State of Maharashtra19, 
+14) Jahir Hak v. State of Rajasthan20, 
+15) Mohd. Hakim v. State21,
+
+SUBMISSIONS ON BEHALF OF THE RESPONDENT
+
+20.	Learned SPP appearing on behalf of the Respondent submitted that the Appellant is a close associate of co-accused Basit Kalam Siddiqui (A-12) having Telegram Id 5645052658 user name � �Wolf�. It is further submitted that the Appellant was influenced by the ideology of ISIS and had become a member of the same upon taking the oath of allegiance. The Appellant had been found to be involved in dissemination of ISIS ideology in cyber space and most of his posts on social media are against Government of India and provocative against the Hindu community. 
+
+21.	It was argued that the Appellant had transferred funds for the cause of ISIS from his Yes Bank account to one Mohd. Unais (PW-125) and the same is reflected in his bank account (D-209). Various pro-ISIS audios, videos, posters were recovered from the digital devices of the Appellant. He joined various pro-ISIS telegram groups such as �Muslim chat�, �The Caravan of desert�, �Al Malhama�, �D@wl@tulisl@m�, �Sawt-al Hind�, �Islam Based department� and �YOH� to meet like-minded people and had conspired to spread ISIS ideology in India. It was further submitted that the Appellant had joined one telegram channel "Voices of Al-Hol Camp" which is directly linked to ISIS.
+
+22.	On 11.12.2024 a pen drive containing electronic data recovered from the various devices seized from the Appellant was handed over in Court. Learned SPP appearing on behalf of the Respondent placed reliance upon certain parts of the data, illustratively, to show the nature of the activities of the Appellant and to emphasize the following aspects: -
+
+i.� That the Appellant had taken oath twice and had sworn allegiance to ISIS. 
+
+ii.� That the Appellant was in the process of recruiting third parties to become a part of ISIS and to swear allegiance to ISIS. 
+
+iii� That the Appellant had sworn his allegiance to a well-known individual terrorist and thereafter to the leader. 
+
+iv.� That the Appellant is a believer of Jihad and the chats reflect that he believes in the establishment of a caliphate and also to eliminate all non-believers.
+	
+23.	It was submitted that the aforesaid chats would establish beyond any reasonable doubt that for more than five years, the Appellant was associated with ISIS. Various materials including the oath of allegiance, the pledges which have been taken, methods for preparation of explosive material, etc. have been recovered during the investigation. It was pointed out that the image depicting the ISIS flag on the India Gate is also available on the Appellant�s digital devices. It was argued that agencies cannot wait for such individuals to manufacture explosives and indulge in terror attacks for taking action or arresting them. 
+
+24.	Learned SPP appearing on behalf of the Respondent submitted that under Sections 38/39 of the UAPA such persons who either associate with terror organisations or render support to terror organisations would also be deemed to commit offences under the UAPA. The chats would establish that Appellant�s case is fully covered under Sections 38 and 39 as also Sections 17 and 18 of UAPA as he is indulging in recruitment of other persons for promoting the cause of terror organisations.
+
+25.	Learned SPP appearing on behalf of the Respondent further submitted that the Appellant had used different names on Telegram groups in order to hide his identity. In one Telegram group he goes by the name �Sam� and in the other Telegram group he goes by the name �Mommin Believer�. It was pointed out that the Appellant is a Senior Project Manager who was working in an IT Company based in Gurgaon with an MBA from an established university and if such persons are involved in terror related activities the impact would be far higher.
+
+26.	Learned SPP appearing on behalf of the Respondent placed reliance upon the Financial Action Task Force evaluation report of September 2024, which states that one of the most serious threats being faced by India is from groups linked to ISIS and Al Qaeda. It is further submitted that the fact that all this material is not being shared physically but through electronic means would not in any way render the offence any lighter in as much as the electronic means and technology is being used to spread the message of terror in a much wider and a far-reaching manner.
+
+27. 	Judgment of the Hon�ble Supreme Court in Arup Bhuyan v. State of Assam and Ors.22, was relied upon to argue that the Hon�ble Supreme Court has not accepted the tests laid down in Brandenburg (Supra) in the context of Section 10 of the UAPA. It was pointed out that in the aforesaid judgment the Hon�ble Supreme court has also held that the intent and purport of the said Act is prevention of unlawful activities.
+
+28.	Lastly, learned SPP appearing on behalf of the Respondent sought to distinguish Thawaha Fasal (Supra) to say that the only incriminating evidence which was found in the said matter against the accused were hard copies of materials concerning CPI (Maoists) and the accused had participated in some gathering of the said organisation and nothing more. Thus, the said case is completely distinguishable. 
+
+29.	Learned SPP has also placed reliance on the following judgments: 
+1) Zahoor Ahmad Shah Watali (supra)
+2) State of U.P. through CBI v. Amarmani Tripathi23,
+3) Umar Khalid v. State of National Capital Territory of Delhi24,
+4) Mohd. Amir Javed v. State25,
+5) Sudesh Kedia v. Union of India26,
+6) Lt. Col Prasad Shrikant Purohit v. The State of Maharashtra27,
+
+REJOINDER SUBMISSIONS ON BEHALF OF THE APPELLANT 
+
+30.	Learned Senior Counsel appearing on behalf of the Appellant submitted that merely expressing communal sentiments on Telegram chats would not make an individual liable to punished for the offences punishable under Section 38 and 39 of the UAPA. Reliance was placed on an opinion of Professor Bipin Chandra to argue that the social, economic and political life of an individual could be aligned with one religion however, it is only after it becomes inimical to the other religions and believers of other religions that it becomes a fundamental resolve. 
+
+31.	It was further submitted that the Appellant got drawn into such conversations on Telegram by three other persons, and the said persons have not been investigated yet. It was argued that the chats at best could be considered as inculcation of religious beliefs which in itself cannot be considered as wrong. 
+
+32.	Learned Senior Counsel appearing on behalf of the Appellant fairly conceded that the aforesaid conversations did reveal that the Appellant had taken oath of the ISIS twice, however, the same was not video-graphed and at best would reveal that he is a supporter. Further it was submitted that the said oath was taken individually and not in a group which was clear from entry 2022 of the Telegram chat. Hence, at best it could be said that the Appellant had communal tendencies but without committing any overt act. 
+
+33.	Reliance was placed upon paragraph 38 of Thawaha Fasal (supra) in which the Hon�ble Supreme Court held that mere association or support to a terrorist organisation by an individual would not constitute a violation under the UAPA, unless there is an overt act on an individual�s part which reflects the intention or the state of mind of constant association and support for a terrorist organisation.
+
+34.	Further reliance is placed upon the judgment of a Co-ordinate Bench of this Court in Ammar Abdul Rahiman vs National Investigation Agency28, to argue that mere existence of material on digital devices showing a radical mindset of an individual would not constitute as support to a terrorist organisation, and the required ingredients of Sections 38 and 39 of the UAPA cannot be left to imagination but have to be borne out from the evidence. 
+
+
+ANALYSIS
+
+35.	Heard the parties and perused the record. 
+
+36.	Admittedly, the charges qua the Appellant have not been framed yet by the learned Trial Court in this case. 
+
+37.	Vide the second supplementary chargesheet dated 12.04.2023,   the Appellant has been charged for offences punishable under Sections 17/18/38/39 of the UAPA and Sections 120B/153A/153B of the IPC. 
+
+38.	Sections 17/18/38/39/40 of the UAPA read as under: -
+�17. Punishment for raising funds for terrorist act.�Whoever, in India or in a foreign country, directly or indirectly, raises or provides funds or collects funds, whether from a legitimate or illegitimate source, from any person or persons or attempts to provide to, or raises or collects funds for any person or persons, knowing that such funds are likely to be used, in full or in part by such person or persons or by a terrorist organisation or by a terrorist gang or by an individual terrorist to commit a terrorist act, notwithstanding whether such funds were actually used or not for commission of such act, shall be punishable with imprisonment for a term which shall not be less than five years but which may extend to imprisonment for life, and shall also be liable to fine. 
+Explanation.�For the purpose of this section,� 
+(a) participating, organising or directing in any of the acts stated therein shall constitute an offence; 
+(b) raising funds shall include raising or collecting or providing funds through production or smuggling or circulation of high quality counterfeit Indian currency; and 
+(c) raising or collecting or providing funds, in any manner for the benefit of, or, to an individual terrorist, terrorist gang or terrorist organisation for the purpose not specifically covered under section 15 shall also be construed as an offence. 
+
+18. Punishment for conspiracy, etc.�Whoever conspires or attempts to commit, or advocates, abets, advises or [incites, directly or knowingly facilitates] the commission of, a terrorist act or any act preparatory to the commission of a terrorist act, shall be punishable with imprisonment for a term which shall not be less than five years but which may extend to imprisonment for life, and shall also be liable to fine.
+
+***				***				***
+
+39. Offence relating to membership of a terrorist organisation.�(1) A person, who associates himself, or professes to be associated, with a terrorist organisation with intention to further its activities, commits an offence relating to membership of a terrorist organisation: 
+Provided that this sub-section shall not apply where the person charged is able to prove� 
+(a) that the organisation was not declared as a terrorist organisation at the time when he became a member or began to profess to be a member; and 
+(b) that he has not taken part in the activities of the organisation at any time during its inclusion in the Schedule as a terrorist organisation. 
+(2) A person, who commits the offence relating to membership of a terrorist organisation under sub-section (1), shall be punishable with imprisonment for a term not exceeding ten years, or with fine, or with both.
+
+40. Offence relating to support given to a terrorist organisation.�(1) A person commits the offence relating to support given to a terrorist organisation,� 
+
+(a) who, with intention to further the activity of a terrorist organisation,� 
+
+(i) invites support for the terrorist organization; and 
+(ii) the support is not or is not restricted to provide money or other property within the meaning of section 40; or 
+
+(b) who, with intention to further the activity of a terrorist organisation, arranges, manages or assists in arranging or managing a meeting which he knows is� 
+
+(i) to support the terrorist organization; or 
+
+(ii) to further the activity of the terrorist organization; or 
+
+(iii) to be addressed by a person who associates or professes to be associated with the terrorist organisation; or 
+
+(c) who, with intention to further the activity of a terrorist organisation, addresses a meeting for the purpose of encouraging support for the terrorist organisation or to further its activity. 
+
+(2) A person, who commits the offence relating to support given to a terrorist organisation under sub-section (1) shall be punishable with imprisonment for a term not exceeding ten years, or with fine, or with both.�
+
+***				***				***
+
+39.	Sections 120B/153A/153B of the IPC read as under: -
+
+120B. Punishment of criminal conspiracy. � (1) Whoever is a party to a criminal conspiracy to commit an offence punishable with death, [imprisonment for life] or rigorous imprisonment for a term of two years or upwards, shall, where no express provision is made in this Code for the punishment of such a conspiracy, be punished in the same manner as if he had abetted such offence. 
+
+(2) Whoever is a party to a criminal conspiracy other than a criminal conspiracy to commit an offence punishable as aforesaid shall be punished with imprisonment of either description for a term not exceeding six months, or with fine or with both.]
+
+***				***				***
+
+153A. Promoting enmity between different groups on grounds of religion, race, place of birth, residence, language, etc., and doing acts prejudicial to maintenance of harmony. � (1) Whoever� 
+
+(a) by words, either spoken or written, or by signs or by visible representations or otherwise, promotes or attempts to promote, on grounds of religion, race, place of birth, residence, language, caste or community or any other ground whatsoever, disharmony or feelings of enmity, hatred or ill-will between different religious, racial, language or regional groups or castes or communities, or
+
+(b) commits any act which is prejudicial to the maintenance of harmony between different religious, racial, language or regional groups or castes or communities, and which disturbs or is likely to disturb the public tranquillity,  [or] 
+
+(c) organizes any exercise, movement, drill or other similar activity intending that the participants in such activity shall use or be trained to use criminal force or violence or knowing it to be likely that the participants in such activity will use or be trained to use criminal force or violence, or participates in such activity intending to use or be trained to use criminal force or violence or knowing it to be likely that the participants in such activity will use or be trained to use criminal force or violence, against any religious, racial, language or regional group or caste or community and such activity for any reason whatsoever causes or is likely to cause fear or alarm or a feeling of insecurity amongst members of such religious, racial, language or regional group or caste or community,] 
+
+shall be punished with imprisonment which may extend to three years, or with fine, or with both
+
+(2) Offence committed in place of worship, etc.�Whoever commits an offence specified in sub-section (1) in any place of worship or in any assembly engaged in the performance of religious worship or religious ceremonies, shall be punished with imprisonment which may extend to five years and shall also be liable to fine.]
+
+153B. Imputations, assertions prejudicial to national integration.�(1) Whoever, by words either spoken or written or by signs or by visible representations or otherwise,� 
+
+(a) makes or publishes any imputation that any class of persons cannot, by reason of their being members of any religious, racial, language or regional group or caste or community, bear true faith and allegiance to the Constitution of India as by law established or uphold the sovereignty and integrity of India, or 
+
+(b) asserts, counsels, advises, propagates or publishes that any class of persons shall, by reason of their being members of any religious, racial, language or regional group or caste or community, be denied, or deprived of their rights as citizens of India, or 
+
+(c) makes or publishes any assertion, counsel, plea or appeal concerning the obligation of any class of persons, by reason of their being members of any religious, racial, language or regional group or caste or community, and such assertion, counsel, plea or appeal causes or is likely to cause disharmony or feelings of enmity or hatred or ill-will between such members and other persons, shall be punished with imprisonment which may extend to three years, or with fine, or with both. 
+
+(2) Whoever commits an offence specified in sub-section (1), in any place of worship or in any assembly engaged in the performance of religious worship or religious ceremonies, shall be punished with imprisonment which may extend to five years and shall also be liable to fine.�
+
+
+40.	So far as the offences under provisions of UAPA are concerned, the Appellant needs to satisfy the threshold as specified in Section 43D (5) of UAPA, in order to avail the benefit of bail. The said provision reads as under: -
+
+�43D Modified application of certain provisions of the Code. �
+
+(5). Notwithstanding anything contained in the Code, no person accused of an offence punishable under Chapters IV and VI of this Act shall, if in custody, be released on bail or on his own bond unless the Public Prosecutor has been given an opportunity of being heard on the application for such release: Provided that such accused person shall not be released on bail or on his own bond if the Court, on a perusal of the case diary or the report made under section 173 of the Code is of the opinion that there are reasonable grounds for believing that the accusation against such person is prima facie true.�
+
+41.	A bare reading of the aforesaid provision indicates that the opinion of the Court as required by the aforesaid section has to be �on a perusal of the case diary or the report made under Section 173 of the Code�. Thus, in order to assess and find justifications for grant or non-grant of bail to the Appellant, the material collected and filed along with chargesheet by the NIA needs to be examined.  
+
+42.	It is admitted case of the Appellant that he is qualified MBA and was working in an IT company based in Gurgaon as a Senior Project Manager. The prosecution has placed heavy reliance on chats retrieved from various devices seized from the Appellant, in order to establish its case qua the Appellant with respect to offences for which he has been charged for.  
+
+43.	As per the case of the prosecution the Appellant was using various IDs to join various pro-ISIS Telegram groups in order to meet like-minded people and to spread ISIS ideology in India as well as recruiting persons to join ISIS and take recourse to violent methods to achieve their purpose. As per the main chargesheet dated 06.01.2022 in paragraph 16.2 it is recorded as under:
+
+�The Islamic State is also known by the names Islamic State of Iraq and Syria (ISIS), Islamic State of Iraq and Levant (ISIL), Daesh, al- Dawlah al-Islamiyyah fi al-Iraq wa al-Sham. It is a radical Sunni insurgent group emerged from the remnants of Al Qaeda in Iraq (AQI), a local offshoot of al Qaeda founded by Abu Musab al Zarqawi in 2004.
+
+xxx				xxx				     xxx
+
+The group changed its name to the Islamic State of Iraq and Syria (ISIS) in 2013. In April 2013, ISIS became an independent outfit.
+
+xxx				xxx  				     xxx
+
+ISIS launched an offensive on Mosul and Tikrit in June 2014. On 29 June 2014, ISIS leader Abu Bakr al Baghdadi announced the formation of a caliphate stretching from Aleppo in Syria to Diyala in Iraq, and renamed the group the Islamic State. The Baghdadi era of ISIS ended on October 26, 2019, when the leader was reportedly killed in a raid in norther Syria by NATO forces.�
+
+(emphasis supplied)
+
+44.	Some of the chats retrieved and relied upon by way of illustration during the course of arguments by learned SPP are being reproduced hereinbelow: -
+
+45.	The Appellant has had a group chat on the group  wherein the Appellant is using Telegram ID Momin-Believer and is seen communicating with another individual having Telegram ID 865888546 .
+
+
+
+
+
+
+
+     
+     The aforesaid chats clearly indicate that the Appellant is very keen on Jihad and wants to establish Khilafat (Caliphate). 
+
+46.	The next set of chats is between the Appellant using the Telegram ID Sam with an individual using Telegram ID 1277972116>   
+
+   
+   
+   
+     
+     From the aforesaid chats it can be clearly seen that the Appellant is contacting the other person in order to go for Hijrah (connotes the travel to Dawlah). As already noted in the chargesheet the Islamic State is also known by the names Islamic State of Iraq and Syria (ISIS), Islamic State of Iraq and Levant (ISIL), Daesh, al Dawlah al-Islamiyyah fi al-Iraq wa al-Sham. 
+
+47.	The next set of chats is between the Appellant using the Telegram ID Sam with another individual using Telegram ID 963326519> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     In these chats again, the Appellant is trying to contact some person in order to travel to Dawlah and is conveying that he has taken Bayath (oath of swearing allegiance to ISIS) once in 2018 in the name of Abu Bakr al Baghdadi and thereafter again in the name of Abu al-Hasan al-Hashimi al-Qurashi (leader of the ISIS) in 2022. This also corresponds to the oath which was retrieved from the phone of the Appellant.
+       
+48.	The Appellant has had online chats by using the Telegram ID Sam with various individuals using different IDs. The first set of chats is with an individual using Telegram ID Abdullah <5327875071>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     The aforesaid conversation would reveal that the Appellant had been using different IDs and was advocating to do the same thing to the person he was chatting with. The chat with the aforesaid further continues in the following manner: -
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     In the aforesaid chats, the Appellant is clearly advocating the difference between Sharia Law and Khilafat (�Caliphate�). It can also be seen that the Appellant states that Jihad is necessary to establish Khilafat (�Caliphate�). The tone and tenure of the said chats clearly reflect that the Appellant was advocating the establishment of Khilafat (�Caliphate�) by all means including violent struggle. As already noted hereinbefore as per the chargesheet on 29.06.2014 ISIS leader Abu Bakr al Baghdadi announced the formation of a �Caliphate� from Aleppo in Syria to Diyala in Iraq, and renamed the group Islamic State. 
+
+49.	The next set of conversation is between the Appellant using Telegram ID Momin-Believer <2071200181> with an individual using ID 13862454577 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     In the aforesaid chats, the Appellant is clearly conveying to the other person that despite of him being well placed in an IT company, he is not happy as he is unable to do much for Jihad. Apart from the above, the recovery of incriminating material recovered from the mobile phone of the Appellant showing Pro-ISIS material including a photograph depicting ISIS flag installed at India Gate and a copy of Bayath would show that the Appellant is deeply influenced with the philosophy and ideology of the ISIS. From the above it can be seen that the Appellant was keen to invite people to join groups and create a movement to further the activities of ISIS. The chats as reproduced hereinabove reflect that the Appellant was not just a passive supporter of ISIS, but was determined to further its activities by influencing other individuals at various platforms.
+
+50.	The prosecution has also placed reliance on other material seized from the digital devices in which various PDFs and videos were found describing methods of preparing explosives and bombs. It is further alleged that chats on Telegram group where the Appellant was also a member, tutorial videos/ PDFs/ images for preparing explosives were being shared. Similarly, the Appellant was a member of many Telegram groups dealing with guns and 3-D printing of weapons/guns. The material extracted from the digital devices of the Appellant demonstrates that on Telegram groups the Appellant and other individuals were discussing making of guns with the help of 3-D printers as well as the digital images showing guns which can be easily made by the 3-D printers with pictorial guides to make paper cartridge. The material extracted from Samsung Galaxy J7 mobile phone (D-202) of the Appellant is reproduced hereinunder: 
+               
+
+
+
+
+51.	Learned Senior Counsel appearing on behalf of the Appellant had placed heavy reliance on the judgment of Hon�ble Supreme Court in Thawaha Fasal (supra) and more particularly on the following paragraphs: -
+
+�37.�Taking the charge-sheet as correct, at the highest, it can be said that the material prima facie establishes association of the accused with a terrorist organisation CPI (Maoist) and their support to the organisation.
+
+38.�Thus, as far as Accused 1 is concerned, it can be said he was found in possession of soft and hard copies of various materials concerning CPI (Maoist). He was seen present in a gathering which was a part of the protest arranged by an organisation which is allegedly having link with CPI (Maoist). As regards Accused 2, minutes of the meeting of various committees of CPI (Maoist) were found. Certain banners/posters were found in the custody of Accused 2 for which the offence under Section 13 has been applied of indulging in unlawful activities. As stated earlier, sub-section (5) of Section 43-D is not applicable to the offence under Section 13.
+
+39.�Now the question is whether on the basis of the materials forming part of the charge-sheet, there are reasonable grounds for believing that accusation of commission of offences under Sections 38 and 39 against Accused 1 and 2 is true. As held earlier, mere association with a terrorist organisation is not sufficient to attract Section 38 and mere support given to a terrorist organisation is not sufficient to attract Section 39. The association and the support have to be with intention of furthering the activities of a terrorist organisation. In a given case, such intention can be inferred from the overt acts or acts of active participation of the accused in the activities of a terrorist organisation which are borne out from the materials forming a part of charge-sheet. At formative young age, Accused 1 and 2 might have been fascinated by what is propagated by CPI (Maoist). Therefore, they may be in possession of various documents/books concerning CPI (Maoist) in soft or hard form.
+
+40.�Apart from the allegation that certain photographs showing that the accused participated in a protest/gathering organised by an organisation allegedly linked with CPI (Maoist), prima facie there is no material in the charge-sheet to project active participation of Accused 1 and 2 in the activities of CPI (Maoist) from which even an inference can be drawn that there was an intention on their part of furthering the activities or terrorist acts of the terrorist organisation. An allegation is made that they were found in the company of Accused 3 on 30-11-2019. That itself may not be sufficient to infer the presence of intention. But that is not sufficient at this stage to draw an inference of presence of intention on their part which is an ingredient of Sections 38 and 39 of the 1967 Act. Apart from the fact that overt acts on their part for showing the presence of the required intention or state of mind are not borne out from the charge-sheet, prima facie, their constant association or support of the organisation for a long period of time is not borne out from the charge-sheet.�
+
+
+     Based on the aforesaid decision it was argued that the mere association or support to a terrorist organisation would not constitute an offence under the UAPA. It is imperative for an accused to reflect intention or a state of mind of constant intention and support for a terrorist organization to be prosecuted under Section 38 and 39 of the UAPA. It was further submitted that the prosecution has not investigated the other persons with whom the Appellant was alleged to have had the aforesaid conversations. It was also urged that the chats would show that the other persons have contacted the Appellant and that there could be a possibility that such persons were acting as a bait in order allure and trap the Appellant by having those conversations. 
+
+52.	It was further argued that the Appellant had transferred funds from his bank account to one Md. Unais (PW-125), who thereafter transferred the funds to one lady Ms. Afa Ibrahim. It was vehemently argued that the prosecution has not been able to place any material on record with regard to the aforesaid lady�s connection with the ISIS. 
+
+53.	In the considered opinion of this Court, the facts of the present case are distinct from those which were the subject matter in the aforesaid judgment, i.e., Thawaha Fasal (supra). In the present case as has been highlighted previously, the Appellant admittedly in 2018 had taken an oath (Bayath) in the name of Abu Bakr al Baghdadi and Abu al-Hasan al-Hashimi al-Qurashi. Abu Bakr al Baghdadi is admittedly a well-known leader of ISIS and as per the chargesheet had declared formation of �caliphate� in June 2014. 
+
+54.	ISIS had been declared to be a terrorist organisation and judicial notice can be taken of the fact that the world at large knows about the activities of ISIS. The aforesaid chats further reflect the intention of the Appellant to join ISIS (Dawlah) and was ready to perform Hijrah (travel) for the same. In two sets of chats as recorded hereinbefore it was the Appellant who is asking other persons for finding a way to reach Dawlah and not the other way around as claimed by the learned Senior Counsel for the Appellant. As already noted, the Appellant is an educated person and was well-aware of the nature of activities of ISIS. Moreover, it is not a case of passive support to a terrorist organisation, but rather the chats, as highlighted hereinabove, show that the Appellant was advocating Jihad in order to establish Khilafat (�Caliphate)�. By doing so the Appellant was also trying to recruit the individuals on these online groups for such acts. 
+
+55. 	So far as the transfer of funds in the account of Md. Unais (PW-125) is concerned, the Appellant will have sufficient opportunity to explain the same before the learned Trial Court at an appropriate stage.
+
+56.	In view of the aforesaid material placed on record along with the chargesheet, this Court is of the considered opinion that the mandate of Section 43(D)(5) of the UAPA is clearly applicable.
+
+57.	Under these circumstances, this Court is of the opinion that the impugned order does not warrant any interference.	 
+
+58.	In view of the above, the present appeal is dismissed and disposed of accordingly. Pending application(s), if any, are also disposed of.  
+
+59.	Needless to state that all the observations made in this judgment are to satisfy this Court whether a prima facie case for bail is made out or not qua the present Appellant. Nothing mentioned hereinabove is an opinion on the merits of the case of the Appellant and the observations made herein are for the purpose of present Appeal. 
+
+60.	Copy of this judgment be communicated to the concerned Jail Superintendent for necessary information and compliance.  
+
+61.	Judgment be uploaded on the website of this Court, forthwith.
+
+
+AMIT SHARMA, J.
+
+
+
+PRATHIBA M. SINGH, J.
+      
+JANUARY 10, 2025/sn/bsr
+1(2005) 5 SCC 294  
+2 (2019) 5 SCC 1
+3 2021 SCC OnLine SC 1000
+4 2024 SCC OnLine SC 1945
+5 395 US 444 (1969)
+6 2015 (5) SCC 1
+7 (1994) 6 SCC 731
+8 (1978) 1 SCC 248
+9 (1980) 1 SCC 81
+10 (1980) 1 SCC 98
+11 (1983) 2 SCC 104
+12 (1986) 4 SCC 481
+13 (2002) 4 SCC 578
+14 (2018) 16 SCC 521
+15 (2011) 1 SCC 784
+16 (2017) 2 SCC 731
+17 (2021) 3 SCC 713
+18 (2021) 3 SCC 723
+19 (2021) 3 SCC 725
+20 2022 SCC Online SC 441
+21 2021 SCC Online Del 4623
+22 2011 (3) SCC 377  
+23 8 SCC 21
+24MANU/DE/4058/2022 
+25 MANU/DE/6294/2023
+26 (2021) 4 SCC 704
+27 (2018) 11 SCC 458
+28 2024 SCC OnLine Del 3318
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+	
+		
+
+CRL.A. 871/2023		Page 1 of 44
+
+
