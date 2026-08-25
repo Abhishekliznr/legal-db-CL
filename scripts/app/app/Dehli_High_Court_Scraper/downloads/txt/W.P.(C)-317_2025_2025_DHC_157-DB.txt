@@ -1,86 +1,0 @@
-$~79
-*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
-
-%							Date of Decision : 14.01.2025
-
-+ 	W.P.(C) 317/2025 & CM APPL. 1501-02/2025 
-
-
-	PANKAJ JAIN
-.....Petitioner
-Through:	Mr Deepanshu Jain and Mr Shaantanu Jain, Advocates.
-
-				versus
-
-ASSISTANT COMMISSIONER OF INCOME TAX, 
-CENTRAL CIRCLE 3, DELHI  & ANR.
-.....Respondent
-Through:	Mr Sunil Aggarwal, SSC, Mr Shivansh B Pandya, Mr Viplav Acharya, JSCs and Mr Utkarsh Tiwari, Advocate for the Revenue. 
-Mr K D Sharma, SPC, Advocate for R2/UOI. 
-
-     CORAM:
-	HON'BLE THE ACTING CHIEF JUSTICE
-	HON'BLE MR. JUSTICE TUSHAR RAO GEDELA
-VIBHU BAKHRU, ACJ. (ORAL)
-
-1.    The petitioner has filed the present petition, inter alia, impugning a notice dated 30.08.2024 (hereafter the impugned notice) issued under Section 148 of the Income Tax Act, 1961 (hereafter the Act) in respect of the assessment year (AY) 2015-16. The petitioner also challenges the constitutional validity of Explanation 2 to Section 148 of the Act.  
-2. Mr Jain, the learned counsel appearing for the petitioner has confined the present petition to assailing the impugned notice on the ground that it is barred by limitation. He submits that the controversy involved in the present petition is covered in favour of the petitioner by the earlier decision of this court in Dinesh Jindal v. Assistant Commissioner of Income Tax, Central Circle 20, Delhi & Others: Neutral Citation: 2024: DHC:4554-DB.  
-3. Undisputedly the initiation of the reassessment proceedings pursuant to the search carried out on or after 01.04.2021 necessarily requires to be initiated within the time frame as specified under Section 153A of the Act, which was in force at the material time. The reassessments covered under Section 153C of the Act are required to be reckoned from the date on which the Assessing Officer (AO) of the searched person records the satisfaction that the books of account, or documents or the material belongs to the assessee (person other than the searched person) or contained information relating to such other person. 
-4. In terms of Section 153A of the Act, the maximum of ten years is required to be computed from the end of the assessment year relevant to the financial year in which such satisfaction note is recorded.   This issue is also covered by an earlier decision of this court in The Pr. Commissioner of Income Tax - Central-1 v. Ojjus Medicare Pvt. Ltd : Neutral Citation : 2024:DHC: 2629-DB.   
-5. Admittedly, in the present case, there is no material on record which indicates that satisfaction note, as required under Section 153C of the Act, as in force at the material time, had been prepared by the AO of the searched person and the relevant material belonging to or containing the information pertaining to the petitioner had been handed over by the AO of the searched person to the AO of the assessee. 
-6. In view of the above, the date of the issuance of the notice is required to be considered for the purpose of computing the period of limitation as would be applicable to the notice under Section 153C of the Act.   
-7. We also consider to refer to the following extract from the decision  of this court in Dinesh Jindal v. Assistant Commissioner of Income Tax, Central Circle 20, Delhi & Others: (supra):- 
-8. Undisputedly, and in terms of Section 153C(3) of the Act, any search if conducted after 01 April 2021, would cease to be regulated by that provision. Sub-section (3), in that sense, embodies a sunset clause insofar as the applicability of Section 153C is concerned. The First Proviso to Section 149(1), however, bids us to go back in a point of time, and to examine whether a reopening would sustain bearing in mind the timeframes as they stood embodied in Section 149(1)(b) or Section 153A and 153C, as the case may be.  The First Proviso essentially requires us to undertake that consideration bearing in mind the timeframes which stood specified in Sections 149, 153A and 153C as they stood prior to the commencement of Finance Act, 2021.  
-9. Thus, an action of reassessment which comes to be initiated in relation to a search undertaken on or after 01 April 2021 would have to meet the foundational tests as specified in the First Proviso to Section 149(1). A reassessment action would thus have to not only satisfy the time frames constructed in terms of Section 149, but in a relevant case  and which is concerned with a search, also those which would be applicable by virtue of the provisions of Section 153A and 153C.
-10. Undisputedly, and if the validity of the reassessment were to be tested on the anvil of Section 153C, the petitioner would be entitled to succeed for the following reasons. It is an undisputed fact that the proceedings under Section 148 commenced on the basis of the impugned notice dated 30 March 2023. This date would be of seminal importance since the period of six AYs� or the �relevant assessment year� would have to be reckoned from the date when action was initiated to reopen the assessment pertaining to AY 2013-14. 
-11. The computation of the six or the block of ten AYs� was explained by us in Ojjus Medicare Private Limited in the following terms: 
-�D. The First Proviso to Section 153C introduces a legal fiction on the basis of which the commencement date for computation of the six year or the ten year block is deemed to be the date of receipt of books of accounts by the jurisdictional AO. The identification of the starting block for the purposes of computation of the six and the ten year period is governed by the First Proviso to Section 153C, which significantly shifts the reference point spoken of in Section 153A(1), while defining the point from which the period of the �relevant assessment year� is to be calculated, to the date of receipt of the books of accounts, documents or assets seized by the jurisdictional AO of the non-searched person. The shift of the relevant date in the case of a non-searched person being regulated by the First Proviso of Section 153C(1) is an issue which is no longer res integra and stands authoritatively settled by virtue of the decisions of this Court in SSP Aviation and RRJ Securities as well as the decision of the Supreme Court in Jasjit Singh. The aforesaid legal position also stood reiterated by the Supreme Court in Vikram Sujitkumar Bhatia. The submission of the respondents, therefore, that the block periods would have to be reckoned with reference to the date of search can neither be countenanced nor accepted . 
-E. The reckoning of the six AYs' would require one to firstly identify the FY in which the search was undertaken and which would lead to the ascertainment of the AY relevant to the previous year of search. The block of six AYs' would consequently be those which immediately precede the AY relevant to the year of search. In the case of a search assessment undertaken in terms of Section 153C, the solitary distinction would be that the previous year of search would stand substituted by the date or the year in which the books of accounts or documents and assets seized are handed over to the jurisdictional AO as opposed to the year of search which constitutes the basis for an assessment under Section 153A . 
-F. While the identification and computation of the six AYs' hinges upon the phrase �immediately preceding the assessment year relevant to the previous year� of search, the ten year period would have to be reckoned from the 31st day of March of the AY relevant to the year of search. This, since undisputedly, Explanation 1 of Section 153A requires us to reckon it �from the end of the assessment year�. This distinction would have to necessarily be acknowledged in light of the statute having consciously adopted the phraseology �immediately preceding� when it be in relation to the six year period and employing the expression �from the end of the assessment year� while speaking of the ten year block .� 
-12. Viewed in that light, it is manifest that AY 2013-14 would fall beyond the block period of ten years. It becomes pertinent to note that the First Proviso to Section 149(1) compels us to test the validity of initiation of action for reassessment commenced pursuant to a search, based upon it being found that the proceedings would have sustained bearing in mind the timelines prescribed in Sections 149, 153A and 153C, as they existed prior to the commencement of Finance Act, 2021. This necessarily requires us to advert to the timeframes comprised in both Section 149(1)(b) as well as Section 153C as it existed on the statute book prior to 01 April 2021, which undisputedly was the date from when Finance Act, 2021 came into effect.
-13. While it is true that Section 153C and the procedure prescribed therein had ceased to be applicable post 31 March 2021, the First Proviso to Section 149(1) does not appear to suggest that the First Proviso to Section 153C(1) would either become inapplicable or be liable to be ignored. Undisputedly, the First Proviso to Section 153C(1), by virtue of a legal fiction enshrined therein requires one to treat the date of initiation of search, and which otherwise constitutes the commencement point for a search assessment in the case of a non-searched party, to be construed as the date when books of accounts or documents and assets seized or requisitioned are transmitted to the AO of such �other person�. Resultantly, the computation of the six preceding AYs� or the �relevant assessment year� in the case of the non-searched entity has to be reckoned from the time when the material unearthed in the search is handed over to the jurisdictional AO. The import of this legal fiction is no longer res integra bearing in mind the judgment of the Supreme Court in CIT v. Jasjit Singh & Ors.:2023 SCC OnLine SC 1265 and the whole line of precedents rendered by our High Court which were noticed in Ojjus Medicare Private Limited. Those decisions have consistently held that in the case of a non-searched entity, it is the date of hand over of material, as opposed to that of the actual search which would constitute the starting point for reckoning the block of six or ten AY�s. 
-14.	However, Section 149(1), as it came to be placed and introduced in the statute book by virtue of Finance Act, 2021, neither effaces nor removes from contemplation the First Proviso to Section 153C(1). Consequently, in cases where a search is conducted after 31 March 2021, the said Proviso would have to be construed and tested with reference to the date when the AO decides to initiate action against the non-searched entity. While in the case of a search initiated after 31 March 2021 there would be no actual hand over of material to the and the whole line of precedents rendered by our High Court which were noticed in Ojjus Medicare Private Limited. Those decisions have consistently held that in the case of a non-searched entity, it is the date of hand over of material, as opposed to that of the actual search which would constitute the starting point for reckoning the block of six or ten jurisdictional AO, that does not convince us to revert to Section 153A and hold that the block period is liable to be computed from the date of search. That, in our considered opinion, would amount to rewriting Section 153C which would clearly be impermissible.�
-[emphasis added]   
-8. In ATS Township Pvt Ltd v. Assistant Commissioner of Income Tax  Circle 1(1) Delhi & Others: Neutral Citation : 2024: DHC: 9978-DB,  this court had noted the decision in Dinesh Jindal v. Assistant Commissioner of Income Tax, Central Circle 20, Delhi & Others: (supra) in regard to the aspect of computation of the period, which could be covered under Section 153C of the Act in the context of search conducted under Section 132 of the Act or requisition made under Section 132A of the Act, and had observed as under:-
-�10. The learned counsel for the Revenue had also contended that the date of placing the material on the insight portal ought to be considered the date of search for the purposes of computing limitation under Section 153C of the Act. However, prima facie, the same is contrary to the decision in Dinesh Jindal v. Assistant Commissioner of Income Tax, Central Circle 20, Delhi & Others: (supra). It is to be noted that in said case, this court had reasoned that in case of a search after 31.03.2021, there would be no actual handover of material to the jurisdictional Assessing Officer and therefore it would not be permissible to revert to Section 153A of the Act for the purposes of computing the period of limitation from the date of the search. Prima facie, this reasoning would also hold good in case of assuming the date of placing information on insight portal as the date of search for the purposes of the proviso to Section 153C of the Act.  
-11.   Uploading of information by the investigation wing of the Income Tax department would not be a substitute for recording of a satisfaction note by the AO of a searched person and handing over the assets, books of accounts or other material to the AO of the person other than the searched person for the purpose of initiation of proceedings under Section 153C of the Act.�
-
-9. It is apparent from the above, that in cases the search is conducted after 31.03.2021, the period of limitation under Section 153C of the Act would have to be construed with reference to the date on which the AO decides to initiate action against a non-searched person.
-10. It is relevant to note that in the present case, the AO exercising jurisdiction in respect of the petitioner had prepared the satisfaction note (in terms of Clause (iv) of Explanation 2 to proviso to Section 148 of the Act).   However, that cannot be construed as a satisfaction note by the AO of the searched person. The date of the said satisfaction note cannot be considered as the start point to consider the limitation period under Section 153C of the Act.  
-11. It is material to note the satisfaction note dated 28.03.2024 was approved on 29.08.2024 by the Chief Commissioner of Income Tax.   Thus, even if the limitation is computed on the basis of the aforesaid approval, the same would be required to be computed from the end of the assessment year relevant to the financial year in which such satisfaction note was prepared. 
-12. The petitioner has set out a tabular statement in support of his contention that the AY 2015-16 is beyond the period of ten years. The said tabular statement is reproduced below:- 
-Analysis of time-period to issue reassessment notice.
-Date of impugned notice under section 148 is 30.08.2024
-This chart is prepared in light of the first proviso of Section 149 of the Act as amended by Finance Act, 2021Relevant Assessment Year for initiating proceedings under Section 148 of the ActWithout prejudice, computation of 10 years in light of first proviso to
-Section 1492025-2612024-2522023-2432022-2342021-2252020-2162019-2072018-1982017-1892016-15102015-1611 (Beyond terminal point of 10 years)
-13. The learned counsel for the Revenue concurs with the aforesaid view. 
-14. In view of the above, the present petition is allowed. The impugned notice and the proceedings pursuant thereto are set aside.  
-15. Pending applications are also disposed of.
-
-VIBHU BAKHRU, ACJ
-
-
-
-TUSHAR RAO GEDELA, J
-JANUARY 14, 2025
-M
-
-					Click here to check corrigendum, if any 
-
-
-
-                                                                                           
-
-                                          
-
-
-
-
-	
-W.P. (C) 317/2025                                                                                                              Page 2 of 2
-
-
-
-
-
-

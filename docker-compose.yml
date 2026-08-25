@@ -1,0 +1,41 @@
+services:
+  # 1. PostgreSQL Database Service
+  db:
+    image: postgres:15-alpine
+    container_name: legal_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: legal_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d legal_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. FastAPI Web App & Scraper Service
+  app:
+    build: .
+    container_name: legal_app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_CONNECTION=postgresql://postgres:password123@db:5432/legal_db
+      - PYTHONPATH=/app/backend:/app
+    volumes:
+      # Mount current directory so code/template/PDF changes persist immediately
+      - .:/app
+      # Preserve container's installed python packages
+      - /app/__pycache__
+
+volumes:
+  postgres_data:

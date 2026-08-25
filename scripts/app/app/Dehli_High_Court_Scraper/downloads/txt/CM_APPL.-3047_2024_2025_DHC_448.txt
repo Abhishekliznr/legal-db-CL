@@ -1,81 +1,0 @@
-$~10
-*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
-     Date of Decision: 22.01.2025
-+ 	RC.REV. 679/2019 
-	ABDUL SATTAR & ANR				.....Petitioners
-Through:	Mr. Bahar U. Barqi and Mr. Maroof Ahmad, Advocates. 
-				versus
-	MASLAH UDDIN						.....Respondent
-Through:	Mr. Himal Akhtar, Mr. Juned Salmani and Ms. Rehana, Advocates for LRs of Respondent with Mohd. Sheriyaz in person. 
-	CORAM:
-	HON'BLE MS. JUSTICE TARA VITASTA GANJU
-TARA VITASTA GANJU, J.: (Oral)
-CM APPL. 3047/2024 [User charges]
-1.	This is an Application for affixation of user and occupation charges. 
-2.	Pleadings have been completed in the Application. 
-3.	The only contention that is raised by the learned Counsel for the Petitioners/tenants is that user charges are not payable because the subject matter in issue is not under the Delhi Rent Control Act, 1958 [hereinafter referred to as �DRC Act�]. However, learned Counsel for the Petitioners/tenants is unable to deny that there is an eviction order dated 13.08.2019 [hereinafter referred to as "Impugned Order"] passed under Section 14(1)(e) of the DRC Act which has been challenged by the Petitioners/tenants before this Court under the provisions of Section 25-B(8) of the DRC Act. 
-3.1	Learned Counsel for the Petitioners/tenants is also unable to deny that this Court by an order dated 29.01.2020 has passed an order directing that the execution of the Impugned Order dated 13.08.2019 shall remain stayed. This position has continued as is. 
-4.	Learned Counsel for the Respondent/landlord points out that this submission made before this Court qua non-applicability of the DRC Act is made for the first time before this Court. 
-5.	The contentions of the learned Counsel for the Petitioner are without merit. In matters wherein a tenant endeavours to seek a stay on an eviction order, it is deemed equitable, and reasonable that said tenant be directed by the High Court to provide compensation to the landlord. This compensation serves to counter potential adverse effects suffered by the landlord due to the delay or suspension of the eviction order. This view is articulated by Supreme Court in Martin & Harris Private Limited and Another v. Rajendra Mehta and Others1 while relying on the Atma Ram Properties (P) Ltd. v. Federal Motors (P) Ltd.2  case and reads as follows:
-�17. In Atma Ram Properties (P) Ltd. v. Federal Motors (P) Ltd. [Atma Ram Properties (P) Ltd. v. Federal Motors (P) Ltd., (2005) 1 SCC 705], this Court held that the appellate court does have jurisdiction to put reasonable terms and conditions as would in its opinion be reasonable to compensate the decree-holder for loss occasioned by delay in execution of the decree while granting the stay. The Court relying upon the provisions of the Delhi Rent Control Act, observed that on passing the decree for eviction by a competent court, the tenant is liable to pay mesne profits or compensation for use and occupation of the premises at the same rate at which the landlord would have been able to let out the premises in present and earn the profit if the tenant would have vacated the premises. The Court has explained that because of pendency of the appeal, which may be in continuation of suit, the doctrine of merger does not have effect of postponing the date of termination of tenancy merely because the decree of eviction stands merged in the decree passed by the superior forum at a later date. �
-[Emphasis supplied]
-5.2	The Supreme Court in Atma Ram case, has laid down that once an order for eviction has been passed against a tenant and the tenant continues in possession of the tenanted premises, such tenant is required to pay use and occupation charges to the landlord at the market rate applicable to �like� premises situated in the vicinity, until the disposal of the Petition impugning such order of eviction.
-5.3	It has further been held in the Atma Ram case that this interim compensation is granted based on the discretion of Court in its judicial wisdom, to offset the detrimental effects of prolonged litigation on landlord. The relevant extract reads as�follows:
-�9. Robust common sense, common knowledge of human affairs and events gained by judicial experience and judicially noticeable facts, over and above the material available on record � all these provide useful inputs as relevant facts for exercise of discretion while passing an order and formulating the terms to put the parties on. After all, in the words of Chief Justice Chandrachud, speaking for the Constitution Bench in� Olga Tellis�v.�Bombay Municipal Corpn.�[(1985) 3 SCC 545] : (SCC p. 574, para 35)
-   �Common sense which is a cluster of life�s experiences, is often more dependable than the rival facts presented by warring litigants.��
-[Emphasis supplied]
-5.4	A similar view has been taken by the Supreme Court in the cases of State of Maharashtra and Anr. v. Super Max International Private Limited and Ors.3; Sumer Corp. v. Vijay Anant Gagan & Ors.4 and Heera Traders v. Kamla Jain5. It has also been held that in fixing the interim compensation/use and occupation charges, the Court would exercise restraint and not fix excessive, fanciful or punitive amount. However, the Appellate/Revisional Court while staying an eviction decree can direct payment of such compensation for continued use of the premises and the compensation would be at the same rate of rental at which the landlord would have been able to get if he had let out such premises after they were vacated by the tenant. It has been held that the direction to pay mesne profits or use and occupation charges, will depend on the facts and circumstances of each case including the location of the property as well as its nature whether it is a commercial or residential area. 
-5.5	Thus, the settled legal principle is that once a decree for eviction has been passed and such decree cannot be executed by the landlord in view of the fact that the Eviction Order is stayed, the tenant can be put to such terms which in the opinion of the Appellate Court would reasonably compensate the landlord for loss occasioned by a delay in execution of the decree for possession. The tenant is liable to pay mesne profits or compensation for use and occupation at reasonable rate as prevalent in the market.
-6.	In the present case, concededly, the Respondent/landlord has an eviction decree in its favour that has been stayed by this Court. For this delay, the Respondent/landlord is entitled to receive use and occupation charges. 
-7.	No lease deeds have been filed by the learned Counsel for the Petitioners/tenants despite the order dated 06.11.2024.
-8.	Learned Counsel for the Respondent/landlord submits that the premises is a 8x8 sq. yards (64 sq. yards), shop bearing No.6509, main road, Bara Hindu Rao, Delhi-06, on the ground floor [hereinafter referred to as �subject premises�]. 
-9.	Learned Counsel for the Respondent/landlord further submits that he has filed two lease deeds dated 13.12.2023 and 06.05.2023, the details of which are as follows: 
-     Lease Deed dated 13.12.2023
-NatureResidential Area72 sq. yards RentRs.18,000/- per monthDescription/DetailsOne shop on ground floor in part of property/Shop No.3589, Main Road, Bara Hindu Rao, Sadar Bazar, Delhi-110006.     
-     Lease Deed dated 06.05.2023
-NatureCommercialArea150 sq. yardsRentRs.17,000/- per monthDescription/DetailsOne shop on ground floor (without roof rights) in part of property/Shop No.4904/1, Main Road, Opposite Masjid Shaikhan, near Dr. Javed Shop, Mohd. Ismail Marg, Bara Hindu Rao, Sadar Bazar, Delhi-110006.
-9.1	Learned Counsel for the Respondent/landlord further submits that the subject premises are being used for commercial purposes and is in a main market area. A perusal of the Eviction Petition shows that the shop is located on the ground floor on the main Bara Hindu Rao Road. 
-10.	Learned Counsel for the Petitioners/tenants seeks to rely upon the photographs which have been annexed with his Reply to show the condition of the subject premises, which is not in a good condition. However, it is admitted by the learned Counsel for the Petitioners/tenants that the subject premises are being used for the sale and purchase of old tyres. 
-11.	Concededly, the subject premises is on the main road and in a commercial market. 
-12.	Given the fact that the premises is not in a good condition, the user and occupation charges need to be discounted as such. Accordingly, this Court deems it apposite to fix user and occupation charges at the rate of Rs.10,000/- per month for present, for the subject premises. 
-13.	The Petitioners/tenants shall pay to the Respondent/landlord use and occupation charges in the following manner:
-(i)	The user and occupation charges for the period commencing from 13.02.2020 to 31.12.2024 shall be paid by the Petitioners/tenants at the rate of Rs. 8,000/- per month;
-(ii)	The user and occupation charges for the month of January, shall be paid by the Petitioners/tenants at the rate of Rs.10,000/- shall be paid on or before 31.01.2025; 
-(iii)	The user and occupation charges from 01.02.2025 onwards, shall be paid by the Petitioners/tenants at the rate of Rs.10,000/- per month, on or before 7th day of each calendar month;
-(iv)	The payment of arrears of user and occupation charges as set out in (i) shall be paid by the Petitioners/tenants in four equal instalments, i.e., 28.02.2025, 31.03.2025, 30.04.2025 and 31.05.2025.
-14.	All payments shall be made into the bank account of the Respondent/landlord. The details of the bank account shall be provided by the learned Counsel for the Respondent/landlord to the learned Counsel for the Petitioners/tenants on his email address within three days.
-15.	It is clarified that the use and occupation charges as affixed hereinabove are without prejudice to the rights and contentions of the parties and are subject to the final outcome of the present Petition.
-16.	In the event that there is any default in the payment of use and occupation charges on behalf of the Petitioner/tenant, interim protection as granted by this Court on 29.01.2020 shall automatically stand dissolved.
-17.	The Application is accordingly disposed of. 
-RC.REV. 679/2019, CM APPL. 51928/2019 [Stay] & 3685/2020 [Additional document]
-
-18.	List on 15.05.2025. 
-19.	In the meantime, the parties seek and are granted time to file their respective written synopsis, not exceeding three pages each, at least one week before the next date of hearing, along with the compilation of judgments, if any, they wish to rely upon.
-19.1	All judgments sought to be relied upon shall be filed with an index which also sets out the relevant paragraph numbers and the proposition of law that it sets forth.
-20.	The parties shall also complete pleadings in the pending applications within eight weeks.
-21.	Registry is directed to place on record the digital copy of the Trial Court Record duly paginated and book-marked in accordance with the rules of the High Court.
-22.	The parties shall act based on a digitally signed copy of the order. 
-
-TARA VITASTA GANJU, J
-JANUARY 22, 2025/pa
-					Click here to check corrigendum, if any
-
-1  (2022)�8�SCC�527
-2  (2005) 1 SCC 705
-3 (2009) 9 SCC 772.
-4 2022 SCC Online SC 1548.
-5 2022 SCC Online SC 220.
----------------
-
-------------------------------------------------------------
-
----------------
-
-------------------------------------------------------------
-
-                                            
-
-
-RC.REV. 679/2019                                                                                                        Page 7 of 7
-
-

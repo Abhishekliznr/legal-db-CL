@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legal Judgment Search Engine | ScaleLegal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-hover: #334155;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --badge-citation: #818cf8;
+      --badge-court: #34d399;
+      --badge-subject: #f472b6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      color: #0f172a;
+    }
+
+    .brand h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #38bdf8, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Search Section */
+    .search-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2rem;
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .search-input {
+      flex: 1;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      color: var(--text-main);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #0f172a;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 0.85rem 1.75rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: var(--bg-hover);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+      box-shadow: none;
+    }
+
+    /* Filters Toolbar */
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .filter-group label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-select {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-main);
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .filter-select:focus {
+      border-color: var(--accent);
+    }
+
+    .search-tags {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .tag-chip {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.2rem 0.6rem;
+      cursor: pointer;
+      color: var(--accent);
+      transition: all 0.2s;
+    }
+
+    .tag-chip:hover {
+      background: var(--accent-glow);
+    }
+
+    /* Results Header */
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .results-count {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .results-count span {
+      color: var(--accent);
+    }
+
+    /* Result Cards */
+    .results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .case-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .case-card:hover {
+      border-color: #475569;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .case-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 0.5rem;
+    }
+
+    .meta-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+    }
+
+    .badge-court {
+      color: var(--badge-court);
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+
+    .badge-citation {
+      color: var(--badge-citation);
+      border-color: rgba(129, 140, 248, 0.3);
+    }
+
+    .badge-subject {
+      color: var(--badge-subject);
+      border-color: rgba(244, 114, 182, 0.3);
+    }
+
+    .badge-date {
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .ai-note-box {
+      background: rgba(15, 23, 42, 0.6);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .ai-note-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* Modal Drawer */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-dark);
+    }
+
+    .modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      background: var(--bg-dark);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .detail-item h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-item p {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .pdf-viewer-frame {
+      width: 100%;
+      height: 450px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-content">
+      <div class="brand">
+        <div class="brand-icon">§</div>
+        <div>
+          <h1>ScaleLegal</h1>
+          <div class="brand-sub">PostgreSQL Legal Judgment Search System</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Search Box -->
+    <div class="search-box">
+      <div class="search-input-wrapper">
+        <input type="text" id="searchInput" class="search-input"
+          placeholder="Search by Case Name, Case No, Neutral Citation (e.g. 2025:INSC:126), Article 226, Judge, or keyword...">
+        <button id="searchBtn" class="btn">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          Search
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label>Court</label>
+          <select id="courtFilter" class="filter-select">
+            <option value="">All Courts</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Year</label>
+          <select id="yearFilter" class="filter-select">
+            <option value="">All Years</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Subject</label>
+          <select id="subjectFilter" class="filter-select">
+            <option value="">All Subjects</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Judge</label>
+          <select id="judgeFilter" class="filter-select">
+            <option value="">All Judges</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Reported Status</label>
+          <select id="reportedFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="true">Reported Only</option>
+            <option value="false">Unreported Only</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tag Suggestions -->
+      <div class="search-tags">
+        <span>Try searching:</span>
+        <span class="tag-chip" onclick="quickSearch('natural justice')">natural justice</span>
+        <span class="tag-chip" onclick="quickSearch('2025:INSC:126')">2025:INSC:126</span>
+        <span class="tag-chip" onclick="quickSearch('Article 226')">Article 226</span>
+        <span class="tag-chip" onclick="quickSearch('4806')">Case 4806</span>
+        <span class="tag-chip" onclick="quickSearch('KRISHNADATT')">KRISHNADATT</span>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-header">
+      <div class="results-count" id="resultsCount">Loading judgments...</div>
+    </div>
+
+    <div class="results-list" id="resultsList">
+      <div class="empty-state">Loading data from PostgreSQL database...</div>
+    </div>
+
+  </div>
+
+  <!-- Modal Case Details -->
+  <div class="modal-overlay" id="caseModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Case Details</div>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Automatically route API requests to FastAPI server on port 3000 if opened via Live Server (port 5500) or static files
+    const API_BASE = (window.location.port === "3000") ? "" : "http://127.0.0.1:3000";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadFilters();
+      performSearch();
+
+      document.getElementById("searchBtn").addEventListener("click", () => performSearch());
+      document.getElementById("searchInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") performSearch();
+      });
+
+      document.querySelectorAll(".filter-select").forEach(el => {
+        el.addEventListener("change", () => performSearch());
+      });
+    });
+
+    async function loadFilters() {
+      try {
+        const res = await fetch(`${API_BASE}/api/filters`);
+        const data = await res.json();
+
+        // Populate Courts
+        const courtSel = document.getElementById("courtFilter");
+        data.courts.forEach(c => {
+          courtSel.innerHTML += `<option value="${c.court_id}">${c.name}</option>`;
+        });
+
+        // Populate Years
+        const yearSel = document.getElementById("yearFilter");
+        data.years.forEach(y => {
+          yearSel.innerHTML += `<option value="${y}">${y}</option>`;
+        });
+
+        // Populate Subjects
+        const subjSel = document.getElementById("subjectFilter");
+        data.subjects.forEach(s => {
+          subjSel.innerHTML += `<option value="${s}">${s}</option>`;
+        });
+
+        // Populate Judges
+        const judgeSel = document.getElementById("judgeFilter");
+        data.judges.forEach(j => {
+          judgeSel.innerHTML += `<option value="${j}">${j}</option>`;
+        });
+      } catch (err) {
+        console.error("Failed to load filters:", err);
+      }
+    }
+
+    function quickSearch(text) {
+      document.getElementById("searchInput").value = text;
+      performSearch();
+    }
+
+    async function performSearch() {
+      const q = document.getElementById("searchInput").value;
+      const court_id = document.getElementById("courtFilter").value;
+      const year = document.getElementById("yearFilter").value;
+      const subject = document.getElementById("subjectFilter").value;
+      const judge = document.getElementById("judgeFilter").value;
+      const is_reported = document.getElementById("reportedFilter").value;
+
+      const params = new URLSearchParams();
+      if (q) params.append("q", q);
+      if (court_id) params.append("court_id", court_id);
+      if (year) params.append("year", year);
+      if (subject) params.append("subject", subject);
+      if (judge) params.append("judge", judge);
+      if (is_reported) params.append("is_reported", is_reported);
+
+      const resultsCount = document.getElementById("resultsCount");
+      const resultsList = document.getElementById("resultsList");
+      resultsList.innerHTML = `<div class="empty-state">Searching PostgreSQL...</div>`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/cases/search?${params.toString()}`);
+        const data = await res.json();
+
+        resultsCount.innerHTML = `Found <span>${data.total}</span> matching judgment(s)`;
+
+        if (!data.results || data.results.length === 0) {
+          resultsList.innerHTML = `<div class="empty-state">No matching case judgments found. Try broadening your query.</div>`;
+          return;
+        }
+
+        resultsList.innerHTML = data.results.map(c => renderCaseCard(c)).join("");
+      } catch (err) {
+        console.error("Search failed:", err);
+        resultsList.innerHTML = `<div class="empty-state" style="color: #ef4444;">Search Error: Unable to query database server.</div>`;
+      }
+    }
+
+    function renderCaseCard(c) {
+      const partyNames = c.parties && c.parties.length > 0
+        ? c.parties.map(p => `${p.name} (${p.role})`).join(" vs ")
+        : (c.case_number || `Diary No. ${c.diary_number}`);
+
+      const subjectsHtml = c.subjects && c.subjects.length > 0
+        ? c.subjects.map(s => `<span class="badge badge-subject">${s}</span>`).join(" ")
+        : "";
+
+      const provisionsHtml = c.provisions && c.provisions.length > 0
+        ? c.provisions.map(p => `<span class="badge badge-citation">${p.act_name} s.${p.section || ''}</span>`).join(" ")
+        : "";
+
+      const aiNote = c.case_note_ai
+        ? `<div class="ai-note-box"><div class="ai-note-header">✨ CaseNote (AI)</div>${c.case_note_ai}</div>`
+        : "";
+
+      return `
+        <div class="case-card">
+          <div class="case-title">${partyNames}</div>
+          <div class="meta-badges">
+            <span class="badge badge-court">${c.court_name || 'Supreme Court of India'}</span>
+            ${c.judgment_date ? `<span class="badge badge-date">📅 ${c.judgment_date}</span>` : ''}
+            ${c.neutral_citation ? `<span class="badge badge-citation">📜 ${c.neutral_citation}</span>` : ''}
+            ${c.is_reported ? `<span class="badge" style="color:#10b981; border-color:#10b981;">Reported</span>` : ''}
+            ${subjectsHtml}
+            ${provisionsHtml}
+          </div>
+          ${aiNote}
+          <div class="card-actions">
+            <button class="btn" onclick="openCaseDetail(${c.id})">View Judgment Details</button>
+            <button class="btn btn-secondary" onclick="openPdf(${c.id})">📄 Open PDF Document</button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function openCaseDetail(caseId) {
+      const modal = document.getElementById("caseModal");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalBody = document.getElementById("modalBody");
+
+      modalTitle.innerText = `Loading Case #${caseId}...`;
+      modalBody.innerHTML = `<div class="empty-state">Fetching record details...</div>`;
+      modal.classList.add("active");
+
+      try {
+        const res = await fetch(`${API_BASE}/api/cases/${caseId}`);
+        const data = await res.json();
+
+        modalTitle.innerText = data.case_number || `Diary No. ${data.diary_number}`;
+
+        const partiesHtml = data.parties.map(p => `<li><strong>${p.name}</strong> (${p.role} - ${p.party_type})</li>`).join("");
+        const judgesHtml = data.judges.map(j => `<li><strong>${j.name}</strong> [${j.role}]</li>`).join("");
+        const advocatesHtml = data.advocates.map(a => `<li><strong>${a.name}</strong> (${a.party_role})</li>`).join("");
+        const provisionsHtml = data.provisions.map(p => `<li>${p.act_name} ${p.section ? 'Section ' + p.section : ''}</li>`).join("");
+        const articlesHtml = data.articles.map(a => `<span class="badge badge-citation">${a}</span>`).join(" ");
+
+        modalBody.innerHTML = `
+          <div class="detail-grid">
+            <div class="detail-item"><h4>Court</h4><p>${data.court_name}</p></div>
+            <div class="detail-item"><h4>Diary Number</h4><p>${data.diary_number || 'N/A'}</p></div>
+            <div class="detail-item"><h4>Neutral Citation</h4><p>${data.neutral_citation || 'N/A'}</p></div>
+            <div class="detail-item"><h4>Judgment Date</h4><p>${data.judgment_date || 'N/A'}</p></div>
+            <div class="detail-item"><h4>Category</h4><p>${data.case_category || 'N/A'}</p></div>
+            <div class="detail-item"><h4>Document Type</h4><p>${data.document_type || 'Caselaws'}</p></div>
+          </div>
+
+          ${data.case_note_ai ? `
+            <div class="ai-note-box">
+              <div class="ai-note-header">✨ CaseNote (AI Summary)</div>
+              ${data.case_note_ai}
+            </div>
+          ` : ''}
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <h4 style="color:var(--text-muted); font-size:0.8rem; margin-bottom:0.5rem; text-transform:uppercase;">Parties</h4>
+              <ul style="padding-left: 1.25rem; font-size: 0.9rem;">${partiesHtml || 'None'}</ul>
+            </div>
+            <div>
+              <h4 style="color:var(--text-muted); font-size:0.8rem; margin-bottom:0.5rem; text-transform:uppercase;">Bench / Judges</h4>
+              <ul style="padding-left: 1.25rem; font-size: 0.9rem;">${judgesHtml || 'None'}</ul>
+            </div>
+          </div>
+
+          ${advocatesHtml ? `
+            <div>
+              <h4 style="color:var(--text-muted); font-size:0.8rem; margin-bottom:0.5rem; text-transform:uppercase;">Counsels / Advocates</h4>
+              <ul style="padding-left: 1.25rem; font-size: 0.9rem;">${advocatesHtml}</ul>
+            </div>
+          ` : ''}
+
+          ${provisionsHtml || articlesHtml ? `
+            <div>
+              <h4 style="color:var(--text-muted); font-size:0.8rem; margin-bottom:0.5rem; text-transform:uppercase;">Acts, Provisions & Articles</h4>
+              <ul style="padding-left: 1.25rem; font-size: 0.9rem; margin-bottom:0.5rem;">${provisionsHtml}</ul>
+              <div>${articlesHtml}</div>
+            </div>
+          ` : ''}
+
+          <div>
+            <h4 style="color:var(--text-muted); font-size:0.8rem; margin-bottom:0.5rem; text-transform:uppercase;">Local PDF File Document</h4>
+            ${data.pdf_file_exists ? `
+              <iframe src="${API_BASE}/api/cases/${caseId}/pdf" class="pdf-viewer-frame"></iframe>
+            ` : `
+              <p style="color:#ef4444; font-size:0.9rem;">PDF File path registered as: <code>${data.pdf_path}</code> (File not found on disk)</p>
+            `}
+          </div>
+        `;
+      } catch (err) {
+        modalBody.innerHTML = `<div class="empty-state" style="color: #ef4444;">Failed to load details.</div>`;
+      }
+    }
+
+    function openPdf(caseId) {
+      window.open(`${API_BASE}/api/cases/${caseId}/pdf`, "_blank");
+    }
+
+    function closeModal() {
+      document.getElementById("caseModal").classList.remove("active");
+    }
+  </script>
+</body>
+
+</html>

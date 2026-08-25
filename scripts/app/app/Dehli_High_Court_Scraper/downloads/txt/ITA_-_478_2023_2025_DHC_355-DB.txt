@@ -1,188 +1,0 @@
-$~8 to 18
-*	IN THE HIGH  COURT  OF  DELHI  AT NEW  DELHI
-%			        	   Judgment delivered on:  23 January 2025 
-+ 	ITA 474/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							    .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-9
-+ 	ITA 476/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							      .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-10
-+ 	ITA 477/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							     .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-11
-+ 	ITA 478/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							       .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-12
-+ 	ITA 479/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							      .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-13
-+ 	ITA 480/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							     .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-14
-+ 	ITA 481/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							     .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-15
-+ 	ITA 753/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							       .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-16
-+ 	ITA 771/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							     .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-17
-+ 	ITA 774/2023
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							      .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-18
-+ 	ITA 415/2024
-THE COMMISSIONER OF INCOME TAX - NTERNATIONAL TAXATION -1			.....Appellant
-				Through:	Mr. Ruchir Bhatia, SSC.
-
-				versus
-
-	ADOBE SYSTEMS SOFTWARE IRELAND 
-     LTD							      .....Respondent
-Through:	Mr. S. Ganesh, Sr. Adv. with Mr. Vishal Kalra and Mr. S.S. Tomar, Advs.
-	CORAM:
-	HON'BLE MR. JUSTICE YASHWANT VARMA
-	HON'BLE MR. JUSTICE HARISH VAIDYANATHAN SHANKAR
-
-J U D G M E N T
-
-YASHWANT VARMA, J.
-
-1. Basis our last hearing, the appellants had reframed the proposed questions of law and which are extracted hereinbelow:
-�i) Whether on the facts and circumstances of the case, the Ld. ITAT erred in holding that no further attribution of profit can be made to the AE when it is renumerated at arm's length, failing to note and appreciate that the actual functions performed by the AE are beyond those covered under the agreement entered into between the Assessee and its AE?
-ii) Whether on the facts and circumstances of the case, and in law, that Assessee Company has existence of Dependent Agent PE (DAPE) in India/Fixed Place PE in India as per Article 7 of India Ireland DTAA?
-iii) Whether the Ld. ITAT erred in not adjudicating the existence of DAPE of the Assessee in the form of Adobe Systems India Pvt. Ltd. as well as fixed place PE as per Article 7 of the India Ireland DTAA, without controverting the findings of the Assessing Officer, clearly pointing to existence of PE in the present case?
-iv) Whether on the facts and circumstances of the case and in law, the Ld. ITAT erred in not appreciating the findings of Ld. CIT(A) that the facts of the case indicate a Double Irish Model of corporate structuring aimed at tax avoidance?�
-
-2. The details of the appeals before us are reproduced in a tabular form hereinbelow:
-Item Nos. as per Cause ListITA No.AY8474/20232013-149476/20232012-1310477/20232011-1211478/20232014-1512479/20232010-1113480/20232007-0814481/20232015-1615753/20232017-1816771/20232019-2017774/20232018-1918415/20242016-173. On hearing Mr. Bhatia, learned counsel who appears in support of these appeals as well as Mr. Ganesh, learned senior counsel along with Mr. Kalra, learned counsel, representing the respondents, we proceed to dispose of these appeals in terms of the present order.
-4. From the facts which have been noticed by the Income Tax Appellate Tribunal1 and which appear to be undisputed, we find that Adobe Systems Software Ireland Limited2, the respondent/assessee is stated to be a company that had been incorporated under the laws of Ireland and is a tax resident of that nation. It accordingly claimed benefits of the India-Ireland Double Taxation Avoidance Agreement3. ADIR is a wholly owned subsidiary of Adobe Software Trading Company Limited4 and Adobe Systems Incorporated5 is the ultimate parent company of ADIR. Adobe USA also had a subsidiary in India known as Adobe Systems India Pvt. Ltd.6
-5. The Assessing Officer7 as well as the Commissioner of Income Tax(Appeals)8 had essentially taken the position that Adobe India constituted not only a Fixed Place Permanent Establishment9 but was also liable to be recognized as a Dependent Agent PE10. The assessee aggrieved by those conclusions, had approached the Tribunal and instituted the appeals in question. 
-6. While dealing with the principal question of a Fixed Place PE as well as DAPE, the Tribunal has taken note of the Transfer Pricing Analysis which was undertaken by the Transfer Pricing Officer11 and has thus taken the view that since the income attributable to the PE had already been subjected to tax, no further exercise was liable to be undertaken.
-7. Mr. Bhatia, learned counsel for the appellants, however, seeks to draw sustenance from the following observations which appear in the decision of the Supreme Court in DIT v. Morgan Stanley & Co. Inc.12:
-�32.�As regards determination of profits attributable to a PE in India (MSAS) is concerned on the basis of arm's length principle we have quoted Article 7(2) of DTAA. According to AAR where there is an international transaction under which a non-resident compensates a PE at arm's length price, no further profits would be attributable in India. In this connection, AAR has relied upon Circular No. 23 of 1969 issued by CBDT as well as Circular No. 5 of 2004 also issued by CBDT. This is the key question which arises for determination in these civil appeals.
-xxxx			xxxx			xxxx
-34.�Article 7 of the UN Model Convention inter alia provides that only that portion of business profits is taxable in the source country which is attributable to PE. It specifies how such business profits should be ascertained. Under the said article, a PE is treated as if it is an independent enterprise (profit centre) dehors the head office and which deals with the head office at arm's length. Therefore, its profits are determined on the basis as if it is an independent enterprise. The profits of the PE are determined on the basis of what an independent enterprise under similar circumstances might be expected to derive on its own. Article 7(2) of the UN Model Convention advocates the arm's length approach for attribution of profits to a PE.
-35.�The object behind enactment of transfer pricing regulations is to prevent shifting of profits outside India. Under Article 7(2) not all profits of MSCo would be taxable in India but only those which have economic nexus with PE in India. A foreign enterprise is liable to be taxed in India on so much of its business profit as is attributable to the PE in India. The quantum of taxable income is to be determined in accordance with the provisions of the IT Act. All provisions of the IT Act are applicable, including provisions relating to depreciation, investment losses, deductible expenses, carry-forward and set-off losses, etc. However, deviations are made by DTAA in cases of royalty, interest, etc. Such deviations are also made under the IT Act (for example Sections 44-BB, 44-BBA, etc.).
-36.�Under the impugned ruling delivered by AAR, remuneration to MSAS was justified by a transfer pricing analysis and, therefore, no further income could be attributed to the PE (MSAS). In other words, the said ruling equates an arm's length analysis (ALA) with attribution of profits. It holds that once a transfer pricing analysis is undertaken, there is no further need to attribute profits to a PE. The impugned ruling is correct in principle insofar as an associated enterprise, that also constitutes a PE, has been remunerated on an arm's length basis�taking into account all the risk-taking functions of the enterprise. In such cases nothing further would be left to be attributed to PE. The situation would be different if transfer pricing analysis does not adequately reflect the functions performed and the risks assumed by the enterprise. In such a situation, there would be a need to attribute profits to PE for those functions/risks that have not been considered. Therefore, in each case the data placed by the taxpayer has to be examined as to whether the transfer pricing analysis placed by the taxpayer is exhaustive of attribution of profits and that would depend on the functional and factual analysis to be undertaken in each case. Lastly, it may be added that taxing corporates on the basis of the concept of economic nexus is an important feature of attributable profits (profits attributable to PE).�
-8. The submission essentially proceeds on the basis that since all the functions performed and risks assumed by Adobe India had not formed subject matter of examination in the course of the Transfer Pricing Analysis, the mere attribution of profits to the PE would have not justified the Tribunal in proceeding to interfere with the views that were expressed by the AO as well as the CIT(A).
-9. We, however, find that although it appears to have been urged before the Tribunal that Adobe India was performing functions which were �wider in scope� and also stretched to matters which had not formed subject matter of examination in the Transfer Pricing Report, the Tribunal on facts has found that the said conclusions were wholly unjustified and were merely assumptions made by the appellants and were not founded on any material or evidence which formed part of the record. 
-10. This becomes manifest from a reading of the following paragraphs forming part of the judgment handed down by the Tribunal and which is impugned before us:
-�13. In all these cases, it has found that the transactions have been found to be at Arm's Length by the Transfer Pricing Officer in the Transfer pricing order of the AE i.e. Adobe India. This is not disputed by the Revenue. In such a situation, the decision of the Hon'ble Apex Court as above applies on all fours in these cases. The Revenue has tried to distinguish the order of the Hon'ble Supreme Court decision by firstly referring by submitting that the Adobe India is performing functions which are wider in scope of the agreement entered with the assessee and in the TP study report of Adobe India. For this purpose, reliance has been placed on the order of the Ld. CIT(A) in this case for AY 2010-11. We find that the above submission by no stretch of imagination can be said to be distinguishing the decision of the Hon�ble Apex Court from being applicable from the facts of the present case. Very well understanding this proposition, the Revenue itself urged that without prejudice to the above, the judicial decision of the attribution of profit by applying FAR analysis has not been accepted by the Indian Government and the profit has to be determined by apply of provisions of DTAA r.w. 10A of the Income Tax Rules, 1962. In view of the above, we are of the opinion that the decision of the Hon�ble Apex Court as above squarely applies in this case. Hence, holding that since the transactions between the assessee and its Indian AE has been found to be at Arm's Length in the transfer pricing adjustment, no further attribution can be made to the PE of the appellant as claimed. Hence, this issue needs to be decided in favour of the assessee.
-14. We further find the above view of the Ld. CIT(A) is not sustainable in the light of the Hon�ble Supreme Court decision as above. The Ld. CIT(A) has opined that Adobe India while discharging the functions as assigned by Adobe Ireland has the right to use the intangible asset in the form of "brand, trademark and logo" but there is cost paid for the same to the assessee. Further he observed that there is persistent risk of violation of copyright of software product and unauthorized use of copies of the software product in Indian market. In this regard, he has referred to case against the particular person filed by Adobe Systems, Inc. 85 Ors. The Ld. CIT(A) hypothesized that Adobe Systems, Inc. & Ors. would come to know about the instances of infringement of copyright only through the local presence of Adobe India Resources. The Ld. CIT(A) further opined that the function of the India AE of identification of potential customers and continuous engagement of registered customers goes into development of market of intangibles and no compensation has been made to the Indian AE for all such actions to develop market intangible asset. From this, the ld. CIT(A) opines that Adobe India is responsible for protecting, development & maintenance of the intangible assets (copyright, brand, patent 85 confidential data of customers) of Adobe group in India. Further, the Ld. CIT(A) opined that risk of receivables from distributors also exist in India but there is no compensation made for such functions. Keeping the above in view, the Ld. CIT(A) held that Adobe India is dependent PE of the assessee company and in order to compensate for the FAR assigned to DAPE, he has no reason to defer from the view of the Assessing Officer to attribute 35% of the total Revenue pertaining to India for this year.
-15. Further, functions attributed to the Adobe India by the Revenue is also based upon the observations of the Ld. CIT(A) for Assessment Year 2010-11 primarily. The allegation of the Revenue is that the assessee was asked to produce dump of the emails correspondence between Adobe India and Adobe Ireland to deep dive to the activities so as to ascertain the clear cut facts to decide about PE. However, it was noted by the Ld. CIT(A) that after couple of months of gap, the assessee produced only sample certain e-mails. On the basis of these e-mails of few instances, the Ld. CIT(A) inferred that quotes offered by the distributors to channel partners are after discussion with Adobe India. The reasoning was that orders are delivered after seeking confirmation from Adobe India resources. Further, one of the e-mails is said to be demonstrating, the control and monitoring by Adobe India of distributors in meeting assigned targets. Basing upon such few e-mails, the Revenue has concluded that activities actually performed by Adobe India are wider in nature as against the activities pointed out in the contract and transfer pricing report. We find that the above observations have been cogently rebutted by the ld. Counsel for the assessee. As regards the few e-mails that have been referred they are only also marked to the Adobe India personnel which has been said to be done only for the sake of keeping the Adobe India in the loop. In none of the e-mail referred Adobe India has actually provided guidance and directions regarding the quotes. This is a fiction of imagination by the Revenue. Hence, the functions attributed on the basis of these e-mails are not at all enlarging the scope of actual functions performed by the AE than as per the agreement and the transfer pricing report. The plea that the email dump has not been provided is a peculiar plea. In Adobe India T.P. adjustment no such issue has been recorded. It is common knowledge e-mail correspondence is a two way process. So when everything was found in order in Adobe India T.P. Adjustment, hence, it cannot be said that Revenue did not have complete access to all the e-mails between Adobe India and Adobe Ireland. The Ld. CIT(A) is also of view that the assets client list gives rise to in intangible assets has also no basis. No cogent case has been made out that Adobe India was provided with right to any intangible asset belonging to the assessee i.e. Adobe Ireland. The issue raised by the Ld. CIT(A) by relying upon legal dispute infringement of copy right in India being looked after by Adobe India/Adobe Ireland is also without any basis as it is Adobe USA, the IP owner which handles the legal matters relating to be undertaken in all jurisdiction in which the Adobe operates including India. Adobe USA is authorised in monitoring to Indian operations and their legal counsels handles the matters therefrom.
-16. As regards the risk recoverable from distributors, the hypothesis that the risk is borne by Adobe India has also no basis, The documents clearly show that the collection from the customers is managed by the team Adobe Ireland. Thus, from the above, it is apparent that only on hypothesis and guess work and assigning of all sorts of imaginary motives by a few e-mails, the Ld. CIT(A) and therefore the Revenue is contending that the functions performed by Adobe India are much wider than the that as per the agreement and the transfer pricing analysis. We find that as discussed by us hereinabove these submissions are not at all cogent enough to warrant a view that the transfer pricing analysing done in the case of Adobe India does not adequately reflects functions performed and the risk assumed by the enterprise. In such a situation as held by Hon�ble Apex Court as above, there is no need to attribute any further profit as all functions and risk have been considered in the computation of Arm's Length Price in the case of Adobe India.�
-
-11. Quite apart from the exhaustive analysis of the issue by the Tribunal, we are constrained to note that the appellant had woefully failed to make good its contention that certain aspects or facets of the functioning of the Associate Enterprise13 did not form part of the Transfer Pricing Analysis. That only leaves us to examine the last question that Mr. Bhatia posed for our consideration and related to certain observations rendered by the CIT(A) referring to the Double Irish model of Corporate Structuring and a perceived scheme of tax avoidance. 
-12. It becomes relevant to note that while dealing with this aspect, the CIT(A) has observed as follows:
-�7.32 The "Double Irish" relies on multinationals setting up two Irish companies, one of which owns the valuable intellectual property central to its products. The first company is tax resident in Ireland and pays royalties to the second company for use of the IP, which generates expenses that reduce the amount of Irish tax it pays. The second company, which is incorporated in Ireland but not tax resident in the country, collects the royalties in a tax haven, thereby avoiding Irish taxes. "Typically the IP holding company earns much of the profits as it owns the valuable IP. A much smaller amount of profits is earned in countries with sales activity," says Peter Vale, tax expert at Grant Thornton. The "Double Irish" scheme takes advantage of a loophole in Irish law, which enables companies to be registered in Ireland without being tax resident in the country.�
-
-13. As is manifest from the above, the Double Irish model which is spoken of by various authors essentially alludes to advantages that may be taken by certain entities of a �loophole� existing in the Irish law so as to escape taxation in that nation. We, however, fail to comprehend or appreciate how that principle could have had any relevance to income which was asserted by the appellants themselves to have arisen or accrued in India. 
-14. We, consequently, find no justification to interfere with the judgment handed down by the Tribunal. The appeals fail and shall stand dismissed.  
-	
-
-YASHWANT VARMA, J.
-
-HARISH VAIDYANATHAN SHANKAR, J.
-JANUARY 23, 2025/DR
-1 Tribunal
-2 ADIR
-3 DTAA
-4 ASTCL
-5 Adobe USA
-6 Adobe India
-7 AO
-8 CIT(A)
-9 PE
-10 DAPE
-11 TPO
-12 2007 SCC OnLine SC 878
-13 AE
----------------
-
-------------------------------------------------------------
-
----------------
-
-------------------------------------------------------------
-
-
-
-										         
-
-
-ITA 474/2023 and connected matters	Page 1 of 12
-
-
-
-
