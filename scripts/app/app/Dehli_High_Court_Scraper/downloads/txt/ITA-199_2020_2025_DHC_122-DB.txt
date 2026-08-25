@@ -1,0 +1,64 @@
+* 	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%					    Judgment delivered on: 13.01.2025
++ 	ITA 199/2020 & CM APPL. 9846/2020
+	DCIT, CIRDE-25(1), NEW DELHI		         .....Appellant
+Through:	Mr. Gaurav Gupta, SSC, Mr. Shivendra Singh and Mr. Yojit Pareek, JSCs 
+				versus
+
+TATA POWER DELHI DISTRIBUTION LTD. .....Respondent
+Through:	Mr. Shashi M Kapila, Mr. Pravesh Sharma and Mr. Sushil Kumar, Advocates
+
+CORAM
+HON�BLE THE ACTING CHIEF JUSTICE 
+HON�BLE MS. JUSTICE SWARANA KANTA SHARMA
+JUDGMENT
+SWARANA KANTA SHARMA, J.
+1. The Revenue has preferred the present appeal under Section 260A of the Income Tax Act, 1961 [hereafter �the Act�] impugning an order dated 14.06.2019 [hereafter �the impugned order�] passed by the learned Income Tax Appellate Tribunal [hereafter �the learned ITAT�], in ITA No. 2785/Del/2013, in respect of the assessment year (AY) 2007-08. 
+
+FACTUAL BACKGROUND 
+2. The respondent � M/s Tata Power Delhi Distribution Limited � [hereafter �the assessee�] is a joint venture between Tata Power Company Limited and the Government of NCT of Delhi, wherein Tata Power Company Limited, along with Tata Sons Limited, holds 51% of the shares, while the remaining 49% of the shares are held by the Government of NCT of Delhi. The assessee is engaged in the power generation and distribution of electricity in North and North West Delhi. 
+3. For the AY 2007-08, the assessee filed its return of income declaring a total income of ?6,49,98,060/- under the normal provisions, and ?187,24,36,245/- as book profits under Section 115JB of the Act. Subsequently, revised computation was filed, declaring the book profits at ?192,54,68,053/-. The return was processed under Section 143(1) of the Act at the declared returned income. The return was thereafter selected for scrutiny, and a notice under Section 143(2) of the Act was issued to the assessee on 16.09.2008, which was duly served upon the assessee. Subsequently, further notices under Sections 143(2) and 142(1) of the Act, accompanied by detailed questionnaires, were issued to the assessee. 
+4. On 29.12.2009, the learned Assessing Officer [hereafter �the AO�] passed an order under Section 143(3) of the Act, assessing the total income of the assessee at ?132,73,84,883/-, and computing the book profit under Section 115JB of the Act at ?318,78,54,880/- The AO�s findings on the computation of book profit under Section 115JB of the Act indicate that though the assessee had computed book profits at ?192,54,68,053/-, a total amount of ?126,23,86,823/- was to be added to the said amount on certain accounts. The relevant findings of the AO are as under:
+
+
+
+5. Aggrieved by the assessment order, the assessee filed an appeal before the learned Commissioner of Income Tax (Appeals)-XVI [hereafter �the CIT(A)�] on 29.01.2010. The CIT(A), by way of order dated 22.02.2013, allowed the appeal of the assessee on some of the grounds raised by it. The CIT(A) noted that the additions made by the AO on account of de-recognition of revenue, excess depreciation on UPS, energy tax disallowed under Section 43B of the Act, and disallowance made under Section 14 of the Act were not covered by provisions of Section 115JB of the Act. The CIT(A) also observed that addition made by the AO on account of difference in provision for doubtful debts (energy tax) was erroneous and could not be sustained. The relevant findings of the CIT(A) are reproduced below:
+�6.1 Ground no. 8 of appeal is directed against additions  made by the A.O. to the book profit computed for the purpose  of section ll5JB of the IT Act, on account of de-recognition of  revenue amounting to Rs. 114,39,00,000/-, excess depreciation  on UPS amounting to Rs. 26,36,870/-, provision for doubtful  debts amounting to Rs. 23,41, 192/-, energy tax disallowed u/s  43B amounting to Rs. 10,17,86,761/- and disallowance u/s 14A  amounting to Rs. 1,17,22,000/-. The Assessing Officer while computing the income of the assessee under the normal  provision had made the above addition to the total income of  the assessee. Consequent to the above said additions the  Assessing Officer also recomputed the book profits under  section 11SJB of the Act by making the above additions of Rs.  126,23,86,823/- to the book profit shown by the assessee under  section 115JB of the Act.  
+
+6.2 The Hon'ble Supreme Court in Apollo Tyres Ltd. 255  ITR 273 (SC) had laid down the principle that the Assessing  Officer while computing income under section l15J had the  power to examine whether the books of account were properly  maintained in accordance with the Companies Act and further  had limited power of making additions/deductions as provided  for in the Explanation to the said section. In view of the  principle laid down by the Hon'ble Supreme Court the  Assessing Officer has limited jurisdiction while computing the  book profits under section 115JB of the Act i.e. there is no  jurisdiction to go beyond the net profit shown in the Profit &  Loss Account except to the extent provided in the Explanation  to section 115JB of the Act. As per the Explanation to section  115JB of the Act, book profit is defined to be the net profit  shown in the Profit & Loss Account for the relevant previous  years as increased/reduced by the amounts specified in the  clauses mentioned thereunder. The additions made by the A.O.  on account of de-recognition of revenue amounting to Rs.  114,39,00,000/-, excess depreciation on UPS amounting to Rs. 26,36,870/- and energy tax disallowed u/s 43B amounting to  Rs. 10,17,86,761/- in the hands of the assessee are not covered  by the aforesaid clauses.  
+
+6.3 Regarding the disallowance made by the A.O. u/s 14A,  no actual expenditure was debited in the profit & loss account  relating to the earning of exempt income. Section 14A contains  subsection (2) and sub-section (3), which do not find a place in  the clause (f) of explanation to Sec 11 SJB. Therefore, insofar as computation of adjusted book profit is concerned, provisions of  subsection (2) and sub-section (3) of section 14A cannot be  imported into clause (f) of explanation to Sec 115JB. Therefore, the disallowance made u/s 14A are also not covered  under the clauses of explanation to sec l 15JB.  
+
+6.4 Regarding addition of sum of Rs. 23,41,192/- on account  of difference in provision for doubtful debts (energy tax) under  the normal provisions as well as under sec 115JB, the provision  for doubtful debts for the year under consideration has been  shown at Rs. 5,53,73,000/- in the balance sheet. However, in  the profit and loss account as well as in the computation of  income and book profit, the assessee has shown provision for  doubtful debts for a sum of Rs. 5,30,31,808/-. The difference of  Rs. 23,41,192/- was added back by the A.O. The provisions for  doubtful debts of Rs. 5,30,31,808/- was debited in the profit  and loss account of the appellant and in the computation of  income as well as in the computation of book profit u/s 115JB the same amount was accordingly added back by the assessee.  Therefore, the net effect was nil and no deduction was claimed  in respect of provision for doubtful debts. Therefore, it is  immaterial that excess provision of Rs. 23,41,192/- was shown  in the balance sheet. So long as provision debited in the profit  & loss account is again added back in the computation of  income and in the computation of book profit, no addition can  be made in respect of excess provisions worked out by the AO  from the balance sheet which is not debited in the profit & loss  account. Therefore, the above the addition made by the A.O.  while computing income under normal provision as well as the  book profit u/s 115 JB of the Act is erroneous and cannot be  sustained. The appeal is allowed on this ground.�
+
+6. Aggrieved by the order of the CIT(A), both the assessee and the Revenue filed cross-appeals before the learned ITAT, the assessee�s appeal being ITA No. 2785/Del/2013 and Revenue�s appeal being ITA No. 4054/Del/2013. A perusal of the impugned reveals that the assessee had raised an additional ground, that is whether in the facts and circumstances of the case, the AO had erred in law in taxing book profits under Section 115JB of the Act. The learned ITAT, vide the impugned order, allowed the assessee�s appeal and dismissed the Revenue�s appeal. The learned ITAT relied on the decision of the Kerala High Court in Kerala State Electricity Board v. Deputy Commissioner of Income-tax: (2010) 329 ITR 91, and held that the ratio of this decision applied to the present case. The learned ITAT accordingly held that Section 115JB of the Act was not applicable to the assessee. The relevant extract of the impugned order is extracted hereunder:
+�7. In so far as question of applicability of provisions of section  115JB of the appellant company is concerned, it has been answered by the Hon'ble Kerala High Court in case of Kerala State Electricity Board 329 ITR 91 favour of the assessee and against the revenue. The Hon'ble High Court has held as under:
+* * *
+8. Finding parity of facts with facts of the judgment of the Hon'ble Kerala High Court [supra], respectfully following the finding of the Hon'ble High Court, we hold the provisions of section 115JB of the Act are not applicable to the appellant company. The Assessing Officer is directed accordingly. additional ground raised by the assessee is allowed�
+
+7. Aggrieved by the decision of the learned ITAT, the Revenue has preferred the present appeal. 
+
+QUESTION OF LAW
+8. The present appeal was admitted on the following Question of Law, for this Court�s consideration: 
+�Whether in the facts and circumstances of the case, and in law, the ITAT was justified in deleting the additions made on account of Book Profit under Section 115 JB of the Income-tax Act, 1961?� 
+
+THE DECISION 
+9. The primary issue for our determination is whether Section 115JB of the Act would be applicable to the assessee, who is engaged in the business of electricity generation and distribution, during the period relevant to AY 2007-08.
+10. It is apposite to note that the present appeal was heard along with ITA 687/2019, captioned Pr. Commissioner of Income Tax-9 v. M/s Tata Power Delhi Distribution Ltd. (Formerly known as M/s North Delhi Power Limited), filed by the Revenue against the same assessee in respect of AY 2006-07, assailing a similar order passed by the learned ITAT. These appeals were admitted on the same question of law by this Court.
+11. By way of judgment dated 13.01.2025 delivered today in ITA 687/2019, we have answered the question of law in favour of the assessee and against the Revenue, and held that Section 115JB of the Act would be inapplicable to an electricity generation company, prior to its amendment by virtue of Finance Act, 2012.
+12. In view thereof, we are of the opinion that the order of the learned ITAT does not suffer from any infirmity or error and, is, therefore upheld. 
+13. Accordingly, in view of the detailed reasons and conclusion recorded in the judgment delivered in ITA 687/2019, the present appeal also stands dismissed.
+14. Pending application also stands disposed of.
+
+SWARANA KANTA SHARMA, J
+
+VIBHU BAKHRU, ACJ
+JANUARY 13, 2025/at
+
+
+								
+
+	
+ITA 199/2020	             	                                                                                                Page 1 of 8
+
+

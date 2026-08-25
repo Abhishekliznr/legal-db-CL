@@ -1,0 +1,59 @@
+$~30
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+
+%							Date of Decision : 10.01.2025
+
++ 	W.P.(C) 234/2025 CM APPL. 1145/2025
+
+M/S NOKIA SOLUTIONS AND NETWORKS INDIA 
+PRIVATE LIMITED SUCCESSOR OF NOKIA SIEMENS NETWORKS INDIA PRIVATE LIMITED
+.....Petitioner
+Through:	Mr Ajay Vohra, Sr Advocate with Mr Ankul Goyal and Mr Priyam Bhatnagar, Advocates. 
+
+				versus
+
+	DEPUTY COMMISSIONER OF INCOME 
+     TAX CIRCLE 16 1 & ANR.
+.....Respondents
+Through:	Mr Abhishek Maratha, SSC, Mr Apoorv Agarwal, Mr Parth Samwal, JSCs, Ms Nupur Sharma, Mr Gaurav Singh, Ms Muskaan Goel, Mr Himanshu Gaur and Mr Kamakshraj Singh Advocates for the Revenue
+
+     CORAM:
+	HON'BLE THE ACTING CHIEF JUSTICE
+	HON'BLE MR. JUSTICE TUSHAR RAO GEDELA
+VIBHU BAKHRU, ACJ. (ORAL)
+
+1. The petitioner has filed the present petition, inter alia, impugning a notice dated 09.04.2021 (hereafter the impugned notice) issued under Section 148 of the Income Tax Act, 1961 (hereafter the Act) in respect of the assessment year (AY) 2014-15. 
+2. The impugned notice was issued in the name of Nokia Siemens Networks India Private Limited (NSNIPL), which prior to the issuance of the notice stood amalgamated with the petitioner company M/s NOKIA Solutions and Networks India Private Limited (hereafter the NOKIA). 
+3. Mr Vohra, the learned senior counsel for the petitioner submits that since the notice has been issued in the name of a non-existent company, the impugned notice is liable to be set aside. Further, since the said notice was the foundation of the reassessment proceedings pertaining to AY 2014-15, further proceedings, pursuant to the impugned notice are also liable to be set aside.  
+4.  The Assessing Officers (AO) had issued several notices under Section 148 of the Act under the provisions as were in force prior to 31.03.2021. These notices were subject matter of challenge in various proceedings including writ petitions filed in this court. In Mon Mohan Kohli v. Assistant Commissioner of Income Tax & Anr: [2022] 441 ITR 207, this court set aside the notices issued under Section 148 of the Act, which were issued after 01.04.2021 but under the provision as in force prior to 01.04.2021.  Similarly various other courts also sustained challenge to such notices.  The Revenue appealed these decisions in the Supreme Court.  
+5. In Union of India & Ors. v. Ashish Agarwal: [2022] 444 ITR 1, the Supreme Court, in exercise of its powers under Article 142 of the Constitution of India, sustained such notices that were issued under the provision as in force prior to 01.04.2021. The court further directed that pan India, such notices be construed as notices under Section 148A(b) of the Act.  
+6. The relevant extract of the said decision is set out below:
+�28.1. The impugned Section 148 notices issued to the respective assessees which were issued under unamended Section 148 of the IT Act, which were the subject-matter of writ petitions before the various respective High Courts shall be deemed to have been issued under Section 148-A of the IT Act as substituted by the Finance Act, 2021 and construed or treated to be show-cause notices in terms of Section 148-A(b). The assessing officer shall, within thirty days from today provide to the respective assessees information and material relied upon by the Revenue, so that the assessees can reply to the show-cause notices within two weeks thereafter.
+***                ***                                   ***                                 ***
+29. The present order shall be applicable PAN INDIA and all judgments and orders passed by the different High Courts on the issue and under which similar notices which were issued after 1-4-2021 issued under Section 148 of the Act are set aside and shall be governed by the present order and shall stand modified to the aforesaid extent. The present order is passed in exercise of powers under Article 142 of the Constitution of India so as to avoid any further appeals by the Revenue on the very issue by challenging similar judgments and orders, with a view not to burden this Court with approximately 9000 appeals. We also observe that the present order shall also govern the pending writ petitions, pending before various the High Courts in which similar notices under Section 148 of the Act issued after 1-4-2021 are under challenge.�
+7. In view of the above, the impugned notice cannot be construed as a notice under Section 148 of the Act and is required to be considered as a notice under Section 148A(b) of the Act.  
+8. The Supreme Court also issued directions, which would enable the assessees to respond to the such notices treating the same as notices under Section 148A(b) of the Act. Such responses were required to be considered in terms of Section 148A(c) of the Act and the AOs were required to pass the appropriate orders under Section 148A(d) of the Act.  In cases where the AOs found after considering the response of the assessees in term of Section 148A(c) of the Act that it was apposite to reopen the assessments, they were required to issue notices under Section 148 of the Act.  
+9. Mr Vohra, the learned senior counsel for the petitioner fairly states that the notice issued under Section 148A(b) of the Act would not be a foundational jurisdictional notice and, therefore, the fact that such a notice is issued in an incorrect name would not vitiate the proceedings initiated thereafter.  
+10. In the present case, a notice dated 29.07.2022 was issued under Section 148 of the Act after following the procedure as set out in Section 148A of the Act and in terms of the decisions of the Supreme Court in Union of India & Ors. v. Ashish Agarwal (supra). The said notice is in the name of the petitioner and, therefore, cannot be faulted on account of the impugned notice having been issued in the name of a non-existent company.  
+11. The reassessment proceedings in respect of AY 2014-15 are now being continued pursuant to the notice dated 29.07.2022 issued under Section 148 of the Act and not the impugned notice, which is to be construed as a notice under Section 148A(b) of the Act.  
+12. In view of the above, the contention that the proceedings are vitiated on account of the fact that the impugned notice was issued in the name of a non-existent company (Nokia Siemens Networks India Private Limited), is unmerited. 
+13. The petition is, accordingly, dismissed. Pending application is also disposed of. 
+
+VIBHU BAKHRU, ACJ
+
+
+TUSHAR RAO GEDELA, J
+JANUARY 10, 2025
+M
+
+					Click here to check corrigendum, if any 
+
+	
+                                                                                            
+                                                                                                                
+
+
+	
+W.P. (C) 234/2025                                                                                                              Page 2 of 2
+
+

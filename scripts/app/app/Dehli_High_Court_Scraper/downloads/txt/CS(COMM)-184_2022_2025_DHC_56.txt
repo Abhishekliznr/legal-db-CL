@@ -1,0 +1,108 @@
+$~25
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
++ 	CS(COMM) 184/2022 & I.A. 4715/2022, I.A. 9908/2023, I.A. 32022/2024
+    
+	SUN PHARMA LABORATORIES LTD			.....Plaintiff
+Through:	Mr. Sachin Gupta, Advocate (through VC)
+				versus
+
+	INTERIO INTERNATIONAL P LTD  & ORS.	      .....Defendants
+Through:	Mr. Sohaib Alam, Advocate for D-2
+Mob: 9999373017
+     Ms. Mehak Bhatia, Advocate for D-3
+     Mob: 9958472603
+	CORAM:
+	HON'BLE MS. JUSTICE MINI PUSHKARNA
+     O R D E R
+%				10.12.2024
+	MINI PUSHKARNA, J (ORAL)
+
+I.A. 32022/2024 (Application seeking Summary Judgment under Order XIII-A of Commercial Courts Act, 2015 read with Section 151 of CPC and Rule 27 of the Delhi High Court IPD Rules, 2021)
+1. The present application has been filed seeking a summary judgment on behalf of the plaintiff under Order XIII-A of Commercial Courts Act, 2015 read with Section 151 of Code of Civil Procedure, 1908 (�CPC�) and Rule 27 of the Delhi High Court Intellectual Property Division Rules, 2021 (�IPD Rules�).
+2. The present suit has been filed by the plaintiff seeking permanent injunction restraining the defendants from dealing in medicinal and pharmaceutical products under the impugned mark OMRA, which is deceptively similar to the plaintiff�s prior used and well-known trademarks OXRA and/or OXRAMET.
+3. The plaintiff seeks�a summary judgment against the defendants, on�the ground that�the defendants have no prospect of defending the plaintiff�s claims.
+4. Vide order dated 28th March, 2022, this Court had granted an ex parte ad interim injunction against the defendants from using the mark �OMRA�, for pharmaceutical medicinal preparation, which is deceptively similar to the plaintiff�s trademarks �OXRA� and �OXRAMET�.
+5. This Court also appointed three Local Commissioners to visit the defendants� premises, to seize the infringing products and prepare inventories. Upon the execution of the local commissions on 08th April, 2022, the two Local Commissioners seized the infringing products which were found at the premises of the defendants.
+6. The relevant extracts of the Local Commissioner Report dated 19th April, 2022 executed at the manufacturing unit of the defendant no. 3, i.e., 134/2, Mouza Ogli, Village Khari, Sidhoura Road, Kala Amb, Dist.- Sirmour, Himachal Pradesh- 173030, is reproduced as under:
+�xxx xxx xxx
+
+10. That thereafter the undersigned proceeded to inspect the premises for searching goods and packaging materials of the impugned trademark �OMRA� where the undersigned was accompanied by Mr. Rajesh. The undersigned visited the foiling room, packaging room, sample room, etc. and after a detailed inspection of the entire premises, the following packaging materials were recovered from the premises of the Defendant:
+i. A Foil wrap of OMRA-10 weighing 1.69 kg.;
+ii. 150 Boxes of OMRA-5 (5x2xl4 tablets).;
+iii. 600 Boxes of OMRA-5 (2xl4 tablets).;
+iv. 1000 Boxes of OMRA-10 (2xl4 tablets).; and
+v. A single sample sale package of OMRA- 10 Tablets (4 strips).
+The abovementioned packaging materials were immediately seized by the �undersigned. On inquiry from the Defendant, the undersigned was informed that the seized inventory is capable of manufacturing approx. 1000 strips of such tablets. A complete inventory list of the seized goods and material was prepared on spot and the original copy of the said Inventory List is annexed hereto and marked as Annexure-C. Photographs of the said seized goods and material are annexed hereto and marked as Annexure D.
+xxx xxx xxx�
+
+7. The relevant extracts of the Local Commissioner Report dated 21st April, 2022 executed at the manufacturing unit of the defendant no. 4, i.e., Plot No. 79,80, Sector 6A, IIE, Sidcul, Haridwar � 249403, is reproduced as under:
+�xxx xxx xxx
+5. That Mr Singh and Mr Tyagi (Representatives of the Defendant No. 4), led me along with Ms Meena (Learned Counsel for the Plaintiff) and Mr Rathor (Representative of the Plaintiff) into the factory, and I initiated the search at the Store Room. I found one aluminium packaging printed roll bearing "OMRA 5", and one metallic packaging printed roll bearing "OMRA 10", weighing 5.526 kg and 5.190 kg respectively. These were kept aside to be sealed and seized.
+A copy of the pictures taken of the aforesaid seized materials are annexed herewith as Annexure B.
+xxx xxx xxx
+7. That the documents mentioned below were searched for on their database, and then printed out in my presence. Learned Counsel for the Plaintiff and the Representative for the Plaintiff Company were also present. Mr Singh and Mr Tyagi provided me with copies of the following documents, of a period between 01-04-2020 and 31-03-2021:
+a) Stock Register, showing the amount of printed foil packaging material for "OMRA 10" received, issued, and remaining. 
+The original print out of the stock register, duly attested by the representative of the Defendant No. 4, is annexed herewith as Annexure C.
+b) Stock Register, showing the amount of printed foil packaging material for "OMRA 5", received, issued, and remaining. 
+The original print out of the stock register, duly attested by the representative of the Defendant No. 4, is annexed herewith as Annexure D.
+c) Stock Register, showing the number of boxes of "OMRA 10", produced and sold, and the invoice thereof.
+The original print out of the stock register, duly attested by the representative of the Defendant No. 4, is annexed herewith as Annexure E.
+d) Stock Register, showing the number of boxes of "OMRA 5", produced and sold, and the invoice thereof. 
+The original print out of the stock register, duly attested by the representative of the Defendant No. 4, is annexed herewith as Annexure F.
+e) Closing Stock Register, showing that no already produced boxes of either "OMRA 10" or "OMRA 5" are presently available in the custody of Defendant No. 4, in their stocks or inventories.
+The original print out of the stock register, duly attested by the representative of the Defendant No. 4, is annexed herewith as Annexure G.
+f) Stock Register, showing the number of boxing material for "OMRA 10", received, issued, and remaining.
+The original print out of the stock register, duly attested by the representative of the Defendant No. 4, is annexed herewith as Annexure H.
+g) Stock Register, showing the number of boxing material for "OMRA 5", received, issued, and remaining.
+The original print out of the stock register, duly attested by the representative of the Defendant No. 4, is annexed herewith as Annexure I.
+8. That I enquired from Mr Tyagi and Mr Singh as to how many more boxes of the infringing products could be produced from the material seized by me. They informed me that out of the printed foil packaging material for "OMRA 10", a total of 10,000 strips could be produced. They further informed me that out of the printed foil packaging material for "OMRA 5", a total of 10,000 strips could be produced.
+9. That Mr Singh and Mr Tyagi informed me that the number of empty printed cartons for "OMRA 10" was 200, and for "OMRA 5" was 202, and these were duly produced, and seized by me.
+A copy of the picture of the seized boxes are annexed herewith as Annexure J.
+xxx xxx xxx�
+8. Learned counsel for the plaintiff draws the attention of this Court to the comparison table of the competing products containing the same salt namely, Dapagliflozin, which is used to treat the same ailment, i.e., diabetes and is sold in the same form, i.e., tablets. The comparison table is reproduced is as under:
+
+9. By referring to the aforesaid, learned counsel for the plaintiff submits that the impugned activities of the defendants are unlawful and amount to passing off and unfair competition, which is causing confusion and deception amongst the public and loss to the plaintiff.
+10. Further, vide order dated 22nd July, 2022, this Court directed the Drugs Control Department, GNCTD, to file a Status Report with respect to the relationship between the defendant nos. 1 and 2. As the per Status Report dated 06th January, 2023, defendant no.2 is a licensed entity, whereas, the defendant no.1 is not a registered entity with the Drugs Control Department, GNCTD, and there is no license issued in favour of defendant no. 1 by the said Department. The relevant extract of the said Status Report filed by GNCTD, is reproduced as under:
+�xxx xxx xxx
+5. That it is submitted that a license bearing no. DL-LXN-124040 dated 03.01.2019, in the Form 20B under Rule 61(1) of Drugs and Cosmetics Rules, 1945 and another license bearing no. DL-LXN-124041 dated 03.01.2019, in the Form 21 B under Rule 61(2) of the Drugs and Cosmetics Rules, 1945 stand issued in favour of the Defendant No.2 viz. M/s MedNich Pharmaceuticals, which is a sole proprietorship concern of Mr. Tanzeem Naqvi, based out of the premises located at G-82 & 81-A, Old No. G-23-A & G-23, 3rd Floor, Pvt. Office No. 308, Laxmi Nagar, Delhi- 110092.
+
+Copies of the two licenses bearing no. DL-LXN-124040 and no. DL-LXN-124041 dated 03.01.2019 are annexed herewith as Annexure 1 and Annexure 2 respectively. 
+6. That it is submitted that the Defendant No. 1 viz. Interio International Pvt. Ltd. is not registered with the Drugs Control Department, GNCTD and there is no license issued in the favour of the said company by the said Department. 
+7. That it is, however, pertinent to mention that another company viz. Abeest International Pvt. Ltd. has its registered office located at the premises situated at Property No. G-82 & 81-A, G- Block, 3rd Floor, Pvt. Office no. 304, Laxmi Nagar, Delhi- 110092. A license bearing no. DL-LXN-152951 dated 08.04.2022, in the Form 20B under Rule 61(1) of the Drugs and Cosmetics Rules, 1945 and another license bearing no. DL-LXN-152952 dated 08.04.2022, in the Form 21B under Rule 61(2) of the Drugs and Cosmetics Rules, 1945 stand issued in favour of Abeest International Pvt. Ltd. As per the said licenses, Mr. Ajmal Navi and Mr. Tanzeem Nagvi are the directors of the said company.
+Copies of the licenses bearing no. DL-LXN-152951 and DL-LXN-152952 dated 08.04.2022 are annexed herewith as Annexure 3 and Annexure 4 respectively.
+xxx xxx xxx�
+
+11. It is to be noted that defendant nos. 3 and 4 are the manufacturers of the impugned products, who were manufacturing at the behest of defendant nos. 1 and 2. Further, defendant nos. 1 and 2 were marketing the said goods under the impugned mark �OMRA�.
+12. It is further noted that defendant no. 2 had been operating under a drug license and was marketing the said products under the said license. However, it has come to the fore that defendant no.1 did not have any drug license to market the drugs.
+13. Learned counsel appearing for the plaintiff submits that defendant nos. 2 and 3 are disassociating themselves from defendant no.1 because defendant no.1 does not have any license to market any medicines, let alone manufacturing. The malpractice of the defendants is further concreted by the revelation made in the aforesaid Status Report.
+14. Learned counsel appearing for defendant no.3 through Video Conferencing (�VC�), submits that defendant no.3 is a third-party manufacturer and admits before this Court that it had been manufacturing the pharmaceutical preparations on instruction from defendant nos. 1 and 2. Further, she submits that, after defendant no.3 was intimated of the present litigation proceedings, it stopped manufacturing the infringing medicines.
+15. This Court notes that vide order dated 10th August, 2023, directions were issued to the State Drugs Controller, Himachal Pradesh, to initiate proceedings against the defendants. Further, vide order dated 07th December, 2023, counsel appearing for State Drugs Controller, Himachal Pradesh, submitted that inquiries are under way against the defendants.
+16. Thus, the plaintiff submits that in view of the ex-parte order dated 28th March, 2022 passed by this Court, and the discovery of the malpractice on part of the defendants which is currently being investigated by the State Drugs Controller, Himachal Pradesh, there are no more contentious issues and the suit ought to be decreed summarily.
+17. This Court notes that when the matter was listed for hearing on 10th December, 2024, learned counsels appearing for the defendant nos. 2 and 3 submitted, that the defendants are ready to suffer the decree of injunction. 
+18. No written statement has been filed by defendant nos. 1 and 4. 
+19. Further, none appears for defendant nos. 1 and 4.
+20. Accordingly, considering the aforesaid discussion and the statement of the defendants, expressing their readiness to suffer the decree of injunction, the plaintiff is entitled to decree of permanent injunction in its favour, and against the defendants.
+21. On the issue of Cost, this Court notes that the defendants� adoption of the infringing mark cannot be considered to be bonafide or honest. The defendants knowingly infringed the plaintiff�s trademarks and cannot plead ignorance of prior existence, as well as the reputation of the plaintiff�s registered trademark. Further, taking into account the impugned goods confiscated by the learned Local Commissioners and the Status Report dated 06th January, 2023, this Court holds that the plaintiff is entitled to Costs in its favour.
+22. Accordingly, the following directions are issued:
+i. Decree of permanent injunction is passed in favour of the plaintiff and against the defendants in terms of Paragraph-27(a) of the plaint.
+ii. The Costs are payable to the plaintiff, in the following manner:
+     Defendant no.1		-		? 2,00,000/-
+     Defendant no.2		-		? 1,50,000/-
+     Defendant no.3		-		? 50,000/-
+     Defendant no.4		-		? 50,000/-
+iii. The aforesaid amounts shall be paid by the defendants to the plaintiff within a period of three months.
+23. Decree sheet be drawn up.
+24. The present suit, along with pending applications, stands disposed of.
+
+
+
+MINI PUSHKARNA, J
+DECEMBER 10, 2024
+
+Corrected & Released on: 08th January, 2025
+au
+                                              	            
+
+CS(COMM) 184/2022                                                 Page 1 of 9
+
+

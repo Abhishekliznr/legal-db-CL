@@ -1,0 +1,66 @@
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%							Date of Decision: 30.01.2025
++ 	O.M.P.(I) (COMM.) 25/2025, IAs 1605-1606/2025
+	RACHANA INFRASTRUCTURE LIMITED	.....Petitioner
+Through:	Dr. Amit George, Mr. Malak Bhatt, Mr. Rushabh Shah, Ms. Neeha Nagpal, Ms. Nitya Prabhakar and Ms. Kaiona Chhatrapati, Advocates. 
+		
+				versus
+
+	NATIONAL HIGHWAYS AUTHORITY 
+     OF INDIA & ANR					.....Respondents
+Through:	Mr. Shivam Goel, Mr. Anil Kumar Goyal and Ms. Ramya S. Goel, Advocates for respondent no.2.
+Mr. Rajiv Dalal, Mr. Vikas Bhardwaj, Ms. Aditya and Mr. Saksham, Advocates for respondent no.2. 
+     
+     CORAM:
+	HON'BLE MR. JUSTICE MANOJ KUMAR OHRI
+
+JUDGMENT (ORAL)
+
+1.	By way of present petition filed under Section 9 of the Arbitration and Conciliation Act, 1996 (hereafter referred, the �A&C Act�), the petitioner seeks the following reliefs: -
+�a) Pass an order directing the Respondent No. 1 to refrain from making direct payments to Respondent No.2 and deposit all future payments made under the Engineering, Procurement, and Construction Contract dated 02.09.2022 into a fresh Joint Escrow Account, jointly operated by the Petitioner and Respondent No.2, in accordance with the terms of the APPENDIX-V, Joint Bidding Agreement dated 23.11.2021; and/or
+
+b) Pass an order directing Respondent No. 1 to provide a detailed rendition of all payments made directly to Respondent No. 2 under the Engineering, Procurement, and Construction Contract dated 02.09.2022 to date, along with a clear and comprehensive account of the corresponding work executed by the parties, as per the terms of the APPENDIX-V, Joint Bidding Agreement dated 23.11.2021; and/or
+
+c) Pass an order directing Respondent No. 1 and 2 to keep the Petitioner duly informed about all communications related to the work of the Joint Venture, including but not limited to notices, correspondence, and instructions addressed to the JV, and to provide the Petitioner with timely and complete updates regarding any work-related decisions or developments;�
+
+2.	Facts, in nutshell, are that a Joint Venture Agreement was entered into between petitioner and respondent no.2, the latter being the lead member in the Joint Venture entity namely, Wagad-Rachna (JV) (hereafter, �the JV entity�). The JV entity was declared successful bidder for an EPC contract, the bids for which were invited by respondent No.1 through NIT bearing Bid/ Package No. NHAI/Guj/Patan- Gojaria/2021 for �Construction of Four Lane Divided Carriageway with Paved Shoulder from Patan (Near Rajpur) at Km 52+000 (design) at Gojariya at Km 128+940 (design), a length of 76.940 Km (package -II) of NH-68 in the State of Gujarat under NH(0) on EPC mode�. The petitioner and respondent no.2 also entered into a Joint Bidding Agreement on 23.11.2021. Vide Letter of Acceptance dated 28.03.2022, the EPC contract was awarded to the JV entity for an amount of Rs.7,41,00,00,000/-. While respondent No.2 has 95% share of the works, the petitioner�s allocation in construction is 5%. 
+3.	Petitioner is aggrieved with the alleged high handedness of the lead member i.e, respondent No.2 in not only withholding communications received by it but also the remittances received from the respondent No 1 pertaining to the EPC Agreement. It claims that since under the terms of agreements/contract, both members in the JV entity, are jointly and severally liable and respondent No.1 is obligated to share all communications with it. Further, the respondent No.2 instead of opening a joint Escrow account has furnished its own account details in which all the remittances are being made by the respondent No.1. The said account has been opened by misusing a power of attorney dated 23.11.2021 whereby respondent No.2 was appointed as the Lead Member of the Joint Venture entity. The power of attorney was executed solely for the purpose of submitting the tender and thereafter its validity expired. Petitioner further claims that its grievances addressed to both respondents having remained ineffective, the urgent measures as prayed are necessitated. Lastly, it is urged that as the works are defined, to ensure transparency and for successful completion of the project, the directions prayed for be granted. 
+4.	Maintainability of the petition is challenged by both the respondents by contending that underlying contract containing the arbitration clause, is executed between the JV entity and respondent No.1, and as such, it�s only the JV entity which if aggrieved, can resort to arbitration. The alleged disputes are inter se between the two JV partners and not between the JV and the Respondent No 1 under the EPC Agreement. It is argued that the arbitration agreement in the EPC Agreement is not available to the JV partners to resolve the disputes inter-se between them, even though the disputes might pertain to EPC Agreement. 
+5.	The maintainability has been challenged on the premise that the disputes raised by the petitioner, are not between the JV Consortium on the one hand and the respondent No 1, even though they might pertain to the EPC Contract. In fact, the disputes do pertain to the EPC Contract and the petitioner has brought into question even the respondent No 1�s own conduct in working the EPC Agreement, that has undermined the rights of the petitioner as a member of the JV under the EPC Agreement.
+6.	In order to test the petitioner�s assertion, it will be useful to refer to the relevant contract provisions, to see, if the inter-se disputes between the JV partners are amenable to arbitration clause in the EPC Agreement. It will also have to be seen if the respondent No 1 is guilty of breaching the EPC Agreement, by dealing with the respondent No 2, as the authorised member of the JV, in relation to the matters pertaining to the EPC Agreement, which will certainly bring the arbitration clause in the EPC Agreement in play.
+7.    In EPC Agreement, there is a concept of Lead Member, which puts one of the two JV members in a leading position for the purposes of co-ordination with the employer respondent No 1.  Clause 1.1(ii) of the EPC Contract defines the term  �Lead Member� as: �in the case of a joint venture, mean the member of such joint venture who shall have the authority to bind the contractor and each member of the Joint venture; and shall be deemed to be the Contractor for the purposes of this Agreement; the Lead Member shall itself undertake and perform at least 51% of the total length of the Project Highway�. 
+8.	Further on, Clause 1.5 (ii) lays down the protocol for communication between the JV and the employer in the matters pertaining to the EPC Agreement. Clause 1.5 (ii) reads as under:
+ �Without prejudice to the joint and several liability of all the members of the Joint Venture, the Lead Member shall represent all the members of the Joint Venture and shall always be liable and responsible for discharging the functions and obligations of the Contractor. The Contractor shall ensure that each member of the Joint Venture shall be bound by any decision, communication, notice, action or inaction of the Lead Member on any matter related to this Agreement and the Authority shall be entitled to rely upon any such action, decision or communication of the Lead Member. The Authority shall have the right to release payments solely to the Lead Member and shall not in any manner be responsible or be held liable for the inter se allocation of payments among members of the Joint venture.�
+9.	In Article 4 of the EPC Contract obligations for the Contractor regarding opening of the bank account and payments are laid down. Following is the read out of Clause 4.1(ix): �The Contractor shall obtain and maintain a project related bank account operational at site where all transactions related to the payment of work will be done. The Contractor shall submit a monthly account statement and a detailed report on utilization of funds transferred to this project related bank account to Authority�s Engineer. Notwithstanding anything contrary to this agreement, the authority, in the interest and to ensure timely completion of the work, 2reserves the right to audit such bank accounts to ensure that there is no diversion of funds from this project specific account to any other project being implemented by the Contractor.�
+10.	Further, Clause 27.13 of the EPC Contract mentions the addresses at which all notices/communicates are to be addressed to the JV entity. Notices are sent to �414, Time Square Arcade, Nr. Bughban Party Plot, Thaltej-Shilaj Road, Ahmedabad- 380059�, which is a common address for the JV instead of separate notices being sent individually to the two JV constituents.  
+11.	JV Consortiums, which are very common in construction contracts, are treated as distinct legal entities, even though they are not registered as separate entities of the likes of an incorporated companies under the Companies Act, or a partnership under a Partnership Act. Courts have recognised them as a distinct entity for the purposes of suing or being sued in relation to the contracts awarded to them. The constituents of the JV are not individually recognised for the said purpose and they have to necessary jointly sue under the name of the JV.
+12.	A co-ordinate bench of this Court in MCD v. M/s.Asian Techs Progressive Constructions Joint Ventures and Ors., reported as 2017 SCC OnLine Del 6455 and in Consulting Engineers Group Limited v. NHAI, reported as 2022 SCC OnLine Del 3253, while relying on the decision of Supreme Court in Gammon India Ltd v. Commissioner of Customs Mumbai reported as (2011) 12 SCC 499  has held that JV constituents cannot sue individually in their own names.    
+13.	In view of the above, there isn�t much merit in the  grievances of raised by the  petitioner against the respondents, which could be resolved by way of arbitration under the EPC Agreement. 
+14.	Merely going by the allegations, it doesn�t appear that the respondent No 1, acted in breach of EPC Agreement, by dealing with or releasing payments to the  respondent No 1 as the Lead Member of the JV Consortium. 
+15.	Petitioner�s grievance, if any, appears to be against the respondent No 2, whose conduct is alleged to be prejudicial to the petitioner�s interest as a JV partner of  the respondent No 2. However, disputes with the respondent No 2 cannot be given a color of disputes that are amenable to dispute resolution clause 26 in the EPC Agreement.
+16.	Finding merit in the preliminary objections taken on behalf of the respondents and keeping in mind the established principles laid down in the relied upon case-law, I find no ground to entertain the present petition.
+17.	However, it may be clarified, this order may not treated as an expression on the merits of the disputes raised by the petitioner in the petition. Petitioner is free to take recourse to any legal remedy available to it against the respondent No 2, in accordance with law.
+18.	The same is accordingly dismissed and pending applications are also disposed of.
+
+
+MANOJ KUMAR OHRI
+								(JUDGE)
+JANUARY 30, 2025/js
+
+
+
+
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+
+
+
+O.M.P.(I) (COMM.) 25/2025                                                              Page 7 of 7
+
+

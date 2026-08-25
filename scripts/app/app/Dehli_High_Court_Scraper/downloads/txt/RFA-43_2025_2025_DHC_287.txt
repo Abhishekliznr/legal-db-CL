@@ -1,0 +1,62 @@
+$~67
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%					                    Date of Decision: 20.01.2025
++ 	RFA 43/2025, CM APPL. 3107/2025, 3106/2025 & 3105/2025 
+	SH. RAJENDRA KUMAR				.....Appellant
+Through:	Mr. Sanjay Mani Tripathi and Mr. Rajnish Kumar, Advocates.
+
+				versus
+
+	MAMTA TANWAR					.....Respondent
+				Through:	None.
+
+	CORAM:          JUSTICE GIRISH KATHPALIA
+				
+J U D G M E N T    (ORAL)
+1.	The appellant has assailed judgment and decree dated 04.06.2024 of the learned District Judge, New Delhi District, Patiala House Courts, whereby leave to defend the suit under Order XXXVII CPC was denied to the appellant and the money recovery suit filed by the respondent was decreed. The appellant has filed entire relevant record of the Trial Court. Having heard the learned counsel for appellant and having examined the records, I do not find any ground to issue notice of the appeal. 
+
+2.	Briefly stated, circumstances leading to the present appeal are as follows. 
+
+2.1 	The present respondent filed suit under Order XXXVII CPC against the appellant for recovery of cheque amount of Rs.6,50,000/-, pleading that she had purchased an immovable property from the appellant for a total sum of Rs.18,40,000/-; that at the time of execution of the sale deed, the appellant requested her for financial help, so she gave cash Rs.6,50,000/- to the appellant towards friendly loan and in return, the appellant issued a post dated cheque dated 27.12.2021 for a sum of Rs.6,50,000/-, but on being presented, the cheque got dishonoured due to insufficiency of funds in the account of the appellant; and that the appellant having not paid the amount despite demand notice, the respondent was entitled to decree. 
+
+2.2 	The appellant entered appearance under Order XXXVII CPC and filed application for leave to defend, pleading that the immovable property in question was sold by him to the respondent for a sum of Rs.27,40,000/-, but after part payment of Rs.6,50,000/-, the respondent changed her mind and asked for refund, so he issued the cheque in question towards security for refund of the said amount; that after some time due to increase in property rates, the respondent again changed her mind and requested the appellant to execute and get registered sale deed in her favour, which was done; and that the respondent retained the said cheque with herself and kept avoiding to return the same, therefore the appellant is entitled to leave to defend the suit. 
+
+2.3 	In reply to the application for leave to defend, the respondent denied the pleadings of the appellant and reiterated her plaint contents. 
+
+2.4 	After hearing both sides, the learned Trial Court dismissed the application for leave to defend, holding the defence set up by the appellant as frivolous and moonshine. 
+
+2.5 	Hence the present appeal.
+
+3.	The legal position as regards scope of grant or denial of leave to defend a suit under Order XXXVII CPC is now well settled. In plethora of judicial pronouncements, the Supreme Court laid down the principles on which an application for leave to defend has to be examined by the trial court. In one such case titled: IDBI Trusteeship Services Limited vs. Hubtown Limited, (2017) 1 SCC 568, the Hon�ble Supreme Court held thus:
+�16. It is thus clear that Order 37 has suffered a change in 1976, and that change has made a difference in the law laid down. First and foremost, it is important to remember that Milkhiram case [Milkhiram (India) (P) Ltd. v. Chamanlal Bros., AIR 1965 SC 1698 : (1966) 68 Bom LR 36] is a direct authority on the amended Order 37 provision, as the amended provision in Order 37 Rule 3 is the same as the Bombay amendment which this Court was considering in the aforesaid judgment. We must hasten to add that the two provisos to sub-rule (3) were not, however, there in the Bombay amendment. These are new, and the effect to be given to them is something that we will have to decide. The position in law now is that the trial Judge is vested with a discretion which has to result in justice being done on the facts of each case. But Justice, like Equality, another cardinal constitutional value, on the one hand, and arbitrariness on the other, are sworn enemies. The discretion that a Judge exercises under Order 37 to refuse leave to defend or to grant conditional or unconditional leave to defend is a discretion akin to Joseph's multi-coloured coat � a large number of baffling alternatives present themselves. The life of the law not being logic but the experience of the trial Judge, is what comes to the rescue in these cases; but at the same time informed by guidelines or principles that we propose to lay down to obviate exercise of judicial discretion in an arbitrary manner. At one end of the spectrum is unconditional leave to defend, granted in all cases which present a substantial defence. At the other end of the spectrum are frivolous or vexatious defences, leading to refusal of leave to defend. In between these two extremes are various kinds of defences raised which yield conditional leave to defend in most cases. It is these defences that have to be guided by broad principles which are ultimately applied by the trial Judge so that justice is done on the facts of each given case.
+
+17.�Accordingly, the principles stated in para 8 of�Mechelec case�[Mechelec Engineers & Manufacturers�v.�Basic Equipment Corpn., (1976) 4 SCC 687] will now stand superseded, given the amendment of Order 37 Rule 3 and the binding decision of four Judges in�Milkhiram case�[Milkhiram (India) (P) Ltd.�v.�Chamanlal Bros., AIR 1965 SC 1698 : (1966) 68 Bom LR 36] , as follows:
+17.1.�If the defendant satisfies the court that he has a substantial defence, that is, a defence that is likely to succeed, the plaintiff is not entitled to leave to sign judgment, and the defendant is entitled to unconditional leave to defend the suit.
+17.2.�If the defendant raises triable issues indicating that he has a fair or reasonable defence, although not a positively good defence, the plaintiff is not entitled to sign judgment, and the defendant is�ordinarily�entitled to unconditional leave to defend.
+17.3.�Even if the defendant raises triable issues, if a doubt is left with the trial Judge about the defendant's good faith, or the genuineness of the triable issues, the trial Judge may impose conditions both as to time or mode of trial, as well as payment into court or furnishing security. Care must be taken to see that the object of the provisions to assist expeditious disposal of commercial causes is not defeated. Care must also be taken to see that such triable issues are not shut out by unduly severe orders as to deposit or security.
+17.4.�If the defendant raises a defence which is plausible but improbable, the trial Judge may impose conditions as to time or mode of trial, as well as payment into court, or furnishing security. As such a defence does not raise triable issues, conditions as to deposit or security or both can extend to the entire principal sum together with such interest as the court feels the justice of the case requires.
+17.5.�If the defendant has no substantial defence and/or raises no genuine triable issues, and the court finds such defence to be frivolous or vexatious, then leave to defend the suit shall be refused, and the plaintiff is entitled to judgment forthwith.
+17.6.�If any part of the amount claimed by the plaintiff is admitted by the defendant to be due from him, leave to defend the suit, (even if triable issues or a substantial defence is raised), shall not be granted unless the amount so admitted to be due is deposited by the defendant in court.�
+
+4.	In the present case, the appellant has clearly admitted having signed the subject cheque. The only plea set up by the appellant is that the said cheque was drawn towards security for repayment of part consideration of Rs. 6,50,000/- taken by him in cash towards purchase of the immovable property. The sale deed between the parties was executed and got registered on 06.12.2018. It remains unexplained as to why the appellant did not take back his cheque once the sale transaction concluded. 
+
+
+
+5. 	The explanation rendered by learned counsel for appellant for the appellant not having taken back his cheque is that parties were on friendly terms. But if parties were on friendly terms, it does not sound believable that for refund of part payment, the appellant would have to issue a security cheque, assuming that the subject cheque, as claimed by the appellant was only as a security.  As mentioned above, the total worth of the transaction between the parties was for more than Rs. 27,00,000/- and the alleged part payment was of Rs. 6,50,000/- only. 
+
+6. 	Further, it is not a case where the presentation and bouncing of the subject cheque occurred in single transaction or immediately after execution of sale deed. As mentioned above, the sale deed was executed and got registered on 06.12.2018 while the subject cheque got dishonoured on 27.01.2022.  It remains unexplained as to why the appellant remained silent across the said period of more than three years and did not demand back the subject cheque by way of any written communication. 
+
+7.	Learned counsel for appellant also argues that qua the subject cheque, the respondent has initiated proceedings under Section 138 Negotiable Instruments Act and has also filed the suit from which this appeal arises, which cannot be permissible since the respondent has to choose either of the remedy. The argument has been recorded only to be rejected in view of settled legal position that the two being separate remedies � one under civil law while the other under criminal law, can be exercised concurrently. 
+
+8.	I find no infirmity in the impugned judgment and decree, so the same are upheld and the appeal as well as the accompanying applications are dismissed.  
+ 	
+
+GIRISH KATHPALIA, J.
+JANUARY 20, 2025/V
+
+
+
+
+RFA 43/2025                                                                                                                 Page 7 of 7 pages
+
+

@@ -1,0 +1,88 @@
+$~ 4, 80 & 81
+*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
+%					                    Date of Decision: 07.01.2025
+4
++ 	W.P.(C) 18002/2024, CM APPL. 76581/2024 , CM APPL. 76582/2024 & CM APPL. 76580/2024 
+
+	PUBLIC WORKS DEPARTMENT 			     .....Petitioner
+				Through: 	Ms. Avni Singh, Advocate
+
+				versus
+
+	SMT MALTI DEVI					   .....Respondent
+				Through:	None
+
+80
++ 	W.P.(C) 32/2025, CM APPL. 79/2025 & 78/2025 (stay)
+
+	PUBLIC WORKS DEPARTMENT 			.....Petitioner
+				Through: 	Ms. Avni Singh, Advocate 
+
+				versus
+
+	SH SUKHBIR SINGH 					.....Respondent
+				Through: 	None
+81
++ 	W.P.(C) 42/2025, CM APPL. 107/2025, CM APPL. 108/2025 & CM APPL. 106/2025 
+
+	PUBLIC WORKS DEPARTMENT 			.....Petitioner
+				Through:	Ms. Avni Singh, Advocate
+
+				versus
+
+	SMT RAMWATI 						.....Respondent
+				Through:	None.
+
+
+	CORAM:          JUSTICE GIRISH KATHPALIA
+				
+C O M M O N   J U D G M E N T    (ORAL)
+1. 	The legal and factual matrix in the captioned petitions being the same, the petitions are taken up together for disposal. By way of these petitions, brought under Article 226 of the Constitution of India, orders dated 29.07.2024 passed by the Appellate Authority under Section 7(7) of the Payment of Gratuity Act have been assailed. By way of the impugned orders dated 29.07.2024, the appeals filed by the petitioner under Section 7(7) of the Act were dismissed on two grounds viz. bar of limitation and failure to deposit the awarded amount.  Having heard learned counsel for petitioner at length, I am unable to find it a fit case to even issue notice. 
+
+2. 	Briefly stated, the circumstances leading to these petitions are as follows.  Vide orders dated 06.03.2023, the Controlling Authority under the Payment of Gratuity Act allowed the claim applications filed by the present respondents.  The petitioner filed appeals dated 14.05.2024, received in the appellate authority on 04.07.2024.  The appeals being clearly time barred, the learned Appellate Authority examined the issue of limitation in detail. The only explanation for delay in filing those appeals was the time spent in obtaining legal opinion.  After traversing through various judicial precedents dealing with the scope of proviso to Section 7(7) of the Act, the learned Appellate Authority held these not to be fit cases to condone the delay, as the authority has no power to condone the delay beyond 120 days in filing the appeal under Section 7(7) of the Act.  Besides, the Appellate Authority also found it fit to dismiss the appeals because, the present petitioner had not deposited the amounts awarded by the Controlling Authority in terms of Section 7(4) of the Act. Hence, the present petitions.
+
+3. 	Learned counsel for petitioner contends that the impugned orders are not sustainable in the eyes of law as these are fit cases to condone the delay in filing the appeals.  Learned counsel for petitioner also argues that these are the cases of faulty computation of the awarded amounts and if the appeals are not heard on merits, it would have wide ramifications.  Further, learned counsel for petitioner contends that the delay beyond 120 days also can be condoned by atleast this Court, if not by the Appellate Authority. In this regard, learned counsel for petitioner places reliance on the judgment of a co-ordinate bench of this Court in the case titled Union of India vs Ramesh Chand, 2021:DHC:1978 and order dated 25.03.2022 of a co-ordinate bench of this Court in the case titled Public Works Department vs Nanji Lal & Anr, WP(C) 4912/2022.  
+
+4.	For convenience, the provision under Section 7(7) of the Act is extracted below:
+�(7) Any person aggrieved by an order under sub-section (4) may, within sixty days from the date of the receipt of the order, prefer an appeal to the appropriate Government or such other authority as may be specified by the appropriate Government in this behalf: 
+Provided that the appropriate Government or the appellate authority, as the case may be, may, if it is satisfied that the appellant was prevented by sufficient cause from preferring the appeal within the said period of sixty days, extend the said period by a further period of sixty days. 
+Provided further that no appeal by an employer shall be admitted unless at the time of preferring the appeal, the appellant either produces a certificate of the controlling authority to the effect that the appellant has deposited with him an amount equal to the amount of gratuity required to be deposited under subsection (4), or deposits with the appellate authority such amount.� 
+
+Clearly, the legislature in its wisdom decided to impose two pre conditions in order to grant admission of the appeals under Section 7(7) of the Act, stipulating that the appellant by the time of institution of the appeal had deposited the impugned amount of gratuity with the Controlling Authority or with the Appellate Authority; and that the appeal was filed within a period of 60 days from the date of receipt of the impugned order of the Controlling Authority, which period can be extended by a further period of 60 days provided the appellant is able to satisfy the Appellate Authority as regards the sufficiency of cause of delay. Both conditions are necessary. 
+
+5.	So far as the limitation period prescribed for filing an appeal under Section 7(7) of the Act is concerned, it is clear that such appeal must be filed within 60 days of receipt by the appellant of the order passed by the Controlling Authority. In case the filing of the appeal gets delayed, the appellant has to establish to the satisfaction of the Appellate Authority sufficient cause explaining the delay. Thereafter, if the Appellate Authority is satisfied about sufficiency of cause, it can extend the limitation period by a further period of 60 days.
+
+6.	It would be significant to note that unlike Section 5, Limitation Act, the proviso to Section 7(7) of the Act does not stipulate �condonation� of delay. The proviso to Section 7(7) of the Act stipulates �extension� of the limitation period. That being so, the scope of the expression �condonation� under proviso to Section 7(7) of the Act cannot be as liberal as in the cases under Section 5 of the Limitation Act. Therefore, in my considered view, the period of limitation to file appeal under Section 7(7) of the Act cannot be extended under any circumstance beyond a period of 120 days after receipt by the appellant of copy of the order passed by the Controlling Authority. In other words, the Appellate Authority has no power to extend or even condone the delay in filing the appeal after 120 days of receipt by the appellant of a copy of the order passed by the Controlling Authority. 
+
+7.	While dealing with the issue of limitation, the court also must keep in mind the issue involved in the dispute. The issue in the present proceedings relates to grant of gratuity under a benevolent legislation. The gratuity in terms with Section 4 of the Act is payable on superannuation or retirement or resignation or death or disablement of the employee who has rendered continuous service of not less than five years. An employee or his legal representative awaiting grant of this monetary benefit, which is not a matter of charity but right of the employee, cannot be left to await endlessly because the employer did not act diligently. For this reason also, I am of the view that the outer limit of 120 days from receipt of order passed by the Controlling Authority must be strictly adhered to while dealing with the issue of limitation.
+
+8.	The learned Appellate Authority has referred to a number of judicial precedents of different High Courts, taking view similar to the above view that the Appellate Authority under the Act is not empowered to entertain an appeal filed under Section 7(7) of the Act beyond a period of 120 days after receipt of the order passed by the Controlling Authority.
+
+9. 	So far as the order passed by the co-ordinate bench in Nanji Lal (supra), relied upon by learned counsel for petitioner is concerned, the same is completely distinguishable insofar as the said order was a consent order, which is not the present situation. Further, in the said case, the appeal had not even been filed and the petitioner had opted to approach this Court directly under Article 226 of the Constitution of India, whereas the present writ action specifically assails a detailed and well reasoned order passed by the Appellate Authority, strength whereof has to be tested. The said order passed in Nanji Lal (supra) does not examine the issue of extendibility of limitation period under proviso to Section 7(7) of the Act. 
+
+10. 	In the case of Ramesh Chand (supra), relied upon by learned counsel for petitioner, the issue involved a challenge to the applicability of the Payment of the Gratuity Act on the Central Government employees.  It is in that context that the co-ordinate bench took a view in para 11 of the judgment that the Appellate Authority ought to have first considered the issue of applicability of the Act prior to dismissing the appeal on limitation, because if the Act itself was not applicable, Section 7(7) thereof would not come into play. In contrast, in the present case there is no such jurisdictional challenge. Therefore, the view taken in Ramesh Chand (supra) would not help the petitioner.
+
+11.	Going a step deeper, I also examined the reason advanced by the petitioner before the Appellate Authority to explain the delay. As mentioned above, the orders dated 06.03.2023 of the Controlling Authority were assailed by the petitioner through appeals filed on 04.07.2024. In the applications seeking condonation of delay in filing the appeals, the only submissions pleaded are that after 06.03.2023, time was taken by the appellant to obtain legal opinion and the appellant had instructed its counsel to file the appeals and time was consumed for preparing and filing the appeals. The explanations, to say the least are completely vague. 
+
+12.	The Court cannot ignore the highly disparate strength of the rival litigants in the present cases in the sense that on the one hand is the State while on the other hand is an individual employee awaiting his gratuity. The State cannot be expected to seek condonation of delay on such vague and flimsy grounds. In the case of Principal Commissioner of Income Tax vs. M/s. National Fertilizers Limited, 2023:DHC:6017-DB, the Division Bench of this Court in which I was one of the members, after traversing through various judicial precedents including the case of State of Madhya Pradesh & Ors. vs. Bherulal, (2020) 10 SCC 654, such laxity on the part of government departments in filing the appeals belatedly was castigated thus:
+�12. Despite anguish expressed by courts at all levels through various judicial pronouncements, no change in work attitude of officials of some of the government departments has taken place. Largely, behind such delays on the part of government agencies in initiating appropriate legal proceedings lies extreme laxity, negligence and dereliction of duties on the part of government officials. Even in this hi-tech �click of mouse� age some of the government officials are yet to come out of their love for �snail pace� style of working. Worst is when such delays are aimed at simply completing formalities so that the government appeals get dismissed on the grounds of limitation, to the designed benefit of the other party. Whatever be the reason, it is either the loss to the exchequer or abrogation of the valuable rights of the assessee litigating against the State. Such negligent or deliberate dormancy on the part of government officials cannot be countenanced. It is high time such government officials are taken to task and penalized to recompense the exchequer, though such exercise can be undertaken in some other appropriate lis. Time has come to take drastic measures qua lethargy caused litigation delays, lest the chaos in judicial functioning percolated further. Time has come when due diligence has to replace negligence which pervades some of the government agencies as in the present case, so that justice does not hang at the altar of dereliction, default, negligence and indifference.�
+
+13.	So far as the second prong of dismissal of appeals is concerned, there is no dispute that the petitioner has till date not deposited the amounts awarded by the Controlling Authority under Section 7(4) of the Act, which also is one of the condition precedent for admission of an appeal. In that regard also, the view taken by the Appellate Authority on the basis of judicial precedents cited in the impugned orders cannot be found fault with.
+
+14. 	In view of the above discussions, I am unable to find any infirmity in the impugned orders, so the same are upheld.
+
+15.	The petitions and the accompanying applications are dismissed, directing the petitioner to ensure compliance with the orders passed by the Controlling Authority within two weeks from today.
+
+
+
+
+GIRISH KATHPALIA
+       (JUDGE)
+JANUARY 07, 2025/as/ry
+
+
+
+
+W.P.(C) 18002/2024   & connected matters                                                                          Page 1 of 9 pages
+
+
