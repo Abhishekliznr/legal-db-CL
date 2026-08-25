@@ -28,8 +28,8 @@ COPY . .
 # Expose port 3000 for FastAPI
 EXPOSE 3000
 
-# Set PYTHONPATH to find all backend modules
+# Set PYTHONPATH so Python finds backend packages
 ENV PYTHONPATH=/app/backend:/app
 
-# Universal command: Works in Dev and Production
-CMD ["sh", "-c", "uvicorn api:app --app-dir backend --host 0.0.0.0 --port ${PORT:-3000} --workers ${WORKERS:-1} --proxy-headers --forwarded-allow-ips '*'"]
+# Default command to run the FastAPI web server
+CMD ["uvicorn", "backend.api:app", "--host", "0.0.0.0", "--port", "3000"]
