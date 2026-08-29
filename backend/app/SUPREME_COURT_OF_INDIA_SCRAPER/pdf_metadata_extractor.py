@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import re
 import ssl
 import time
@@ -10,6 +11,21 @@ from pathlib import Path
 from typing import Any
 
 import fitz
+
+_script_dir = Path(__file__).resolve().parent
+_backend_dir = _script_dir.parent.parent
+_project_root = _backend_dir.parent
+for _p in [str(_project_root), str(_backend_dir)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+try:
+    from backend import azure_blob
+except ImportError:
+    try:
+        import azure_blob
+    except Exception:
+        azure_blob = None
 
 # ============================================================
 # SUPREME COURT OF INDIA
@@ -2039,6 +2055,20 @@ def is_pdf_scanned(document: fitz.Document, text: str) -> bool:
     return False
 
 
+def extract_pdf_text_from_bytes(pdf_bytes: bytes) -> tuple[str, bool]:
+    """Extracts text from in-memory PDF bytes."""
+    document = fitz.open(stream=pdf_bytes, filetype="pdf")
+    text_parts = []
+    try:
+        for page in document:
+            text_parts.append(page.get_text())
+        full_text = "\n".join(text_parts)
+        is_scanned = is_pdf_scanned(document, full_text)
+    finally:
+        document.close()
+    return full_text, is_scanned
+
+
 def extract_pdf_text(pdf_path: Path) -> tuple[str, bool]:
     document = fitz.open(str(pdf_path))
     text_parts = []
@@ -2120,7 +2150,7 @@ def build_standardized_record(
         "case": {
             "case_id": cnr,
             "cnr": cnr,
-            "case_number": pdf_metadata.get("case_number"),
+            "case_number": pdf_metadata.get("case_number") or scraper_record.get("case_number"),
             "case_category": pdf_metadata.get("case_category"),
             "case_age": pdf_metadata.get("case_age"),
             "date_of_judgment": decision_date,
@@ -2134,19 +2164,22 @@ def build_standardized_record(
                 "result_text": pdf_metadata.get("outcome", {}).get("result_text"),
             },
             "neutral_citation": neutral_citation,
-            "parties": pdf_metadata.get("parties", []),
+            "parties": pdf_metadata.get("parties", []) or [
+                {"name": scraper_record.get("petitioner"), "role": "PETITIONER"} if scraper_record.get("petitioner") else None,
+                {"name": scraper_record.get("respondent"), "role": "RESPONDENT"} if scraper_record.get("respondent") else None,
+            ],
             "coram": {
                 "bench_strength": bench_strength,
-                "judge_bench": pdf_metadata.get("judge_bench"),
-                "judges": judges_list,
+                "judge_bench": pdf_metadata.get("judge_bench") or scraper_record.get("judge"),
+                "judges": judges_list or ([scraper_record.get("judge")] if scraper_record.get("judge") else []),
             },
             "bench": {
                 "strength": bench_strength,
-                "judge_bench": pdf_metadata.get("judge_bench"),
-                "judges": judges_list,
+                "judge_bench": pdf_metadata.get("judge_bench") or scraper_record.get("judge"),
+                "judges": judges_list or ([scraper_record.get("judge")] if scraper_record.get("judge") else []),
             },
-            "counsel": advocates_list,
-            "advocates": advocates_list,
+            "counsel": advocates_list or ([{"name": scraper_record.get("advocate")}] if scraper_record.get("advocate") else []),
+            "advocates": advocates_list or ([{"name": scraper_record.get("advocate")}] if scraper_record.get("advocate") else []),
         },
         "legal_information": {
             "acts": pdf_metadata.get("acts", []),
@@ -2192,8 +2225,8 @@ def build_standardized_record(
         },
         "processing": {
             "status": "SUCCESS",
-            "pdf_found": True,
-            "text_extracted": True,
+            "pdf_found": bool(pdf_path or pdf_url),
+            "text_extracted": bool(pdf_metadata.get("content", {}).get("raw_text")),
             "error": None,
         },
         "source": {
@@ -2204,8 +2237,8 @@ def build_standardized_record(
             },
             "pdf": {
                 "pdf_url": pdf_url,
-                "pdf_path": pdf_path,
-                "original_pdf_path": pdf_path,
+                "pdf_path": str(pdf_path) if pdf_path else None,
+                "original_pdf_path": str(pdf_path) if pdf_path else None,
             },
             "metadata_extraction": {
                 "parsed_at": datetime.now().isoformat(),
@@ -2213,7 +2246,7 @@ def build_standardized_record(
             },
         },
         "quality": {
-            "confidence_score": pdf_metadata.get("confidence_score", 0.0),
+            "confidence_score": pdf_metadata.get("confidence_score", 50.0),
             "missing_fields": pdf_metadata.get("missing_fields", []),
         },
     }
@@ -2225,18 +2258,40 @@ def build_standardized_record(
 
 def process_case(scraper_record: dict) -> dict | None:
     pdf_path = resolve_pdf_path(scraper_record)
+    pdf_url = scraper_record.get("pdf_url")
 
-    if not pdf_path or not pdf_path.exists():
-        print(f"  [SKIP] PDF file not found for: {scraper_record.get('case_number')}")
-        return None
+    raw_text = ""
+    is_scanned = False
+    effective_path = str(pdf_path) if pdf_path else "remote_pdf"
 
-    print(f"  [PDF] {pdf_path.name}")
+    if pdf_path and pdf_path.exists():
+        print(f"  [PDF LOCAL] {pdf_path.name}")
+        try:
+            raw_text, is_scanned = extract_pdf_text(pdf_path)
+        except Exception as e:
+            print(f"  [WARN] Local PDF text extraction failed: {e}")
+    elif pdf_url and str(pdf_url).startswith("http"):
+        print(f"  [PDF REMOTE] Downloading in memory: {str(pdf_url)[:70]}...")
+        try:
+            req = urllib.request.Request(
+                str(pdf_url),
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            )
+            # Support SSL bypass for court domains if needed
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            with urllib.request.urlopen(req, context=ctx, timeout=25) as resp:
+                pdf_bytes = resp.read()
+            raw_text, is_scanned = extract_pdf_text_from_bytes(pdf_bytes)
+            print(f"  [PDF STREAM] Extracted {len(raw_text)} chars from remote PDF.")
+        except Exception as dl_err:
+            print(f"  [WARN] Could not fetch remote PDF: {dl_err}")
 
     try:
-        raw_text, is_scanned = extract_pdf_text(pdf_path)
         extractor = MetadataExtractor(
             raw_text=raw_text,
-            pdf_path=str(pdf_path),
+            pdf_path=effective_path,
             scraper_record=scraper_record,
             is_scanned=is_scanned,
         )
@@ -2316,6 +2371,19 @@ def main():
     print(f"Standardized records  : {len(all_records)}")
     print(f"Skipped records       : {skipped_records}")
     print(f"Output Metadata JSON  : {OUTPUT_JSON}")
+
+    if azure_blob and azure_blob.is_azure_blob_configured():
+        try:
+            print("\n[AZURE] Archiving Silver metadata to Azure Blob Storage...")
+            url = azure_blob.upload_json_to_blob(
+                OUTPUT_JSON,
+                court_code="SCIN",
+                layer="Silver",
+                filename="supreme_court_metadata_2025.json"
+            )
+            print(f"✅ Silver Metadata Blob URL: {url}")
+        except Exception as e:
+            print(f"⚠️ Warning uploading Silver metadata to Azure: {e}")
 
 
 if __name__ == "__main__":

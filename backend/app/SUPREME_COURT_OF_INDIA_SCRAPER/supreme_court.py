@@ -35,6 +35,29 @@ if sys.platform == "win32":
 
 
 # ============================================================
+# ENTERPRISE BACKEND & AZURE INTEGRATION
+# ============================================================
+
+_script_dir = Path(__file__).resolve().parent
+_backend_dir = _script_dir.parent.parent
+_project_root = _backend_dir.parent
+
+for _p in [str(_project_root), str(_backend_dir)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+try:
+    from backend import db_manager, azure_blob
+except ImportError:
+    try:
+        import db_manager
+        import azure_blob
+    except Exception as _e:
+        print(f"⚠️ Warning importing backend/azure_blob: {_e}")
+        db_manager = None
+        azure_blob = None
+
+# ============================================================
 # CONFIGURATION
 # ============================================================
 
@@ -245,49 +268,49 @@ def download_pdf(pdf_url, filename):
 
 
 # ============================================================
-# PARSE TABLE ROWS
+# PARSE TABLE ROWS (WITH ENTERPRISE DEDUPLICATION)
 # ============================================================
 
-def parse_results_table(page, records_list, seen_keys):
+def parse_results_table(page, records_list, seen_keys, upload_azure: bool = False, stream_cloud: bool = False):
+    """
+    Parses the results table from sci.gov.in.
+    Performs fast O(1) deduplication check against PostgreSQL & local cache.
+    If already scraped, skips PDF download entirely.
+    """
     rows = page.locator(".distTableContent table tbody tr")
-    count = rows.count()
-    print(f"Parsing {count} rows on current page...")
+    total_rows = rows.count()
+    if total_rows == 0:
+        print("No result rows found in table.")
+        return
 
-    new_count = 0
+    headers = [clean_text(h.inner_text()) for h in page.locator(".distTableContent table thead th").all()]
+    print(f"Parsing {total_rows} row(s) from results table...")
+
     skipped_count = 0
+    new_count = 0
 
-    for i in range(count):
+    for i in range(total_rows):
         row = rows.nth(i)
-        tds = row.locator("td")
-        td_count = tds.count()
-        if td_count == 0:
+        cells = row.locator("td")
+        if cells.count() == 0:
             continue
 
         data_map = {}
+        for col_idx, cell in enumerate(cells.all()):
+            header_name = headers[col_idx] if col_idx < len(headers) else f"col_{col_idx}"
+            data_map[header_name] = clean_text(cell.inner_text())
+
+        # Extract links (PDFs)
         pdf_urls = []
-        neutral_citation = ""
-        decision_date = ""
+        for a_tag in row.locator("a").all():
+            href = a_tag.get_attribute("href")
+            if href:
+                pdf_urls.append(urljoin(BASE_URL, href))
 
-        for j in range(td_count):
-            th_name = tds.nth(j).get_attribute("data-th") or f"col_{j}"
-            text_content = tds.nth(j).inner_text().strip()
-            data_map[th_name] = text_content
-
-            # Look for PDF links and citations
-            links = tds.nth(j).locator("a")
-            for k in range(links.count()):
-                href = links.nth(k).get_attribute("href") or ""
-                link_text = links.nth(k).inner_text().strip()
-                if href and href not in pdf_urls and href != "#":
-                    if href.endswith(".pdf") or "Judgement" in href or "supremecourt" in href:
-                        pdf_urls.append(href)
-                if "INSC" in link_text:
-                    neutral_citation = link_text
-                elif re.search(r'\d{2}-\d{2}-\d{4}', link_text) and not decision_date:
-                    decision_date = re.search(r'\d{2}-\d{2}-\d{4}', link_text).group(0)
-
-        diary_number = data_map.get("Diary Number", "").strip()
-        case_number = data_map.get("Case Number", "").strip()
+        diary_number = data_map.get("Diary Number")
+        case_number = data_map.get("Case Number")
+        decision_date = data_map.get("Order / Judgment By Date") or data_map.get("Judgment Date") or data_map.get("Date")
+        neutral_citation = data_map.get("Neutral Citation")
         serial_no = data_map.get("Serial Number", str(len(records_list) + 1))
         primary_pdf_url = pdf_urls[0] if pdf_urls else None
 
@@ -299,11 +322,14 @@ def parse_results_table(page, records_list, seen_keys):
             keys_to_check.append(f"{diary_number}_{case_number}")
         if diary_number:
             keys_to_check.append(diary_number)
+        if neutral_citation:
+            keys_to_check.append(neutral_citation)
         if primary_pdf_url:
             keys_to_check.append(primary_pdf_url)
 
-        # Check if already scraped
+        # FAST DEDUPLICATION CHECK: Skip if already exists in PostgreSQL or session cache
         if any(k in seen_keys for k in keys_to_check):
+            print(f"⏩ [SKIP DEDUPLICATED] Case already exists in database (Diary: {diary_number} | Case: {case_number}). Skipping PDF download.")
             skipped_count += 1
             continue
 
@@ -318,11 +344,26 @@ def parse_results_table(page, records_list, seen_keys):
         bench = clean_text(data_map.get("Bench", ""))
         judgment_by = clean_text(data_map.get("Judgment By", ""))
 
-        # Download PDF if available (or reuse if already downloaded)
+        # Download PDF if available
         pdf_path = None
+        azure_pdf_url = None
         if primary_pdf_url:
             pdf_name = safe_filename(f"{diary_number}_{case_number}_{decision_date}") + ".pdf"
             pdf_path = download_pdf(primary_pdf_url, pdf_name)
+
+            # Direct Azure Streaming Option: Upload instantly to Azure and delete local copy
+            if upload_azure and azure_blob and pdf_path:
+                try:
+                    azure_pdf_url = azure_blob.upload_pdf_to_blob(
+                        pdf_path,
+                        court_code="SCIN",
+                        diary_number=diary_number,
+                        case_number=case_number,
+                        judgment_date=decision_date,
+                        delete_local_after=stream_cloud
+                    )
+                except Exception as e:
+                    print(f"⚠️ Error streaming PDF to Azure: {e}")
 
         record = {
             "serial_no": serial_no,
@@ -337,8 +378,8 @@ def parse_results_table(page, records_list, seen_keys):
             "court": "Supreme Court of India",
             "decision_date": decision_date,
             "neutral_citation": neutral_citation,
-            "pdf_url": primary_pdf_url,
-            "pdf_path": pdf_path,
+            "pdf_url": azure_pdf_url or primary_pdf_url,
+            "pdf_path": None if (stream_cloud and azure_pdf_url) else pdf_path,
             "source_page": SEARCH_URL,
         }
 
@@ -346,21 +387,20 @@ def parse_results_table(page, records_list, seen_keys):
         for k in keys_to_check:
             seen_keys.add(k)
         new_count += 1
+        # Save JSON incrementally after every scraped record
+        save_json(records_list)
 
     if skipped_count > 0:
-        print(f"Skipped {skipped_count} existing records. Added {new_count} new records. Total collected: {len(records_list)}")
+        print(f"✅ Batch Summary: Skipped {skipped_count} duplicate records. Ingested {new_count} new unique records. Total: {len(records_list)}")
     else:
-        print(f"Added {new_count} new records. Total collected: {len(records_list)}")
-
-    if new_count > 0:
-        save_json(records_list)
+        print(f"✅ Batch Summary: Ingested {new_count} new unique records. Total: {len(records_list)}")
 
 
 # ============================================================
 # SEARCH SINGLE DATE BATCH (MAX 30 DAYS)
 # ============================================================
 
-def search_date_batch(page, batch_from_str, batch_to_str, records_list, seen_keys):
+def search_date_batch(page, batch_from_str, batch_to_str, records_list, seen_keys, upload_azure: bool = False, stream_cloud: bool = False):
     print("\n" + "=" * 80)
     print(f"SEARCHING BATCH: {batch_from_str} TO {batch_to_str}")
     print("=" * 80)
@@ -425,7 +465,7 @@ def search_date_batch(page, batch_from_str, batch_to_str, records_list, seen_key
         return
 
     # Parse first page
-    parse_results_table(page, records_list, seen_keys)
+    parse_results_table(page, records_list, seen_keys, upload_azure=upload_azure, stream_cloud=stream_cloud)
 
     # Handle pagination
     page_num = 1
@@ -439,7 +479,7 @@ def search_date_batch(page, batch_from_str, batch_to_str, records_list, seen_key
             next_btn.first.click()
             page.wait_for_timeout(3000)
             page_num += 1
-            parse_results_table(page, records_list, seen_keys)
+            parse_results_table(page, records_list, seen_keys, upload_azure=upload_azure, stream_cloud=stream_cloud)
         except Exception as err:
             print(f"Pagination completed or failed: {err}")
             break
@@ -449,11 +489,13 @@ def search_date_batch(page, batch_from_str, batch_to_str, records_list, seen_key
 # MAIN SCRAPER ENTRYPOINT
 # ============================================================
 
-def run_scraper(from_date, to_date):
+def run_scraper(from_date, to_date, upload_azure: bool = False, stream_cloud: bool = False, headless: bool = HEADLESS):
     print("=" * 80)
-    print("SUPREME COURT OF INDIA JUDGMENT SCRAPER")
+    print("SUPREME COURT OF INDIA JUDGMENT SCRAPER (ENTERPRISE DEDUPLICATION)")
     print("=" * 80)
-    print(f"Requested Date Range: {from_date} to {to_date}")
+    print(f"Requested Date Range : {from_date} to {to_date}")
+    print(f"Azure Cloud Upload   : {upload_azure}")
+    print(f"Stream-Cloud (0-Disk): {stream_cloud}")
     print("=" * 80)
 
     # Standardize input date formats YYYY-MM-DD or DD-MM-YYYY
@@ -475,16 +517,23 @@ def run_scraper(from_date, to_date):
         print("ERROR: from_date cannot be after to_date.")
         return
 
-    # Load existing JSON records if present and deduplicate
-    records_list = []
+    # 1. Load existing keys from PostgreSQL for O(1) duplicate skipping
     seen_keys = set()
+    job_id = None
+    if db_manager:
+        db_keys = db_manager.get_existing_cases_keys("SUPREME_COURT_OF_INDIA")
+        seen_keys.update(db_keys)
+        print(f"🛡️ Loaded {len(db_keys)} existing case keys from PostgreSQL for instant duplicate skipping!")
+        job_id = db_manager.log_scraper_job_start("SUPREME_COURT_OF_INDIA", from_date, to_date)
+
+    # 2. Load existing JSON records if present
+    records_list = []
     if JSON_FILE.exists():
         try:
             with open(JSON_FILE, "r", encoding="utf-8") as f:
                 existing_data = json.load(f)
                 raw_list = existing_data.get("Supreme Court of India", [])
                 
-                # Deduplicate existing file in-place
                 deduped = []
                 for r in raw_list:
                     d_no = str(r.get("diary_number", "")).strip()
@@ -502,21 +551,18 @@ def run_scraper(from_date, to_date):
                     if pdf_u:
                         keys.append(pdf_u)
 
-                    # If not already recorded in this session
                     if not any(k in seen_keys for k in keys):
                         deduped.append(r)
                         for k in keys:
                             seen_keys.add(k)
 
                 records_list = deduped
-            print(f"Loaded and verified {len(records_list)} unique existing records from {JSON_FILE.name}")
-            # If duplicates were cleaned up, save cleaned version
-            if len(records_list) < len(raw_list):
-                save_json(records_list)
-                print(f"Cleaned up {len(raw_list) - len(records_list)} duplicate records from {JSON_FILE.name}")
+            print(f"Loaded and verified {len(records_list)} existing local records from {JSON_FILE.name}")
         except Exception as err:
             print(f"Warning reading existing JSON: {err}")
             records_list = []
+
+    initial_count = len(records_list)
 
     # Split date range into <= 30 day batches as required by sci.gov.in
     batches = []
@@ -532,7 +578,7 @@ def run_scraper(from_date, to_date):
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=HEADLESS,
+            headless=headless,
             args=[
                 "--disable-blink-features=AutomationControlled",
                 "--no-sandbox",
@@ -558,17 +604,54 @@ def run_scraper(from_date, to_date):
 
         for b_from, b_to in batches:
             try:
-                search_date_batch(page, b_from, b_to, records_list, seen_keys)
+                search_date_batch(page, b_from, b_to, records_list, seen_keys, upload_azure=upload_azure, stream_cloud=stream_cloud)
             except Exception as batch_error:
                 print(f"Error processing batch {b_from} - {b_to}: {batch_error}")
                 save_debug_page(page, f"batch_error_{b_from}.html")
 
         browser.close()
 
+    new_scraped = len(records_list) - initial_count
+
+    # Upload Bronze JSON to Azure Blob Storage if requested
+    if upload_azure and azure_blob and JSON_FILE.exists():
+        year_str = str(dt_start.year)
+        azure_blob.upload_json_to_blob(
+            JSON_FILE,
+            court_code="SCIN",
+            layer="Bronze",
+            filename=f"supreme_court_judgments_{year_str}.json"
+        )
+
+    # Log Job Finish in PostgreSQL
+    if db_manager and job_id:
+        db_manager.log_scraper_job_finish(
+            job_id,
+            status="COMPLETED",
+            total_found=len(seen_keys),
+            new_scraped=new_scraped,
+            skipped=len(seen_keys) - new_scraped
+        )
+
     print("\n" + "=" * 80)
-    print(f"SCRAPING FINISHED: Collected total {len(records_list)} judgment records.")
+    print(f"SCRAPING FINISHED: Collected {new_scraped} new records. Total: {len(records_list)} judgment records.")
     print("=" * 80)
 
 
 if __name__ == "__main__":
-    run_scraper("2026-05-01", "2026-05-05")
+    import argparse
+    parser = argparse.ArgumentParser(description="Supreme Court of India Judgment Scraper with Enterprise Deduplication")
+    parser.add_argument("--from", dest="from_date", default="2025-01-01", help="From date (YYYY-MM-DD or DD-MM-YYYY)")
+    parser.add_argument("--to", dest="to_date", default="2025-01-05", help="To date (YYYY-MM-DD or DD-MM-YYYY)")
+    parser.add_argument("--upload-azure", action="store_true", help="Upload new PDFs and JSON to Azure Blob Storage")
+    parser.add_argument("--stream-cloud", action="store_true", help="Delete local PDFs after uploading to Azure (Zero Disk Usage)")
+    parser.add_argument("--headful", action="store_true", help="Run browser in visible mode")
+
+    args = parser.parse_args()
+    run_scraper(
+        from_date=args.from_date,
+        to_date=args.to_date,
+        upload_azure=args.upload_azure,
+        stream_cloud=args.stream_cloud,
+        headless=not args.headful
+    )

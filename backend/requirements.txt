@@ -8,3 +8,4 @@ uvicorn
 Pillow
 ddddocr
 PyMuPDF
+azure-storage-blob
