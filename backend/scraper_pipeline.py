@@ -92,14 +92,14 @@ def run_pipeline_worker(
             logger.log(f"🌐 Navigating to Supreme Court of India portal ({from_date} to {to_date})...")
             
             # Run scraper
-            supreme_court.run_scraper(
+            records_list = supreme_court.run_scraper(
                 from_date=from_date,
                 to_date=to_date,
                 upload_azure=upload_azure,
                 stream_cloud=stream_cloud
             )
-            
-            bronze_json_path = _script_dir / "app" / "SUPREME_COURT_OF_INDIA_SCRAPER" / "supreme_court_judgments.json"
+            if not isinstance(records_list, list):
+                records_list = []
         else:
             raise ValueError(f"Unsupported court ID: {court_id}")
 
@@ -108,26 +108,18 @@ def run_pipeline_worker(
             db_manager.log_scraper_job_finish(job_id, status="CANCELLED")
             return
 
-        if not bronze_json_path.exists():
-            raise FileNotFoundError(f"Scraper did not produce JSON output at {bronze_json_path}")
-
-        # Count scraped cases
-        with open(bronze_json_path, "r", encoding="utf-8") as f:
-            raw_data = json.load(f)
-        
-        records_list = raw_data.get("Supreme Court of India", []) if isinstance(raw_data, dict) else (raw_data if isinstance(raw_data, list) else [])
         total_scraped = len(records_list)
         logger.log(f"✅ Phase 1 Complete: Scraped {total_scraped} judgment record(s).")
 
         # ----------------------------------------------------
-        # STEP 2: BRONZE AZURE ARCHIVING
+        # STEP 2: BRONZE AZURE ARCHIVING (In-Memory)
         # ----------------------------------------------------
         bronze_blob_url = None
-        if upload_azure and azure_blob.is_azure_blob_configured():
-            logger.log("📦 Phase 2/4: Archiving Bronze raw JSON to Azure Blob Storage...")
+        if upload_azure and azure_blob.is_azure_blob_configured() and total_scraped > 0:
+            logger.log("📦 Phase 2/4: Archiving Bronze raw JSON directly to Azure Blob Storage...")
             bronze_filename = f"supreme_court_judgments_{year_str}.json"
             bronze_blob_url = azure_blob.upload_json_to_blob(
-                bronze_json_path,
+                {"Supreme Court of India": records_list},
                 court_code="SCIN",
                 layer="Bronze",
                 filename=bronze_filename
@@ -135,21 +127,21 @@ def run_pipeline_worker(
             logger.log(f"☁️ [BRONZE] Archive URL: {bronze_blob_url}")
 
         # ----------------------------------------------------
-        # STEP 3: SILVER AI METADATA EXTRACTION
+        # STEP 3: SILVER AI METADATA EXTRACTION (In-Memory)
         # ----------------------------------------------------
-        silver_json_path = None
+        silver_records = []
         silver_blob_url = None
         if extract_metadata and total_scraped > 0:
             logger.log("✨ Phase 3/4: Running AI CaseNote & Statutory Metadata Extractor...")
             try:
                 from app.SUPREME_COURT_OF_INDIA_SCRAPER import pdf_metadata_extractor
-                pdf_metadata_extractor.main()
-                silver_json_path = _script_dir / "app" / "SUPREME_COURT_OF_INDIA_SCRAPER" / "supreme_court_metadata.json"
+                silver_records = pdf_metadata_extractor.extract_metadata_from_records(records_list)
+                logger.log(f"✨ Extracted metadata for {len(silver_records)} cases in memory.")
                 
-                if silver_json_path.exists() and upload_azure and azure_blob.is_azure_blob_configured():
+                if silver_records and upload_azure and azure_blob.is_azure_blob_configured():
                     silver_filename = f"supreme_court_metadata_{year_str}.json"
                     silver_blob_url = azure_blob.upload_json_to_blob(
-                        silver_json_path,
+                        {"Supreme Court of India": silver_records},
                         court_code="SCIN",
                         layer="Silver",
                         filename=silver_filename
@@ -159,17 +151,31 @@ def run_pipeline_worker(
                 logger.log(f"⚠️ Metadata extraction notice: {meta_err}")
 
         # ----------------------------------------------------
-        # STEP 4: DATABASE INGESTION
+        # STEP 4: DATABASE INGESTION (In-Memory)
         # ----------------------------------------------------
-        logger.log("💾 Phase 4/4: Ingesting normalized records into PostgreSQL database...")
-        json_to_import = silver_json_path if (silver_json_path and silver_json_path.exists()) else bronze_json_path
+        logger.log("💾 Phase 4/4: Ingesting normalized records directly into PostgreSQL database...")
+        records_to_import = silver_records if silver_records else records_list
         
-        imported_count = db_manager.import_json_file(
-            json_path=str(json_to_import),
-            default_court="SUPREME_COURT_OF_INDIA",
-            upload_to_blob=False # Already uploaded during scraping
+        imported_count = db_manager.import_json_data(
+            raw_data={"Supreme Court of India": records_to_import},
+            default_court="SUPREME_COURT_OF_INDIA"
         )
         logger.log(f"🎉 Database Ingestion Complete: {imported_count} cases saved into PostgreSQL.")
+
+        # Cleanup any local intermediate files (Zero Disk Mode)
+        if stream_cloud:
+            try:
+                local_dir = _script_dir / "app" / "SUPREME_COURT_OF_INDIA_SCRAPER"
+                for temp_file in [local_dir / "supreme_court_judgments.json", local_dir / "supreme_court_metadata.json"]:
+                    if temp_file.exists():
+                        temp_file.unlink()
+                pdf_dir = local_dir / "pdf"
+                if pdf_dir.exists():
+                    import shutil
+                    shutil.rmtree(pdf_dir, ignore_errors=True)
+                logger.log("🧹 Zero Disk Mode: Cleaned all local temp files (0 local PDFs & 0 local JSON on disk).")
+            except Exception:
+                pass
 
         # Finalize job in DB
         db_manager.log_scraper_job_finish(

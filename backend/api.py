@@ -16,8 +16,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-import db_manager
-import scraper_pipeline
+try:
+    from backend import db_manager, scraper_pipeline
+except ImportError:
+    import db_manager
+    import scraper_pipeline
 
 class ScraperJobRequest(BaseModel):
     court_id: str = Field("SCIN", description="Court code: SCIN (Supreme Court of India)")
@@ -41,6 +44,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ============================================================
+# STARTUP EVENT: AUTO-INITIALIZE SCHEMA & TABLES IF MISSING
+# ============================================================
+
+@app.on_event("startup")
+def on_startup():
+    """Automatically creates all database tables, extensions, and seed data on server startup if not present."""
+    try:
+        print("🔍 Checking and verifying PostgreSQL tables & schema on startup...")
+        db_manager.init_database(drop_existing=False)
+        print("✅ Database schema & tables verified!")
+    except Exception as e:
+        print(f"⚠️ Warning: Auto-initialization on startup encountered: {e}. Check PostgreSQL connection.")
 
 
 # ============================================================

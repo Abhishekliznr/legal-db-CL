@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d legal_db"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d legal_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "8080:3000"
     environment:
       - DB_CONNECTION=postgresql://postgres:1234@db:5432/legal_db
       - PYTHONPATH=/app/backend:/app

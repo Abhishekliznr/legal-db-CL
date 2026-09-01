@@ -636,6 +636,7 @@ def run_scraper(from_date, to_date, upload_azure: bool = False, stream_cloud: bo
     print("\n" + "=" * 80)
     print(f"SCRAPING FINISHED: Collected {new_scraped} new records. Total: {len(records_list)} judgment records.")
     print("=" * 80)
+    return records_list
 
 
 if __name__ == "__main__":
