@@ -1,137 +1,0 @@
-$~1
-*	IN  THE  HIGH  COURT  OF  DELHI  AT  NEW  DELHI
-     Date of decision: 30.01.2025
-+ 	RFA(COMM) 570/2024
-	M/S TAKSHASHILA HOTELS PVT LTD	   .....APPELLANT
-Through:	Mr. Rajesh Ranjan and Mr. Sohaib Alam, Advs.
-
-				versus
-
-	MOHD ILLYAS					.....RESPONDENT
-				Through: 	Ms. Kritika Gupta, Adv.
-
-	CORAM:
-	HON'BLE MR. JUSTICE NAVIN CHAWLA
-	HON'BLE MS. JUSTICE SHALINDER KAUR
-
-SHALINDER KAUR, J. (ORAL)
-
-CM APPL. 76615/2024
-1. Allowed, subject to all just exceptions. 
-CM APPL. 76616/2024
-2. The present application has been filed by the Appellant, seeking condonation of a delay of 6 days in filing the appeal.
-3. For the reasons stated in the application, the delay of 6 days in filing the Appeal is hereby condoned.
-4. The application stands disposed of.
-RFA(COMM) 570/2024
-5. The present Regular First Appeal, under section 13(1A) of the Commercial Courts Act, 2015 (�CC Act�), has been filed by the Appellant challenging the Judgment dated 31.08.2024 passed by the learned District Judge (Commercial-02), South-East, Saket Courts, Delhi (�Trial Court�) in CS (Comm) 443/2023, vide which the Appellant has been directed to pay a sum of Rs. 16,76,537/- (Rupees Sixteen Lacs Seventy-Six Thousand Five Hundred and Thirty-Seven Only) along with an interest at the rate of 6% per annum from the date of last payment, that is 02.03.2020, till the date of filing of the aforesaid suit, that is 06.05.2023.
-Brief Facts:
-6. In the present case, the Respondent filed the above Commercial Suit seeking recovery of Rs. 16,76,537/- along with interest at the rate of 18% per annum from the Appellant, M/s Takshashila Hotels Pvt. Ltd., which is a private limited Company engaged in the business of running Hotels and dining Restaurants.
-7. In 2017, the Appellant had entered into an agreement with the Respondent, Mohd. Illyas, a sole-proprietor of Al-Rashid Interiors, for the supply of furniture for the Appellant�s Property in Pune for a sum of Rs. 61,76,537/- (Rupees Sixty-One Lacs Seventy-Six Thousand Five Hundred and Thirty-Seven Only). The Respondent provided a quotation for Rs. 48,76,212/- on 01.08.2017, but later claimed the total value of goods supplied exceeding Rs. 61,76,537/-.
-8. The Respondent alleges in the Suit that the goods were supplied to the Appellant in accordance with the six GST invoices, while the Appellant had made a part payment to the tune of Rs. 40,00,000/- (Rupees Forty Lacs Only) towards the alleged outstanding amount of  Rs. 61,76,537/- (Rupees Sixty-One Lacs Seventy-Six Thousand Five Hundred and Thirty-Seven Only), leaving an arrear of Rs. 21,76,537/- (Rupees Twenty-One Lacs Seventy-Six Thousand Five Hundred and Thirty-Seven Only). The Appellant initially acknowledged its debt to the tune of Rs. 21,76,537/- (Rupees Twenty-One Lacs Seventy-Six Thousand Five Hundred and Thirty-Seven Only) in its reply dated 13.01.2020 to a demand notice dated 11.11.2019 issued by the Respondent, and agreed to a settlement, thereby proposing to settle the matter amicably by honoring the entire amount due in 9 instalments. The said settlement was reiterated by the Appellant in its email dated 28.01.2020, subject to signing of a Memorandum of Understanding (MoU).
-9. The Appellant, thereafter, made a payment to the tune of Rs. 5,00,000/- (Rupees Five Lacs Only) in various instalments. On further demands made by the Respondent, the Appellant replied by admitting the liability to the tune of Rs. 4,27,743/- (Rupees Four Lacs Twenty-Seven Thousand Seven Hundred and Forty-Three Only) but disputed the higher amounts claimed by the Respondent.
-10. Despite several communications including legal notices, the Appellant contended that the payments were made as per the agreed terms and that any remaining liability was way less than the amount claimed by the Respondent. Additionally, the Appellant disputed the delivery of certain goods and alleged discrepancies in the invoices provided by the Respondent.
-11. Following unsuccessful mediation attempts, the Respondent filed the above Suit for recovery before the learned Trial Court, of which the Appellant was duly served the summons around 20.05.2023. 
-12. The learned Trial Court, vide its Impugned Judgment dated 31.08.2024, decreed the suit in favour of the Respondent based on the application under Order VIII Rule 1 and Order VIII Rule 10 of the CPC read with Order XIII-A of the CPC as amended by the CC Act on the ground that the Appellant failed to file its Written Statement within the stipulated time limit.
-13. Being aggrieved, the Appellant now challenges the Impugned Judgment by way of the present Appeal.
-Submissions on behalf of the Appellant
-14. Mr. Rajesh Ranjan, the learned counsel for the Appellant, in support of the Appeal, submits that the learned Trial Court has erred in considering that the Appellant did not admit or acknowledge its liability to the tune of Rs. 21,76,537/- (Rupees Twenty-One Lacs Seventy-Six Thousand Five Hundred and Thirty-Seven Only) vide reply dated 13.01.2020, and had instead raised objections to the claim of the Respondent.
-15. He submits that the offer of settlement made by the Appellant was conditional in nature as the Appellant had specifically mentioned the signing of an MoU as a condition precedent to the Appellant�s willingness to pay a sum of Rs. 21,76,537/- (Rupees Twenty-One Lacs Seventy-Six Thousand Five Hundred and Thirty-Seven Only).
-16. The learned counsel for the Appellant submitted that the learned Trial Court has erred in passing the Impugned Judgment, as the same was passed in absence of any documentary evidence being filed by the Respondent proving the existence of a valid contract between the parties. Placing reliance on the Judgment in case of Christian Loubouti Sas v. Abuhaker, 2018 SCC OnLine Del 9185, he submits that it is an obligation of the Respondent under Order VII Rule 14 of CPC to produce, before the Court, the documents relied upon by it.
-17. The learned counsel submits that mere failure to file the Written Statement within stipulated time does not automatically entitle the Respondent/Plaintiff to a Summary Judgment. It is essential that the Court satisfies itself that no material facts are in dispute. He places reliance on Atanu Bhattacharjee & Anr. v. Corporation Bank, 2024 SCC Online Del 2399, and Balraj Taneja v. Sunil Madan, (1999) 8 SCC 396.
-Submissions on behalf of the Respondent
-18. While seeking dismissal of the Appeal, Ms. Kritika Gupta, the learned counsel for Respondent submits that the Appellant has failed to honour its contractual obligation by refusing to pay the remaining amount to the Respondent despite complete delivery of goods within the prescribed time. More so, the Appellant failed to honour the settlement arrived between the parties as it failed to adhere to its obligation to pay the balance amount to the Respondent resulting in substantial loss to the Respondent. She submits that the action of making part payment in itself was an evidence that the parties had reached to a settlement and that the Appellant had acted in furtherance thereto.
-19. She further submits that the learned Trial Court has passed a well-reasoned Judgment thereby directing the Appellant to pay the outstanding amount to the Respondent, therefore, no interference is warranted with the Impugned Judgment and the present Appeal be dismissed.
-Analysis and Findings
-20. Having heard the parties and examined the record, we may note that the learned Trial Court has passed a Summary Judgment under the provisions of Order VIII Rule 10, Order VII Rule 1, Order XIII-A of the CPC read with section 151 of the CPC.
-21. We may now note the findings given by the learned Trial Court in the Impugned Judgment, which reads as below:
-����30. It is further noticed that the Defendant was served on 20.05.2023, the Written Statement was to be filed by 19.06.2023. However, the Defendant had appeared on 08.06.2023 and was granted 2 weeks� time to file the written statement. The Defendant failed to file the Written Statement within the stipulated time granted. The Defendant did not file its written statement by 07.07.2023 nor filed any application for extension of time to file the written statement. 
-
-31.Order VIII Rule 1 CPC as applicable to the commercial dispute, if the Defendant fails to file the written statement within the statutory period of 30 days, he shall be allowed to file the written statement on such other day, as may be specified by the court, for reasons to be recorded in writing and on payment of such costs as the court deems fit, but it shall not be later than 120 days from the date of service of summons, the Defendant shall forfeit the right to file the written statement and the court shall not allow the written statement to be taken on record.
-
-32.Therefore, the Defendant had not filed any application for extension of time after expiry of statutory period of 30 days, therefore the right to file the written statement came to an end on 07.07.2023 itself rather Defendant has not filed its written statement even within a period of 120 days or anytime thereafter. Order VIII Rule 10 CPC provides that if the Defendant fails to file its written statement within the time prescribed under Order VIII Rule 1, then the Court shall forthwith pronounce judgment against the Defendant and decree the suit. In the present case, provisions of Order VIII Rule 10 read with Order XIII -A CPC comes to aid of the Plaintiff. The Defendant has already admitted its liability to the tune of Rs.21,76,537/- in the reply dated 13.01.2020 sent by the Defendant in response to the demand notice dated 11.11.2019 of the Plaintiff. It was further stated in the said reply dated 13.01.2020 that in order to settle the matter amicably, the Defendant was accepting the proposal of the Plaintiff for paying the entire outstanding amount, in nine installments starting from 25.01.2020, ending on 25.09.2020, with the first 8 installments of Rs.2.5 lakhs each, and the last 9th installment for Rs.1,76,537/-. The said settlement was reiterated by the Defendant in its email dated 28-01-2020�����..�
-
-22. In view of the above, it is evident that the Appellant failed to file its Written Statement within the statutory period, thereby forfeiting its right to file the same. The learned Trial Court also dealt with the effect of the Appellant�s admission made in prior communications between the parties, which were found to be pivotal in determining the Appellant�s liability. 
-23. In this regard, it is important to note that the Commercial Courts, Commercial Division and Commercial Appellate Division of High Courts Act, 2015 came into force on 23.10.2015, thereby amending certain provisions to the CPC. Order VIII Rule 1 of the CPC as applicable to commercial disputes of specified value, is reproduced herein below:-
- �1. Written Statement.�The Defendant shall, within thirty days from the date of service of summons on him, present a Written Statement of his defence:
-Provided that where the defendant fails to file the written statement within the said period of thirty days, he shall be allowed to file the same on such other day, as may be specified by the Court, for reasons to be recorded in writing, but which shall not be later than ninety days from the date of service of summons.
-Provided that where the defendant fails to file the written statement within the said period of thirty days, he shall be allowed to file the written statement on such other day, as may be specified by the Court, for reasons to be recorded in writing and on payment of such costs as the Court deems fit, but which shall not be later than one hundred twenty days from the date of service of summons and on expiry of one hundred twenty days from the date of service of summons, the defendant shall forfeit the right to file the Written Statement and the Court shall not allow the written statement to be taken on record.�
-
-24. �Emphasis is further placed on yet another provision,�Order VIII Rule 10 CPC, which reads as follows:
-�10. Procedure when party fails to present Written Statement called for by court.-Where any party from whom a written statement is required under Rule 1 or Rule 9 fails to present the same within the time permitted or fixed by the court, as the case may be, the court shall pronounce judgment against him, or make such order in relation to the suit as it thinks fit and on the pronouncement of such judgment a decree shall be drawn up:
-Provided further that no Court shall make an order to extend the time provided under Rule 1 of this Order for filing of the written statement.�
-
-25. In SCG Contracts (India) (P) Ltd. v. K.S. Chamankar Infrastructure (P) Ltd. & Ors., (2019) 12 SCC 210, the Supreme Court has held that the period for filing of the Written Statement cannot be extended by beyond 120 days. The Court held as under:-
-�8. �A perusal of these provisions would show that ordinarily a written statement is to be filed within a period of 30 days. However, grace period of a further 90 days is granted which the Court may employ for reasons to be recorded in writing and payment of such costs as it deems fit to allow such written statement to come on record. What is of great importance is the fact that beyond 120 days from the date of service of summons, the defendant shall forfeit the right to file the written statement and the Court shall not allow the written statement to be taken on record. This is further buttressed by the proviso in Order 8 Rule 10 also adding that the court has no further power to extend the time beyond this period of 120 days.� 
-26. It is a well settled position of law that the Courts are bound to follow the timeframe defined for the purpose of limitation, which, in any manner, cannot be extended unless and until as provided by the law.
-27. In the present case, the Appellant/Defendant was served with the summons of the Suit on 20.05.2023 and the time period to file the Written Statement expired on 19.06.2023. The Appellant had put an appearance before the Court on 08.06.2023 and was granted two weeks� time to file the Written Statement, however, it failed to file the Written Statement within the stipulated time. The Appellant has acknowledged his failure to file Written Statement within the prescribed time. 
-28. Accordingly, we find that the Appellant has failed to file the Written Statement within the statutory timeline. No further extension for filing the same could have been granted beyond the prescribed period of 120 days, as the Courts are not vested with the power to extend this statutory limit even by a single day. 
-29. Coming to the submission of the Appellant that even before passing a Summary Judgment, the Court has to essentially satisfy itself that no material facts are in dispute.
-30. Order XIII-A of the CPC empowers the Commercial Court/Commercial Division to pass a Summary Judgment in a Commercial Suit. It reads as below:
-�ORDER XIII-A
-Summary Judgment
-1. Scope of and classes of suits to which this Order applies. �(1) This Order sets out the procedure by which Courts may decide a claim pertaining to any Commercial Dispute without recording oral evidence. 
-(2) For the purposes of this Order, the word?
-      �claim� shall include�
-       (a) part of a claim; 
-(b) any particular question on which the claim (whether in whole or in part) depends; or 
-      (c) a counterclaim, as the case may be.
- (3) Notwithstanding anything to the contrary, an application for Summary Judgment under this Order shall not be made in a suit in respect of any Commercial Dispute that is originally filed as a summary suit under Order XXXVII. 
-2. Stage for application for Summary Judgment.�An applicant may apply for Summary Judgment at any time after summons has been served on the defendant: Provided that, no application for Summary Judgment may be made by such applicant after the Court has framed the issues in respect of the suit. 
-3. Grounds for Summary Judgment.�The Court may give a Summary Judgment against a plaintiff or defendant on a claim if it considers that��
-(a) the plaintiff has no real prospect of succeeding on the claim or the defendant has no real prospect of successfully defending the claim, as the case may be; and (b) there is no other compelling reason why the claim should not be disposed of before recording of oral evidence.
-4. Procedure.�(1) An application for Summary Judgment to a Court shall, in addition to any other matters the applicant may deem relevant, include the matters set forth in sub-clauses (a) to (f) mentioned hereunder:� 
-(a) the application must contain a statement that it is an application for Summary Judgment made under this Order;
-(b) the application must precisely disclose all material facts and identify the point of law, if any; 
-(c) in the event the applicant seeks to rely upon
-any documentary evidence, the applicant must,�� 
-(i)include such documentary evidence in its application, and 
-(ii) identify the relevant content of such documentary evidence on which the applicant relies; 
-(d) the application must state the reason why there are no real prospects of succeeding on the claim or defending the claim, as the case may be; 
-(e) the application must state what relief the applicant is seeking and briefly state the grounds for seeking such relief.
-(2) Where a hearing for Summary Judgment is fixed, the respondent must be given at least thirty days� notice of:� 
-(a) the date fixed for the hearing; and 
-(b) the claim that is proposed to be decided by the Court at such hearing.
- (3) The respondent may, within thirty days of the receipt of notice of application of Summary Judgment or notice of hearing (whichever is earlier), file a reply addressing the matters set forth in clauses (a) to (f) mentioned hereunder in addition to any other matters that the respondent may deem relevant:� 
-(a) the reply must precisely��
-(i) disclose all material facts; 
-(ii) identify the point of law, if any; and 
-(iii) state the reasons why the relief sought by the applicant should not be granted; 
-(b) in the event the respondent seeks to rely upon any documentary evidence in its reply, the respondent must� 
-(i) include such documentary evidence in its reply; and (ii) identify the relevant content of such documentary evidence on which the respondent relies;
-(c) the reply must state the reason why there are real prospects of succeeding on the claim or defending the claim, as the case may be; (d) the reply must concisely state the issues that should be framed for trial; (e) the reply must identify what further evidence shall be brought on record at trial that could not be brought on record at the stage of Summary Judgment; and (f) the reply must state why, in light of the evidence or material on record if any, the Court should not proceed to Summary Judgment�...�
-	
-31. The extracted provision of Order XIII-A of CPC has been introduced through the Commercial Courts, Commercial Division, and Commercial Appellate Division of High Courts Act, 2015. It prescribes the procedure by which the Courts may adjudicate claims arising from a "Commercial Dispute" without the necessity of recording oral evidence. Consequently, the applicability of this provision is confined solely to disputes falling within the ambit of the said Act. In other words, for the provisions of Summary Judgment under Order XIII-A to be invoked, the Suit must qualify as a Commercial Dispute.
-32. Under Order XIII-A Rule 3 of the CPC, the Court is empowered to pass a Summary Judgment in favour of either of the parties if it is evident that the opposing party has no real prospect of succeeding on the claim or defending against it, respectively. Further, Rule 4 of Order XIII-A sets out the procedure to be followed while adjudicating an application for Summary Judgment. Sub-rule (1) of Rule 4 explicitly enumerates the essential elements that must be incorporated in such an application. Firstly, the application must expressly state that it is filed under Order XIII-A of the CPC for Summary Judgment. Secondly, it must disclose all the material facts and identify any relevant points of law. Thirdly, the applicant may rely on documentary evidence, which must be annexed to the application, with the relevant portions specifically identified. Lastly, the application must set forth the reasons demonstrating that there is no real prospect of success in the Suit, along with the relief being sought.
-33. At this stage, we may also note that in the case of Christian Loubouti Sas v. Abuhaker, (supra), wherein the Court held that the provisions relating to Summary Judgment, which enable the Courts to decide claims pertaining to commercial disputes without recording oral evidence are exceptional in nature and out of the ordinary course, which a normal suit has to follow. In such an eventuality, it is essential that the stipulations are followed scrupulously otherwise it may result in gross injustice.
-34. Further in Atanu Bhattacharjee & Anr v. Corporation Bank, (supra), the Court held as below:
-�18. What emerges from a reading of Balraj Taneja (supra), with which we wholeheartedly concur, is that only on being satisfied that there is no fact which need to be proved on account of deemed admission, could the court pass a judgment against the defendant who has not filed the Written Statement; but if the plaint itself suggests involvement of disputed questions of fact, it would not be safe for the court to pass a judgment without requiring the plaintiff to prove the facts. 
-
-     xxxx		xxxx		xxxx
- 65. The second reason given by the learned Trial Court was that since the appellants? right to file written statement has been forfeited due to which they failed to defend the respondent bank�s claim, therefore, the suit is liable to be decreed in terms of Order VIII Rule 10 of the CPC. It is held that since the appellants failed to file their written statement after the lapse of 120 days, therefore, the view taken by the learned Trial Court is correct and the same is upheld.�
-
-35. In the present case, the Appellant�s contention, in reference to the application of the Respondent, pursuant to which the Impugned Judgment is passed, is that the Respondent has failed to disclose material facts. The main focus of the Appellant has been on technicalities and urging that the Respondent did not plead in the application, the necessary ingredients of the relevant Section / Order of the CPC. It is settled law that mere mechanical reproduction of a provision of law without demonstrating as to how the legal provision is applicable to the facts of the case is inadequate.
-36. We have carefully reviewed the pleadings and supporting documents from both the parties. Upon perusal of the Respondent�s application, it is evident that the application is not limited to Order XIII-A of the CPC but also invokes Order VIII Rule 1 and 10 of the CPC. A thorough examination of documents on record supports the passing of the Impugned Judgment forthwith and summary in nature. Furthermore, the Respondent has furnished sufficient material, along with the averments in the application, which substantially comply with the requirements of Rule 4(1) of Order XIII-A. 
-37. In the suit filed by the Respondent, the Respondent has relied upon the invoices raised in respect of the outstanding payments and the Appellant�s reply dated 13.01.2020 unequivocally acknowledges its liability towards the Respondent.
-38. The defence to the application for passing the Judgment raised by the Appellant and the grounds of challenge raised in the present Appeal do not inspire confidence for the reason that the Appellant through its counsel�s letter dated 13.01.2020 stated as under:
-�That my client states that without prejudice to the contentions raised by my client in para 1 to 8, the above proposal submitted by you is acceptable to my client and my client is ready and willing to make the payment of Rs.21,76,537/- within 9 months in accordance with the instalments mentioned in para 9 hereinabove...�
-
-39. This was followed by the Appellant�s email dated 28.01.2020 wherein it gave the instalment schedule as under:
-InstalmentDue date of InstalmentAmount of Instalment (Rs.)Ist25.01.20202,50,000IInd25.02.20202,50,000IIIrd25.03.20202,50,000IVth25.04.20202,50,000Vth 25.05.20202,50,000VIth25.06.20202,50,000VIIth25.07.20202,50,000VIIIth25.08.20202,50,000IXth25.09.20201,76,537
-40. From the above, it emerges that the Appellant, through its reply dated 13.01.2020, has unequivocally admitted and acknowledged its liability in the sum of Rs. 21,76,537/- (Rupees Twenty-One Lacs Seventy-Six Thousand Five Hundred and Thirty-Seven Only). The Appellant, in the said reply, proposed to amicably resolve the matter by discharging the outstanding amount in nine instalments. In furtherance thereof, the appellant proceeded to make a part payment of Rs. 5,00,000/- (Rupees Five Lacs Only), in two instalments as per the terms mentioned, thereby demonstrating its adherence to the settlement terms mutually arrived at between the parties. Having acted in accordance with the proposed settlement, the Appellant cannot, at a subsequent stage, be permitted to resile from its commitment by contending that the settlement offer was conditional. If the Appellant�s claim that it owed only Rs. 4,27,743/- and not Rs.21,76,537/- was correct, then it would not have agreed to pay Rs.21,76,537/- and proposed a 9-month instalment plan for it. This shows that the Appellant/Defendant has no dispute on any fact or legal question with the Respondent/Plaintiff, accepts the case presented in the plaint and that there is no genuine issue for trial.
-41. It is a well-established principle that an admission can be made in pleadings and/or the accompanying documents. The Respondent has also placed on record its ledger showing the amounts due. None of the issues raised by the Appellant in the Appeal either arises or are otherwise relevant to the current case. 
-42. Furthermore, the core objective of a Commercial Courts Act is not to prolong litigation. In this particular case, the Appellant has not filed its Written Statement, indicating a clear lack of substantial defence to the claim of the Respondent/Plaintiff. The Appellant�s own admission, coupled with its conduct of acting upon this admission by making a partial payment, leaves no doubt that Appellant has no real prospect of successfully defending the claim of the Respondent and lacks any substantial grounds to warrant interference with the Impugned Judgment. 
-43. Consequently, the Summary Judgment, as per the provisions of Order XIII-A of the CPC, in conjunction with Order VIII Rule 10 of the CPC, has been justly and appropriately passed in favour of the Respondent/Plaintiff. 
-44. In view thereof, we do not find any ground to interfere in the Judgment passed by the learned Trial Court. The Appeal is dismissed leaving the parties to bear their own costs. 
-
-SHALINDER KAUR, J
-
-NAVIN CHAWLA, J
-JANUARY 30, 2025/ss/kp/IK
-				Click here to check corrigendum, if any
-
-
-
-
-RFA(COMM) 570/2024					            Page 1 of 18
-
-

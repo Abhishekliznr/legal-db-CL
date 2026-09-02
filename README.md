@@ -1,6 +1,6 @@
 # 🏛️ Liznr Legal — Automated Court Scraper & Citator Pipeline
 
-> High-throughput legal judgment scraper, AI metadata extraction engine (Bronze & Silver layers), Azure Blob streaming, Citator precedence graph, and normalized PostgreSQL relational database.
+> High-throughput legal judgment scraper, AI metadata extraction engine (Bronze & Silver layers), Azure Blob streaming, Citator precedence graph, and normalized PostgreSQL relational database — split into two independently deployable services sharing one database.
 
 ---
 
@@ -8,36 +8,40 @@
 
 ```mermaid
 graph TD
-    UI["🖥️ Legal UI (Next.js)<br>/admin/scraper"] -->|REST API| API["⚙️ FastAPI Backend Service<br>(Port 8000)"]
-    
-    subgraph Pipeline [4-Phase Automated Scraper Pipeline]
+    UI["🖥️ Legal UI (Next.js)<br>/admin/scraper & /case-research"] -->|REST API| API["⚙️ api-backend<br>Case Search & Filters (Port 8000)"]
+    UI -->|REST API| SCR["🕷️ scraper-backend<br>Court Scraper Engine (Port 8001)"]
+
+    subgraph Pipeline [4-Phase Automated Scraper Pipeline — inside scraper-backend]
         P1["Phase 1: Supreme Court Scraper<br>(Playwright / Date Filter / In-Memory Stream)"]
         P2["Phase 2: Bronze Layer Sync<br>(Raw Case Archives)"]
         P3["Phase 3: Silver AI Metadata<br>(CaseNotes, Acts, Sections, Citations)"]
         P4["Phase 4: Database Ingestion<br>(UUIDs, Master Judges, Citator Graph)"]
-        
+
         P1 --> P2 --> P3 --> P4
     end
 
-    API -->|Spawns Background Job| Pipeline
-    
+    SCR -->|Spawns Background Job| Pipeline
+
     subgraph Storage [Cloud & Relational Storage]
         AZURE_PDF["☁️ Azure Blob (PDFs)<br>liznr-legal-dev-judgment-pdfs"]
         AZURE_RAW["☁️ Azure Blob (JSON)<br>liznr-legal-dev-raw-judgments"]
-        PG[("🐘 PostgreSQL (legal_db)<br>Port 5432")]
+        PG[("🐘 PostgreSQL (legal_db)<br>Port 5432 — shared by both services")]
     end
 
     P1 -->|Live Stream (Zero Disk)| AZURE_PDF
     P2 -->|Accumulative Merge| AZURE_RAW
     P3 -->|Silver Metadata Sync| AZURE_RAW
     P4 -->|Auto-Ingest| PG
+    API -->|Read-only queries| PG
 ```
+
+`api-backend` and `scraper-backend` are two separate services with their own Dockerfiles, requirements, and containers — the only thing they share is the `shared/` Python package (DB connection, schema, scraper-job tracking) and the one PostgreSQL database. `api-backend` never installs Playwright/PyMuPDF/ddddocr, so its image is small and its build is fast.
 
 ---
 
 ## ⚡ Quickstart with Docker (Recommended)
 
-Start the entire backend and PostgreSQL database with **one single command**:
+Start PostgreSQL and both backend services with **one single command**:
 
 ```bash
 # 1. Clone the repository
@@ -47,14 +51,14 @@ cd legal-db
 # 2. Setup your environment variables
 cp .env.example .env
 
-# 3. Start PostgreSQL and FastAPI Backend
+# 3. Start PostgreSQL, api-backend, and scraper-backend
 docker-compose up -d
 ```
 
 ### 🌐 Service Endpoints:
-* **FastAPI Backend & Scraper API**: [http://localhost:8000](http://localhost:8000)
-* **Interactive Swagger API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
-* **PostgreSQL Database**: `localhost:5432` (`legal_db`)
+* **API Backend (case search/filters)**: [http://localhost:8080](http://localhost:8080) · Swagger: [http://localhost:8080/docs](http://localhost:8080/docs)
+* **Scraper Backend (admin scraping)**: [http://localhost:8081](http://localhost:8081) · Swagger: [http://localhost:8081/docs](http://localhost:8081/docs)
+* **PostgreSQL Database**: `localhost:5432` (`legal_db`) — shared by both services
 
 ---
 
@@ -68,21 +72,21 @@ cd legal-db
 # 2. Setup your environment configuration:
 cp .env.example .env
 
-# 3. Build and start both services (PostgreSQL Database + FastAPI Backend):
+# 3. Build and start all three services (PostgreSQL + api-backend + scraper-backend):
 docker-compose up --build -d
 
-# 4. Initialize the database schema:
-docker-compose exec app python backend/db_manager.py init
+# 4. Initialize the database schema (either service can run this — same shared schema):
+docker-compose exec api-backend python -m shared.db_manager init
 
 # 5. Access the services:
-# - Web UI / API: http://<SERVER_IP>:8000
-# - Swagger Docs: http://<SERVER_IP>:8000/docs
+# - Case Search API : http://<SERVER_IP>:8080  (Swagger: :8080/docs)
+# - Scraper API      : http://<SERVER_IP>:8081  (Swagger: :8081/docs)
 ```
 ---
 
 ## ⚙️ Environment Configuration (`.env`)
 
-Create a `.env` file in the root directory:
+Both services read from the **same** root `.env` file (each container only uses the variables relevant to it):
 
 ```env
 # ==========================================
@@ -91,19 +95,17 @@ Create a `.env` file in the root directory:
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=1234
 POSTGRES_DB=legal_db
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
 DB_CONNECTION=postgresql://postgres:1234@db:5432/legal_db
 
 # ==========================================
-# Azure Blob Storage Configuration
+# Azure Blob Storage Configuration (scraper-backend only)
 # ==========================================
 AZURE_STORAGE_CONNECTION_STRING=your_azure_storage_connection_string_here
 AZURE_PDF_CONTAINER_NAME=liznr-legal-dev-judgment-pdfs
 AZURE_RAW_CONTAINER_NAME=liznr-legal-dev-raw-judgments
 
 # ==========================================
-# AI / OpenAI Configuration (Optional)
+# AI / OpenAI Configuration (Optional, scraper-backend only)
 # ==========================================
 OPENAI_API_KEY=your_openai_api_key_here
 ```
@@ -112,87 +114,62 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ## 💻 Manual Setup & Local Execution (Without Docker)
 
-If you prefer to run the project natively using Python on your local machine without Docker:
+Each service has its own virtual environment and its own requirements file — set them up independently.
 
 ### 📋 Prerequisites:
 * **Python 3.10 or 3.11** installed
 * **PostgreSQL Database** running locally or remotely (e.g. `localhost:5432` or cloud PostgreSQL)
 
----
+### 🛠️ api-backend (lightweight — no Playwright)
 
-### 🛠️ Step-by-Step Instructions:
-
-#### 1️⃣ Clone the Repository & Navigate:
 ```bash
-git clone https://github.com/LiznrLabsOrg/legal-db.git
 cd legal-db
+python -m venv api-backend/venv
+source api-backend/venv/bin/activate     # Windows: api-backend\venv\Scripts\activate
+pip install -r api-backend/requirements.txt
+
+# Repo root must be on PYTHONPATH so `shared` resolves:
+export PYTHONPATH=$(pwd)                 # Windows (PowerShell): $env:PYTHONPATH = (Get-Location)
+
+cd api-backend
+uvicorn api:app --reload --port 8000
 ```
 
-#### 2️⃣ Create & Activate Virtual Environment:
+### 🛠️ scraper-backend (heavy — installs Playwright/Chromium)
+
 ```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate on Windows (PowerShell):
-.\venv\Scripts\Activate.ps1
-
-# Activate on Windows (CMD):
-.\venv\Scripts\activate.bat
-
-# Activate on Linux / macOS:
-source venv/bin/activate
-```
-
-#### 3️⃣ Install Dependencies & Playwright Browsers:
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
+cd legal-db
+python -m venv scraper-backend/venv
+source scraper-backend/venv/bin/activate
+pip install -r scraper-backend/requirements.txt
 playwright install chromium
+
+export PYTHONPATH=$(pwd)
+
+cd scraper-backend
+uvicorn api:app --reload --port 8001
 ```
 
-#### 4️⃣ Configure `.env`:
-Create `.env` and set `DB_CONNECTION` to your local PostgreSQL instance (`localhost:5432` instead of `db:5432`):
-```env
-DB_CONNECTION=postgresql://postgres:1234@localhost:5432/legal_db
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=1234
-POSTGRES_DB=legal_db
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-
-AZURE_STORAGE_CONNECTION_STRING=your_azure_storage_connection_string
-AZURE_PDF_CONTAINER_NAME=liznr-legal-dev-judgment-pdfs
-AZURE_RAW_CONTAINER_NAME=liznr-legal-dev-raw-judgments
-```
-
-#### 5️⃣ Initialize Database Tables & Schema:
+### 🗄️ Initialize Database Tables & Schema (run once, from either service's venv):
 ```bash
-python backend/db_manager.py init
-```
-
-#### 6️⃣ Start the FastAPI Backend Server:
-```bash
-uvicorn backend.api:app --reload --port 8000
+cd legal-db
+PYTHONPATH=$(pwd) python -m shared.db_manager init
 ```
 
 ### 🌐 Access Without Docker:
-* **Interactive Swagger API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
-* **API Root Healthcheck**: [http://localhost:8000/api/scraper/courts](http://localhost:8000/api/scraper/courts)
+* **API Backend Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+* **Scraper Backend Docs**: [http://localhost:8001/docs](http://localhost:8001/docs)
 
 ---
 
-## 📡 Admin Scraper REST API Reference
+## 📡 Admin Scraper REST API Reference (scraper-backend, port 8001)
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | `POST` | `/api/scraper/start` | Trigger a new background scraping job with date range & court filters. |
 | `GET` | `/api/scraper/status/{job_id}` | Poll real-time progress, log stream, cases count, and Azure URLs. |
 | `GET` | `/api/scraper/jobs` | Retrieve the execution history of past scraping runs. |
-| `POST` | `/api/scraper/stop/{job_id}` | Cancel/abort an active running scraping job. |
-| `GET` | `/api/scraper/courts` | List supported courts and status codes. |
-| `GET` | `/api/cases/search` | Search judgments across citations, judges, acts, and full-text summaries. |
-
----
+| `POST` | `/api/scraper/cancel/{job_id}` | Cancel/abort an active running scraping job. |
 
 ### 📝 Example: Start Scraping Job Payload
 `POST /api/scraper/start`
@@ -209,40 +186,59 @@ uvicorn backend.api:app --reload --port 8000
 
 ---
 
+## 🔍 Case Search REST API Reference (api-backend, port 8000)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/cases/filters` | Filter sidebar metadata (courts, treatment status, judges, acts, years) with live counts. |
+| `GET` | `/api/cases/searches` | Advanced boolean search-builder field metadata (all/any/exact/none-of-these-words). |
+| `QUERY` | `/api/cases` | Search & list cases — filters, search fields, page, limit, sort in the request body (RFC 10008). Not renderable in Swagger UI yet; see `/openapi.json`. |
+| `GET` | `/api/cases/{case_id}` | Full judgment metadata, provisions, and citations. |
+| `GET` | `/api/cases/{case_id}/citations` | Citation precedence graph (Good Law, Overruled, Distinguished). |
+| `GET` | `/api/cases/{case_id}/pdf` | Stream judgment PDF directly or redirect to Azure Blob. |
+| `GET` | `/api/stats` | Corpus statistics & citator status breakdown. |
+
+---
+
 ## 🖥️ Frontend Integration (`legal-ui`)
 
-To connect the Next.js Frontend (`legal-ui`) to this Scraper backend:
+The Next.js frontend (`legal-ui`) now needs **two** API origins:
 
-1. In `legal-ui/.env.local`, set:
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:8000
-   ```
-2. Start the frontend:
-   ```bash
-   npm run dev
-   ```
-3. Open **`http://localhost:3000/admin/scraper`** or click **"Court Scraper"** in the sidebar.
+```env
+# legal-ui/.env.local
+NEXT_PUBLIC_API_URL=http://localhost:8080          # api-backend — case search/filters
+NEXT_PUBLIC_SCRAPER_API_URL=http://localhost:8081  # scraper-backend — admin scraping
+```
 
 ---
 
 ## 📂 Project Structure
 
 ```text
-├── backend/
+├── shared/                              # Imported by BOTH services — connection, schema, job tracking
+│   ├── db_manager.py
+│   └── normalizer.py
+├── api-backend/                         # Case search & filters (lightweight, no Playwright)
+│   ├── api.py
+│   ├── routers/ (filter_router.py, search_router.py)
+│   ├── static/index.html                # "Backend is up and running" landing page
+│   ├── requirements.txt
+│   └── Dockerfile
+├── scraper-backend/                     # Court scraper & ingestion (heavy: Playwright, PyMuPDF, ddddocr)
+│   ├── api.py
+│   ├── main.py                          # Interactive CLI scraper entrypoint
+│   ├── ingestion.py                     # Case ingestion pipeline (writes cases/parties/citations)
+│   ├── court_manager.py / scraper_pipeline.py / citator.py / azure_blob.py
+│   ├── routers/scraper_router.py
+│   ├── static/index.html
 │   ├── app/
 │   │   └── SUPREME_COURT_OF_INDIA_SCRAPER/
 │   │       ├── supreme_court.py            # Playwright Scraper Engine
 │   │       └── pdf_metadata_extractor.py   # AI CaseNote & Statutory Extractor
-│   ├── api.py                             # FastAPI REST Endpoints & Citator API
-│   ├── scraper_pipeline.py                # 4-Phase Background Worker Orchestrator
-│   ├── azure_blob.py                      # Azure Blob Stream & Accumulative JSON Merge
-│   ├── citator.py                         # Precedent Analyzer & Treatment Tagger
-│   ├── db_manager.py                      # PostgreSQL Relational Schema & Ingestion
-│   └── normalizer.py                      # Party & Citation Data Cleanser
-├── docker-compose.yml                     # Multi-container orchestration (App + DB)
-├── Dockerfile                             # Python 3.11 + Playwright Production Image
-├── requirements.txt                       # Python dependencies
-└── README.md                              # Documentation
+│   ├── requirements.txt
+│   └── Dockerfile
+├── docker-compose.yml                   # Orchestrates db + api-backend + scraper-backend
+└── README.md
 ```
 
 ---

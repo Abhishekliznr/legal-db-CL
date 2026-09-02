@@ -1,715 +1,0 @@
-*	IN  THE  HIGH  COURT  OF  DELHI  AT NEW  DELHI
-%		 		  Judgment reserved on: 09 January 2025
-            Judgment pronounced on: 15 January, 2025
-
-+ 	ITA 1029/2018
-THE PR. COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -3			.....Appellant
-Through:	Mr. Sanjay Kumar, SSC with Ms. Monica Benjamin and Ms. Easha Kadian, JSCs. 
-
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD.	       .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
-
-+ 	ITA 1058/2018
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -3			.....Appellant
-Through:	Mr. Sanjay Kumar, SSC with Ms. Monica Benjamin and Ms. Easha Kadian, JSCs. 
-
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD.	       .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
-
-+ 	ITA 1060/2018
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -3			.....Appellant
-Through:	Mr. Sanjay Kumar, SSC with Ms. Monica Benjamin and Ms. Easha Kadian, JSCs. 
-
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD	       .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
-
-+ 	ITA 1065/2018
-THE PR. COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -3			.....Appellant
-Through:	Mr. Sanjay Kumar, SSC with Ms. Monica Benjamin and Ms. Easha Kadian, JSCs. 
-
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD	       .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
-
-+ 	ITA 1066/2018
-THE  COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -3			.....Appellant
-Through:	Mr. Sanjay Kumar, SSC with Ms. Monica Benjamin and Ms. Easha Kadian, JSCs. 
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD.	       .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
-
-+ 	ITA 1099/2018
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -3			.....Appellant
-Through:	Mr. Sanjay Kumar, SSC with Ms. Monica Benjamin and Ms. Easha Kadian, JSCs. 
-
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD.	       .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
-
-+ 	ITA 604/2019
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -3			.....Appellant
-Through:	Mr. Ruchir Bhatia, SSC with Mr. Anant Mann, JSC.
-
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD.	      .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
-
-
-+ 	ITA 625/2019
-THE COMMISSIONER OF INCOME TAX - INTERNATIONAL TAXATION -3			.....Appellant
-Through:	Mr. Ruchir Bhatia, SSC with Mr. Anant Mann, JSC.
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD.	       .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
-
-+ 	ITA 289/2023
-COMMISSIONER OF INCOME TAX (INTERNATIONAL TAXATION)-3						.....Appellant
-Through:	Mr. Ruchir Bhatia, SSC with Mr. Anant Mann, JSC.
-
-				versus
-
-	SAMSUNG ELECTRONICS CO. LTD.	      .....Respondent
-Through:	Mr. Himanshu S. Sinha, Mr. Prashant Meharchandani, Mr. Jainender Singh Kataria & Ms. Kanika Jain, Advs.
- 
-
-     CORAM:
-     HON'BLE MR. JUSTICE YASHWANT VARMA
-     HON'BLE MR. JUSTICE HARISH VAIDYANATHAN
-     SHANKAR
-      
-J U D G M E N T
-
-YASHWANT VARMA, J.
-
-1. The Commissioner of Income Tax (International Taxation) in this batch of appeals impugns the order of 22 March 2018 passed by the Income Tax Appellate Tribunal1 and which had been followed by the Tribunal in its orders dated 14 December 2018 and 22 March 2021, pursuant to which composite appeals preferred by the respondent-assessee Samsung Electronics Co. Ltd.2 and pertaining to Assessment Years3 2007-08 to 2009-10, 2011-12 to 2015-16 and 2017-18 came to be allowed.  
-2. ITAs 604/2019, 625/2019 and 289/2023 which are connected with the lead appeal, ITA 1029/2018, pertain to AYs 2013-14, 2015-16 and 2017-18 respectively, in which the view as expressed by the Tribunal in its judgment of 22 March 2018 has been followed. For the sake of convenience, we place hereinbelow a tabular chart which would encapsulate the details pertaining to all the appeals forming part of the batch:-
-ITA Nos.Assessment YearOrder of the Tribunal challenged in the appealsITA 1029/20182007-08Order of 22 March 2018 for AYs 2004-05 to 2009-10; 2011-12; 2012-13 & 2014-15ITA 1058/20182012-13ITA 1060/20182008-09ITA 1065/20182009-10ITA 1066/20182011-12ITA 1099/20182014-15ITA 604/20192013-14Order of 14 December 2018 for AY 2013-14 and 2015-16 which has followed the order of 22 March 2018ITA 625/20192015-16ITA 289/20232017-18Order of 22 March 2021 for AY 2017-18 which has followed the orders of 22 March 2018 and 14 December 2018
-3. We had by our order dated 09 August 2024, admitted these appeals on the following questions of law:-
-�A. 	Whether the Income Tax Appellate Tribunal [�Tribunal�] erred in law in holding that the assessee company had no Fixed Place Permanent Establishment [�PE�] in India within the meaning of Article 5 of the Double Tax Avoidance Treaty [�DTAA�] between India and Korea without appreciating the detailed finding of the Dispute Resolution Panel?
-B. 	Whether the Tribunal erred in holding that the activities of the assessee in India were of the nature specified in Article 5(4) of the DTAA and consequently there was no PE in India, when the facts on record clearly indicate that critical business decisions such as decisions relating to the product to be manufactured, pricing of the product and decisions relating to launch of new products were being taken in India?  �
-
-4.  The salient facts which merit notice for the purposes of disposal of these appeals are as follows. Samsung Korea, the respondent-assessee is stated to be a company incorporated in South Korea and a tax resident of that country. It had two wholly owned subsidiaries in India being Samsung India Electronics Pvt. Ltd.4 and Samsung India Software Operations Pvt. Ltd.5, the latter of which for the sake of brevity shall be called �Samsung R&D�. It appears that a survey was conducted on the premises of SIEL on 24 June 2010 and which led to notices under Section 148 coming to be issued for six A.Y.s, namely 2004-05 to 2009-10.
-5. The Assessing Officer6, as the Tribunal noticed in the course of proceedings undertaken, had held against the respondent by coming to the conclusion that the premises of SIEL constituted a Fixed Place Permanent Establishment7 by virtue of Article 5 of the India- Korea Double Tax Avoidance Agreement8. The AO had further held that SIEL, being a subsidiary of Samsung Korea, was liable to be considered as a PE per se. It had additionally held that SIEL also met the tests of a Dependent Agent Permanent Establishment9 as well as a Service PE.
-6. When the matter reached the board of the Dispute Resolution Panel10, it proceeded to set aside the conclusions which had come to be recorded by the AO with respect to SIEL being liable to be viewed as a PE of Samsung Korea solely on account of it being a subsidiary. The DRP also negated the conclusion of the AO with respect to DAPE and Service PE. This becomes evident from a reading of paras 5.4.4.2 to 5.4.4.6 of the order of the DRP dated 29 September 2012 and which are extracted hereinbelow:-
-�5.4.4.2 Subsidiary as P.E: The Panel has also observed that all the conclusions made by the AO are based on the statements of various employees of SIEL during the survey conducted at its premises. Apart from these statements, the other material relied on by the AO is a presentation on Wi-max found during the survey, a layout plan of SIEL's factory at Chennai to cater for South east Asian market and the Technology Agreements between SIEL and SEC. Therefore in order to determine whether the claim that SEC exercises such a high level of control on the affairs of SIEL that it may in its entirety be treated as PE of the assessee, it would be in order to examine whether this is evidenced by the facts on record. The statements of employees attached with the remand report were therefore perused by us to sift our the responses under various heads. The result in respect of some salient aspects which are very relevant to determine what is the exact level of control exercised by SEC over SIEL is as under:  
-
-i. Level of control of SEC for appointment of expatriate employees in SIEL: who decides such issues whether they can be summarily sent back etc.
-
-1. Jung Soo Shin, President and CFO:
-
-On being asked if he can go back and join the parent company whenever he likes: It is mutually agreed between me and the company. (p-39)
-
-Movement of expatriate a tri-partite agreement between the two companies and the employee (p-40)
-
-Normally they stay in India for 5 years.
-
-There are several reasons for their going to Korea like personal reason, work performance, business need, spent enough time in India. (p-41)
-
-Decision for repatriation: It was done by HR under my advise
-
-Salary of persons coming from Korea: It is decided by SIEL with employee concerned. (P-41)
-
-Decision to recruit a particular employee: Sometime I choose, while
-other time they come from other side2. Anshuman Shah: Qu.7: We are a technology company and sometime like whenever there is a new launch we need one or two experts to come and train us and sometimes explain to our potential client. The request for such experts can be sent either by me or my direct reporties. (page 3)
-
-Qu.10: We have few expats come few days back. Normally they are
-here in 2-3 months as per requirement. They normally come to impart technical expertise to local engineers. They come here on local units request for training and some technical support. This request is made to the R&D Technical Support Group based out of Korea. (P-5)
-
-(Qu 13) To impart technical details of new technology or products,
-expatriate engineers are required. Once the local engineers acquire
-requisite knowledge and expertise, the local support is handled by
-them.3. HK Seo, President Sales and Marketing:
-
-You opted yourself to join India from Moscow: The current CFO and MD of SIEL proposed to current position and I accept that position. (p-53). In the first place SIEL asked me about my decision and SIEL asked to Moscow office and relieved me to go. (p-54)
-4.Yong Hee Cho, V.P (Sales and Marketing (North):
-When you came to India was it you choice: I had got suggestion and I accepted that position. (p-61)
-5. Byong Dae Park:
-Can you be repatriated back to Samsung Korea at your wish or would it be decision of Hqrs (Korea) to when to get you back: In two way agreement (p-65)
-ii. Extent of control of SEC over launch of new products; instruction by SEC to employees of SIEL; role of SEC in other major decisions taken by employees of SEC:
-Anshuman Shah: Senior Management from. Sales and Marketing are responsible for product launch. The decision is democratic and based on collective leadership (Q. 8-Page4)
-Hyun Dong Lee, Head of CDMA business (P-26) (about who decides production of phones and takes decision about its launch in India): It will be decided by lots of people. After discuss internally. There are product Manager and Sales force and so on. After discuss with them we decide we will launch the model in India or not.
-
-(About last strategic decision about sales, marketing and launch of product): There was a meeting with TATA. I could not provide details for this Meeting. It was held in May 2010. The attendee was Mr. Jung Soo Shin, CEO of SIEL, Mr. Ranjit Yadav, Director of HHP. (P-27)
-Juno Soo Shin President and CFO: on being asked about who decide if a product is manufactured in India or Korea: It is decided by Factory Management and I do not personally look into this matter. (p-44)
-
-Respective Division decides this matter (which item to import and market in India) (p-44)
-J. H Kyung, Chief Financial Officer and Director:
-
-Who takes policy decisions regarding financing various business divisions:
-MD and CFO (me) (p-49)
-
-Decision both through Board Meeting and independently (p-49)
-
-Are your decisions influenced by Hqrs at Korea: No
-
-Do you communicate major policy decision to Hqrs at Korea: Yes, just reference
-
-For major investment or policy decisions eg. Setting up a factory in Chennai, approval of Korea is taken It is necessary. (p-51).
-HK Seo. President Sales and Marketing:
-How do you liaise with Samsung Hq for product development and
-production?: By reading Indian consumer insight and finding the better product for India. I request Hq to develop Indianised product. In this process there needs lots of explanation and persuasion.(p-54)
-
-Communicate with Hqrs: In general once a week. Before that I hear and discuss with local people .... as a result of that Samsung Fridge has two vegetable box.
-Yong Hee Cho, V.P (Sales and Marketing( North):
-Do you get any directions for marketing policies to adopt from the Hqrs: No. directly from Hq. but from H.O in Gurgaon.
-Chungseop Song, G.M Purchase (Mobiles Phones):
-Sometime I receive guidelines from Korea. Regarding vendors (foreign suppliers) (p-76)
-Chong Ho Yon, G.M (R & D) & Visual Display:
-I receive guidelines from Mr. K. W Cho, M.D in India. Technically Korea supports me (for guidance)
-
-iii. Other issues: who pays salary; whom the senior employees report to; frequency of communication with Headquarter in Korea etc.
-
-S
-NoName of employeeIn India sinceReporting to (who has the authority to Instruct)Getting salary fromWhether employed by SEC or SIEL/Communication with SEC1Kyung Yeol Kim, V.P Home Appliance
-October 2004Jung Soo Shin, CEONot askedNot askedTravel back to Korea 1 to 2 times a year for business as well as family visits2Hyun Dong Lee, Head of CDMA businessApril 2009Not askedNot getting any remuneration from SECNot askedNot asked3Jung Soo Shin, President and CFOFebruary 2009Communicate with Heads of relevant Divisions in KoreaNot askedNot askedNot very often (in touch with H.O) 
-Communicate mostly through Internet
-4J.H Kyung, Chief Financial Officer and Director
-January 2010Not askedNot askedNot asked2 to 4 times a week on internet and mobile phone
-
-With Global Support and Global business management team 
-No regular reporting- only 1 to 2 time per year5HK Seo, President Sales and MarketingOctober 2009Not askedNot askedSIEL asked him about shifting from Moscow to India and then it was arranged7Yong Hee Cho, VP (Sales and Marketing (North)
-April 2006Not askedNot askedCommunicates once a week. They usually ask me about aging stock. Because of global performance reason.
-8Byong Dae Park2008Not askedNot askedNot askedNormally daily9Chungseo p Song, G.M Purchase (Mobile Phones)2010Mr K. W Cho (MD)Not askedSIELSome times10Chong Ho Yon, G.M. (R&D) & Visual Display2005Mr K. W Cho (MD)Not askedSamsung IndiaNot asked11Byung Gwan Yun, Production Manager2006Mr K. W Cho (MD)Not askedSamsung IndiaNot asked12Eungkyo Seo, C.F.O.2008Mr K. W Cho (MD)Not askedSIELNot asked
-From above it is seen that SEC is not exercising that kind of absolute control over posting of employees to SIEL that the A.O seem to assert. From above it can be seen that SEC does not unilaterally post its employees to SIEL. It is a tripartite arrangement in which SEC, SIEL and the concerned employee is involved. Repatriation of employees is also with agreement. Appointment is done by SIEL. In the A.O's compilation itself there are appointment letters issued by SIEL to Sh. K. W Cho, Director Marketing (p 172), Sh. J Kyung (p 176) and Sh B. D Park, Director HHP (P180). Although some senior employees are in constant touch with SEC it is not as if all major decisions are taken by SEC. Majority of the decisions seem to be taken by SIEL and that too by mutual consultation by division head and their teams. In very important strategic decisions like starting a new plant in Chennai, the approval of SEC is said to be necessary. However, considering that SIEL is a 100% subsidiary of SEC control in such strategic decisions is something quite expected.
-
-Next, it is seen that all the employees are getting their salary from SIEL which deducts tax at source on them. All the senior employees report to MD and the MD deals with various Division Heads of SEC in Korea.
-
-iv. On page 3 of 33 of his report the AO has referred to some documents which according to the AO prove clearly how strong the SEC's control over SIEL is. The AO has stated as under:
-
-�The Control and Management of the subsidiary rests with the parent company including even basic matters such as like what to do, how to source, from whom to source, pricing issues, ageing stock issues etc.
-SIPL is not free to make decisions of what to buy, from whom to buy and at what price/except rom the menu provided by Parent, please refer Page No. 111 & 112 of Annexure -I of survey material of documents found at M/s Samsung India Electronics Ltd (Corporate Office-Gurgaon) which is Technology License Agreement dated 26/0212006, according to which SEC lends its Technology, Specifies Standards SEC provides assistance in manufacturing, sale and operation of Products through its personnel Technology remains property of SEC to have full access to SIEL's premises Improvements in Technology is SEC's property SIEL to provide funds and personnel for SEC's projects Suppliers to be chosen by SEC Inspection of products by SEC and Audit by SEC.�
-
-However a reference to page 111 and 112 of the Annexure shows that there is nothing in them to justify the above assertion. Pare 111-12 contain Article 2 to 4.3 of an Agreement dated 1.6.2003 between SEC and SIEL. The Articles contained in these pages relate to terms of licensing, acceptance of license, provision of technology, general obligations of SEC. However there is nothing in these two pages which could even distantly relate to anything concerning the 'control or management' of subsidiary by SEC. Considering the gravity of the above assertion made by the AO and the bearing it may have on deciding the issue at hand, this Panel sifted through the compilation submitted by the AO and it was seen that it contains copies of the following Agreements:
-
- i. Agreement dated 1.9.2006 between SEC and SIEL pages 90-108ii. Agreement dated 1.6.2003 between SEC and SIELpages 109-125iii. Agreement dated 1.6.2003 between SEC and SIELpages 126-142iv. Agreement dated 1.12.2004 between SEC and SIELpages 143-146v. Agreement dated 26.2.2006 between SEC and STIPLpages 147-164vi. Agreement dated 1.12.2004 between SEC and SIELpages219-222vii. Agreement dated 26.2.2006 between STIPLpages 223-241
-There are two Agreements dated 26.2.2006; however both of them are between SEC and Samsung Telecommunication India P Ltd and not with SIEL. Giving discount of some inadvertence on the part of the AO, this Panel further examined at least one of the Technology Agreement between SIEL and SEC (the one at no. i. above at pages 90-118). This Agreement does not contain any thing which would evidence the following assertion made by the AO:
-
-�The Control and Management of the subsidiary rests with the parent company including even basic matters such as like what to do, how to source, from whom to source, pricing issues, ageing stock issues etc.
-SIPL is not free to make decisions of what to buy, from whom to buy and at what price/except from the menu provided by Parent,�
-
-It does contain an Article (no.5), which lays down that all Technical Information provided by SEC to SIEL shall remain the property of SEC and that SIEL shall during the term of Agreement disclose to SEC all improvements to the Technical Information. Considering that it is a know-how cum technical service type of an Agreement, in which the Company providing the know-how retains the right over it and gives the other party the right only to use the know-how and not to part with it to a third party, no adverse inference can be derived from this Article as far as the issue at hand is concerned. However this Article or the Agreement do not contain any provision which can prove the above assertion of the AO. Therefore, considering the serious nature of assertion made by the AO and the kind of evidence (or in this case total lack of any evidence) it are based on, this Panel tends to agree that it is based on surmises and conjectures.
-
-A perusal of the data reproduced earlier in the tabular form shows that the conclusion drawn by the AO that SEC controls each and every aspect of functioning of SIEL is not borne out of the evidence on record. Further it has to be kept in mind that SIEL is a company incorporated under the law governing the Companies in India and is conforming to all the rules and regulations that govern the operations of a corporate body in the country. It is filing its return and paying the taxes under the Income tax Act and other Statutes. Its International transactions have been reported under the Transfer Pricing regulations and examined by the TPO. In view of all these facts there can be no case for lifting of corporate veil and ignoring totally that the existence of the corporate entity (SIEL) and hold that it is merely a PE of SEC. The proposition made by the AO to treat the subsidiary company as a P.E is therefore rejected.
-
-5.4.4.3 Fixed place P.E: This issue has already been discussed earlier and this Panel has agreed that in as much as the deputationists and other visiting expatriate employees of SEC perform the functions which actually belong to SEC through the premises of SIEL, a fixed-place P.E is deemed to come into existence. It may again be reiterated here that the direction given by this Panel is to hold the deemed P.E created owing to the facts narrated earlier as a 'fixed place P.E' and not a 'Service P.E'. This issue need not therefore be discussed again here.
-
-5.4.4.4 Agency P.E: The proposal made by the AO to treat SIEL as Agency P.E is considered next. It is noted that there is no material brought on record by the AO on the basis of which it could be said that SIEL is an Agent of SEC. What the AO has asserted is that SIE is maintaining stock of goods of SEC. However there is no evidence in support of this proposition. The assessee has clarified that all the goods is sold by SEC to SIEL ex-Korea and that the title to these goods passes when they are shipped; these goods are imported. by SIEL in its own name and custom clearance etc is done by SIEL and these goods are stocked in SIEL's warehouse and all the subsequent operations relating to sales, collections of receivables etc are done by SIEL in its own name. There is nothing on record to controvert these assertions made by the assessee. The assessee has further rebutted the assertion of AO that is completely economically dependent on SEC by clarifying that it is a manufacturer of goods in its own right in India and imports finished goods from SEC to supplement its portfolio. The assessee has further stated that all its transaction with SEC, whether it is import of finished goods, stores or service parts, exports, import of technology etc are in a principal to principal capacity and it has no authority to act on behalf of SEC or to conclude contracts on behalf of SEC. and this relationship can in no manner be treated as an 'agency' relationship. The assessee has given some more arguments to rebut the AO. However they need not be reproduced here. This Panel is of the view that in absence of any material on record except of the statements of employees and technology Agreements, which have been considered by us it cannot be held that SIEL's relation with SEC is that of an 'Agent'. In view of this the suggestion that SIEL may be treated as a dependent Agent for the purpose of Art 5 is rejected.
-5.4.4.5. SIEL as a place of management for South East Operations. The assessee has stated in its rebuttal that during the period under consideration it did not have any set-up for Southwest Asia Regional operations and the business of its sales into Bangladesh, Sri Lanka, Nepal, Bhutan and Maldives was handled from Korea itself without any involvement of SIEL's officials and therefore, the assertion that SEC had a PE at SIEL premises under Article 5(2)(a) of DTAA in respect of sales made by it in the Southwest Asian countries, is contrary to the facts for the year under consideration. The assessee has, categorically stated that operations with regard to Southwest Asia region were not carried out during the period under consideration from SIEL's premises and therefore the assertion with regard to SEC having place of management at SIEL's premises with reference to such activities is baseless and based on conjecture and surmises. No PE of SEC exists under Article 5(2)(a) of the Treaty with regard to South West Asia operations. It has been pointed out by the assessee that this issue was examined by the AO in the original assessment proceedings and the assessee had filed its reply in this regard vide letter dated November 18, 2011, which was considered and accepted by the AO while framing the draft assessment order. The submissions of the assessee have been considered. As in the case of 'subsidiary P.E' and 'Agency P.E', it is seen that this suggestion has also been made by the AO merely on the basis of the response of the M.D of SIEL that he is looks after the operations of some south East Asian countries. However apart from this there is no other material on record in support of this suggestion. It is not possible to hold SIEL as SEC's place of management for south East Asian countries merely on the basis of this statement. However this issue is important from the point of view of the function of business development of Asian market performed by the M.D for the Head office which has been dealt with under the head 'fixed place' P.E earlier and compensation for which has been brought to tax by the AO in the draft order.
-
-5.4.4.6. SIEL as a service P.E: The AO has suggested that SIEL can be considered inter-alia as a Service P.E of SEC. In this connection the assessee has made the following rebuttal:
-�....even if the seconded expatriate employees are said to have performed stewardship functions, as alleged by the Ld. AO, no PE of SEC can said to result from such activities in India in view of the Apex Court's decision. Further, it is reiterated that the India-Korea Tax Treaty does not have a service PE clause and therefore such PE cannot in any case be alleged to have been formed by such expatriate employees seconded to SIEL by SEC.
-
-Secondly, the Ld. AO has placed reliance on the advance ruling in the case of Verizon Data Services India Private Limited to draw guidance with regard to existence of PE of SEC in India. Without going into facts of Verizon's case, it would be relevant to note that the Hon�ble Madras High Court has set aside the Advance Ruling in the case of Verizon and therefore any reliance by the Ld. AO on said ruling is legally misplaced.�
-
-The suggestion of AO and the rebuttal of assessee have been considered. A service P.E comes into existence when an enterprise of a contracting state renders services in the other contracting state through its employees for another enterprise. Here the AO is proposing that the expatriate employees of assessee performing services for the assessee may be considered a Service P.E. This is not in keeping with the concept of the Service P.E which comes into existence in the circumstance referred to above. Moreover the India-South Korea does not contain a provision for a service P.E. This proposition of AO is therefore rejected.�
-
-7. The DRP, while disagreeing with the various suggestions of the AO, essentially came to conclude that the secondment of employees by Samsung Korea would result in SIEL being treated as a deemed Fixed Place PE of the respondent-assessee. The aforesaid conclusion rested on the statements of various expatriate employees who had been seconded to SIEL. 
-8. The conclusions as drawn by the DRP in this respect are noticed by the Tribunal in paragraph 31 of its judgment and which is reproduced hereinbelow:-
-�31. Having rejected all the grounds pleaded by the AO, Ld. DRP reached a conclusion that SIEL be treated as a deemed fixed place PE of the assessee, and the relevant observation is to the effect that-
-   
-�Although they derive their remuneration from SIEL, their formal contract of employment is with the Parent company. The statements of some of these employees report frequently to. SEC. Sh B. D Park, Director (Mobile and 1.T business), who is at number two position in SIEL has acknowledged that he communicates with SEC almost daily. Sh J. H Kyung, Chief Financial Officer has stated that he is in touch with SEC two to three times a week. Sh H. K Sea) President Marketing and Sales also. Stated that. he communicates with SEC once a week in general. Sh. Yang Hee who, who is. The charge of sales has stated that he communicates with SEC once week. Statements of some of these officers who. are of the rank of Division Heads, also. Show that they continue to. be under the same can, the SEC for certain activities like research and development of products for the Indian market and development of marketing strategy, decisions relating to pricing of product exploration and development of new markets in the neighbouring countries. These are the functions that would normally have been performed by SEC through its own employees, or such functions would have been outsourced by it to some third party, in which case the third party would be entitled to some remuneration for these services. However in the present case it is the seconded employees of SEC are performing these functions in addition to their own duties performed by them for SIEL. For performing the above functions of SEC these employees have a 'fixed place of business' i.e the premises of SEiL available to them. Moreover, it is an admitted fact that apart from these 'seconded employees' who are in the payroll of SIEL, other employees of SEC also come from time to time to India and
-use the premises of SIEL for the functions performed by them for SEC. This is quite evident from the statements of Sh Mahesh Sutagatti and Sh Anshuman Sah, VP (Sales & Marketing). Sh Suttagati is himself an employee of SEC who was in India for the development of assessee's Wi-max business in India. Sh. Sah has admitted that the employees of SEC come from time to time and work with the local personnel.�
-
-9. The Tribunal in the order impugned before us has copiously reproduced the statements of various expatriate employees which had been recorded in the course of the survey. Since Mr. Kumar, learned counsel appearing in support of these appeals has rested his submissions primarily on those statements, we deem it appropriate to extract paragraph 19 of the order of the Tribunal in its entirety hereinbelow:-
-�19. Proper appreciation of the rival contentions requires reference to relevant portion of such statements, hereunder:
-
-Statement of Sh. Kyoung Sao Kim s/o Shri Jong Suk Kim
-
-Q1. 	Please identify yourself ?
-Ans. 	I am Kyoung Soo Kim s/o Jong Suk Kim aged 40 yrs, working with Samsung. India Electronics as Deputy General Manager (Purchasing).
-
-Q2 	Since you use working in this organisation ?
-
-Q7.  Being the purchase in charge do you get any direction from Samsung Electronics Korea regarding the import of raw materials
-Ans. Korean company gives me information on quality, delivery & cost of raw materials.
-
-Q8.	Who are you reporting here?
-Ans.	I am reporting K W Cho MD.
-
-Q9.	By whom have you been issued the appointment letter for working in the Samsung Electronics India P. Ltd.?
-Ans. I have been issued the appointment letter by Samsung electronics Corporate Korea.
-
-Q10.  Who decides the pricing of imports?
-Ans. I am guided by the Korean company Samsung electronics Korea, then I decided the purchase.
-
-Statement of Mr. B.D. Park, Director, Samsung India Electronics Ltd. 
-
-Q1. 	Please identify yourself ?
-Ans. 	Name Byong Dae Park, working as a Director in Samsung India Electronics Ltd. Looking after the Mobile business & IT Business.
-
-Q2. 	Since when have you been with M/ s SIEL?
-Ans. 	Since the middle of the year 200
-
-Q5. 	What is your present Salary approximately?
-Ans. 	Approximately US 200 K a year.
-
-Q6. 	You are working in India, why is it convenient for you to remember your salary in US currency especially when you are getting your salary in INR? 
-Ans. I am more comfortable in calculating in us dollars.
-
-Q9. 	For how much time have you been posted in India?
-Ans. 	It is not fixed , normally I expect to stay for three to four years
-
-Q10. 	Can you be replaced back to Samsung Korea, at your wish or would it be the decision of the headquarters to when to get you back?
-Ans. 	In two way agreement.
-
-Ql6. 	What is the mode of communication with Samsung Korea?
-Ans. 	Over the phone & email (intranet) .
-
-Ql7. 	You have the intranet systems installed with the corporation, where is the server of the intranet situated?
-Ans. 	I have no idea. Maybe, in Korea, or in Singapore.
-
-Q18.	How often do you communicate with the headquarter in Samsung Korea?
-Ans. 	Normally daily.
-
-Q19. 	You communicate directly or through your GEO? 
-Ans. 	 It depends on the issues. Something which may affect the business result seriously will be discussed with my boss, MD but in most cases of simple opinion exchange the communication is done without MD intervention.
-
-Q20. To whom do you generally communicate in Korea?
-Ans. Mr. Ryu, Vice President. of Mobile Communication Division and many other persons,
-
-Q21.	From where do you generally import your products, please give details product-wise.
-1) Mobile Phone. : Korea, China & Vietnam,
-2) Monitor : Malaysia
-3) OMS. : Philippines
-4) Printer : China
-5) Lap Top Computer : China
-
-Q25 	The computer in your office have an operation system installed in Korean, as well as the communication between the heads is in Korean. What is the reason for it?
-Ans. 	Sometimes in Korean. Sometimes in English. Communication between only Koreans is done in Korean normally. But when any Indian or non-Korean is involved we use English.
-
-Statement of Shri Anuj Pareek, Sr. Manager Accounts
-
-Q.	Please introduce yourself
-Ans. 	Myself is Anuj Pareek, working in Samsung (SIEL) since July ... At present working in the capacity of Sr. Manager- Accounts.
-
-Q. 	I am showing you the remittances of Rs. 9,63,134 dtd. 10/02/10 and Rs. 12,42,25,457 dtd.9/02/10 in which these payments have been made to M/ s Samsung Electronics Corporation as reimbursement of expenses. How would you justify such payment without deduction of tax thereon?
-Ans. Question asked about Rs. 12,42,25,457 dtd. 09/02/10 was not made. Form 15CA  was wrongly uploaded on the site and there is no provision to sever it or cancel it. Remittance of Rs. 9,63,13481 dtd. 9. Feb ]0 was on also salary paid to the Expatriate employees, the said salary has been offered to tax by the employers in India. Far administration conveyance part of the salary is paid to Samsung Korea which in turn is paid to expatriate employees all In Korea.
-
-Q3. 	The part salary which IS remitted outside India is of the individual expatriate and if it has to be remitted for their conveyance then it should be in their respective South Korea Bank A/cs and not in the Bank a/c of Samsung Electronics Corporation. Please give reason for this
-Ans. 	For the administrative conveyance, the salary paid to Samsung Electronics Corporation Korea
-
-Q4. 	What is the administrative conveyance in getting the salary to the A/c of the parent company that is Samsung Electronics Corporation?
-Ans. The expatriate employees have personal obligations in Korea. To avoid any inconvenience for their personal obligation in Korea the salaries paid by Samsung Electronics Korea to expatriate Bank A/c and same is reimbursed by Samsung India Electronics Pvt.. Ltd.
-
-Q5. 	Does this reply in Q4 mean that the salaries of the employees of Samsung India Electronics Pvt. Ltd is paid by SEC South Korea and the same is reimbursed by SIEL.
-Ans. No. Samsung Electronics is only a conduit for the payments in expatriate Bank a/cs in Korea. Salary expenses are incurred in SIEL India and proper income tax on the salaries is deducted from individual of expatriate employees' salary and deposited.
-
-Q6. 	Pls explain why such remittances are termed as reimbursements.
-Ans. The salary paid IS expense of SIEL, India as stated above. Just for Administration purpose the amount is paid to SEC Korea which in turn paid to expatriate personal bank a/cs.
-
-Q7. 	In reply to Q4 and Q3 you stated that the above the methodology adopted for the Administration conveyance of the expatriate employees, where is in reply of Qno. 6 you have stated that SEC paid 1.his amount to personal Bank a/c of the employees when such amount is remitted to SEC.since the remittance of salaries are made to SEC on a Qtrly basis, this would mean that a person I would get his salary in his South Korea Bank after 3 months of the receipt of salary in India. How would you term this as a conveyance of such employee.
-Ans. 	I am not aware
-
-Q8. 	The remittance letter sent to bank of America show that this expartiate are on deputation to your company on SEC Korea, where as it has been claimed that such persons are your employees without any (Not clearly readable) with the parent company. Pls justify your above statement.
-Ans. 	I am not aware.
-
-Q9. 	Details available show that sometimes the remittance is credited to (Not clearly readable) Bank Branch whereas sometimes to Korea Exchange Bank. Who gives direction regarding Bank Branch in which this amount has to be credited.
-Ans. 	Looks after by the treasury department.
-
-Q10. 	The details available show that a Debit note has been raised by SEC, Korea and their after-payment is made from SIEL India. This implies the salaries are not paid to the employees of SIEL after the payment has been received from India but the salaries are paid as if such expats were their own employees and then a debit note in respect of such salaries is raised to SIEL India. What do you have to say?
-Ans. 	I cannot comment because I am not aware of the reason.
-
-Statement of Mr. Anshuman Sah 
-1)	Please identify yourself I am Anshuman Sah. working as Vice-President (Sales & Marketing) for Telecom Systems in Samsung Electronics India Ltd. I have been working here for 7 months.
-
-7) 	How frequently do you deal with the expats while carrying out your duties as VP-Sales eX Marketing? Please give a detailed note on it. 
-
-We are a technology Company & sometimes like whenever there is a new launch, one or two experts to come and train us and & sometimes explain to our potential client. The request for such experts can be sent either by me or my Direct reports
-
-10) 	Please refer to question sr. no 7 and your reply . Do you have such experts working for you at present: 
-We have few expat came few days back. Normally they are here in 2-3 months as per requirement. There are 5 persons here:
-1. Mr. Mahesh -for tech support.
-2. Mr: Jiho Song -for tech marketing
-3. Mr. Shin-for tech support
-4. Ms. Cha -for tech support
-5. Mr. Jaewoo Park-Marketing support.
-Are working to support my local unit as technical expert. They normally come to impart technical expertise to local engineers. They have come here on a local unit's request for training & some tech support. This request is made to the R&D or Technical support Group bases out of South Korea.
-
-11) 	How are these expats compensated for their services?
-I do not know.
-12) 	For how long these experts would be in India?
-There is no fixed tenure but generally, they come for 3-4 days & go back by the weekend
-13) 	Please refer to the question @ Sr. No. 10 and your subsequent reply to that. You have said that these expats "come to 'impart technical expertise to local engineers". Please elaborate on this.
-To impart technical details of new technology or products, expat engineers are required once the local engineers acquire requisite knowledge & expertise the local support is, handled by them. Some such support also is arranged through tele conferencing
-
-Statement of Sh Kyong Yeol Kim, vice President, HA marketing,
-
-Q1. 	Please identify yourself and your nationality
-Ans. 	I am Sh.. Kyung Yeol Kim, Vice President, Samsung Electronics Pvt ltd (Home appliences) Marketing I am a national of the Republic of Korea
-
-Q8 	How often do You travel back to Korea
-Ans. 	I travel back to Korea 1-2 times a year for business trip and family visits. My family is in Delhi with me and my parents are in Korea
-
-Q9. 	What is the agenda for meetings in Korea?
-Produce line in India is discussed along with business strategy. The main product line and R&D is in Korea. At the address: 413 Mactan- Dong, Young Tong - ku, Suwan Ciy, Korea.
-This is the office of R&D and marketing.
-
-Q10. Who do you report to here?
-CEO - Jung Soo Shin,
-Deputy MD - Ravindra Zuithi
-They are both at present in South Korea on a Global Strategy meeting being held from 2200 June to 24th June at office premises 4B Mactan - Dong, Young Tong - Ku Suwan City, Korea of Samsung Electronics Ltd. All the country heads of Samsung Electronics ....coming for this meeting.
-
-Statement of Mr. JH Kyung
-
-Ql. 	Please identify yourself.
-Ans. 	I am JHKyung as CFO & Director SIEL since Jan 2010.
-
-Q2. 	Where had you been working before joining SIEL?
-Ans. 	I was worked in Mobile ..... Division in Samsung Korea.
-
-Q3. 	You were working in the parent company before you joined SIEL? What was your designation in Samsung Korea?
-Ans. 	Yes, Director.
-
-Q4. 	Since when have you been associated with Samsung group?
-Ans. 	1990
-
-Q6. 	What are the duties assigned to you in SIEL?
-Ans. 	Managing F/A, A/R, Logistics, Taxation & HR
-
-Q7.	When you joined SIEL, was it your decision or you were simply posted to India?
-Ans. Own decision and MD�s order and HO recommendation.
-
-Q9. 	How often do you communicate with the Head Quarter? What is the most common mode of communication?
-Ans.	2-4 times a week, internet and mobile phones.
-
-Ql0.	With whom do you generally communicate in headquarters at Korea for official purposes?
-Ans.	Global support team and global Biz management
-
-Ql1. 	Please clarify what is global biz management.
-Ans.	Manage all functions of specific product all over the world.
-
-Q12.	Are there different GBMS for different products?
-Ans.	Yes, Mobile-Mobile phones & Video Display-TV, monitor.
-
-Q13.	Do you regularly send reports to GBMS? How often are the report sent?
-Ans.	No, 1-2 times by-yearly.
-
-Q14.	Then how do the GBMS manage the functioning of different divisions in India, as stated by you in answer to question 11?
-Ans. 	GBM is more common sales they touch more sale teams then
-
-Q15.	Who takes the policy decision regarding the financing of various business divisions of SIEL?
-Ans.	MD&CFO
-
-Q16.	How are such policy decisions taken? Are they through the board meetings or your independent decisions?
-Ans.	Both
-
-Q17.	But none of the minutes of board meetings show any such policy decisions being taken in board meetings?
-Ans.	I am not sure because have joined less than 6 month but major issue show all board members.
-
-Q20.	Who takes the policy decision regarding which product/ model are to be manufactured and which are to be purchased and traded? 
-Ans. 	Sales. I just concern Profit and Loss
-
-Q26. 	In case of major investment or policy decision of setting up a factory in Chennai etc, is the consent or approval of headquarters at Korea taken?
-Ans. 	Yes
-
-Q27. Is this approval necessary? Say if you have your own funds and you want to launch a manufacturing unit of new product, still you would require approval from headquarter at Korea?
-Ans. Yes
-
-Statement of Mr. H.K. Seo, Vice President- CE Sales & Marketing in M/ s Samsung India electronics (P)Ltd. (SIEL)
-
-Q5. 	What are the duties assigned to you in current posting?'
-Ans. 	Sales & Marketing related job:
-- Involve local sales & marketing in SIEL's strategic direction. For example: to introduce Samsung products on Global consumer's requirements;
--  Sales Forecast for sales and production;
-- More strategic direction setting and also liase with Samsung HQ for product development and production;
-- Also, by meeting Indian customers- try to make strategy of sales & marketing with other employee of SIEL.
-
-Q6. How do you liase with Samsung HQ for products development and production?
-Ans. By reading Indian Consumer's insight and finding the better product for India, I request HQ to develop Indianized products. In this process, there needs lots of explanation & persuasion. Once HQ decided to develop the product by utilizing HQ�s resource in initial stage and then factory prepare its production facilities for material locally and other country �s factory. If possible, factory is trying to purchase its material locally.
-
-Q7. 	In the Liasoning activities with the HQ, do-you send information collected from India to Samsung Korea. So that they can develop a product suitable for India?
-Ans. 	Definitely 
-
-Q8.  	How Often do you communicate with HO and what is the mode of communication?
-Ans. 	In General once a week, Before communicating I hear and discuss with Local people and hear the necessities and I summarize and communicate with HQ Marketing and Other Department.
-
-Q9. 	Since you are having R&D centre's in India at Bangalore and Noida, Then why is not such technology develop in these R&D Centres?
-Ans. Basically Samsung's philosophy is to make localized for operation (Sales & Marketing) and production. When local environment is not ready, Samsung HQ support to develop. And when all local functions are ready, whole development & Material purchase occurs locally. In the meantime, localization rate is increasing year by year.
-
-Q10. 	What is the role of GBM (Global Business Management) at HQ in deciding which products to manufacture or Trade?
-Ans. 	It is not GBM's decision to decide a specific models. On SIEL�s requirement they develop and also SIEL select the models of local market's demand. GBM has more product and strategy function from global market perspective they discuss with global subsidiaries for products, price trend, and market development, marketing function. But, as they are more globally dedicated functional organization, SIEL is communicating with HQ to develop the product and support marketing practice by collecting best practice of Samsung Global operation.
-
-Q11. What is gathered from your replies is that after market research of Indian Market & coordination with GBM, a new product is developed in Korea, Later on this technology is transformed to SIEL for domestic production. Is it true?
-Ans. 	Yes. Market research is done two ways, a,) by SIEL alone b) by the request of SIEL together with GBM. As recent research, MWO, it is found that Indian consumers prefer more small oavity of MWO, and more black colour. This is done by Focus group Interview. As results it was sent to HO under progress of Development.
-
-Statement of Mr. Y.H. Cho, VP ,Sales -North Region in M/ s Samsung Electronics (P) Ltd (SIEL)
-
-Q5. 	How did you carry product marketing as GBM GM in India?
-Ans. Discussion about, proper USP with each country subsidiary. We don't arrange direct marketing, which will be done by Subsidiary. GBM is focusing on developing special features for each market subsidiary.
-
-Q6. 	How do you get technical input to develop special features for Indian Market?
-Ans. 	SIEL sends each requirement of USP to GBM. We discuss on these Requirements with internal R&D Department in GBM.
-
-Q7. 	This means that the technical input for a specific products specialization are provided by SIEL?
-Ans. 	Feature Requirements are requested by SIEL.
-
-Q8. 	What are your duties as Head of Sales, North Region in SIEL?
-Ans. Manage organization and Sales of SIEL products in Northern Region.
-
-Q9. 	How do you carry out such duties?
-Ans. 	We have each RM & BMs execute our sales & also get involved in Sales with them.
-
-Q10. Do you have to communicate with Samsung Headquarter to perform your duties? If yes then how after do you communicate with Samsung India?
-Ans. 	Yes, Once in a week.
-
-Ql 1. In your communication with HQ what are things/points discussed?
-Ans. 	They usually ask us about the reason of aging stock.
-
-Q12. Since most of the items marketed by you, being CE head, are manufactured in India then why is HQ concerned with Ageing Stock?
-Ans. 	Because of Global performance.
-
-Statement of Mr. Mahesh Suttagati 
-
-Q1. 	Please give your introduction.
-Ans. 	Working as manager in Samsung Electronics, since 2004 Oct 15 at their HQ R&D in Suwon, before this I had taken a sabbatical of approx. 1 year, before this worked with L&T Infotech (Bangalore) for 3 years approx. as Project Leader, before that worked in Arvind Mills (Pune) for approx. 8yr.
-
-Q2. 	You are drawing your salary from which company and what is the amount of salary?
-Ans. 	Samsung Electronics Corp. Suwon South Korea, my salary is being paid by Samsung Electronics approx 3200000-3500000 Won (net in my salary account) in Won.
-
-Q3. 	What is your scope of work in Samsung Electronics South Korea?
-Ans. 	Incharge for interoperational testing between base station and mobile devices, Also take care of trail test with operators for mobile wimax.
-
-Q4. 	Since when have you been in India and what is your scope of work in India?
-Ans. Arrived at Bombay on 18th June, Scope of work is to plan POC/proof of concept trial test with RIL and assist states assets.
-
-Q7.	Who instructed you to proceed to India and help Samsung Electronics India Ltd for wimax?
-Ans.	Usually on request from Indian team and local HQ representatives, we get instructions through emails/telephone etc.
-
-Q8.	Who pays you for the work done in India for Samsung India Electronics ltd?
-Ans.	I am paid my monthly salary in Korea, I collect bills for money that I spread during Stay and get reimbursements in Korea.
-
-Q9.	Why is Samsung Electronics Corporation paying you for the work you are in India for Samsung Electronics India Ltd.?
-Ans. 	I don t know
-
-Statement of Mr. Chungseop Song
-
-Q13. Do you receive the Guidelines from Korea regarding Purchases?
-Ans. 	Yes, Sometimes I receive guideline from Korea.
-
-Q14. 	What type of Guidelines you receive?
-Ans. 	Regarding Vendors (Foreign Suppliers)�
-
-10. Ultimately and upon evaluation of the aforenoted statements, the Tribunal had come to the following conclusions:-
-�27. It is pertinent to note that having gone through the statements and also some other material relating to the aspects as to who pays the salary, whom the senior employees reported to, frequency of communication with headquarters in Korea etc, ld. DRP dealt with almost all the aspects argues by the ld. DR before us. They found that the assessee is not exercising that kind of absolute control over posting of employees to the Indian subsidiary, but the assessee has been posting the employees only pursuant to the Triparte agreements between the assessee, Indian subsidiary and the concerned employee. Ld. DRP further held that the Indian subsidiary is a company incorporated under the laws governing the companies in India and is confirming to all the rules and regulations that govern the operations of a corporate body in the country, by filing its returns and paying the taxes under the income tax at and other statutes. It was further observed by the library DRP that the international transactions have been reported under the transfer pricing regulations and examined by the TPO.
-
-28. Ld. DRP vide paragraph No. 5.4.4.2 recorded that the observations of the Ld. AO in respect of the assertion as to the subsidiary as PE, the conclusions made by the AO are based on the statement of the various employees of SIEL during the survey conducted at its premises. Since SIEL is a company incorporated under the laws governing the companies in India and is confirming to all the rules and regulations that govern the operations of a cooperate body, filing its returns of income and paying taxes by reporting the international transactions under Transfer Pricing Regulations, it cannot be said that the SIEL which is subsidiary company is a PE and rejected the findings of the AO on that aspect.
-
-29. So also the Ld. DRP by paragraph no 5.4.4.4 rejected the contention of the AO that SIEL may be treated as a dependent agent for the purpose of Article 5. Ld. DRP also rejected the view of the AO that SIEL is a place of management for south east operations and held that no PE of the assessee exists under Article 5(2)(a) of the treaty with regard to south east operations. 
-
-   ?   ?   ?
-32. We have considered the observations of ld. DRP in the light of the above statements. There is no doubt that there is seemless information exchange between the employees of the assessee and the expat employees. However, on a careful consideration of the entire matter including the statements of the expatriate employees, extracted supra, we are of the considered opinion that the statements show that such information exchange relates to the models/designs to the liking of the Indian consumers, plans and strategies relating to the sale of the products, detailed stock/logistical status, the market strategies both the mid and long terms etc.
-
-33. As rightly argued by the Ld. AR that none of the statement would go to show that the any activity of the global business management (GBM) has ever been conducted in India or that the market survey is conducted in India, as spoken by the expatriate employees has nothing to do with the business of the Indian subsidiary and it is solely for the benefit of the assessee. All the activities that are spoken by the expatriate employees related to the specificity of the products, stock verification, they designs according to the preferences of the Indian consumers, the market strategies to be adopted etc are clearly within the ambit of the business of the Indian subsidiary. Such a communication would primarily benefit the Indian subsidiary and would help the assessee in its GBM to sustain its supply chain management and to place optimized purchase orders at a right timing or to acquire the most promising manufacturing technologies, as is submitted on behalf of the assessee.
-
-34. At the best, the statements and other material relied upon by the revenue show that by way of the seamless communication between the Indian subsidiary and the assessee, the expatriate employees were only discharging the duties of the subsidiary company towards the holding company. Whatever the benefits that are derived by the Indian subsidiary by such communication are offer to tax in India. We therefore find that the activities spoken by the expatriate employees in their statements are in the nature of reporting required in the course of discharge of the functions of the subsidiary company towards the holding company, and such activities do not constitute a PE under Article 5(4)(d), (e) and (f) of the DTAA.
- 
-  ?   ?   ?
-37. In the absence of proof as to any management activity of the assessee being conducted in India or that it is established that the decisions relating to the products to be manufactured, pricing in the domestic markets, or the decisions relating to the launch of such products in India taken by the assessee, we find it difficult to agree with the authorities below that through the expatriate employees the assessee has been conducting the business of assessee in India. Further, except stating that 10% of the remuneration of these employees has to be assumed as the income of the assessee, absolutely there is no evidence that is placed on record by the assessing officer to show that by way of business through these expatriate and seconded employees, the assessee derived any business income in India.�
-
-11. As is manifest from the aforesaid conclusions rendered by the Tribunal, the appellants appear to have woefully failed to establish that the seconded employees were engaged in the carrying on of any activity pertaining or relating to the business of Samsung Korea. The Tribunal also found on fact that the seconded employees were being posted to India pursuant to a tripartite agreement entered into between the respondent-assessee, SIEL and the concerned employees. 
-12. On consideration of the statements of those seconded employees, the Tribunal noted that although information was exchanged and plans and strategies for the Indian market were also discussed, none of the activities undertaken by those seconded employees could be said or construed to be the carrying on or the conduct of business of Samsung Korea from the premises of SIEL. It is these facts which led to the Tribunal observing that none of those statements could be interpreted as evidence of any activity of the global business of Samsung Korea being conducted in India. The Tribunal has also on facts found that the seconded employees were engaged in assisting SIEL in its business in India. It has observed that the mere fact that marketing strategies and future plans pertaining to the business of the Indian subsidiary were also discussed and deliberated upon by Samsung Korea, would not lead to a PE coming into existence. 
-13. Article 5 of the India- Korea DTAA reads as follows:-
-�ARTICLE 5
-PERMANENT ESTABLISHMENT
-1. For the purposes of this Agreement, the term "permanent establishment" means a fixed place of business through which the business of an enterprise is wholly or partly carried on.
-
-2. The term "permanent establishment" includes especially :
-(a)  a place of management ;
-(b)  a branch;
-(c)  an office;
-(d)  a factory;
-(e)  a workshop;
-(f)  a sales outlet;
-(g) a warehouse in relation to a person providing storage  facilities for others;
-(h) a farm, plantation or other place where agricultural, forestry, plantation or related activities are carried on; and
-(i) a mine, an oil or gas well, a quarry or any other place of extraction of natural resources.
-
-3. The term "permanent establishment" also encompasses:
-
-(a) a building site or construction, installation or assembly project or supervisory activities in connection therewith, only if such site, project or activities last more than 183 days;
-(b) the furnishing of services, including consultancy services, by an enterprise through employees or other personnel engaged by the enterprise for such purpose, but only where activities of that nature continue (for the same or connected project) within the country for a period or periods aggregating more than 183 days within any 12-month period.
-4. Notwithstanding the preceding provisions of this Article, the term "permanent establishment" shall be deemed not to include:
-
-(a)	 the use of facilities solely for the purpose of storage, display or delivery of goods or merchandise belonging to the enterprise;
-(b)	 the maintenance of a stock of goods or merchandise belonging to the enterprise solely for the purpose of storage, display or delivery;
-(c)	 the maintenance of a stock of goods or merchandise belonging to the enterprise solely for the purpose of processing by another enterprise;
-(d)	 the maintenance of a fixed place of business solely for the purpose of purchasing goods or merchandise or of collecting information, for the enterprise;
-(e)	 the maintenance of a fixed place of business solely for the purpose of carrying on, for the enterprise, any other activity of a preparatory or auxiliary character;
-(f)	 the maintenance of a fixed place of business solely for any combination of activities mentioned in subparagraphs a) to e), provided that the overall activity of the fixed place of business resulting from this combination is of a preparatory or auxiliary character.
-5. Notwithstanding the provisions of paragraphs 1 and 2, where a person - other than an agent of an independent status to whom paragraph 7 applies - is acting in a Contracting State on behalf of an enterprise of the other Contracting State, that enterprise shall be deemed to have a permanent establishment in the first-mentioned Contracting State in respect of any activities which that person undertakes for the enterprise, if such a person:
-
-(a)	 has and habitually exercises in that State an authority to conclude contracts in the name of the enterprise, unless the activities of such person are limited to those mentioned in paragraph 4 which, if exercised through a fixed place of business, would not make this fixed place of business a permanent establishment under the provisions of that paragraph; or
-(b)	 has no such authority, but habitually maintains in the first-mentioned State a stock of goods or merchandise from which he regularly delivers goods or merchandise on behalf of the enterprise; or
-(c)	 habitually secures orders in the first-mentioned State, wholly or almost wholly for the enterprise itself.
-6. Notwithstanding the preceding provisions of this Article, an insurance enterprise of a Contracting State shall, except in regard to re-insurance, be deemed to have a permanent establishment in the other Contracting State if it collects premiums in the territory of that other State or insures risks situated therein through a person other than an agent of an independent status to whom paragraph 7 applies.
-
-7. An enterprise shall not be deemed to have a permanent establishment in a Contracting State merely because it carries on business in that State through a broker, general commission agent or any other agent of an independent status, provided that such persons are acting in the ordinary course of their business. However, when the activities of such an agent are devoted wholly or almost wholly on behalf of that enterprise, and conditions are made or imposed between that enterprise and the agent in their commercial and financial relations which differ from those which would have been made between independent enterprises, he will not be considered an agent of an independent status within the meaning of this paragraph.
-
-8. The fact that a company which is a resident of a Contracting State controls or is controlled by a company which is a resident of the other Contracting State or which carries on business in that other State (whether through a permanent establishment or otherwise), shall not of itself constitute either company a permanent establishment of the other.�
-
-14. A Full Bench of this Court in a recent decision handed down in Hyatt International Southwest Asia Ltd. v. CIT11 had an occasion to explain in some detail the concept of a PE and which question occurs repeatedly in taxation related disputes emanating from DTAAs�. While Hyatt International was concerned with the DTAA between India and United Arab Emirates12, the definition of a PE as appearing in that Treaty and Convention is similar to Article 5 of the India- Korea DTAA. In any event, we fail to discern any significant conceptual distinction in the manner in which a PE has been defined in those two Conventions. We thus proceed further.
-15. In Hyatt International, the Full Bench while explaining the concept of a PE had observed as follows:-
-�33. �It becomes pertinent to note that Article 5 while defining the expression �PE� brings within its ambit a varied nature of establishments and which need not necessarily be those which have a separate legal persona. As we view Article 5, it becomes apparent that the nature of establishments which are included within the meaning of the phrase �PE� range from a place of management to a mine or a building site and thus not being confined to a juridical entity as is ordinarily understood in law.
-   ?   ?   ?
-42.�The concept of a PE is based upon the undertaking of economic activity in a particular State irrespective of the residence of an enterprise and the same being understood to be in the nature of a conglomerate or an entity which may have many arms or independent functional units situate in various fiscal jurisdictions. Any entrepreneurial activity which gives rise to income or profit thus becomes liable to be taxed at source irrespective of the ultimate recipient or owner of that income. Source here would mean the location which gives rise to the accrual of profits or income or which is the location where the same arises. The PE principle thus enables the assignment of tax to the State which constitutes the source. The PE concept thus creates a functional relationship and connect between the principal entity and the place of business whose activities give rise to the income or profit. It is this fictional creation of an independent economic center in a Contracting State which informs the allocation of taxing rights. Once the DTAA confers an independent identity upon the PE, it would be wholly erroneous to answer the question of taxability basis either the activities or profitability of the parent or the entity which seeds and sustains the PE.
-
-43.�The Contracting State in which this imagined entity is domiciled and undertakes business thus becomes identified as an independent profit or revenue earning center which is liable to be taxed. Once such an entity is found to exist in one of the Contracting State, it is viewed as a unit which contributes to the economic life of that State and thus be liable to tax. It is these basic precepts which convince us to debunk the theory of taxation in the source State being dependent upon a global profit or taxation being subject to income or profit having been earned at an entity level.
-
-44.�The identity which attaches to a PE for the purposes of ascertainment of a taxing liability cannot possibly be doubted bearing in mind the succinct observations of the Supreme Court in�Morgan Stanley�and where their Lordships without a degree of equivocation acknowledged the distinction that is liable to be drawn between a PE with respect to income earned in the Contracting State where it is domiciled or deemed to exist and the global enterprise of which it may be a part. Vogel explains the PE concept as constituting the threshold and the �essential demarcation line� in the source State which sanctions the imposition of a tax in a fiscal jurisdiction other than the State of residence. This would clearly appeal to logical since the right of taxation which inheres in the source State is connected to the �economic life� of that transnational enterprise which is moored and berthed by virtue of the existence of a PE which may be found to exist. Regard must also be had to the fact that right of the source State to tax does not extend to profits which are not allocable to the PE. All of the above, thus clearly leads us to hold that the existence and identity of the PE is separate and distinct and subject to tax to the extent of activities that it may undertake in a State distinct from that of its principal.
-
-45.�It would also be pertinent to note that a cross-border entity may structure its operations in a manner where it operates in more than one taxing jurisdiction. If it be open for such an entity to assert that its global profits and income are not liable to be taxed on the basis of the source principle, it would be wholly impermissible for it to contend that the income which accrues or arises in the Contracting State is also exempt from tax. In any case, the usage of the phrase���so much of them as is attributable to the permanent establishment.��is a clear indicator of the DTAA warranting the PE being liable to be viewed as an independent center of revenue.
-
-46.�The identifiable parts of Article 7 not only restrict the right of one of the Contracting States to tax, it also provisions for the extent to which a tax may be imposed by that State. This becomes evident from it freeing a trans-border entity from the spectre of a tax liability if it does not have a PE in the introductory part of that covenant. It then proceeds to restrict the impost by adopting the principle of attribution. It thus constructs an objective criterion for identification of a PE and when a foreign enterprise with sufficient economic presence would become subject to tax. All of the above, convinces us to hold against the argument of a PE not being taxable on an independent evaluation being misconceived.
-
-47.�On a jurisprudential plane, the sovereignty concept is based on a State's power over a territory and a set of subjects which accept its authority. It was these aspects which governed and regulated the right of a State to levy a tax. However, as trade and commerce transcended boundaries and borders, nations were confronted with profits and incomes being shifted and claimed as exempt. It is the aforenoted factors which appear to have moved the League of Nations in the early 1920s� to constitute a group of economists to study the issue of double taxation. That group is stated to have identified the fundamental factors worthy of consideration to be (a) the origin of wealth or income, (b) the situs of income, (c) enforcement of rights connected with the above and (d) domicile of the person vested with the power to use or dispose of that income or wealth. It was the factor pertaining to �origin� of income which led to the enunciation of the source rule bearing in mind the need to identify the primary source of creation of income and the residence of its owner. It is these fundamental precepts which led to the formulation of measures to determine the economic presence of an entity in a given State and the functional integration of such an entity in the economic activity undertaken in that State.�
-
-16. Proceeding further to explain the extent to which the profits of an enterprise could be taxed in a Contracting State where a PE existed, our Court in Hyatt International had held as follows:-
-�52.�Article 7 of the DTAA postulates that the profits of an enterprise shall be taxable only in that State. It thus, and as a matter of first principle, restricts the taxation of profits of an enterprise only to and in the State of which it may be a resident. However, it then proceeds to expand the scope of taxability by taking into consideration the activities that may be undertaken by such an enterprise in the other Contracting State through a PE situate therein. This is further explained with Article 7(1) prescribing that if the enterprise were carrying on business through a PE situate in the other Contracting State, its profits would become liable to be taxed in the other State, restricted however, to the extent that those profits are attributable to that PE.
-
-53.�On a plain reading of Article 7(1), it becomes apparent that while the profits of an enterprise of a Contracting State are ordained to be taxed only in that State, if that enterprise were to carry on business in the other Contracting State through a PE, the profits earned from activities undertaken by such an establishment would become subject to tax in the other State coupled with the rider of the same being confined to the extent to which those profits are attributable to such an establishment.
-
-54.�As we read Article 7, it becomes evident that Paragraph (1) clearly envisages the profits of a PE being liable to be independently taxed notwithstanding that PE being a constituent of a larger enterprise which may be domiciled in the other Contracting State. The exemption from taxation which stands accorded to an enterprise of a contracting State would cease to be applicable by virtue of the use of the word �unless� which precedes the Article taking into consideration the existence of a PE of that enterprise in the other Contracting State. Article 7(1) proceeds to clarify that if the enterprise were carrying on business through a PE in the other Contracting State, its profits to the extent attributable to that PE would become subject to tax in the other State.
- 
-    ?   ?   ?
-58.�Consequently, even though a PE may be merely a part of the larger entity, the profits generated from its activities undertaken in the other State becomes subject to taxation. Article 7(1) further requires us to undertake an exercise of identifying the extent of profits as are attributable to the PE. It is to that extent alone that the profits of the enterprise ultimately come to be taxed.
-   
-  ?   ?   ?
-63.�As was noticed hereinabove, the profits of an enterprise do not become subject to taxation unless it be found that it functions in the other Contracting State through a PE. Article 7 further postulates that it is only such income which is attributable to the PE which would be subjected to tax in the source State. As is pertinently noted in the OECD and UN Commentaries, it would be wholly incorrect to found taxation on the basis of the overall activities or profitability of an enterprise. The source State is ultimately concerned with the income or profit which arises or accrues within its territorial boundaries and the activities undertaken therein. As those commentaries pertinently observe, the profits attributable to a PE are not liable to be ignored on the basis of the performance of the entity as a whole. This position also finds resonance in the decisions of the Supreme Court in�Morgan Stanley�and�Ishikawajama�and relevant parts whereof have been extracted above.�
-
-17. Having noticed the broad legal principles underlying the concept of a PE, we proceed further to take note of the salient precepts which courts have identified as being germane for answering the question of when a PE could be said to have come into existence. We in our recent decision in Progress Rail Locomotive Inc. v. Deputy Commissioner of Income-tax (International Taxation) and Others13 had an occasion to review the body of precedent which has come to evolve around this question and thus deem it appropriate to refer to the following passages from that decision.
-18. It becomes pertinent to note at the outset that Progress Rail too was a case where a corporate entity whose activities straddled various tax jurisdictions had two units in India. The Revenue in that case had asserted that those units constituted a PE and thus profits liable to be attributed and brought to tax. 
-19. While negating those contentions, we had held:-
-�85. That leads us to examine the correctness of the opinion as formed with respect to the Noida factory and the Varanasi office constituting a fixed place permanent establishment. Decades before global commerce attained the degree of complexity which attaches to it today, the Andhra Pradesh High Court in CIT v. Visakhapatnam Port Trust [(1983) 144 ITR 146 (AP); 1983 SCC OnLine AP 287; (1984) 38 CTR 1 (AP); (1983) 15 Taxman 72 (AP).], and which decision constitutes the locus classicus on the subject, explained the concept of a �permanent establishment� as postulating a substantial element of presence of a foreign enterprise in another country. The presence, as Jagannadha Rao, J. explained, had to additionally meet the test of an enduring and permanent nature. It was this seminal decision which propounded the concept of �virtual projection�.
-
-86. The principles pertaining to fixed place permanent establishment were more lucidly explained by the Supreme Court in Formula One World Championship Ltd. [Formula One World Championship Ltd. v. CIT (International Taxation), (2017) 394 ITR 80 (SC); (2017) 15 SCC 602; (2017) 295 CTR 12 (SC); (2017) 248 Taxman 192 (SC).] in the following terms (page 100 of 394 ITR):
-�Emphasising that as a creature of international tax law, the concept of permanent establishment has a particularly strong claim to a uniform international meaning, Philip Baker discerns two types of permanent establishments contemplated under article 5 of Organization for Economic Co-operation and Development Model. First, an establishment which is part of the same enterprise under common ownership and control�an office, branch, etc., to which he gives his own description as an �associated permanent establishment�. The second type is an agent, though legally separate from the enterprise, nevertheless who is dependent on the enterprise to the point of forming a permanent establishment. Such permanent establishment is given the nomenclature of �unassociated permanent establishment� by Baker. He, however, pointed out that there is a possibility of a third type of permanent establishment, i.e., a construction or installation site may be regarded as permanent establishment under certain circumstances. In the first type of permanent establishment, i.e., associated permanent establishments, primary requirement is that there must be a fixed place of business through which the business of an enterprise is wholly or partly carried on. It entails two requirements which need to be fulfilled : (a) there must be a business of an enterprise of a contracting State (FOWC in the instant case); and (b) permanent establishment must be a fixed place of business, i.e., a place which is at the disposal of the enterprise. It is universally accepted that for ascertaining whether there is a fixed place or not, permanent establishment must have three characteristics : stability, productivity and dependence. Further, fixed place of business connotes existence of a physical location which is at the disposal of the enterprise through which the business is carried on�
-The principal test, in order to ascertain as to whether an establishment has a fixed place of business or not, is that such physically located premises have to be �at the disposal� of the enterprise. For this purpose, it is not necessary that the premises are owned or even rented by the enterprise. It will be sufficient if the premises are put at the disposal of the enterprise. However, merely giving access to such a place to the enterprise for the purposes of the project would not suffice. The place would be treated as �at the disposal� of the enterprise when the enterprise has right to use the said place and has control thereupon.�
-Taking cue from the word �through� in the article, Vogel has also emphasised that the place of business qualifies only if the place is �at the disposal� of the enterprise. According to him, the enterprise will not be able to use the place of business as an instrument for carrying on its business unless it controls the place of business to a considerable extent. He hastens to add that there are no absolute standards for the modalities and intensity of control. Rather, the standards depend on the type of business activity at issue. According to him, �disposal� is the power (or a certain fraction thereof) to use the place of business directly.�
-Organization for Economic Co-operation and Development commentary on Model Tax Convention mentions that a general definition of the term �permanent establishment� brings out its essential characteristics, i.e., a distinct 'situs', a �fixed place of business'. This definition, therefore, contains the following conditions : (i) the existence of a �place of business', i.e., a facility such as premises or, in certain instances, machinery or equipment; (ii) this place of business must be �fixed�, i.e., it must be established at a distinct place with a certain degree of permanence; (iii) the carrying on of the business of the enterprise through this fixed place of business. This means usually that persons who, in one way or another, are dependent on the enterprise (personnel) conduct the business of the enterprise in the State in which the fixed place is situated.
-The term �place of business' is explained as covering any premises, facilities or installations used for carrying on the business of the enterprise whether or not they are used exclusively for that purpose. It is clarified that a place of business may also exist where no premises are available or required for carrying on the business of the enterprise and it simply has a certain amount of space at its disposal. Further, it is immaterial whether the premises, facilities or installations are owned or rented by or are otherwise at the disposal of the enterprise. A certain amount of space at the disposal of the enterprise which is used for business activities is sufficient to constitute a place of business. No formal legal right to use that place is required. Thus, where an enterprise illegally occupies a certain location where it carries on its business, that would also constitute a permanent establishment. Some of the examples where premises are treated at the disposal of the enterprise and, therefore, constitute permanent establishment are : a place of business may thus be constituted by a pitch in a market place, or by a certain permanently used area in a customs depot (e.g. for the storage of dutiable goods). Again the place of business may be situated in the business facilities of another enterprise. This may be the case for instance where the foreign enterprise has at its constant disposal certain premises or a part thereof owned by the other enterprise. At the same time, it is also clarified that the mere presence of an enterprise at a particular location does not necessarily mean that the location is at the disposal of that enterprise.�
-As per article 5 of the Double Taxation Avoidance Agreement, the permanent establishment has to be a fixed place of business �through� which business of an enterprise is wholly or partly carried on. Some examples of fixed place are given in article 5(2), by way of an inclusion. Article 5(3), on the other hand, excludes certain places which would not be treated as permanent establishment, i.e., what is mentioned in clauses (a) to (f) as the �negative list�. A combined reading of sub-articles (1), (2) and (3) of article 5 would clearly show that only certain forms of establishment are excluded as mentioned in article 5(3), which would not be permanent establishments. Otherwise, sub-article (2) uses the word �include� which means that not only the places specified therein are to be treated as permanent establishments, the list of such permanent establishments is not exhaustive. In order to bring any other establishment which is not specifically mentioned, the requirements laid down in sub-article (1) are to be satisfied. Twin conditions which need to be satisfied are : (a) existence of a fixed place of business; and (b) through that place business of an enterprise is wholly or partly carried out.�
-We are of the opinion that the test laid down by the Andhra Pradesh High Court in CIT v. Visakhapatnam Port Trust [(1983) 144 ITR 146 (AP); 1983 SCC OnLine AP 287; (1984) 38 CTR 1 (AP); (1983) 15 Taxman 72 (AP).] fully stands satisfied. Not only the Buddh International Circuit is a fixed place where the commercial/economic activity of conducting F-1 Championship was carried out, one could clearly discern that it was a virtual projection of the foreign enterprise, namely, Formula-1 (i.e., FOWC) on the soil of this country. It is already noted above that as per Philip Baker (A Manual on the Organization for Economic Co-operation and Development Model Tax Convention on Income and on Capital), a permanent establishment must have three characteristics : stability, productivity and dependence. All characteristics are present in this case. Fixed place of business in the form of physical location, i.e., Buddh International Circuit, was at the disposal of FOWC through which it conducted business. Aesthetics of law and taxation jurisprudence leave no doubt in our mind that taxable event has taken place in India and the non-resident FOWC is liable to pay tax in India on the income it has earned on this soil.�
-
-87. As per the Manual on the Organization for Economic Co-operation and Development Model Tax Convention, and the precedents rendered on the subject, there are two basic conditions which are spelt out and which must be fulfilled for acknowledging a permanent establishment being existent and constituting a fixed place of business. They are:
-(a) a place which stands placed at the �disposal� of an enterprise; and
-(b) The establishment answering the characteristics of stability, productivity and dependence.
-
-88. The expression "disposal" was explained to mean a right to use a place and exercise "control" thereupon. "Control" was explained further to mean the place of business being at the "disposal" of an enterprise and which may have use of the same to a considerable extent. It was further observed that the test of place of business being under the "control" of a foreign enterprise would be met even though the said premises may not be directly owned or taken by way of lease or on rental basis. In Formula One World Championship Ltd., the Supreme Court observed that even a certain amount of space which may be placed at the "disposal" of an enterprise for the purposes of the use of its business activities would be sufficient. The Supreme Court significantly observed that for the purposes of recognizing the existence of a fixed place permanent establishment, no formal legal right to use need be discerned or proven. It was thus held that as long as it is a space in an establishment or premises placed at the constant "disposal" of the enterprise, it would satisfy the test of a fixed place permanent establishment as contemplated under articles 5(1) and 5 (2)(a)-(k) of the Double Taxation Avoidance Agreement.
-
-89. The principles governing fixed place permanent establishment were again spelt out and enunciated by the Supreme Court in Morgan Stanley and Co. Inc. [DIT (International Taxation) v. Morgan Stanley and Co. Inc., (2007) 292 ITR 416 (SC); (2007) 7 SCC 1.] and Samsung Heavy Industries Co. Ltd. [DIT (International Taxation) v. Samsung Heavy Industries Co. Ltd., (2020) 426 ITR 1 (SC); (2020) 7 SCC 347.] In Morgan Stanley and Co. Inc. [DIT (International Taxation) v. Morgan Stanley and Co. Inc., (2007) 292 ITR 416 (SC); (2007) 7 SCC 1.] , and where the following pertinent observations came to be rendered (page 421 of 292 ITR):
-
-�With globalisation, many economic activities spread over to several tax jurisdictions. This is where the concept of permanent establishment becomes important under article 5(1). There exists a permanent establishment if there is a fixed place through which the business of an enterprise, which is multinational enterprise (MNE), is wholly or partly carried on. In the present case MSCo is a multinational entity. As stated above it has out sourced some of its activities to MSAS in India. A general definition of permanent establishment in the first part of article 5(1) postulates the existence of a fixed place of business whereas the second part of article 5(1) postulates that the business of MNE is carried out in India through such fixed place. One of the questions which we are called upon to decide is whether the activities to be undertaken by MSAS consist of back office operations of MSCo and if so whether such operations would fall within the ambit of the expression �the place through which the business of an enterprise is wholly or partly carried out� in article 5(1)�.
-In our view, the second requirement of article 5(1) of the Double Taxation Avoidance Agreement is not satisfied as regards back office functions. We have examined the terms of the Agreement along with the advance ruling application made by MSCo inviting the AAR to give its ruling. It is clear from a reading of the above Agreement/ application that MSAS in India would be engaged in supporting the front office functions of MSCo in fixed income and equity research and in providing Information Technology enabled services such as data processing support centre and technical services as also reconciliation of accounts. In order to decide whether a permanent establishment stood constituted one has to undertake what is called as a functional and factual analysis of each of the activities to be undertaken by an establishment. It is from that point of view, we are in agreement with the ruling of AAR that in the present case article 5(1) is not applicable as the said MSAS would be performing in India only back office operations. Therefore to the extent of the above back office functions the second part of article 5(1) is not attracted.�
-
-90. Morgan Stanley and Co. Inc. was followed by the Supreme Court in Samsung Heavy Industries Co. Ltd.  and where and in the context of a fixed place permanent establishment, the Supreme Court held (page 18 of 426 ITR):
-�A recent judgment of this court, namely, Asst. DIT v. E-Funds IT Solution Inc., concerned itself with the India-US Double Taxation Avoidance Agreement with similar provisions. Dealing with what was referred to as a 'fixed place', permanent establishment, this court held (SCC p. 310, para 16 and page 51 of 399 ITR):
-
-�The Income-tax Act, in particular section 90 thereof, does not speak of the concept of a permanent establishment. This is a creation only of Double Taxation Avoidance Agreement. By virtue of article 7(1) of the Double Taxation Avoidance Agreement, the business income of companies which are incorporated in the US will be taxable only in the US, unless it is found that they were permanent establishments in India, in which event their business income, to the extent to which it is attributable to such permanent establishments, would be taxable in India. Article 5 of the Double Taxation Avoidance Agreement set out hereinabove provides for three distinct types of permanent establishments with which we are concerned in the present case : fixed place of business permanent establishment under articles 5(1) and 5(2)(a) to 5(2)(k); service permanent establishment under article 5(2)(1) and agency permanent establishment under article 5(4). Specific and detailed criteria are set out in the aforesaid provisions in order to fulfil the conditions of these permanent establishments existing in India. The burden of proving the fact that a foreign assessee has a permanent establishment in India and must, therefore, suffer tax from the business generated from such permanent establishment is initially on the Revenue. With these prefatory remarks, let us analyse whether the respondents can be brought within any of the subclauses of article 5.'  �
-Dealing with 'support services' rendered by an Indian company to American companies, it was held that the outsourcing of such services to India would not amount to a fixed place permanent establishment under article 5 of the aforesaid treaty, as follows (SCC p. 320, para 22 and page 63 of 399 ITR):
-�This report would show that no part of the main business and revenue earning activity of the two American companies is carried on through a fixed business place in India which has been put at their disposal. It is clear from the above that the Indian company only renders support services which enable the assessees in turn to render services to their clients abroad. This outsourcing of work to India would not give rise to a fixed place permanent establishment and the High Court judgment (DIT v. E-Funds IT Solution);  is, therefore, correct on this score  �
-A reading of the aforesaid judgments makes it clear that when it comes to 'fixed place' permanent establishments under double taxation avoidance treaties, the condition precedent for applicability of article 5 (1) of the double taxation treaty and the ascertainment of a 'permanent establishment' is that it should be an establishment 'through which the business of an enterprise' is wholly or partly carried on. Further, the profits of the foreign enterprise are taxable only where the said enterprise carries on its core business through a permanent establishment. What is equally clear is that the maintenance of a fixed place of business which is of a preparatory or auxiliary character in the trade or business of the enterprise would not be considered to be a permanent establishment under article 5. Also, it is only so much of the profits of the enterprise that may be taxed in the other State as is attributable to that permanent establishment....
-Though it was pointed out to Income-tax Appellate Tribunal that there were only two persons working in the Mumbai office, neither of whom was qualified to perform any core activity of the assessee, the Income-tax Appellate Tribunal chose to ignore the same. This being the case, it is clear, therefore, that no permanent establishment has been set up within the meaning of article 5(1) of the Double Taxation Avoidance Agreement, as the Mumbai project office cannot be said to be a fixed place of business through which the core business of the assessee was wholly or partly carried on. Also, as correctly argued by Shri Ganesh, the Mumbai project office, on the facts of the present case, would fall within article 5(4)(e) of the Double Taxation Avoidance Agreement, inasmuch as the office is solely an auxiliary office, meant to act as a liaison office between the assessee and ONGC. This being the case, it is not necessary to go into any of the other questions that have been argued before us.�
-
-91. When we test the stand taken by the respondents, bearing in mind the aforesaid precepts as culled out from the various judgments noticed hereinabove, we find ourselves unable to sustain even the prima facie formation of opinion by the first respondent in this respect. It is pertinent to note that the impugned notices and the reasons set out for initiating action under section 147/148 nowhere allude to a particular space or a part of the premises situated in Noida or Varanasi having been placed under the exclusive or significant �control� or �disposal� of the petitioner. The first respondent fails to rest its prima facie opinion with respect to fixed place permanent establishment on any part of the Noida or Varanasi premises which may have been set apart or exclusively placed in and under the �control� of the petitioner for use of its business activities and which may have tended to indicate that the space was made available for the use of the petitioner and from where it was conducting its business activities. It would have had to be shown that the �control� of that space answered the test of considerable extent. We recall Vogel describing this particular genre of a permanent establishment as being akin to an �instrument (equalling or resembling an operating asset) for his entrepreneurial activity�. The concept of �virtual projection� is concerned with a functional integration between the two units and which would mean an establishment which has been virtually used for all purposes to carry out the paramount business activity of the petitioner. None of these factors are either alluded to or appear to have been borne in consideration before arriving at the conclusion that the Indian establishment constituted a fixed place permanent establishment.
-
-?   ?   ?
-20. 
-94. We also take note of the judgment in Formula One World Championship Ltd. [Formula One World Championship Ltd. v. CIT (International Taxation), (2017) 394 ITR 80 (SC); (2017) 15 SCC 602; (2017) 295 CTR 12 (SC); (2017) 248 Taxman 192 (SC).] and where it was significantly observed that a permanent establishment must qualify and meet the tests of stability, productivity and dependence. Of equal significance were the observations which explained the phrases �at the disposal of� and �through�. Tested on the aforesaid precepts also, the impugned notices and the reasons set out for initiating action under section 147/148 woefully fail to rest on any evidence which could have possibly compelled us in acknowledging that a fixed place permanent establishment had come into being.� 
-
-20. As is manifest from the principles that we had identified in Progress Rail, a PE would be deemed to have come into existence if one were to find a Fixed Place through which the business of the enterprise seated in the other Contracting State was being carried out. Those premises must be found to be at the disposal of that enterprise and under its control. We had quoted, with approval, the test formulated by Klaus Vogel who had explained control over premises or space to answer the test of �considerable extent� and the premises being �an instrument (equalling or resembling an operating asset) for his entrepreneurial activity�. It is these tests which would qualify the benchmark of �virtual projection� as evolved by courts.
-21. In Hyatt International, the Full Bench of our Court had explained that PE itself was a concept based upon an enterprise undertaking economic activity in a particular State irrespective of its residence. The taxability of business profits, we had explained, is itself dependent upon a PE existing in the Contracting State notwithstanding that establishment being a constituent of a larger enterprise which may be domiciled in the other Contracting State. However, and as the Tribunal itself has noticed, the DRP had not concurred with the opinion of the AO that a Fixed Place PE, DAPE or Service PE of the respondent-assessee had come into existence. While the DRP had disagreed with the AO on those aspects, it ultimately came to hold against the respondent-assessee, taking the view that by virtue of secondment of employees, a deemed PE had come into being. It is this view that the Tribunal has proceeded to overturn. 
-22. We find ourselves in complete agreement with the opinion expressed by the Tribunal, since the secondment of employees has not been found to be for the furtherance of the business or enterprise of the respondent. Those seconded employees were not discharging functions or performing activities connected with the global enterprise of the respondent. Their placement in India was with the objective of facilitating the activities of SIEL. Collection of market information, collation of data for development of products, market trend studies or exchange of information would not meet the qualifying benchmarks of a PE.  
-23. This was an aspect which we had noticed even in our decision in Progress Rail where we had held as follows:-
-�96. We then proceed to test the correctness of the prima facie conclusions arrived at by the first respondent on the anvil of article 5(3) of the India-USA Double Taxation Avoidance Agreement ((1991) 187 ITR (Stat) 102). As was noticed hereinabove, article 5(3) excludes permanent establishments which may otherwise fall within the ambit of article 5(1) or article 5(2), if it were found that the said permanent establishment were engaged in the discharge of functions enumerated therein. While and undisputedly sub-clauses (a), (b) and (c) of article 5(3) are not even invoked, even if we were to examine the correctness of the view taken by the first respondent based on sub-clauses (d) and (e), we find ourselves unable to sustain the impugned notices and the reasons set out for initiating action under section 147/148, basis which the impugned notices were issued.
-
-97. In terms of article 5(3)(d), if a permanent establishment were to be engaged solely for the purposes of purchase of goods or merchandise, or for that matter for �collecting information� for a foreign enterprise, the same would stand excluded from the ambit of sub-clauses (1) and (2) of article 5. The first respondent appears to have been heavily influenced by the Indian subsidiary - PRIPL routing communications between the petitioner and DLW and other arms of the Indian Railways. The first respondent also alludes to certain supportive functions such as gathering of information and other allied activities allegedly undertaken by PRIPL for and on behalf of the petitioner. It becomes pertinent to note that be it collecting information or for that matter studying market trends or future business prospects, the same would clearly fall not only within the ken of sub-clause (d), but also partly within the scope of sub-clause (e) of article 5(3). This, since both sub-clauses (d) and (e) are concerned with collection or supply of information. We also bear in consideration the Supreme Court in Morgan Stanley and Co. Inc. [DIT (International Taxation) v. Morgan Stanley and Co. Inc., (2007) 292 ITR 416 (SC); (2007) 7 SCC 1.] having held that market research or analysis, data processing support or for that matter, account reconciliation are essentially back office functions and support services and which would not be sufficient to acknowledge a fixed place permanent establishment existing.
-****
-134. In so far as the MES Agreement and other allied agreements are
-concerned, it is clear that in terms of the said agreements, the employees of the Indian subsidiary were to keep track of monetary balances and record the movement of goods, maintain and co-ordinate the implementation of accounting control procedures, assist in the development of both short term and long-term strategy plans, study market trends and other such allied activities. Regard must be had to the fact that the Indian entity - PRIPL was undoubtedly a wholly owned subsidiary of the petitioner, and formed part of the multi-national group - Caterpillar. There would undoubtedly be some degree of collaboration and exchange of information between a principal and its wholly owned subsidiary. However, that alone would not justify a presumption of a permanent establishment having come into existence. As has been repeatedly emphasized, a subsidiary would be deemed to become a permanent establishment only if it satisfies the tests as laid out in article 5(1), 5(2), 5(4) and 5(5). A group of companies may well engage in discussions at different levels so as to evolve a marketing strategy or identify a research output with respect to future prospects. That, however, cannot be viewed as being sufficient to hold that the Indian establishment attains the character of a permanent establishment. The exchange and collaboration between entities forming part of a larger conglomerate would clearly be intended towards subserving the growth of the group as a whole and could relate to not only operations in India, but also to any market in the globe in which the petitioner may have a footprint.�
-
-24. Regard must also be had to the fact that Paragraph 3(b) of Article 5 would also not be applicable since it was not even the case of the appellants that the respondent was rendering services, consultative or otherwise, to SIEL through the employees who stood seconded or placed at the disposal of the latter. 
-25. This would constitute an appropriate juncture to pause and take into consideration how the secondment of employees is explained in the UN and OECD Model Commentaries.
-26. The OECD Model Commentary 2017 while explaining the scope of Article 5 enters the following pertinent clarifications:-
-�39. There are different ways in which an enterprise may carry on its business. In most cases, the business of an enterprise is carried on by the entrepreneur or persons who are in a paid-employment relationship with the enterprise (personnel). This personnel includes employees and other persons receiving instructions from the enterprise (e.g. dependent agents). The powers of such personnel in its relationship with third parties are irrelevant. It makes no difference whether or not the dependent agent is authorised to conclude contracts if he works at the fixed place of business of the enterprise (see paragraph 100 below). As explained in paragraph 8.11 of the Commentary on Article 15, however, there may be cases where individuals who are formally employed by an enterprise will actually be carrying on the business of another enterprise and where, therefore, the first enterprise should not be considered to be carrying on its own business at the location where these individuals will perform that work. Within a multinational group, it is relatively common for employees of one company to be temporarily seconded to another company of the group and to perform business activities that clearly belong to the business of that other company. In such cases, administrative reasons (e.g. the need to preserve seniority or pension rights) often prevent a change in the employment contract. The analysis described in paragraphs 8.13 to 8.15 of the Commentary on Article 15 will be relevant for the purposes of distinguishing these cases from other cases where employees of a foreign enterprise perform that enterprise�s own business activities.�
-
-27. While dealing with Article 15 and the subject of taxation of income from employment, we find the following relevant passages which would guide us in answering the challenge which is raised before us: -
-�8.5 In some cases, services rendered by an individual to an enterprise may be considered to be employment services for purposes of domestic tax law even though these services are provided under a formal contract for services between, on the one hand, the enterprise that acquires the services, and, on the other hand, either the individual himself or another enterprise by which the individual is formally employed or with which the individual has concluded another formal contract for services.
-(Added on 22 July 2010; see HISTORY)
-8.6 In such cases, the relevant domestic law may ignore the way in which the services are characterised in the formal contracts. It may prefer to focus primarily on the nature of the services rendered by the individual and their integration into the business carried on by the enterprise that acquires the services to conclude that there is an employment relationship between the individual and that enterprise.
-   (Added on 22 July 2010; see HISTORY)
-8.7 Since the concept of employment to which Article 15 refers is to be determined according to the domestic law of the State that applies the Convention (subject to the limit described in paragraph 8.11 and unless the context of a particular convention requires otherwise), it follows that a State which considers such services to be employment services will apply Article 15 accordingly. It will, therefore, logically conclude that the enterprise to which the services are rendered is in an employment relationship with the individual so as to constitute his employer for purposes of subparagraphs 2 b) and c). That conclusion is consistent with the object and purpose of paragraph 2 of Article 15 since, in that case, the employment services may be said to be rendered to a resident of the State where the services are performed. 
-(Added on 22 July 2010; see HISTORY)
-****
-8.13 The nature of the services rendered by the individual will be an important factor since it is logical to assume that an employee provides services which are an integral part of the business activities carried on by his employer. It will therefore be important to determine whether the services rendered by the individual constitute an integral part of the business of the enterprise to which these services are provided. For that purpose, a key consideration will be which enterprise bears the responsibility or risk for the results produced by the individual�s work. Clearly, however, this analysis will only be relevant if the services of an individual are rendered directly to an enterprise. Where, for example, an individual provides services to a contract manufacturer or to an enterprise to which business is outsourced, the services of that individual are not rendered to enterprises that will obtain the products or services in question. (Added on 22 July 2010; see HISTORY)
-8.14 Where a comparison of the nature of the services rendered by the individual with the business activities carried on by his formal employer and by the enterprise to which the services are provided points to an employment relationship that is different from the formal contractual relationship, the following additional factors may be relevant to determine whether this is really the case:
-- who has the authority to instruct the individual regarding the manner in which the work has to be performed; 
-- who controls and has responsibility for the place at which the work is performed; 
-- the remuneration of the individual is directly charged by the formal employer to the enterprise to which the services are provided (see paragraph 8.15 below); 
-- who puts the tools and materials necessary for the work at the individual�s disposal;
-- who determines the number and qualifications of the individuals performing the work; 
-- who has the right to select the individual who will perform the work and to terminate the contractual arrangements entered into with that individual for that purpose; 
-- who has the right to impose disciplinary sanctions related to the work of that individual; who determines the holidays and work schedule of that individual.
-(Added on 22 July 2010; see HISTORY)
-
-8.15 Where an individual who is formally an employee of one enterprise
-provides services to another enterprise, the financial arrangements made between the two enterprises will clearly be relevant, although not necessarily conclusive, for the purposes of determining whether the remuneration of the individual is directly charged by the formal employer to the enterprise to which the services are provided. For instance, if the fees charged by the enterprise that formally employs the individual represent the remuneration, employment benefits and other employment costs of that individual for the services that he provided to the other enterprise, with no profit element or with a profit element that is computed as a percentage of that remuneration, benefits and other employment costs, this would be indicative that the remuneration of the individual is directly charged by the formal employer to the enterprise to which the services are provided. That should not be considered to be the case, however, if the fee charged for the services bears no relationship to the remuneration of the individual or if that remuneration is only one of many factors taken into account in the fee charged for what is really a contract for services (e.g. where a consulting firm charges a client on the basis of an hourly fee for the time spent by one of its employees to perform a particular contract and that fee takes account of the various costs of the enterprise), provided that this is in conformity with the arm�s length principle if the two enterprises are associated. It is important to note, however, that the question of whether the remuneration of the individual is directly charged by the formal employer to the enterprise to which the services are provided is only one of the subsidiary factors that are relevant in determining whether services rendered by that individual may properly be regarded by a State as rendered in an employment relationship rather than as under a contract for services concluded between two enterprises.
-(Added on 22 July 2010; see HISTORY)�
-
-28. A similar explanation appears in the UN Model Commentary 2021 which, while explaining the scope of Article 5 of the Model Convention, adopts the position as enunciated in paragraph 39 of the OECD Commentary and observes: -
-�15. The Committee considers that the following part of the Commentary on Article 5 of the 2017 OECD Model Tax Convention, which deals with the interpretation of the phrase �through which the business of an enterprise is wholly or partly carried on� in paragraph 1 of the Article, is applicable to paragraph 1 of Article 5 of this Model (the modifications that appear in italics between square brackets, which are not part of the Commentary on the OECD Model Tax Convention, have been inserted in order to provide additional explanations or to reflect the differences between the provisions of the OECD Model Tax Convention and those of this Model):
-�39. There are different ways in which an enterprise may carry on its business. In most cases, the business of an enterprise is carried on  mainly by the entrepreneur or persons who are in a paid-employment relationship with the enterprise (personnel). This personnel includes employees and other persons receiving instructions from the enterprise (e.g. dependent agents). The powers of such personnel in its relationship with third parties are irrelevant. It makes no difference whether or not the dependent agent is authorised to conclude contracts if he works at the fixed place of business of the enterprise (see paragraph 100 below [of the Commentary on Article 5 of the 2017 OECD Model Tax Convention] ). As explained in paragraph 8.11 of the Commentary on Article 15 [of the 2017 OECD Model Tax Convention, as quoted in paragraph 5 of the Commentary on Article 15 of this Model] , however, there may be cases where individuals who are formally employed by an enterprise will actually be carrying on the business of another enterprise and where, therefore, the first enterprise should not be considered to be carrying on its own business at the location where these individuals will perform that work. Within a multinational group, it is relatively common for employees of one company to be temporarily seconded to another company of the group and to perform business activities that clearly belong to the business of that other company. In such cases, administrative reasons (e.g. the need to preserve seniority or pension rights) often prevent a change in the employment contract. The analysis described in paragraphs 8.13 to 8.15 of the Commentary on Article 15 [of the 2017 OECD Model Tax Convention, as quoted in paragraph 5 of the Commentary on Article 15 of this Model]  will be relevant for the purposes of distinguishing these cases from other cases where employees of a foreign enterprise perform that enterprise�s own business activities������
-
-29. As is manifest from the above, the secondment of employees which may consist of technically trained personnel or persons with experience is an arrangement not uncommon in today�s world of business. What however needs to be considered is whether the deployment of such employees is in furtherance of the business of their formal employer or intended to be utilized for the business of the enterprise with whom they are placed. In the facts of the present case, the weight of evidence which was collated unerringly leans towards their engagement being viewed as one which was for the benefit of SIEL. 
-30. We thus find no error in the view expressed by the Tribunal in this regard. In our considered opinion, the Tribunal was justified in interfering with the opinion formed by the DRP and which had spoken of a deemed PE having come into being merely on account of the secondment of employees. Absent any material that would have even tended to indicate that the functioning of the seconded employees was concerned with the business or the generation of income of the respondent in India, the decision of the Tribunal cannot be faulted.
-31. We consequently answer the questions posited in the negative and against the appellant. We accordingly and for reasons assigned hereinabove, uphold the judgment of the Tribunal dated 22 March 2018, 14 December 2018 and 22 March 2021 and dismiss these appeals.     
-
-YASHWANT VARMA, J.
-
-HARISH VAIDYANATHAN SHANKAR, J.
-JANUARY 15, 2025/RW
-	
-1 Tribunal 
-2 Samsung Korea
-3 AY
-4 SIEL
-5 Samsung R&D
-6 AO
-7 PE
-8 DTAA
-9 DAPE
-10 DRP
-11 2024 SCC OnLine Del 6546
-12 UAE
-13 2024 SCC OnLine Del 4065
----------------
-
-------------------------------------------------------------
-
----------------
-
-------------------------------------------------------------
-
-
-
-
-
-								          
-
-ITA 1029/2018 & Connected Matters   	Page 32 of 32
-
-
-
-
-
-

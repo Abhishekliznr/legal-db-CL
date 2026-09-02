@@ -1,5 +1,5 @@
 services:
-  # 1. PostgreSQL Database Service
+  # 1. PostgreSQL Database Service (shared by both backend services)
   db:
     image: postgres:15-alpine
     container_name: legal_postgres_db
@@ -18,24 +18,47 @@ services:
       timeout: 5s
       retries: 5
 
-  # 2. FastAPI Web App & Scraper Service
-  app:
-    build: .
-    container_name: legal_app
+  # 2. API Backend — case search, filters & citator (lightweight, no Playwright)
+  api-backend:
+    build:
+      context: .
+      dockerfile: api-backend/Dockerfile
+    container_name: legal_api_backend
     restart: always
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - "8080:3000"
+      - "8080:8000"
     environment:
       - DB_CONNECTION=postgresql://postgres:1234@db:5432/legal_db
-      - PYTHONPATH=/app/backend:/app
+      - PYTHONPATH=/app
     volumes:
-      # Mount current directory so code/template/PDF changes persist immediately
+      # Mount current directory so code changes persist immediately
       - .:/app
-      # Preserve container's installed python packages
-      - /app/__pycache__
+      - /app/api-backend/__pycache__
+
+  # 3. Scraper Backend — court scraping, AI metadata extraction & Azure Blob sync (heavy)
+  scraper-backend:
+    build:
+      context: .
+      dockerfile: scraper-backend/Dockerfile
+    container_name: legal_scraper_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8081:8001"
+    environment:
+      - DB_CONNECTION=postgresql://postgres:1234@db:5432/legal_db
+      - PYTHONPATH=/app
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
+      - AZURE_CONTAINER_NAME=${AZURE_CONTAINER_NAME}
+      - AZURE_PDF_CONTAINER_NAME=${AZURE_PDF_CONTAINER_NAME}
+    volumes:
+      - .:/app
+      - /app/scraper-backend/__pycache__
 
 volumes:
   postgres_data:
