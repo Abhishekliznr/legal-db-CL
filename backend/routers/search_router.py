@@ -1,19 +1,22 @@
 """
-Search Router: Dedicated Endpoints for Case Search, Citator Treatment, Case Details & PDF
-------------------------------------------------------------------------------------------
+Search Router: Case Search, Facet Extraction, Citator Treatment, Case Details & PDF
+------------------------------------------------------------------------------------
 Handles:
-- GET /api/cases/search            : Multi-field full-text search with dynamic filters & pagination
-- GET /api/cases/{case_id}         : Full judgment metadata, provisions, and citations
-- GET /api/cases/{case_id}/citations: Citation precedence graph (Good Law, Overruled, Distinguished)
-- GET /api/cases/{case_id}/pdf     : Stream judgment PDF directly or redirect to Azure Blob
-- GET /api/stats                   : Corpus statistics & citator status breakdown
+- POST /api/case-research/search   : Structured JSON search with multi-filter mapping & dynamic facets
+- POST /api/cases/search           : Alias for structured search
+- GET  /api/cases/search           : Query-param search for quick GET lookups & backward compatibility
+- GET  /api/cases/{case_id}        : Full judgment metadata, provisions, and citations
+- GET  /api/cases/{case_id}/citations: Citation precedence graph (Good Law, Overruled, Distinguished)
+- GET  /api/cases/{case_id}/pdf    : Stream judgment PDF directly or redirect to Azure Blob
+- GET  /api/stats                  : Corpus statistics & citator status breakdown
 """
 
 import os
 from pathlib import Path
-from typing import Optional, List, Dict, Any
-from fastapi import APIRouter, Query, HTTPException
+from typing import Optional, List, Dict, Any, Union
+from fastapi import APIRouter, Query, HTTPException, Body
 from fastapi.responses import FileResponse, RedirectResponse
+from pydantic import BaseModel, Field
 
 try:
     from backend import db_manager
@@ -23,31 +26,68 @@ except ImportError:
 router = APIRouter(tags=["Legal Search & Citator Engine"])
 
 
-@router.get("/api/cases/search", response_model=Dict[str, Any])
-def search_cases(
-    q: Optional[str] = Query(None, description="Free text query across case name, numbers, AI notes, judges, acts"),
-    court_id: Optional[str] = Query(None, description="Filter by Court ID (e.g. SCIN)"),
-    year: Optional[int] = Query(None, description="Filter by Judgment Year"),
-    treatment_status: Optional[str] = Query(None, description="Filter by Citator Status (GOOD_LAW, OVERRULED, DOUBTED, DISTINGUISHED)"),
-    judge: Optional[str] = Query(None, description="Filter by Judge Name"),
-    act: Optional[str] = Query(None, description="Filter by Canonical Act"),
-    is_reported: Optional[bool] = Query(None, description="Filter by Reported Status"),
-    page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(10, ge=1, le=100, description="Results per page")
-):
-    """
-    High-performance multi-field legal search across the entire case corpus.
-    Supports full-text queries, dynamic filter combinations, Citator treatment status, and pagination.
-    """
+class SearchQueryModel(BaseModel):
+    text: Optional[str] = Field(None, description="General free text query")
+    all: Optional[List[str]] = Field(None, description="All of these words must appear (AND)")
+    any: Optional[List[str]] = Field(None, description="Any of these words may appear (OR)")
+    exact: Optional[str] = Field(None, description="Exact phrase matching")
+    none: Optional[List[str]] = Field(None, description="None of these words may appear (NOT)")
+
+
+class SearchDateRangeModel(BaseModel):
+    from_date: Optional[str] = Field(None, alias="from", description="Start date (YYYY-MM-DD)")
+    to_date: Optional[str] = Field(None, alias="to", description="End date (YYYY-MM-DD)")
+
+
+class SearchSortModel(BaseModel):
+    field: Optional[str] = Field("date", description="Sort field: relevance, date, court")
+    direction: Optional[str] = Field("desc", description="Sort direction: asc or desc")
+
+
+class SearchRequestModel(BaseModel):
+    query: Optional[Union[SearchQueryModel, str]] = Field(None, description="Text query or structured search")
+    filters: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Filter keys mapped to list of selected values")
+    date: Optional[SearchDateRangeModel] = Field(None, description="Decision date range")
+    sort: Optional[SearchSortModel] = Field(default_factory=SearchSortModel, description="Sorting options")
+    page: int = Field(1, ge=1, description="Page number")
+    limit: int = Field(20, ge=1, le=100, description="Results per page")
+
+
+# Safe Filter Mapping for Parameterized Queries (Zero Raw SQL Injection)
+FILTER_FIELD_MAP = {
+    "court": "c.court_id",
+    "court_id": "c.court_id",
+    "treatment_status": "c.treatment_status",
+    "judgment_year": "EXTRACT(YEAR FROM c.judgment_date)",
+    "year": "EXTRACT(YEAR FROM c.judgment_date)",
+    "is_reported": "c.is_reported"
+}
+
+
+def execute_case_search(
+    text_query: Optional[str] = None,
+    all_terms: Optional[List[str]] = None,
+    any_terms: Optional[List[str]] = None,
+    exact_phrase: Optional[str] = None,
+    none_terms: Optional[List[str]] = None,
+    filters_dict: Optional[Dict[str, Any]] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    sort_field: str = "date",
+    sort_direction: str = "desc",
+    page: int = 1,
+    limit: int = 20
+) -> Dict[str, Any]:
+    """Core parameterized SQL builder & executor with live facet generation."""
     conn = db_manager.get_connection()
     try:
         with conn.cursor() as cur:
             where_clauses = []
             params: List[Any] = []
 
-            # 1. Free Text Search
-            if q and q.strip():
-                query_str = f"%{q.strip()}%"
+            # 1. Free Text / General Query
+            if text_query and text_query.strip():
+                query_str = f"%{text_query.strip()}%"
                 text_condition = """(
                     c.case_number ILIKE %s
                     OR c.cnr ILIKE %s
@@ -63,45 +103,114 @@ def search_cases(
                 where_clauses.append(text_condition)
                 params.extend([query_str] * 12)
 
-            # 2. Filter: Court
-            if court_id and court_id.strip():
-                where_clauses.append("c.court_id = %s")
-                params.append(court_id.strip())
+            # 2. Exact Phrase
+            if exact_phrase and exact_phrase.strip():
+                p_str = f"%{exact_phrase.strip()}%"
+                where_clauses.append("(c.case_note_ai ILIKE %s OR c.case_number ILIKE %s)")
+                params.extend([p_str, p_str])
 
-            # 3. Filter: Year
-            if year:
-                where_clauses.append("EXTRACT(YEAR FROM c.judgment_date) = %s")
-                params.append(year)
+            # 3. All Terms (AND)
+            if all_terms:
+                for term in all_terms:
+                    if term and str(term).strip():
+                        t_str = f"%{str(term).strip()}%"
+                        where_clauses.append("(c.case_note_ai ILIKE %s OR c.case_number ILIKE %s)")
+                        params.extend([t_str, t_str])
 
-            # 4. Filter: Treatment Status
-            if treatment_status and treatment_status.strip():
-                where_clauses.append("c.treatment_status = %s")
-                params.append(treatment_status.strip())
+            # 4. Any Terms (OR)
+            if any_terms:
+                any_clauses = []
+                for term in any_terms:
+                    if term and str(term).strip():
+                        t_str = f"%{str(term).strip()}%"
+                        any_clauses.append("(c.case_note_ai ILIKE %s)")
+                        params.append(t_str)
+                if any_clauses:
+                    where_clauses.append("(" + " OR ".join(any_clauses) + ")")
 
-            # 5. Filter: Judge
-            if judge and judge.strip():
-                where_clauses.append("EXISTS (SELECT 1 FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id WHERE cj.case_id = c.id AND jm.canonical_name ILIKE %s)")
-                params.append(f"%{judge.strip()}%")
+            # 5. None Terms (NOT)
+            if none_terms:
+                for term in none_terms:
+                    if term and str(term).strip():
+                        t_str = f"%{str(term).strip()}%"
+                        where_clauses.append("(c.case_note_ai NOT ILIKE %s OR c.case_note_ai IS NULL)")
+                        params.append(t_str)
 
-            # 6. Filter: Act
-            if act and act.strip():
-                where_clauses.append("EXISTS (SELECT 1 FROM provisions pr JOIN act_master am ON pr.act_id = am.id WHERE pr.case_id = c.id AND am.canonical_name ILIKE %s)")
-                params.append(f"%{act.strip()}%")
+            # 6. Apply Filter Dictionary (Safe Parameterized Mapping)
+            if filters_dict:
+                for f_key, f_val in filters_dict.items():
+                    if f_val is None or f_val == "" or (isinstance(f_val, list) and len(f_val) == 0):
+                        continue
 
-            # 7. Filter: Reported Status
-            if is_reported is not None:
-                where_clauses.append("c.is_reported = %s")
-                params.append(is_reported)
+                    val_list = f_val if isinstance(f_val, list) else [f_val]
+
+                    if f_key in ["court", "court_id"]:
+                        expanded = set(val_list)
+                        if "SCIN" in val_list or "sc" in [str(x).lower() for x in val_list]:
+                            expanded.add("SUPREME_COURT_OF_INDIA")
+                            expanded.add("SCIN")
+                        if "SUPREME_COURT_OF_INDIA" in val_list:
+                            expanded.add("SCIN")
+                        where_clauses.append("(c.court_id = ANY(%s) OR UPPER(c.court_id) = ANY(%s))")
+                        params.extend([list(expanded), [str(x).upper() for x in expanded]])
+
+                    elif f_key in ["treatment_status", "status"]:
+                        where_clauses.append("c.treatment_status = ANY(%s)")
+                        params.append(val_list)
+
+                    elif f_key in ["judgment_year", "year"]:
+                        int_years = [int(y) for y in val_list if str(y).isdigit()]
+                        if int_years:
+                            where_clauses.append("EXTRACT(YEAR FROM c.judgment_date)::INT = ANY(%s)")
+                            params.append(int_years)
+
+                    elif f_key in ["judge", "judges"]:
+                        judge_likes = [f"%{str(j).strip()}%" for j in val_list if str(j).strip()]
+                        if judge_likes:
+                            where_clauses.append("""EXISTS (
+                                SELECT 1 FROM case_judges cj 
+                                JOIN judge_master jm ON cj.judge_id = jm.id 
+                                WHERE cj.case_id = c.id AND (jm.canonical_name ILIKE ANY(%s))
+                            )""")
+                            params.append(judge_likes)
+
+                    elif f_key in ["act", "acts"]:
+                        act_likes = [f"%{str(a).strip()}%" for a in val_list if str(a).strip()]
+                        if act_likes:
+                            where_clauses.append("""EXISTS (
+                                SELECT 1 FROM provisions pr 
+                                LEFT JOIN act_master am ON pr.act_id = am.id 
+                                WHERE pr.case_id = c.id AND (
+                                    am.canonical_name ILIKE ANY(%s) 
+                                    OR pr.raw_act_name ILIKE ANY(%s)
+                                )
+                            )""")
+                            params.extend([act_likes, act_likes])
+
+            # 7. Date Range
+            if from_date:
+                where_clauses.append("c.judgment_date >= %s")
+                params.append(from_date)
+            if to_date:
+                where_clauses.append("c.judgment_date <= %s")
+                params.append(to_date)
 
             where_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
 
-            # Count total records
+            # Count total matching records
             count_sql = f"SELECT COUNT(DISTINCT c.id) FROM cases c {where_sql};"
             cur.execute(count_sql, params)
             total_records = cur.fetchone()[0]
 
-            offset = (page - 1) * page_size
-            total_pages = (total_records + page_size - 1) // page_size if total_records > 0 else 1
+            offset = (page - 1) * limit
+            total_pages = (total_records + limit - 1) // limit if total_records > 0 else 1
+
+            # Order by clause
+            direction = "ASC" if str(sort_direction).lower() == "asc" else "DESC"
+            if sort_field == "date":
+                order_sql = f"ORDER BY c.judgment_date {direction} NULLS LAST, c.created_at DESC"
+            else:
+                order_sql = f"ORDER BY c.judgment_date DESC NULLS LAST, c.created_at DESC"
 
             # Fetch matching cases
             query_sql = f"""
@@ -113,21 +222,21 @@ def search_cases(
                 FROM cases c
                 LEFT JOIN courts co ON c.court_id = co.court_id
                 {where_sql}
-                ORDER BY c.judgment_date DESC NULLS LAST, c.created_at DESC
+                {order_sql}
                 LIMIT %s OFFSET %s;
             """
-            cur.execute(query_sql, params + [page_size, offset])
+            cur.execute(query_sql, params + [limit, offset])
             rows = cur.fetchall()
 
             results = []
             for r in rows:
                 case_id = str(r[0])
 
-                # Fetch parties summary
+                # Parties summary
                 cur.execute("SELECT name, role FROM parties WHERE case_id = %s LIMIT 4;", (case_id,))
                 parties = [{"name": p[0], "role": p[1]} for p in cur.fetchall()]
 
-                # Fetch judges summary
+                # Judges summary
                 cur.execute("""
                     SELECT jm.canonical_name, cj.role
                     FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id
@@ -135,7 +244,7 @@ def search_cases(
                 """, (case_id,))
                 judges = [{"name": j[0], "role": j[1]} for j in cur.fetchall()]
 
-                # Fetch provisions sample
+                # Provisions sample
                 cur.execute("""
                     SELECT COALESCE(am.canonical_name, pr.raw_act_name) AS act_name, pr.section, pr.provision_full
                     FROM provisions pr 
@@ -144,7 +253,7 @@ def search_cases(
                 """, (case_id,))
                 provisions = [{"act_name": p[0], "section": p[1], "full_text": p[2]} for p in cur.fetchall()]
 
-                # Fetch citations sample
+                # Citations sample
                 cur.execute("""
                     SELECT raw_citation_text, treatment_type 
                     FROM citations 
@@ -175,20 +284,145 @@ def search_cases(
                     "citations": citations
                 })
 
+            # 8. Dynamic Facet Counts
+            cur.execute("""
+                SELECT COALESCE(c.court_id, 'SCIN'), COALESCE(ct.name, 'Supreme Court of India'), COUNT(c.id)
+                FROM cases c
+                LEFT JOIN courts ct ON c.court_id = ct.court_id
+                GROUP BY c.court_id, ct.name
+                ORDER BY COUNT(c.id) DESC;
+            """)
+            facet_courts = [{"value": r[0], "label": r[1], "count": r[2]} for r in cur.fetchall()]
+
+            cur.execute("""
+                SELECT treatment_status, COUNT(id)
+                FROM cases
+                WHERE treatment_status IS NOT NULL
+                GROUP BY treatment_status
+                ORDER BY COUNT(id) DESC;
+            """)
+            facet_treatments = [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
+
+            cur.execute("""
+                SELECT j.canonical_name, COUNT(DISTINCT cj.case_id)
+                FROM case_judges cj
+                JOIN judge_master j ON cj.judge_id = j.id
+                GROUP BY j.canonical_name
+                ORDER BY COUNT(DISTINCT cj.case_id) DESC
+                LIMIT 20;
+            """)
+            facet_judges = [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
+
+            cur.execute("""
+                SELECT COALESCE(a.canonical_name, p.raw_act_name), COUNT(DISTINCT p.case_id)
+                FROM provisions p
+                LEFT JOIN act_master a ON p.act_id = a.id
+                WHERE COALESCE(a.canonical_name, p.raw_act_name) IS NOT NULL
+                GROUP BY COALESCE(a.canonical_name, p.raw_act_name)
+                ORDER BY COUNT(DISTINCT p.case_id) DESC
+                LIMIT 20;
+            """)
+            facet_acts = [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
+
+            facets = {
+                "court": facet_courts,
+                "treatment_status": facet_treatments,
+                "judge": facet_judges,
+                "act": facet_acts
+            }
+
             return {
                 "total": total_records,
                 "page": page,
-                "page_size": page_size,
+                "limit": limit,
                 "total_pages": total_pages,
-                "results": results
+                "results": results,
+                "facets": facets
             }
     finally:
         conn.close()
 
 
+@router.post("/api/case-research/search", response_model=Dict[str, Any])
+@router.post("/api/cases/search", response_model=Dict[str, Any])
+def post_search_cases(req: SearchRequestModel):
+    """
+    Configuration-Driven JSON Search API (Recommended by Frontend Team):
+    Accepts structured queries, filter maps, date ranges, and sorting.
+    Returns matching cases and dynamic facet counts in a single round-trip.
+    """
+    text_q = None
+    all_terms = None
+    any_terms = None
+    exact_phrase = None
+    none_terms = None
+
+    if isinstance(req.query, str):
+        text_q = req.query
+    elif isinstance(req.query, SearchQueryModel):
+        text_q = req.query.text
+        all_terms = req.query.all
+        any_terms = req.query.any
+        exact_phrase = req.query.exact
+        none_terms = req.query.none
+
+    from_d = req.date.from_date if req.date else None
+    to_d = req.date.to_date if req.date else None
+    sort_f = req.sort.field if req.sort else "date"
+    sort_d = req.sort.direction if req.sort else "desc"
+
+    return execute_case_search(
+        text_query=text_q,
+        all_terms=all_terms,
+        any_terms=any_terms,
+        exact_phrase=exact_phrase,
+        none_terms=none_terms,
+        filters_dict=req.filters,
+        from_date=from_d,
+        to_date=to_d,
+        sort_field=sort_f,
+        sort_direction=sort_d,
+        page=req.page,
+        limit=req.limit
+    )
+
+
+@router.get("/api/cases/search", response_model=Dict[str, Any])
+def get_search_cases(
+    q: Optional[str] = Query(None, description="Free text query across all legal fields"),
+    court_id: Optional[str] = Query(None, description="Filter by Court ID"),
+    year: Optional[int] = Query(None, description="Filter by Judgment Year"),
+    treatment_status: Optional[str] = Query(None, description="Filter by Treatment Status"),
+    judge: Optional[str] = Query(None, description="Filter by Judge Name"),
+    act: Optional[str] = Query(None, description="Filter by Canonical Act"),
+    is_reported: Optional[bool] = Query(None, description="Filter by Reported Status"),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(10, ge=1, le=100, description="Results per page")
+):
+    """GET Search Endpoint with Query Parameters for browser URL bookmarking & backward compatibility."""
+    filters = {}
+    if court_id:
+        filters["court_id"] = court_id
+    if year:
+        filters["year"] = year
+    if treatment_status:
+        filters["treatment_status"] = treatment_status
+    if judge:
+        filters["judge"] = judge
+    if act:
+        filters["act"] = act
+
+    return execute_case_search(
+        text_query=q,
+        filters_dict=filters,
+        page=page,
+        limit=page_size
+    )
+
+
 @router.get("/api/cases/{case_id}", response_model=Dict[str, Any])
 def get_case_detail(case_id: str):
-    """Retrieves full case details including all parties, judges, advocates, acts, provisions, and citations."""
+    """Retrieves full case details including parties, judges, advocates, acts, provisions, and citations."""
     conn = db_manager.get_connection()
     try:
         with conn.cursor() as cur:
@@ -209,11 +443,9 @@ def get_case_detail(case_id: str):
 
             c_uuid = str(row[0])
 
-            # Parties
             cur.execute("SELECT name, role FROM parties WHERE case_id = %s;", (c_uuid,))
             parties = [{"name": p[0], "role": p[1]} for p in cur.fetchall()]
 
-            # Judges
             cur.execute("""
                 SELECT jm.canonical_name, cj.role
                 FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id
@@ -221,7 +453,6 @@ def get_case_detail(case_id: str):
             """, (c_uuid,))
             judges = [{"name": j[0], "role": j[1]} for j in cur.fetchall()]
 
-            # Advocates
             cur.execute("""
                 SELECT a.name, ca.representing_party
                 FROM case_advocates ca JOIN advocates a ON ca.advocate_id = a.id
@@ -229,7 +460,6 @@ def get_case_detail(case_id: str):
             """, (c_uuid,))
             advocates = [{"name": a[0], "representing": a[1]} for a in cur.fetchall()]
 
-            # Provisions
             cur.execute("""
                 SELECT COALESCE(am.canonical_name, pr.raw_act_name) AS act_name, pr.section, pr.provision_full
                 FROM provisions pr 
@@ -238,7 +468,6 @@ def get_case_detail(case_id: str):
             """, (c_uuid,))
             provisions = [{"act_name": p[0], "section": p[1], "full_text": p[2]} for p in cur.fetchall()]
 
-            # Citations Made
             cur.execute("""
                 SELECT raw_citation_text, treatment_type, COALESCE(cited_case_id::text, '')
                 FROM citations
@@ -246,7 +475,6 @@ def get_case_detail(case_id: str):
             """, (c_uuid,))
             citations_made = [{"citation": c[0], "treatment": c[1], "cited_case_id": c[2]} for c in cur.fetchall()]
 
-            # Cases that cite this case
             cur.execute("""
                 SELECT c.case_number, c.neutral_citation, cit.treatment_type, c.id::text
                 FROM citations cit
@@ -310,7 +538,6 @@ def get_case_citation_network(case_id: str):
             }]
             links = []
 
-            # Citations made by this case
             cur.execute("""
                 SELECT cit.raw_citation_text, cit.treatment_type, cit.cited_case_id::text
                 FROM citations cit
