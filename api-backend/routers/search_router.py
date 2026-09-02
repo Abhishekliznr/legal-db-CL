@@ -1,31 +1,40 @@
 """
-Search Router: Case Search, Facet Extraction, Citator Treatment, Case Details & PDF
-------------------------------------------------------------------------------------
+Search Router: Case Search, Case Details & Search-Field Definitions
+------------------------------------------------------------------------
 Handles:
 - QUERY /api/cases                 : Structured JSON search (filters, search fields, page,
-                                      limit, sort in the request body, per RFC 10008) with
-                                      dynamic facets.
+                                      limit, sort in the request body, per RFC 10008).
                                       NOT visible in Swagger UI (/docs) - swagger-ui-dist
                                       doesn't render the QUERY method yet. It IS present in
                                       /openapi.json under paths./api/cases.query. See the
                                       handler's docstring below for a curl example.
 - GET  /api/cases/{case_id}        : Full judgment metadata, provisions, and citations
-- GET  /api/cases/{case_id}/citations: Citation precedence graph (Good Law, Overruled, Distinguished)
-- GET  /api/cases/{case_id}/pdf    : Stream judgment PDF directly or redirect to Azure Blob
-- GET  /api/stats                  : Corpus statistics & citator status breakdown
+- GET/POST/PATCH/DELETE /api/cases/searches[/{field_id}] : CRUD for the advanced
+                                      boolean search-builder field definitions
+                                      (all/any/exact/none/text) backing GET's public
+                                      contract.
 """
 
-import os
-from pathlib import Path
+import logging
+import uuid
+from collections import defaultdict
 from typing import Optional, List, Dict, Any, Union
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse, RedirectResponse
+from uuid import UUID
+
+import psycopg2
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from shared import db_manager
 
-router = APIRouter(tags=["Legal Search & Citator Engine"])
+logger = logging.getLogger("api_backend.search")
 
+router = APIRouter(tags=["Case Search & Details"])
+
+
+# ============================================================
+# REQUEST MODELS
+# ============================================================
 
 class SearchQueryModel(BaseModel):
     text: Optional[str] = Field(None, description="General free text query")
@@ -54,15 +63,163 @@ class SearchRequestModel(BaseModel):
     limit: int = Field(20, ge=1, le=100, description="Results per page")
 
 
-# Safe Filter Mapping for Parameterized Queries (Zero Raw SQL Injection)
-FILTER_FIELD_MAP = {
-    "court": "c.court_id",
-    "court_id": "c.court_id",
-    "treatment_status": "c.treatment_status",
-    "judgment_year": "EXTRACT(YEAR FROM c.judgment_date)",
-    "year": "EXTRACT(YEAR FROM c.judgment_date)",
-    "is_reported": "c.is_reported"
-}
+# ============================================================
+# RESPONSE MODELS
+# ============================================================
+
+class PartySummary(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+
+
+class JudgeSummary(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+
+
+class AdvocateSummary(BaseModel):
+    name: Optional[str] = None
+    representing: Optional[str] = None
+
+
+class ProvisionSummary(BaseModel):
+    act_name: Optional[str] = None
+    section: Optional[str] = None
+    full_text: Optional[str] = None
+
+
+class CitationSummary(BaseModel):
+    citation: Optional[str] = None
+    treatment: Optional[str] = None
+
+
+class CitationMade(BaseModel):
+    citation: Optional[str] = None
+    treatment: Optional[str] = None
+    cited_case_id: Optional[str] = None
+
+
+class CitedByItem(BaseModel):
+    case_number: Optional[str] = None
+    citation: Optional[str] = None
+    treatment: Optional[str] = None
+    case_id: Optional[str] = None
+
+
+class CaseListItem(BaseModel):
+    id: str
+    diary_number: Optional[str] = None
+    case_number: Optional[str] = None
+    cnr: Optional[str] = None
+    neutral_citation: Optional[str] = None
+    judgment_date: Optional[str] = None
+    case_category: Optional[str] = None
+    document_type: Optional[str] = None
+    treatment_status: str = "GOOD_LAW"
+    overruled: Optional[bool] = None
+    is_reported: Optional[bool] = None
+    reporting_status: Optional[str] = None
+    case_note_ai: Optional[str] = None
+    pdf_path: Optional[str] = None
+    pdf_url: Optional[str] = None
+    court_name: str
+    parties: List[PartySummary] = []
+    judges: List[JudgeSummary] = []
+    provisions: List[ProvisionSummary] = []
+    citations: List[CitationSummary] = []
+
+
+class CaseSearchResponse(BaseModel):
+    total: int
+    page: int
+    limit: int
+    total_pages: int
+    results: List[CaseListItem]
+
+
+class CaseDetail(BaseModel):
+    id: str
+    diary_number: Optional[str] = None
+    case_number: Optional[str] = None
+    cnr: Optional[str] = None
+    neutral_citation: Optional[str] = None
+    judgment_date: Optional[str] = None
+    registration_date: Optional[str] = None
+    case_category: Optional[str] = None
+    document_type: Optional[str] = None
+    treatment_status: str = "GOOD_LAW"
+    overruled: Optional[bool] = None
+    is_reported: Optional[bool] = None
+    reporting_status: Optional[str] = None
+    case_note_ai: Optional[str] = None
+    pdf_path: Optional[str] = None
+    pdf_url: Optional[str] = None
+    court_name: str
+    court_id: Optional[str] = None
+    parties: List[PartySummary] = []
+    judges: List[JudgeSummary] = []
+    advocates: List[AdvocateSummary] = []
+    provisions: List[ProvisionSummary] = []
+    citations_made: List[CitationMade] = []
+    cited_by: List[CitedByItem] = []
+
+
+# ============================================================
+# HELPERS
+# ============================================================
+
+def _to_valid_uuid(case_id: str) -> Optional[str]:
+    """Returns a normalized UUID string if case_id is a real UUID, else None."""
+    try:
+        return str(uuid.UUID(case_id))
+    except (ValueError, AttributeError, TypeError):
+        return None
+
+
+def _fetch_related_for_cases(cur, case_ids: List[str]) -> Dict[str, Dict[str, list]]:
+    """
+    Batch-fetches parties/judges/provisions/citations for a whole page of case_ids in
+    4 queries total (instead of 4 queries PER case — the N+1 pattern this replaces).
+    Per-case truncation (parties<=4, provisions<=3, citations<=3, matching the previous
+    per-row LIMITs) is applied in Python after grouping.
+    """
+    related: Dict[str, Dict[str, list]] = defaultdict(lambda: {"parties": [], "judges": [], "provisions": [], "citations": []})
+    if not case_ids:
+        return related
+
+    cur.execute("SELECT case_id, name, role FROM parties WHERE case_id = ANY(%s::uuid[]);", (case_ids,))
+    for case_id, name, role in cur.fetchall():
+        if len(related[str(case_id)]["parties"]) < 4:
+            related[str(case_id)]["parties"].append({"name": name, "role": role})
+
+    cur.execute("""
+        SELECT cj.case_id, jm.canonical_name, cj.role
+        FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id
+        WHERE cj.case_id = ANY(%s::uuid[]);
+    """, (case_ids,))
+    for case_id, name, role in cur.fetchall():
+        related[str(case_id)]["judges"].append({"name": name, "role": role})
+
+    cur.execute("""
+        SELECT pr.case_id, COALESCE(am.canonical_name, pr.raw_act_name) AS act_name, pr.section, pr.provision_full
+        FROM provisions pr
+        LEFT JOIN act_master am ON pr.act_id = am.id
+        WHERE pr.case_id = ANY(%s::uuid[]);
+    """, (case_ids,))
+    for case_id, act_name, section, full_text in cur.fetchall():
+        if len(related[str(case_id)]["provisions"]) < 3:
+            related[str(case_id)]["provisions"].append({"act_name": act_name, "section": section, "full_text": full_text})
+
+    cur.execute("""
+        SELECT citing_case_id, raw_citation_text, treatment_type
+        FROM citations
+        WHERE citing_case_id = ANY(%s::uuid[]);
+    """, (case_ids,))
+    for case_id, citation, treatment in cur.fetchall():
+        if len(related[str(case_id)]["citations"]) < 3:
+            related[str(case_id)]["citations"].append({"citation": citation, "treatment": treatment})
+
+    return related
 
 
 def execute_case_search(
@@ -79,9 +236,8 @@ def execute_case_search(
     page: int = 1,
     limit: int = 20
 ) -> Dict[str, Any]:
-    """Core parameterized SQL builder & executor with live facet generation."""
-    conn = db_manager.get_connection()
-    try:
+    """Core parameterized SQL builder & executor."""
+    with db_manager.get_pooled_connection() as conn:
         with conn.cursor() as cur:
             where_clauses = []
             params: List[Any] = []
@@ -169,8 +325,8 @@ def execute_case_search(
                         judge_likes = [f"%{str(j).strip()}%" for j in val_list if str(j).strip()]
                         if judge_likes:
                             where_clauses.append("""EXISTS (
-                                SELECT 1 FROM case_judges cj 
-                                JOIN judge_master jm ON cj.judge_id = jm.id 
+                                SELECT 1 FROM case_judges cj
+                                JOIN judge_master jm ON cj.judge_id = jm.id
                                 WHERE cj.case_id = c.id AND (jm.canonical_name ILIKE ANY(%s))
                             )""")
                             params.append(judge_likes)
@@ -179,14 +335,19 @@ def execute_case_search(
                         act_likes = [f"%{str(a).strip()}%" for a in val_list if str(a).strip()]
                         if act_likes:
                             where_clauses.append("""EXISTS (
-                                SELECT 1 FROM provisions pr 
-                                LEFT JOIN act_master am ON pr.act_id = am.id 
+                                SELECT 1 FROM provisions pr
+                                LEFT JOIN act_master am ON pr.act_id = am.id
                                 WHERE pr.case_id = c.id AND (
-                                    am.canonical_name ILIKE ANY(%s) 
+                                    am.canonical_name ILIKE ANY(%s)
                                     OR pr.raw_act_name ILIKE ANY(%s)
                                 )
                             )""")
                             params.extend([act_likes, act_likes])
+
+                    elif f_key == "is_reported":
+                        is_reported_val = val_list[0] if isinstance(val_list, list) else val_list
+                        where_clauses.append("c.is_reported = %s")
+                        params.append(bool(is_reported_val))
 
             # 7. Date Range
             if from_date:
@@ -229,39 +390,13 @@ def execute_case_search(
             cur.execute(query_sql, params + [limit, offset])
             rows = cur.fetchall()
 
+            case_ids = [str(r[0]) for r in rows]
+            related = _fetch_related_for_cases(cur, case_ids)
+
             results = []
             for r in rows:
                 case_id = str(r[0])
-
-                # Parties summary
-                cur.execute("SELECT name, role FROM parties WHERE case_id = %s LIMIT 4;", (case_id,))
-                parties = [{"name": p[0], "role": p[1]} for p in cur.fetchall()]
-
-                # Judges summary
-                cur.execute("""
-                    SELECT jm.canonical_name, cj.role
-                    FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id
-                    WHERE cj.case_id = %s;
-                """, (case_id,))
-                judges = [{"name": j[0], "role": j[1]} for j in cur.fetchall()]
-
-                # Provisions sample
-                cur.execute("""
-                    SELECT COALESCE(am.canonical_name, pr.raw_act_name) AS act_name, pr.section, pr.provision_full
-                    FROM provisions pr 
-                    LEFT JOIN act_master am ON pr.act_id = am.id 
-                    WHERE pr.case_id = %s LIMIT 3;
-                """, (case_id,))
-                provisions = [{"act_name": p[0], "section": p[1], "full_text": p[2]} for p in cur.fetchall()]
-
-                # Citations sample
-                cur.execute("""
-                    SELECT raw_citation_text, treatment_type 
-                    FROM citations 
-                    WHERE citing_case_id = %s LIMIT 3;
-                """, (case_id,))
-                citations = [{"citation": cit[0], "treatment": cit[1]} for cit in cur.fetchall()]
-
+                rel = related[case_id]
                 results.append({
                     "id": case_id,
                     "diary_number": r[1],
@@ -279,75 +414,25 @@ def execute_case_search(
                     "pdf_path": r[13],
                     "pdf_url": r[14],
                     "court_name": r[15] or "Supreme Court of India",
-                    "parties": parties,
-                    "judges": judges,
-                    "provisions": provisions,
-                    "citations": citations
+                    "parties": rel["parties"],
+                    "judges": rel["judges"],
+                    "provisions": rel["provisions"],
+                    "citations": rel["citations"]
                 })
-
-            # 8. Dynamic Facet Counts
-            cur.execute("""
-                SELECT COALESCE(c.court_id, 'SCIN'), COALESCE(ct.name, 'Supreme Court of India'), COUNT(c.id)
-                FROM cases c
-                LEFT JOIN courts ct ON c.court_id = ct.court_id
-                GROUP BY c.court_id, ct.name
-                ORDER BY COUNT(c.id) DESC;
-            """)
-            facet_courts = [{"value": r[0], "label": r[1], "count": r[2]} for r in cur.fetchall()]
-
-            cur.execute("""
-                SELECT treatment_status, COUNT(id)
-                FROM cases
-                WHERE treatment_status IS NOT NULL
-                GROUP BY treatment_status
-                ORDER BY COUNT(id) DESC;
-            """)
-            facet_treatments = [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
-
-            cur.execute("""
-                SELECT j.canonical_name, COUNT(DISTINCT cj.case_id)
-                FROM case_judges cj
-                JOIN judge_master j ON cj.judge_id = j.id
-                GROUP BY j.canonical_name
-                ORDER BY COUNT(DISTINCT cj.case_id) DESC
-                LIMIT 20;
-            """)
-            facet_judges = [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
-
-            cur.execute("""
-                SELECT COALESCE(a.canonical_name, p.raw_act_name), COUNT(DISTINCT p.case_id)
-                FROM provisions p
-                LEFT JOIN act_master a ON p.act_id = a.id
-                WHERE COALESCE(a.canonical_name, p.raw_act_name) IS NOT NULL
-                GROUP BY COALESCE(a.canonical_name, p.raw_act_name)
-                ORDER BY COUNT(DISTINCT p.case_id) DESC
-                LIMIT 20;
-            """)
-            facet_acts = [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
-
-            facets = {
-                "court": facet_courts,
-                "treatment_status": facet_treatments,
-                "judge": facet_judges,
-                "act": facet_acts
-            }
 
             return {
                 "total": total_records,
                 "page": page,
                 "limit": limit,
                 "total_pages": total_pages,
-                "results": results,
-                "facets": facets
+                "results": results
             }
-    finally:
-        conn.close()
 
 
 @router.api_route(
     "/api/cases",
     methods=["QUERY"],
-    response_model=Dict[str, Any],
+    response_model=CaseSearchResponse,
     summary="Search & list cases (HTTP QUERY method, RFC 10008)",
     description=(
         "NOTE: Swagger UI (/docs) cannot render this operation yet - swagger-ui-dist "
@@ -363,8 +448,8 @@ def query_cases(req: SearchRequestModel):
     """
     Configuration-Driven JSON Search API (RFC 10008 QUERY method):
     Accepts structured queries, filter maps, date ranges, and sorting in the
-    request body. Returns matching cases and dynamic facet counts in a single
-    round-trip.
+    request body. Returns matching cases in a single round-trip. Filter/facet
+    metadata lives separately in GET /api/cases/filters.
 
     Not visible in Swagger UI (/docs) - see the `description` above / /openapi.json.
     """
@@ -388,217 +473,318 @@ def query_cases(req: SearchRequestModel):
     sort_f = req.sort.field if req.sort else "date"
     sort_d = req.sort.direction if req.sort else "desc"
 
-    return execute_case_search(
-        text_query=text_q,
-        all_terms=all_terms,
-        any_terms=any_terms,
-        exact_phrase=exact_phrase,
-        none_terms=none_terms,
-        filters_dict=req.filters,
-        from_date=from_d,
-        to_date=to_d,
-        sort_field=sort_f,
-        sort_direction=sort_d,
-        page=req.page,
-        limit=req.limit
+    try:
+        return execute_case_search(
+            text_query=text_q,
+            all_terms=all_terms,
+            any_terms=any_terms,
+            exact_phrase=exact_phrase,
+            none_terms=none_terms,
+            filters_dict=req.filters,
+            from_date=from_d,
+            to_date=to_d,
+            sort_field=sort_f,
+            sort_direction=sort_d,
+            page=req.page,
+            limit=req.limit
+        )
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed during case search")
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Unexpected error during case search")
+        raise HTTPException(status_code=500, detail="Case search failed.")
+
+
+# ============================================================
+# SEARCH-FIELD DEFINITIONS (CRUD backing GET /api/cases/searches)
+# ============================================================
+
+class SearchFieldDefinition(BaseModel):
+    id: str
+    key: str
+    label: str
+    placeholder: str
+    combinator: str
+    isActive: bool
+    displayOrder: int
+
+
+class SearchFieldsResponse(BaseModel):
+    fields: List[SearchFieldDefinition]
+
+
+class SearchFieldCreate(BaseModel):
+    key: str
+    label: str
+    placeholder: str = "Search items..."
+    combinator: str
+    isActive: bool = True
+    displayOrder: int = 0
+
+
+class SearchFieldUpdate(BaseModel):
+    key: Optional[str] = None
+    label: Optional[str] = None
+    placeholder: Optional[str] = None
+    combinator: Optional[str] = None
+    isActive: Optional[bool] = None
+    displayOrder: Optional[int] = None
+
+
+def _row_to_search_field(row) -> SearchFieldDefinition:
+    f_id, key, label, placeholder, combinator, is_active, display_order = row
+    return SearchFieldDefinition(
+        id=str(f_id), key=key, label=label, placeholder=placeholder,
+        combinator=combinator, isActive=is_active, displayOrder=display_order
     )
 
 
-@router.get("/api/cases/{case_id}", response_model=Dict[str, Any])
+@router.get("/api/cases/searches", response_model=SearchFieldsResponse)
+def get_configuration_driven_search_fields(
+    include_inactive: bool = Query(False, description="Admin use: also return inactive search-field definitions.")
+):
+    """
+    Configuration-Driven Search Builder Metadata API:
+    Describes the advanced boolean search fields (All/Any/Exact/None-of-these-words)
+    so the frontend can render the search builder form with zero hardcoding.
+    """
+    try:
+        with db_manager.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                if include_inactive:
+                    cur.execute("""
+                        SELECT id, key, label, placeholder, combinator, is_active, display_order
+                        FROM search_field_definitions ORDER BY display_order;
+                    """)
+                else:
+                    cur.execute("""
+                        SELECT id, key, label, placeholder, combinator, is_active, display_order
+                        FROM search_field_definitions WHERE is_active ORDER BY display_order;
+                    """)
+                fields = [_row_to_search_field(row) for row in cur.fetchall()]
+                return SearchFieldsResponse(fields=fields)
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while loading search fields")
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except Exception:
+        logger.exception("Unexpected error while loading search fields")
+        raise HTTPException(status_code=500, detail="Failed to load search field metadata.")
+
+
+@router.post("/api/cases/searches", response_model=SearchFieldDefinition, status_code=201)
+def create_search_field(payload: SearchFieldCreate):
+    try:
+        with db_manager.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO search_field_definitions (key, label, placeholder, combinator, is_active, display_order)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING id, key, label, placeholder, combinator, is_active, display_order;
+                """, (payload.key, payload.label, payload.placeholder, payload.combinator, payload.isActive, payload.displayOrder))
+                row = cur.fetchone()
+                conn.commit()
+                return _row_to_search_field(row)
+    except psycopg2.errors.UniqueViolation:
+        raise HTTPException(status_code=409, detail=f"A search field with key '{payload.key}' already exists.")
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while creating search field")
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except Exception:
+        logger.exception("Unexpected error while creating search field")
+        raise HTTPException(status_code=500, detail="Failed to create search field.")
+
+
+@router.get("/api/cases/searches/{field_id}", response_model=SearchFieldDefinition)
+def get_search_field(field_id: UUID):
+    try:
+        with db_manager.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT id, key, label, placeholder, combinator, is_active, display_order
+                    FROM search_field_definitions WHERE id = %s;
+                """, (str(field_id),))
+                row = cur.fetchone()
+                if not row:
+                    raise HTTPException(status_code=404, detail="Search field not found.")
+                return _row_to_search_field(row)
+    except HTTPException:
+        raise
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while loading search field %s", field_id)
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except Exception:
+        logger.exception("Unexpected error while loading search field %s", field_id)
+        raise HTTPException(status_code=500, detail="Failed to load search field.")
+
+
+@router.patch("/api/cases/searches/{field_id}", response_model=SearchFieldDefinition)
+def update_search_field(field_id: UUID, payload: SearchFieldUpdate):
+    """Partial update — only fields present in the request body are changed."""
+    updates = payload.model_dump(exclude_unset=True)
+    column_map = {
+        "key": "key", "label": "label", "placeholder": "placeholder",
+        "combinator": "combinator", "isActive": "is_active", "displayOrder": "display_order"
+    }
+    set_clauses = []
+    params: List = []
+    for field_name, column in column_map.items():
+        if field_name in updates:
+            set_clauses.append(f"{column} = %s")
+            params.append(updates[field_name])
+
+    try:
+        with db_manager.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT id FROM search_field_definitions WHERE id = %s;", (str(field_id),))
+                if not cur.fetchone():
+                    raise HTTPException(status_code=404, detail="Search field not found.")
+
+                if set_clauses:
+                    set_clauses.append("updated_at = CURRENT_TIMESTAMP")
+                    params.append(str(field_id))
+                    cur.execute(f"UPDATE search_field_definitions SET {', '.join(set_clauses)} WHERE id = %s;", params)
+
+                conn.commit()
+                cur.execute("""
+                    SELECT id, key, label, placeholder, combinator, is_active, display_order
+                    FROM search_field_definitions WHERE id = %s;
+                """, (str(field_id),))
+                return _row_to_search_field(cur.fetchone())
+    except HTTPException:
+        raise
+    except psycopg2.errors.UniqueViolation:
+        raise HTTPException(status_code=409, detail="A search field with that key already exists.")
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while updating search field %s", field_id)
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except Exception:
+        logger.exception("Unexpected error while updating search field %s", field_id)
+        raise HTTPException(status_code=500, detail="Failed to update search field.")
+
+
+@router.delete("/api/cases/searches/{field_id}", status_code=204)
+def delete_search_field(field_id: UUID):
+    try:
+        with db_manager.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM search_field_definitions WHERE id = %s RETURNING id;", (str(field_id),))
+                deleted = cur.fetchone()
+                conn.commit()
+                if not deleted:
+                    raise HTTPException(status_code=404, detail="Search field not found.")
+                return None
+    except HTTPException:
+        raise
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while deleting search field %s", field_id)
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except Exception:
+        logger.exception("Unexpected error while deleting search field %s", field_id)
+        raise HTTPException(status_code=500, detail="Failed to delete search field.")
+
+
+@router.get("/api/cases/{case_id:path}", response_model=CaseDetail)
 def get_case_detail(case_id: str):
     """Retrieves full case details including parties, judges, advocates, acts, provisions, and citations."""
-    conn = db_manager.get_connection()
+    valid_uuid = _to_valid_uuid(case_id)
     try:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT c.id, c.diary_number, c.case_number, c.cnr, c.neutral_citation,
-                       c.judgment_date, c.registration_date, c.decision_date,
-                       c.case_category, c.document_type, c.treatment_status, c.overruled,
-                       c.is_reported, c.reporting_status, c.case_note_ai, c.pdf_path, c.pdf_url,
-                       co.name AS court_name, co.court_id
-                FROM cases c
-                LEFT JOIN courts co ON c.court_id = co.court_id
-                WHERE c.id = %s::uuid OR c.diary_number = %s OR c.case_number = %s;
-            """, (case_id if len(case_id) == 36 and '-' in case_id else '00000000-0000-0000-0000-000000000000', case_id, case_id))
-            
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="Case judgment not found.")
+        with db_manager.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                id_clause = "c.id = %s::uuid OR " if valid_uuid else ""
+                id_params = [valid_uuid] if valid_uuid else []
+                cur.execute(f"""
+                    SELECT c.id, c.diary_number, c.case_number, c.cnr, c.neutral_citation,
+                           c.judgment_date, c.registration_date,
+                           c.case_category, c.document_type, c.treatment_status, c.overruled,
+                           c.is_reported, c.reporting_status, c.case_note_ai, c.pdf_path, c.pdf_url,
+                           co.name AS court_name, co.court_id
+                    FROM cases c
+                    LEFT JOIN courts co ON c.court_id = co.court_id
+                    WHERE {id_clause}c.diary_number = %s OR c.case_number = %s;
+                """, (*id_params, case_id, case_id))
 
-            c_uuid = str(row[0])
+                row = cur.fetchone()
+                if not row:
+                    raise HTTPException(status_code=404, detail="Case judgment not found.")
 
-            cur.execute("SELECT name, role FROM parties WHERE case_id = %s;", (c_uuid,))
-            parties = [{"name": p[0], "role": p[1]} for p in cur.fetchall()]
+                c_uuid = str(row[0])
 
-            cur.execute("""
-                SELECT jm.canonical_name, cj.role
-                FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id
-                WHERE cj.case_id = %s;
-            """, (c_uuid,))
-            judges = [{"name": j[0], "role": j[1]} for j in cur.fetchall()]
+                cur.execute("SELECT name, role FROM parties WHERE case_id = %s;", (c_uuid,))
+                parties = [{"name": p[0], "role": p[1]} for p in cur.fetchall()]
 
-            cur.execute("""
-                SELECT a.name, ca.representing_party
-                FROM case_advocates ca JOIN advocates a ON ca.advocate_id = a.id
-                WHERE ca.case_id = %s;
-            """, (c_uuid,))
-            advocates = [{"name": a[0], "representing": a[1]} for a in cur.fetchall()]
+                cur.execute("""
+                    SELECT jm.canonical_name, cj.role
+                    FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id
+                    WHERE cj.case_id = %s;
+                """, (c_uuid,))
+                judges = [{"name": j[0], "role": j[1]} for j in cur.fetchall()]
 
-            cur.execute("""
-                SELECT COALESCE(am.canonical_name, pr.raw_act_name) AS act_name, pr.section, pr.provision_full
-                FROM provisions pr 
-                LEFT JOIN act_master am ON pr.act_id = am.id 
-                WHERE pr.case_id = %s;
-            """, (c_uuid,))
-            provisions = [{"act_name": p[0], "section": p[1], "full_text": p[2]} for p in cur.fetchall()]
+                cur.execute("""
+                    SELECT a.name, ca.party_role
+                    FROM case_advocates ca JOIN advocates a ON ca.advocate_id = a.id
+                    WHERE ca.case_id = %s;
+                """, (c_uuid,))
+                advocates = [{"name": a[0], "representing": a[1]} for a in cur.fetchall()]
 
-            cur.execute("""
-                SELECT raw_citation_text, treatment_type, COALESCE(cited_case_id::text, '')
-                FROM citations
-                WHERE citing_case_id = %s;
-            """, (c_uuid,))
-            citations_made = [{"citation": c[0], "treatment": c[1], "cited_case_id": c[2]} for c in cur.fetchall()]
+                cur.execute("""
+                    SELECT COALESCE(am.canonical_name, pr.raw_act_name) AS act_name, pr.section, pr.provision_full
+                    FROM provisions pr
+                    LEFT JOIN act_master am ON pr.act_id = am.id
+                    WHERE pr.case_id = %s;
+                """, (c_uuid,))
+                provisions = [{"act_name": p[0], "section": p[1], "full_text": p[2]} for p in cur.fetchall()]
 
-            cur.execute("""
-                SELECT c.case_number, c.neutral_citation, cit.treatment_type, c.id::text
-                FROM citations cit
-                JOIN cases c ON cit.citing_case_id = c.id
-                WHERE cit.cited_case_id = %s;
-            """, (c_uuid,))
-            cited_by = [{"case_number": c[0], "citation": c[1], "treatment": c[2], "case_id": c[3]} for c in cur.fetchall()]
+                cur.execute("""
+                    SELECT raw_citation_text, treatment_type, COALESCE(cited_case_id::text, '')
+                    FROM citations
+                    WHERE citing_case_id = %s;
+                """, (c_uuid,))
+                citations_made = [{"citation": c[0], "treatment": c[1], "cited_case_id": c[2]} for c in cur.fetchall()]
 
-            return {
-                "id": c_uuid,
-                "diary_number": row[1],
-                "case_number": row[2],
-                "cnr": row[3],
-                "neutral_citation": row[4],
-                "judgment_date": row[5].strftime("%Y-%m-%d") if row[5] else None,
-                "registration_date": row[6].strftime("%Y-%m-%d") if row[6] else None,
-                "decision_date": row[7].strftime("%Y-%m-%d") if row[7] else None,
-                "case_category": row[8],
-                "document_type": row[9],
-                "treatment_status": row[10] or "GOOD_LAW",
-                "overruled": row[11],
-                "is_reported": row[12],
-                "reporting_status": row[13],
-                "case_note_ai": row[14],
-                "pdf_path": row[15],
-                "pdf_url": row[16],
-                "court_name": row[17] or "Supreme Court of India",
-                "court_id": row[18],
-                "parties": parties,
-                "judges": judges,
-                "advocates": advocates,
-                "provisions": provisions,
-                "citations_made": citations_made,
-                "cited_by": cited_by
-            }
-    finally:
-        conn.close()
+                cur.execute("""
+                    SELECT c.case_number, c.neutral_citation, cit.treatment_type, c.id::text
+                    FROM citations cit
+                    JOIN cases c ON cit.citing_case_id = c.id
+                    WHERE cit.cited_case_id = %s;
+                """, (c_uuid,))
+                cited_by = [{"case_number": c[0], "citation": c[1], "treatment": c[2], "case_id": c[3]} for c in cur.fetchall()]
 
-
-@router.get("/api/cases/{case_id}/citations", response_model=Dict[str, Any])
-def get_case_citation_network(case_id: str):
-    """Returns the graph network of citations (nodes and links) for visual citator exploration."""
-    conn = db_manager.get_connection()
-    try:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT c.id, c.case_number, c.neutral_citation, c.treatment_status 
-                FROM cases c 
-                WHERE c.id = %s::uuid OR c.diary_number = %s;
-            """, (case_id if len(case_id) == 36 and '-' in case_id else '00000000-0000-0000-0000-000000000000', case_id))
-            root = cur.fetchone()
-            if not root:
-                raise HTTPException(status_code=404, detail="Case not found.")
-
-            root_uuid = str(root[0])
-            nodes = [{
-                "id": root_uuid,
-                "label": root[1] or root[2] or "Root Case",
-                "type": "root",
-                "treatment": root[3] or "GOOD_LAW"
-            }]
-            links = []
-
-            cur.execute("""
-                SELECT cit.raw_citation_text, cit.treatment_type, cit.cited_case_id::text
-                FROM citations cit
-                WHERE cit.citing_case_id = %s;
-            """, (root_uuid,))
-            for r in cur.fetchall():
-                node_id = r[2] if r[2] else f"cit_{hash(r[0])}"
-                nodes.append({
-                    "id": node_id,
-                    "label": r[0],
-                    "type": "cited",
-                    "treatment": r[1] or "AFFIRMED"
-                })
-                links.append({
-                    "source": root_uuid,
-                    "target": node_id,
-                    "treatment": r[1] or "CITED"
-                })
-
-            return {"root_id": root_uuid, "nodes": nodes, "links": links}
-    finally:
-        conn.close()
+                return {
+                    "id": c_uuid,
+                    "diary_number": row[1],
+                    "case_number": row[2],
+                    "cnr": row[3],
+                    "neutral_citation": row[4],
+                    "judgment_date": row[5].strftime("%Y-%m-%d") if row[5] else None,
+                    "registration_date": row[6].strftime("%Y-%m-%d") if row[6] else None,
+                    "case_category": row[7],
+                    "document_type": row[8],
+                    "treatment_status": row[9] or "GOOD_LAW",
+                    "overruled": row[10],
+                    "is_reported": row[11],
+                    "reporting_status": row[12],
+                    "case_note_ai": row[13],
+                    "pdf_path": row[14],
+                    "pdf_url": row[15],
+                    "court_name": row[16] or "Supreme Court of India",
+                    "court_id": row[17],
+                    "parties": parties,
+                    "judges": judges,
+                    "advocates": advocates,
+                    "provisions": provisions,
+                    "citations_made": citations_made,
+                    "cited_by": cited_by
+                }
+    except HTTPException:
+        raise
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while loading case %s", case_id)
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except Exception:
+        logger.exception("Unexpected error while loading case %s", case_id)
+        raise HTTPException(status_code=500, detail="Failed to load case detail.")
 
 
-@router.get("/api/cases/{case_id}/pdf")
-def get_case_pdf(case_id: str):
-    """Directly streams the local judgment PDF or redirects to permanent Azure Blob URL."""
-    conn = db_manager.get_connection()
-    try:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT pdf_path, pdf_url 
-                FROM cases 
-                WHERE id = %s::uuid OR diary_number = %s OR case_number = %s;
-            """, (case_id if len(case_id) == 36 and '-' in case_id else '00000000-0000-0000-0000-000000000000', case_id, case_id))
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="Case not found.")
-
-            pdf_path, pdf_url = row[0], row[1]
-            if pdf_path and Path(pdf_path).exists():
-                return FileResponse(pdf_path, media_type="application/pdf", filename=Path(pdf_path).name)
-            elif pdf_url:
-                return RedirectResponse(url=pdf_url)
-            else:
-                raise HTTPException(status_code=404, detail="Physical PDF document not found on storage.")
-    finally:
-        conn.close()
-
-
-@router.get("/api/stats", response_model=Dict[str, Any])
-def get_corpus_statistics():
-    """Returns summary statistics for the legal research corpus."""
-    conn = db_manager.get_connection()
-    try:
-        with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM cases;")
-            total_cases = cur.fetchone()[0]
-
-            cur.execute("SELECT COUNT(*) FROM provisions;")
-            total_provisions = cur.fetchone()[0]
-
-            cur.execute("SELECT COUNT(*) FROM citations;")
-            total_citations = cur.fetchone()[0]
-
-            cur.execute("""
-                SELECT treatment_status, COUNT(*) 
-                FROM cases 
-                GROUP BY treatment_status;
-            """)
-            treatment_counts = {r[0] or "UNKNOWN": r[1] for r in cur.fetchall()}
-
-            return {
-                "total_cases": total_cases,
-                "total_provisions": total_provisions,
-                "total_citations": total_citations,
-                "treatment_breakdown": treatment_counts
-            }
-    finally:
-        conn.close()

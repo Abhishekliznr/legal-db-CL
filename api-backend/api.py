@@ -2,16 +2,19 @@
 API Backend: Case Search & Citator FastAPI Application
 --------------------------------------------------------
 Orchestrates:
-- 🔍 Legal Search Router   : QUERY /api/cases, /api/cases/{case_id}*, /api/stats
+- 🔍 Legal Search Router   : QUERY /api/cases, /api/cases/{case_id}
 - 🏷️ Dynamic Filter Router : /api/cases/filters, /api/cases/searches
 - 🐘 Automatic Database Startup Verification (shared schema with scraper-backend)
+- 🏊 Pooled Read Connections (initialized on startup, closed on shutdown)
 - 🌐 Static Landing Page at "/"
 
 Read-only, DB-only service — no Playwright/scraping dependencies live here.
 Court scraping is a separate service: see ../scraper-backend.
 """
 
+import logging
 import sys
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 # Make the repo-root `shared/` package importable whether this runs via
@@ -22,42 +25,69 @@ for _p in [str(_project_root), str(_script_dir)]:
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from fastapi import FastAPI
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from shared import db_manager
 from routers import filter_router, search_router
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+logger = logging.getLogger("api_backend")
+
+
+# ============================================================
+# LIFESPAN: SCHEMA VERIFICATION + CONNECTION POOL LIFECYCLE
+# ============================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Checking and verifying PostgreSQL tables & schema on startup...")
+    try:
+        db_manager.init_database(drop_existing=False)
+        logger.info("Database schema & tables verified.")
+    except Exception:
+        logger.exception("Database schema verification failed on startup — check PostgreSQL connectivity.")
+
+    db_manager.init_connection_pool()
+    logger.info("Database connection pool initialized.")
+
+    yield
+
+    db_manager.close_connection_pool()
+    logger.info("Database connection pool closed.")
+
+
 app = FastAPI(
     title="Legal Judgment Intelligence API",
     description="Enterprise API providing multi-field case search, citator treatments, and dynamic facets.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan,
 )
 
-# Allow CORS for development & cross-origin frontend support
+# Allow CORS for development & cross-origin frontend support.
+# No credentialed (cookie/session) requests are used by this API, so
+# allow_credentials is intentionally omitted — combining it with a
+# wildcard origin is a common misconfiguration browsers reject anyway.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
 # ============================================================
-# STARTUP EVENT: AUTO-INITIALIZE SCHEMA & TABLES IF MISSING
+# GLOBAL EXCEPTION HANDLER (backstop for anything routers don't catch)
 # ============================================================
 
-@app.on_event("startup")
-def on_startup():
-    """Automatically verifies and creates all PostgreSQL tables, extensions, and seed data on startup."""
-    try:
-        print("🔍 Checking and verifying PostgreSQL tables & schema on startup...")
-        db_manager.init_database(drop_existing=False)
-        print("✅ Database schema & tables verified!")
-    except Exception as e:
-        print(f"⚠️ Warning: Auto-initialization on startup encountered: {e}. Check PostgreSQL connection.")
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
+    return JSONResponse(status_code=500, content={"detail": "Internal server error."})
 
 
 # ============================================================
@@ -70,7 +100,7 @@ def on_startup():
 # /api/cases/{case_id} wildcard route.
 app.include_router(filter_router.router)
 
-# Legal Search & Citator Router (QUERY /api/cases, /api/cases/{case_id}*, /api/stats)
+# Legal Search & Citator Router (QUERY /api/cases, /api/cases/{case_id})
 app.include_router(search_router.router)
 
 
@@ -81,7 +111,7 @@ app.include_router(search_router.router)
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, tags=["System"])
 def serve_landing_page():
     """Serves a minimal status page confirming the API backend is up and running."""
     index_file = STATIC_DIR / "index.html"
@@ -91,6 +121,6 @@ def serve_landing_page():
 
 
 # Health Check Endpoint
-@app.get("/health")
+@app.get("/health", tags=["System"])
 def health_check():
     return {"status": "healthy", "service": "api-backend", "version": "1.0.0"}
