@@ -190,13 +190,20 @@ PYTHONPATH=$(pwd) python -m shared.db_manager init
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/cases/filters` | Filter sidebar metadata (courts, treatment status, judges, acts, years) with live counts. |
-| `GET` | `/api/cases/searches` | Advanced boolean search-builder field metadata (all/any/exact/none-of-these-words). |
+| `GET` | `/api/cases/filters` | Filter sidebar metadata (courts, treatment status, judges, acts, years) with live counts. `?include_inactive=true` also returns disabled filters. |
+| `POST` | `/api/cases/filters` | Create a filter definition. `dataSource: "static"` filters accept an inline `options: [{label, value}]` array. |
+| `GET` | `/api/cases/filters/{filter_id}` | Get one filter definition with its current options. |
+| `PATCH` | `/api/cases/filters/{filter_id}` | Partially update a filter definition; including `options` fully replaces its option rows. |
+| `DELETE` | `/api/cases/filters/{filter_id}` | Delete a filter definition (cascades its options). |
+| `GET` | `/api/cases/searches` | Advanced boolean search-builder field metadata (all/any/exact/none-of-these-words). `?include_inactive=true` also returns disabled fields. |
+| `POST` | `/api/cases/searches` | Create a search-field definition. |
+| `GET` | `/api/cases/searches/{field_id}` | Get one search-field definition. |
+| `PATCH` | `/api/cases/searches/{field_id}` | Partially update a search-field definition. |
+| `DELETE` | `/api/cases/searches/{field_id}` | Delete a search-field definition. |
 | `QUERY` | `/api/cases` | Search & list cases — filters, search fields, page, limit, sort in the request body (RFC 10008). Not renderable in Swagger UI yet; see `/openapi.json`. |
 | `GET` | `/api/cases/{case_id}` | Full judgment metadata, provisions, and citations. |
-| `GET` | `/api/cases/{case_id}/citations` | Citation precedence graph (Good Law, Overruled, Distinguished). |
-| `GET` | `/api/cases/{case_id}/pdf` | Stream judgment PDF directly or redirect to Azure Blob. |
-| `GET` | `/api/stats` | Corpus statistics & citator status breakdown. |
+
+> ⚠️ The `filters`/`searches` write endpoints (`POST`/`PATCH`/`DELETE`) have **no authentication** currently — anyone who can reach api-backend can rewrite the filter sidebar and search builder for every user. Gate this at the network/reverse-proxy level until real auth is added.
 
 ---
 

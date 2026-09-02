@@ -16,6 +16,7 @@ import os
 import sys
 import argparse
 import json
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
@@ -33,6 +34,7 @@ except ImportError:
 
 try:
     import psycopg2
+    import psycopg2.pool
     from psycopg2.extras import RealDictCursor
 except ImportError:
     psycopg2 = None
@@ -72,11 +74,65 @@ def get_db_url() -> str:
 
 
 def get_connection(db_url: Optional[str] = None):
-    """Establishes connection to PostgreSQL database."""
+    """Establishes a fresh, unpooled connection to PostgreSQL. Used by scraper-backend,
+    whose ingestion transactions are long-held and shouldn't share a pool sized for
+    api-backend's short reads."""
     if psycopg2 is None:
         raise ImportError("psycopg2 module is missing. Run: pip install psycopg2-binary")
     target_url = db_url or get_db_url()
     return psycopg2.connect(target_url)
+
+
+# ============================================================
+# CONNECTION POOL (api-backend only)
+# ============================================================
+# scraper-backend must keep using get_connection() above — its ingestion writes
+# hold a connection for the duration of a whole scrape/import run, which would
+# starve a pool sized for api-backend's fast, frequent reads.
+
+_pool: "Optional[psycopg2.pool.ThreadedConnectionPool]" = None
+
+
+def init_connection_pool(minconn: int = 2, maxconn: int = 20, db_url: Optional[str] = None) -> None:
+    """Creates the process-wide read connection pool. Call once, at api-backend startup."""
+    global _pool
+    if psycopg2 is None:
+        raise ImportError("psycopg2 module is missing. Run: pip install psycopg2-binary")
+    if _pool is not None:
+        return
+    _pool = psycopg2.pool.ThreadedConnectionPool(minconn, maxconn, db_url or get_db_url())
+
+
+def close_connection_pool() -> None:
+    """Closes all pooled connections. Call once, at api-backend shutdown."""
+    global _pool
+    if _pool is not None:
+        _pool.closeall()
+        _pool = None
+
+
+@contextmanager
+def get_pooled_connection():
+    """
+    Context manager yielding a connection borrowed from the pool, returning it
+    automatically afterward. Rolls back any open transaction before returning
+    the connection so a failed request never leaves the pooled connection dirty
+    for the next borrower.
+
+        with db_manager.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(...)
+    """
+    if _pool is None:
+        raise RuntimeError("Connection pool not initialized — call init_connection_pool() at startup first.")
+    conn = _pool.getconn()
+    try:
+        yield conn
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        _pool.putconn(conn)
 
 
 def parse_date(date_str: Optional[str]) -> Optional[str]:
@@ -258,7 +314,47 @@ CREATE TABLE IF NOT EXISTS scraper_jobs (
     notes TEXT
 );
 
--- 12. INDEXES FOR LIGHTNING FAST RETRIEVAL & DEDUPLICATION
+-- 12. FILTER_DEFINITIONS & FILTER_OPTIONS (Admin-managed /api/cases/filters)
+CREATE TABLE IF NOT EXISTS filter_definitions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key TEXT UNIQUE NOT NULL,
+    label TEXT NOT NULL,
+    type TEXT NOT NULL DEFAULT 'select',
+    selection_mode TEXT NOT NULL DEFAULT 'multi',
+    query_key TEXT,                                 -- only set when it differs from `key` (e.g. court -> court_id)
+    data_source TEXT NOT NULL DEFAULT 'database',    -- 'database' (fixed live-count SQL) | 'static' (admin-supplied options)
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_searchable BOOLEAN NOT NULL DEFAULT FALSE,    -- frontend hint: render a search box inside the option list (large lists e.g. judges, acts)
+    display_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS filter_options (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    filter_id UUID NOT NULL REFERENCES filter_definitions(id) ON DELETE CASCADE,
+    value TEXT NOT NULL,
+    label TEXT NOT NULL,
+    display_order INT NOT NULL DEFAULT 0,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 13. SEARCH_FIELD_DEFINITIONS (Admin-managed /api/cases/searches)
+CREATE TABLE IF NOT EXISTS search_field_definitions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key TEXT UNIQUE NOT NULL,
+    label TEXT NOT NULL,
+    placeholder TEXT NOT NULL DEFAULT 'Search items...',
+    combinator TEXT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    display_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 14. INDEXES FOR LIGHTNING FAST RETRIEVAL & DEDUPLICATION
 CREATE INDEX IF NOT EXISTS idx_cases_court_id ON cases(court_id);
 CREATE INDEX IF NOT EXISTS idx_cases_diary_num ON cases(diary_number);
 CREATE INDEX IF NOT EXISTS idx_cases_judgment_date ON cases(judgment_date);
@@ -276,6 +372,21 @@ CREATE INDEX IF NOT EXISTS idx_parties_case ON parties(case_id);
 CREATE INDEX IF NOT EXISTS idx_case_judges_case ON case_judges(case_id);
 CREATE INDEX IF NOT EXISTS idx_case_judges_judge ON case_judges(judge_id);
 CREATE INDEX IF NOT EXISTS idx_scraper_jobs_court ON scraper_jobs(court_id, from_date, to_date);
+CREATE INDEX IF NOT EXISTS idx_filter_options_filter_id ON filter_options(filter_id);
+
+-- 15. TRIGRAM INDEXES FOR ILIKE '%term%' FREE-TEXT SEARCH (api-backend search)
+CREATE INDEX IF NOT EXISTS idx_trgm_cases_note_ai ON cases USING gin (case_note_ai gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_cases_case_number ON cases USING gin (case_number gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_cases_cnr ON cases USING gin (cnr gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_cases_neutral_citation ON cases USING gin (neutral_citation gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_cases_diary_number ON cases USING gin (diary_number gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_parties_name ON parties USING gin (name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_judge_master_name ON judge_master USING gin (canonical_name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_advocates_name ON advocates USING gin (name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_act_master_name ON act_master USING gin (canonical_name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_provisions_raw_act ON provisions USING gin (raw_act_name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_provisions_section ON provisions USING gin (section gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_trgm_citations_raw_text ON citations USING gin (raw_citation_text gin_trgm_ops);
 """
 
 
@@ -323,6 +434,47 @@ def seed_canonical_acts(conn):
         conn.commit()
 
 
+INITIAL_FILTER_DEFINITIONS = [
+    # (key, label, type, selection_mode, query_key, data_source, is_searchable, display_order)
+    ("court", "Court", "select", "multi", "court_id", "database", False, 0),
+    ("treatment_status", "Treatment Status", "select", "multi", None, "database", False, 1),
+    ("judge", "Judge / Bench", "select", "multi", None, "database", True, 2),
+    ("act", "Act / Law", "select", "multi", None, "database", True, 3),
+    ("judgment_year", "Judgment Year", "select", "multi", None, "database", False, 4),
+]
+
+INITIAL_SEARCH_FIELD_DEFINITIONS = [
+    # (key, label, placeholder, combinator, display_order)
+    ("all", "All of these words", "Search items...", "AND", 0),
+    ("any", "Any of these words", "Search items...", "OR", 1),
+    ("exact", "Exactly this phrase", "Search items...", "PHRASE", 2),
+    ("none", "None of these words", "Search items...", "NOT", 3),
+    ("text", "These words", "Search items...", "AND", 4),
+]
+
+
+def seed_filter_and_search_definitions(conn):
+    """
+    Seeds the 5 filter definitions and 5 search-field definitions that reproduce
+    today's hardcoded behavior. ON CONFLICT (key) DO NOTHING so this is a no-op
+    against an already-seeded DB and never clobbers admin edits.
+    """
+    with conn.cursor() as cur:
+        cur.executemany("""
+            INSERT INTO filter_definitions (key, label, type, selection_mode, query_key, data_source, is_searchable, display_order)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (key) DO NOTHING;
+        """, INITIAL_FILTER_DEFINITIONS)
+
+        cur.executemany("""
+            INSERT INTO search_field_definitions (key, label, placeholder, combinator, display_order)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (key) DO NOTHING;
+        """, INITIAL_SEARCH_FIELD_DEFINITIONS)
+
+        conn.commit()
+
+
 def init_database(db_url: Optional[str] = None, drop_existing: bool = False):
     """Initializes the production database schema and seeds master data if not present."""
     conn = get_connection(db_url)
@@ -333,12 +485,19 @@ def init_database(db_url: Optional[str] = None, drop_existing: bool = False):
                 cur.execute("""
                     DROP TABLE IF EXISTS citations, case_articles, provisions, case_advocates,
                     advocates, case_judges, parties, case_subjects, cases, act_aliases,
-                    act_master, judge_aliases, judge_master, scraper_jobs CASCADE;
+                    act_master, judge_aliases, judge_master, scraper_jobs,
+                    filter_options, filter_definitions, search_field_definitions CASCADE;
                 """)
                 conn.commit()
 
             print("🚀 Verifying/creating enterprise PostgreSQL schema with UUIDs & Citations...")
             cur.execute(CREATE_TABLES_SQL)
+
+            # Incremental column additions for tables that may already exist from an
+            # earlier version of the schema (CREATE TABLE IF NOT EXISTS above won't
+            # retrofit new columns onto an already-created table).
+            cur.execute("ALTER TABLE filter_definitions ADD COLUMN IF NOT EXISTS is_searchable BOOLEAN NOT NULL DEFAULT FALSE;")
+            conn.commit()
 
             # Seed courts
             cur.executemany("""
@@ -348,9 +507,10 @@ def init_database(db_url: Optional[str] = None, drop_existing: bool = False):
             """, INITIAL_COURTS)
             conn.commit()
 
-        # Seed acts
+        # Seed acts, filters, and search fields
         seed_canonical_acts(conn)
-        print("✅ Database verified and initialized successfully with master Acts, Aliases, and Courts!")
+        seed_filter_and_search_definitions(conn)
+        print("✅ Database verified and initialized successfully with master Acts, Aliases, Courts, Filters, and Search Fields!")
     finally:
         conn.close()
 
