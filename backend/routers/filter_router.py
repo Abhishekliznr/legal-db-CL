@@ -18,7 +18,6 @@ except ImportError:
 router = APIRouter(tags=["Dynamic Filters & Facets"])
 
 
-@router.get("/api/case-research/filters", response_model=Dict[str, Any])
 @router.get("/api/filters", response_model=Dict[str, Any])
 def get_configuration_driven_filters():
     """

@@ -343,7 +343,6 @@ def execute_case_search(
         conn.close()
 
 
-@router.post("/api/case-research/search", response_model=Dict[str, Any])
 @router.post("/api/cases/search", response_model=Dict[str, Any])
 def post_search_cases(req: SearchRequestModel):
     """
