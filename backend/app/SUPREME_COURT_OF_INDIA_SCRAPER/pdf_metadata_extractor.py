@@ -2381,10 +2381,27 @@ def main():
                 layer="Silver",
                 filename="supreme_court_metadata_2025.json"
             )
-            print(f"✅ Silver Metadata Blob URL: {url}")
         except Exception as e:
             print(f"⚠️ Warning uploading Silver metadata to Azure: {e}")
 
 
+def extract_metadata_from_records(records: list) -> list:
+    """
+    Direct in-memory metadata extraction: processes raw scraper records without saving local files.
+    """
+    enriched = []
+    for index, record in enumerate(records, start=1):
+        if not isinstance(record, dict):
+            continue
+        try:
+            standardized = process_case(record)
+            if standardized:
+                enriched.append(standardized)
+        except Exception as e:
+            print(f"⚠️ Error extracting metadata for record {index}: {e}")
+    return enriched
+
+
 if __name__ == "__main__":
     main()
+

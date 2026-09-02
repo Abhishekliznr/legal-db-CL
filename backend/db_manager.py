@@ -13,7 +13,7 @@ import json
 import argparse
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Union
 
 if sys.platform == "win32":
     try:
@@ -308,21 +308,21 @@ def seed_canonical_acts(conn):
         conn.commit()
 
 
-def init_database(db_url: Optional[str] = None, drop_existing: bool = True):
-    """Initializes the production database schema and seeds master data."""
+def init_database(db_url: Optional[str] = None, drop_existing: bool = False):
+    """Initializes the production database schema and seeds master data if not present."""
     conn = get_connection(db_url)
     try:
         with conn.cursor() as cur:
             if drop_existing:
-                print("🧹 Resetting old schema tables for clean UUID migration...")
+                print("🧹 Resetting old schema tables for clean migration...")
                 cur.execute("""
                     DROP TABLE IF EXISTS citations, case_articles, provisions, case_advocates, 
                     advocates, case_judges, parties, case_subjects, cases, act_aliases, 
-                    act_master, judge_aliases, judge_master CASCADE;
+                    act_master, judge_aliases, judge_master, scraper_jobs CASCADE;
                 """)
                 conn.commit()
 
-            print("🚀 Creating enterprise PostgreSQL schema with UUIDs & Citations...")
+            print("🚀 Verifying/creating enterprise PostgreSQL schema with UUIDs & Citations...")
             cur.execute(CREATE_TABLES_SQL)
             
             # Seed courts
@@ -335,7 +335,7 @@ def init_database(db_url: Optional[str] = None, drop_existing: bool = True):
 
         # Seed acts
         seed_canonical_acts(conn)
-        print("✅ Database initialized successfully with master Acts, Aliases, and Courts!")
+        print("✅ Database verified and initialized successfully with master Acts, Aliases, and Courts!")
     finally:
         conn.close()
 
@@ -839,6 +839,47 @@ def import_json_file(
         conn.close()
 
 
+def import_json_data(
+    raw_data: Union[dict, list],
+    default_court: str = "SUPREME_COURT_OF_INDIA",
+    db_url: Optional[str] = None
+) -> int:
+    """
+    Direct in-memory ingestion into PostgreSQL without saving any JSON file to local disk.
+    """
+    effective_court = default_court or "SUPREME_COURT_OF_INDIA"
+    if isinstance(raw_data, dict):
+        if "supreme_court" in raw_data:
+            data = raw_data["supreme_court"]
+        elif "Supreme Court of India" in raw_data:
+            data = raw_data["Supreme Court of India"]
+        else:
+            first_val = next(iter(raw_data.values()))
+            data = first_val if isinstance(first_val, list) else list(raw_data.values())
+    elif isinstance(raw_data, list):
+        data = raw_data
+    else:
+        data = [raw_data]
+
+    conn = get_connection(db_url)
+    success = 0
+    try:
+        with conn.cursor() as cur:
+            for item in data:
+                try:
+                    ingest_case_metadata(cur, item, default_court=effective_court, upload_to_blob=False)
+                    success += 1
+                except Exception as e:
+                    print(f"⚠️ Error ingesting case {item.get('diary_number')}: {e}")
+            conn.commit()
+
+        # Run treatment recompute job
+        citator.recompute_all_treatment_statuses(conn)
+        return success
+    finally:
+        conn.close()
+
+
 def get_existing_cases_keys(court_id: str = "SUPREME_COURT_OF_INDIA", db_url: Optional[str] = None) -> set:
     """
     Returns a fast set of existing keys (diary_number, diary_date, neutral_citation)
@@ -1072,7 +1113,8 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # init
-    subparsers.add_parser("init", help="Initialize schema and seed master tables")
+    init_parser = subparsers.add_parser("init", help="Initialize schema and seed master tables")
+    init_parser.add_argument("--drop", action="store_true", help="Drop existing tables before recreating")
 
     # import
     import_parser = subparsers.add_parser("import", help="Import scraped JSON metadata")
@@ -1095,7 +1137,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "init":
-        init_database()
+        init_database(drop_existing=args.drop)
     elif args.command == "import":
         import_json_file(args.file, court_id=args.court, upload_to_blob=args.upload_azure)
     elif args.command == "sync-blobs":
