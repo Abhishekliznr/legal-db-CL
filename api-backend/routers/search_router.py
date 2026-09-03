@@ -25,7 +25,7 @@ import psycopg2
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from shared import db_manager
+import db_manager
 
 logger = logging.getLogger("api_backend.search")
 

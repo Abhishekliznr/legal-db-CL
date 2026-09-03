@@ -1,0 +1,41 @@
+services:
+  # 1. PostgreSQL Database Service — own instance for api-backend
+  db:
+    image: postgres:15-alpine
+    container_name: legal_api_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+      POSTGRES_DB: legal_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - api_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d legal_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. API Backend — case search, filters & citator (lightweight, no Playwright)
+  api-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal_api_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8000"
+    environment:
+      - DB_CONNECTION=postgresql://postgres:1234@db:5432/legal_db
+    volumes:
+      # Mount current directory so code changes persist immediately
+      - .:/app
+      - /app/__pycache__
+
+volumes:
+  api_postgres_data:

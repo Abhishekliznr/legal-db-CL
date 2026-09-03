@@ -1,8 +1,8 @@
 """
 Case Ingestion Pipeline for Legal Intelligence
 ------------------------------------------------
-Normalizes and writes scraped judgment metadata into the shared PostgreSQL
-schema (see shared/db_manager.py), resolving Master Judge/Act/Advocate
+Normalizes and writes scraped judgment metadata into the PostgreSQL
+schema (see db_manager.py), resolving Master Judge/Act/Advocate
 records, extracting citations via the Citator engine, and optionally
 archiving PDFs/JSON to Azure Blob Storage. Scraper-only: nothing here is
 imported by api-backend, which only ever reads already-ingested case data.
@@ -12,8 +12,8 @@ import json
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple, Union
 
-from shared import db_manager
-from shared import normalizer
+import db_manager
+import normalizer
 import citator
 import azure_blob
 

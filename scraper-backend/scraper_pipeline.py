@@ -23,7 +23,7 @@ for _p in [str(_project_root), str(_script_dir)]:
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from shared import db_manager
+import db_manager
 import azure_blob
 import ingestion
 

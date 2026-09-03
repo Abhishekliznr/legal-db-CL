@@ -12,16 +12,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Shared DB connection/schema package, used by both services.
-COPY shared/ ./shared/
+COPY requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY api-backend/requirements.txt ./api-backend/requirements.txt
-RUN pip install --no-cache-dir -r api-backend/requirements.txt
-
-COPY api-backend/ ./api-backend/
-
-ENV PYTHONPATH=/app
-WORKDIR /app/api-backend
+COPY . .
 
 EXPOSE 8000
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]

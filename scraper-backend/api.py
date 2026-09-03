@@ -3,30 +3,29 @@ Scraper Backend: Court Judgment Scraper & Ingestion FastAPI Application
 -------------------------------------------------------------------------
 Orchestrates:
 - 🕷️ Court Scraper Router  : /api/scraper/start|status|jobs|cancel
-- 🐘 Automatic Database Startup Verification (shared schema with api-backend)
+- 🐘 Automatic Database Startup Verification (own copy of the DB schema)
 - 🌐 Static Landing Page at "/"
 
 Heavy service (Playwright, PyMuPDF, ddddocr, Azure Blob) — kept separate
-from api-backend so the lightweight read/search API never needs a browser
-runtime. Both services point at the same PostgreSQL database.
+and standalone from api-backend so the lightweight read/search API never
+needs a browser runtime. Both services point at the same PostgreSQL
+database, but ship independent copies of the DB connection/schema code.
 """
 
 import sys
 from pathlib import Path
 
-# Make the repo-root `shared/` package importable whether this runs via
-# Docker (PYTHONPATH=/app) or directly from a local checkout.
+# Make this directory's own modules (db_manager, routers/) importable
+# regardless of the process's cwd when it was launched.
 _script_dir = Path(__file__).resolve().parent
-_project_root = _script_dir.parent
-for _p in [str(_project_root), str(_script_dir)]:
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
+if str(_script_dir) not in sys.path:
+    sys.path.insert(0, str(_script_dir))
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from shared import db_manager
+import db_manager
 from routers import scraper_router
 
 app = FastAPI(

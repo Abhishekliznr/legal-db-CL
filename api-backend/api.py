@@ -4,12 +4,12 @@ API Backend: Case Search & Citator FastAPI Application
 Orchestrates:
 - 🔍 Legal Search Router   : QUERY /api/cases, /api/cases/{case_id}
 - 🏷️ Dynamic Filter Router : /api/cases/filters, /api/cases/searches
-- 🐘 Automatic Database Startup Verification (shared schema with scraper-backend)
+- 🐘 Automatic Database Startup Verification (own copy of the DB schema)
 - 🏊 Pooled Read Connections (initialized on startup, closed on shutdown)
 - 🌐 Static Landing Page at "/"
 
 Read-only, DB-only service — no Playwright/scraping dependencies live here.
-Court scraping is a separate service: see ../scraper-backend.
+Court scraping is a separate, standalone service: see ../scraper-backend.
 """
 
 import logging
@@ -17,19 +17,17 @@ import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-# Make the repo-root `shared/` package importable whether this runs via
-# Docker (PYTHONPATH=/app) or directly from a local checkout.
+# Make this directory's own modules (db_manager, routers/) importable
+# regardless of the process's cwd when it was launched.
 _script_dir = Path(__file__).resolve().parent
-_project_root = _script_dir.parent
-for _p in [str(_project_root), str(_script_dir)]:
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
+if str(_script_dir) not in sys.path:
+    sys.path.insert(0, str(_script_dir))
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from shared import db_manager
+import db_manager
 from routers import filter_router, search_router
 
 logging.basicConfig(

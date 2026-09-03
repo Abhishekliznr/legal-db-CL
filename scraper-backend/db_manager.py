@@ -1,15 +1,14 @@
 """
-Shared PostgreSQL Connection, Schema & Scraper-Job Tracking
+PostgreSQL Connection, Schema & Scraper-Job Tracking
 -------------------------------------------------------------
-Used by BOTH api-backend and scraper-backend (same database, same schema).
+scraper-backend's own copy of the DB layer (kept in sync by hand with
+api-backend's copy — the two services no longer share code).
 Defines the production schema (Global UUIDs, Master Judge & Act tables with
 alias mapping, the Citator & Citation Graph) and the scraper_jobs tracking
-CRUD that api-backend's /api/scraper/* proxying and scraper-backend's own
-job execution both read/write.
+CRUD that scraper-backend's job execution reads/writes.
 
 Case-ingestion logic (writing cases/parties/citations from scraped JSON)
-lives in scraper-backend/ingestion.py, not here — only the scraper writes
-case data, so that logic doesn't need to ship inside api-backend's image.
+lives alongside this file in ingestion.py.
 """
 
 import os
@@ -39,7 +38,7 @@ try:
 except ImportError:
     psycopg2 = None
 
-from . import normalizer
+import normalizer
 
 
 # ============================================================
@@ -680,7 +679,7 @@ def list_scraper_jobs(limit: int = 50, db_url: Optional[str] = None) -> List[Dic
 # ============================================================
 
 def main():
-    parser = argparse.ArgumentParser(description="Shared Legal Database Schema Manager")
+    parser = argparse.ArgumentParser(description="Legal Database Schema Manager")
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     init_parser = subparsers.add_parser("init", help="Initialize schema and seed master tables")

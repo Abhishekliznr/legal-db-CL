@@ -12,7 +12,7 @@ from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
 from pydantic import BaseModel, Field
 
-from shared import db_manager
+import db_manager
 import scraper_pipeline
 
 router = APIRouter(prefix="/api/scraper", tags=["Court Scraper Engine"])
