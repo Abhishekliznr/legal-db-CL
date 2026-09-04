@@ -1,109 +1,0 @@
-$~3
-*	IN THE HIGH COURT OF DELHI AT NEW DELHI
-
-Decided on 31.01.2025
-+ 	W.P.(C) 13467/2024
-
-	LAKSHYA ARYA	.....Petitioner
-				Through:	Mr. Manish Gupta, Ms. Deepti 							Verma, Mr. Prateek Gupta, Ms. 						Sowmya China and Mr. Rishabh 						Rai, Advocates. 
-
-				versus
-
-	 COUNCIL OF SCIENTIFIC AND INDUSTRIAL RESEARCH  
-	THROUGH ITS SECRETARY AND ORS. 	.....Respondents
-				Through:	Ms. Iram Majid, CGSC with Mr. 						Md. Suboor and Mr. Seham Khan, 						Advocates for R-1. 
-						Mr. Udit Seth, Advocate for R-2. 
-CORAM:
-HON�BLE MR. JUSTICE PRATEEK JALAN
-PRATEEK JALAN, J. (ORAL)
-				
-1. The petitioner was a candidate for appointment to the post of Executive in the respondent No. 2 � Centre For Development of Technologies [�C-DOT�]. He was issued an offer of appointment on 17.04.2024, but his offer was cancelled by a communication dated 12.09.2024. By way of the present writ petition, the petitioner challenges the communication dated 12.09.2024.
-2. The petitioner completed an engineering degree (B.Tech) from National Institute of Technology, Kurukshetra [�NIT�], in the Department of Electronics and Communication Engineering, in the year 2021. He thereafter enrolled, in February 2022, for an MBA programme at Indian Institute of Management, Udaipur [�IIM-U�]. 
-3. The petitioner participated in campus placement at IIM-U in January 2024, in which C-DOT also participated as a prospective employer. Students were required to register themselves in the C-DOT recruitment portal for participation in the campus interview, to fill their profile and upload necessary documents.
-4. The petitioner applied for the said recruitment and submitted copies of his marksheets. He was called for an interview on 20.02.2024. It is averred in the writ petition that the petitioner was informed on 22.02.2024 that he has been selected,1 and that he was therefore not permitted to participate in any further campus placement interviews. The averment, that the petitioner was orally informed in February 2024 about his selection, is denied in the counter affidavit filed by C-DOT.2
-5. Be that as it may, the petitioner was issued a provisional appointment letter on 17.04.2024. He was called upon to submit a declaration with regard to his eligibility, which he submitted on 14.05.2024. However, a doubt arose as to whether his qualification fell within the eligibility criteria, which led to communications between C-DOT and NIT, and between C-DOT and the petitioner, details whereof are discussed below. Ultimately, C-DOT came to the conclusion that the petitioner was not eligible on the ground that he had not cleared all his examinations in the �first and single attempt�, as required in the eligibility criteria, and therefore withdrew the offer of appointment, by the impugned communication dated 12.09.2024.
-6. I have heard Mr. Manish Gupta, learned counsel for the petitioner, and Mr. Udit Seth, learned counsel for C-DOT. 
-7. Further to the order dated 23.01.2025, learned counsel on both sides submit that C-DOT, a society registered under the Societies Registration Act, 1860, is not amenable to the jurisdiction of the Central Administrative Tribunal. As the maintainability of the writ petition is not contested by learned counsel for the respondents, the petition has been heard on merits.
-8. The eligibility criteria laid down by C-DOT for the said post are contained in a communication sent by C-DOT, to the placement team at IIM-U. The relevant criteria are as follows: 
-� 1. Eligibility:
-MBA students passing out in 2024
-� Aggregate of all semesters in MBA should be 70% or 7 CGPA (on 10 point scale) and above.
-� Graduation should be in B.E./ B.Tech any stream.
-� Linear conversions will be done if any other scale is followed
-� The above is up to and inclusive of the 2nd Term (1st year).
-� However appointment will be subject to concurrence to the above marks after completion of final semester.
-� Every exam should be cleared in first & single attempt. There should not be any failure and repeat, ( no backlog in any semester)
-� 70% or 7 CGPA in 10th and 12th. Both exam should have been cleared in first & single attempt.
-� Candidate should be Indian National only.
-� Training & induction cost of Rs. 1 lakh will be recovered if the candidate leaves during probation period of 1 year.�3           
-9. The communication contained the following further provisions:
-�Please note that the candidates must meet the above criteria with respect to marks and age both at the time of appearing for campus interviews & final placement in C- DOT (after the completion of the course).
-	xxxx			xxxx			xxxx		
-�Please note if the no. of eligible students as per above criteria exceed 30 in nos. C-DOT will be shortlisting the candidates and final shortlisted can informed to attend the interview. With regard to shortlisting C-DOT final and no communication in this regard will be entertained.�
-10. The conclusion that the petitioner was ineligible for appointment, is based upon the admitted position that he had failed to clear one paper in the 4th semester of his B.Tech degree, in the first attempt. He first sat for the 4th semester examination in May/June 2019, but was unsuccessful in the paper �Microprocessor and Microcontroller�. He took the said examination again in November/December 2019 and cleared the examination. 
-11. The first, and most important, submission of Mr. Gupta is that the eligibility criteria does not include a requirement that all papers, in the candidate�s B.Tech degree, should also have been cleared on the first attempt. He submits that the stipulation in this regard, under the heading �MBA students passing out in 2024� contained in the eligibility criteria, is referrable to the MBA degree of the candidate, and not his/ her graduation degree. Where such a condition was sought to be added for the 10th and 12th class examination, Mr. Gupta points out that it has been expressly so mentioned. However, no such qualification is found expressly mentioned in respect of the eligibility condition with regard to graduation in B.E/B.Tech. 
-12. The eligibility criteria, read as a whole, do not, in my view lend themselves to this interpretation. The eligibility is for MBA students passing out in 2024, and the qualifications expected of them are stipulated in various bullet points thereunder. One of them is that graduation should be in BE/B.Tech any stream. There is a separate condition with regard to clearing every exam in the first and single attempt without any failure or repeat. This applies, in my view, to both the qualifying degrees mentioned in the eligibility criteria, i.e. the candidate�s basic engineering degree, as well as to the MBA degree. 
-13. The argument of Mr. Gupta is based upon an understanding that the word �backlog� in a particular semester, is understood in engineering colleges, to cover clearing an exam in the second attempt in a following year, and not to clearing the exam in the following semester in the same year. He also relies upon a communication dated 30.07.2024 issued by NIT4, which certifies that the petitioner attended his B.Tech degree �with no backlog�. 
-14. However, even assuming this contention to be correct, I am of the view that it does not fully answer the eligibility conditions stipulated by C-DOT. The relevant condition was not merely that there should be �no backlog�, but also to that every exam should be cleared in the �first and single attempt�, without any failure and repeat. This condition was clear and unequivocal, and cannot be restricted by any understanding of the word �backlog�, which appears subsequently. 
-15. Indeed, the communication dated 30.07.2024 of NIT, relied upon by Mr. Gupta, establishes the position that the petitioner had failed in one paper in the 4th semester, for which he reappeared later, and cleared on the second attempt. A semester wise examination result summary is given in the said communication, which is as follows: 
-�Sr.
-No.Sem.Normal Exam Session for PassingActual Session PassedNo. of re-appearsNo. of Attempts for passing sem.Result (SGPA)11st Nov/Dec. 2017Nov/Dec. 2017Nil1st 9.136422nd May/June. 2018May/June. 2018Nil1st 7.750033rd Nov/Dec. 2018Nov/Dec. 2018Nil1st 7.703744th May/June. 2019Nov/Dec. 2019012nd 6.7200555th Nov/Dec. 2019Nov/Dec. 2019Nil1st 8.960066th May/June. 2020May/June. 2020Nil1st 10.000077th Nov/Dec. 2020Nov/Dec. 2020Nil1st 9.416788th May/June. 2021May/June. 2021Nil1st 9.0000� 
-16. Although the point is not disputed on facts, it may be noted that subsequent to the communication dated 30.07.2024, NIT also clarified the correspondence with C-DOT  by an e-mail dated 27.08.2024, that the petitioner had failed in the 4th semester in his first attempt, and cleared the said examination in his second attempt.6
-17. An ancillary point may be dealt with here. Mr. Gupta argued that C-DOT has committed a material suppression of facts, by reason of its failure to disclose NIT�s communication dated 30.07.2024 in its counter affidavit. I am of the view that such a course would have been advisable for completeness of the record, but that it is, in any event, of little assistance to the petitioner, as it quite clearly demonstrates that the petitioner was ineligible for appointment. It may also be noted that there was further correspondence thereafter between C-DOT and NIT, which rested with NIT�s communication dated 27.08.2024 referred to above, which has been annexed to the counter affidavit. 
-18. Turning back to the merits of the matter, any doubt as to the interpretation of the eligibility criteria, is further dispelled by the contents of the provisional offer letter, and the declaration submitted by the petitioner himself. In the provisional offer letter, it was stated as follows:  
- �iv) Please note that this offer is purely provisional and is subject to fulfilling our criteria of age, percentage of marks, submission of Caste/Community Certificate (if applicable), medical fitness, graduation and post graduation stream only ECE and CSE, no backlog in any semester or yearly exam (candidate must have cleared the exam in first and single attempt) and other criterias, at the time of reporting for duty.�7
-19. The declaration signed and submitted by the petitioner on 14.05.2024, is also in similar terms: 
-�I Lakshay Arya have been given the Offer letter for Appointment vide Ref. No. C-DOT/P&HR/2023-24/04/78 dated 17th April, 2024 from Centre for Development of Telematics, C-DOT campus, Mandi Road, Mehrauli, New Delhi -110030 for the post of Executive and have accepted the Offer.
-In consideration of the same, I hereby declare that I have fulfilled all criteria for appointment including that of age, percentage of marks, submission of Caste/Community certificate (if applicable), graduation (BTech) and post-graduation (MBA) and have no backlog in any semester or yearly exams (cleared the exam in first and single attempt) and other criteria�s, at the time of reporting for duty.
-I also declare that I will have no proprietary/commercial interests in any software developed and any other product/service offered by C-DOT; C-DOT reserves all rights to products and services created at C-DOT. I will not claim any ownership or share any of these rights irrespective of any involvement I may have in the development of product/services etc. I will sign the non-disclosure agreement at the time of joining.
-I will discharge my duties and responsibilities carefully and diligently. I will maintain confidentiality of the documents and information available at C-DOT.
-I hereby declare that all information provided by me is true, accurate and to the best of my knowledge. I understand that my appointment is provisional subject to fulfilling all criteria as per C-DOT rules and regulations. If at any time, in case it is found to be false, my services are liable to be terminated any time without assigning any reason or notice thereof.�8
-20. The aforesaid declaration was, in my view, clearly contrary to the record. Mr. Gupta however submits that the petitioner has not misrepresented to the respondent at any stage with regard to his qualifications. He understood the eligibility criteria to be referrable to the MBA degree, and not to the B.Tech decree, and submitted all his marksheets to C-DOT prior to being called for the interview. It is contended that the marksheets were examined by C-DOT, and he was called for interview upon C-DOT being satisfied of his eligibility. 
-21. The marksheets in question have also been annexed to the writ petition as Annexure P-2. They include the following marksheets:
-* 1st semester - Session November/December 2017;
-* 2nd semester - Session May/June 2018;
-* 3rd semester - Session November/December 2018;
-* 4th semester - Session November/December, 2019;
-* 5th semester - Session November/December, 2019;
-* 6th semester - Session May/June, 2020;
-* 7th semester - Session November/December, 2020; and 
-* 8th semester - Session May/June, 2021. 
-It may be noticed from the aforesaid that the marksheets for  4th and 5th semester are both issued in the session Nov/Dec. 2019. The 4th semester marksheet includes the paper �Microprocessor and Microcontroller�, and bears a footnote �cleared in Nov/Dec. 2019�. 
-22.  The respondent has alleged that the petitioner has not supplied the marksheet for the 4th semester, as originally issued when he first took the examination in May/June 2019, but the one which was issued after he had retaken the examination in the following semester. Mr. Gupta submits that no marksheet was, in fact, issued to the petitioner in May/June 2019. According to him, the result that was declared by NIT showed that he had failed in one paper, but the marksheet was issued only after he repeated and passed the paper in the following semester. 
-23. Without entering into the controversy as to whether the petitioner had deliberately withheld any marksheet from C-DOT at the stage of interview, I am of the view that the eligibility criteria did not admit of ambiguity. The petitioner was on notice from the very outset, that every exam was required to be cleared in the first and single attempt, without any failure and repeat. He was aware at that stage that he did not fulfil this criteria, but nonetheless applied. If he was doubtful for any reason, he did not seek a clarification at any stage. Even at the stage when the appointment latter was issued, the petitioner did not seek any further clarification, but proceeded to submit a solemn declaration which was clearly at variance with the true factual position.
-24. The eligibility criteria being clear and unequivocal, the petitioner participated in the recruitment despite lacking the required academic record. He cannot, in my view, lay a legitimate claim to a job for which he clearly does not meet the eligibility criteria.
-25. For the reasons aforesaid, I am of the view that the impugned decision of C-DOT to cancel the offer made to the petitioner, does not call for interference under Article 226 of the Constitution. The writ petition is, therefore, dismissed, but with no orders as to costs. 
-
-
-PRATEEK JALAN, J
-JANUARY 31, 2025
-�Bhupi�/kb/
-1 Paragraph 2.9 of the writ petition. 
-2 Para-wise reply � paragraph 2.9. 
-3 Emphasis supplied.
-4 Part of Annexure R-1 to  the affidavit in rejoinder dated 09.11.2024, filed by the petitioner.
-5 Emphasis supplied.
-6 Annexure 14 to the counter affidavit dated  26.10.2024, filed by C-DOT.
-7 Emphasis supplied.
-8 Emphasis supplied.
----------------
-
-------------------------------------------------------------
-
----------------
-
-------------------------------------------------------------
-
-
-
-
-
-
-
-W.P.(C) 13467/2024		Page 1 of 10
-
-
-
-
-
-
