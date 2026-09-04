@@ -28,7 +28,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 import db_manager
-from routers import filter_router, search_router
+from routers import filter_router, history_router, search_router, stats_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -97,6 +97,13 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 # search_router so these static paths are matched before the
 # /api/cases/{case_id} wildcard route.
 app.include_router(filter_router.router)
+
+# Aggregate stats + per-user recent search history (/api/cases/stats,
+# /api/cases/history) — same reason: static sub-paths of /api/cases, so these
+# must also be mounted before search_router's /api/cases/{case_id} wildcard,
+# or a request to e.g. /api/cases/stats would be swallowed by get_case_detail("stats").
+app.include_router(stats_router.router)
+app.include_router(history_router.router)
 
 # Legal Search & Citator Router (QUERY /api/cases, /api/cases/{case_id})
 app.include_router(search_router.router)

@@ -354,7 +354,18 @@ CREATE TABLE IF NOT EXISTS search_field_definitions (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 14. INDEXES FOR LIGHTNING FAST RETRIEVAL & DEDUPLICATION
+-- 14. CASE_RESEARCH_SEARCH_HISTORY (per-user recent searches, legal-ui /case-research)
+-- user_id is opaque text supplied by the caller (legal-ui's Next.js server actions, keyed off
+-- the verified NextAuth session) — no FK, this DB has no users table of its own. Same no-auth
+-- trust model as the rest of this service: the backend trusts whatever user_id it's given.
+CREATE TABLE IF NOT EXISTS case_research_search_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id TEXT NOT NULL,
+    query TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 15. INDEXES FOR LIGHTNING FAST RETRIEVAL & DEDUPLICATION
 CREATE INDEX IF NOT EXISTS idx_cases_court_id ON cases(court_id);
 CREATE INDEX IF NOT EXISTS idx_cases_diary_num ON cases(diary_number);
 CREATE INDEX IF NOT EXISTS idx_cases_judgment_date ON cases(judgment_date);
@@ -373,8 +384,9 @@ CREATE INDEX IF NOT EXISTS idx_case_judges_case ON case_judges(case_id);
 CREATE INDEX IF NOT EXISTS idx_case_judges_judge ON case_judges(judge_id);
 CREATE INDEX IF NOT EXISTS idx_scraper_jobs_court ON scraper_jobs(court_id, from_date, to_date);
 CREATE INDEX IF NOT EXISTS idx_filter_options_filter_id ON filter_options(filter_id);
+CREATE INDEX IF NOT EXISTS idx_case_research_search_history_user ON case_research_search_history(user_id, created_at DESC);
 
--- 15. TRIGRAM INDEXES FOR ILIKE '%term%' FREE-TEXT SEARCH (api-backend search)
+-- 16. TRIGRAM INDEXES FOR ILIKE '%term%' FREE-TEXT SEARCH (api-backend search)
 CREATE INDEX IF NOT EXISTS idx_trgm_cases_note_ai ON cases USING gin (case_note_ai gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_trgm_cases_case_number ON cases USING gin (case_number gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_trgm_cases_cnr ON cases USING gin (cnr gin_trgm_ops);
