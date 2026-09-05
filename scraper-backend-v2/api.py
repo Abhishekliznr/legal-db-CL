@@ -1,0 +1,122 @@
+"""
+scraper-backend-v2: Court Judgment Scraper & Ingestion Engine (rebuild)
+-------------------------------------------------------------------------
+Standalone FastAPI app — no shared code with api-backend or the old
+scraper-backend (docs/scraper-backend-revamp-spec.md §3.2). See that spec
+for the full architecture; this file wires up what exists so far:
+
+- Phase 0 (done): schema (db/schema.sql) + connection layer (db/connection.py)
+- Phase 1 (done): Supreme Court adapter, orchestrator, OCR + stub extraction +
+  promotion pipeline, scraper_router. The stub extraction stage gets replaced
+  by a real structured-output LLM call in Phase 3 — see pipeline/extraction.py.
+- Phase 2 (done): generic eCourts adapter for all 25 High Courts, driven by
+  court_scrape_config (seed via `python -m db.seed_courts`). scraper_router
+  now resolves the adapter + state/bench code from that config automatically.
+- Phase 3 (done): real OCR fallback (Tesseract, for scanned PDFs with no
+  text layer), real structured-output LLM extraction (pipeline/extraction.py,
+  replacing the Phase 1 stub — see pipeline/extraction_stub.py), the
+  normalization/ package (act/judge/party cleaning), and citation
+  finding + treatment reconciliation (pipeline/citator.py).
+- Phase 4 (done, separate service): api-backend-v2/ reads what this service
+  writes — see legal-db/api-backend-v2/.
+- Phase 5 (not yet started): cutover.
+
+Startup does NOT auto-apply the schema (unlike the old service) — run
+`python -m db.init_db init` explicitly once against a fresh database. Schema
+changes here are deliberate, not something that should happen silently on
+every container restart.
+"""
+
+import logging
+import sys
+from pathlib import Path
+
+_script_dir = Path(__file__).resolve().parent
+if str(_script_dir) not in sys.path:
+    sys.path.insert(0, str(_script_dir))
+
+# Without this, Python's root logger defaults to WARNING — every
+# logger.info() call across this service (batch progress in
+# orchestrator/batch_runner.py, diagnostic table-header dumps in
+# adapters/supreme_court/adapter.py, etc.) would be silently swallowed.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+
+from fastapi import FastAPI
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
+
+from db import connection
+from routers import court_config_router, scraper_router
+
+app = FastAPI(
+    title="Legal Court Scraper & Ingestion Engine (v2)",
+    description="Rebuild in progress — see legal-db/docs/scraper-backend-revamp-spec.md",
+    version="2.0.0-phase3",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.on_event("startup")
+def on_startup():
+    # Deliberately non-fatal: if Postgres isn't reachable yet (e.g. the db
+    # container is still coming up despite the compose healthcheck, or a
+    # transient network blip), the app still starts and serves /health as
+    # "degraded" instead of crash-looping. A hard failure here would make
+    # /health's own graceful degradation unreachable.
+    try:
+        connection.init_connection_pool()
+    except Exception as e:
+        print(f"WARNING: could not initialize DB connection pool at startup: {e}")
+
+
+@app.on_event("shutdown")
+def on_shutdown():
+    connection.close_connection_pool()
+
+
+app.include_router(court_config_router.router)
+app.include_router(scraper_router.router)
+
+
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+
+@app.get("/", response_class=HTMLResponse)
+def serve_landing_page():
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return HTMLResponse("<h1>Legal Court Scraper & Ingestion Engine (v2)</h1><p>Visit <a href='/docs'>/docs</a>.</p>")
+
+
+@app.get("/health")
+def health_check():
+    """
+    Verifies the app can actually reach Postgres, not just that the process
+    is up — a plain 200 with no DB check would hide a bad DB_HOST/DB_PORT.
+    """
+    try:
+        with connection.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1;")
+                cur.fetchone()
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {e}"
+
+    return {
+        "status": "healthy" if db_status == "connected" else "degraded",
+        "service": "scraper-backend-v2",
+        "version": "2.0.0-phase3",
+        "database": db_status,
+    }
