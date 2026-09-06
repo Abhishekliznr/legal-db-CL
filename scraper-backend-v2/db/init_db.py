@@ -22,6 +22,8 @@ _DROP_TABLES_SQL = """
 DROP TABLE IF EXISTS
     filter_options, filter_definitions, search_field_definitions,
     court_scrape_config,
+    document_paragraphs, case_timeline_events, case_appellate_history,
+    document_holdings, citation_sequences,
     citations, document_ministry_department, document_industries,
     document_subjects, document_sections, document_coram, case_counsels,
     parties, cases, documents, raw_ingestions, scrape_batches,
@@ -34,7 +36,7 @@ _DROP_TYPES_SQL = """
 DROP TYPE IF EXISTS
     doc_type_enum, decision_type_enum, party_side_enum,
     ingestion_status_enum, citation_treatment_enum,
-    disposition_category_enum, data_source_enum
+    disposition_category_enum, data_source_enum, appellate_outcome_enum
     CASCADE;
 """
 

@@ -14,9 +14,9 @@ find_citation_candidates() feeds pipeline/extraction.py's prompt with
 candidates worth asking the LLM to classify — it does not itself decide a
 treatment. reconcile_citations() is the periodic job that resolves
 citations.cited_document_id by matching cited_reporter_citation against
-other documents' neutral_citation/equivalent_citations — separate from
-promotion because a case being cited might not exist in this database yet
-(it may get ingested in a later batch).
+other documents' neutral_citation — separate from promotion because a case
+being cited might not exist in this database yet (it may get ingested in a
+later batch).
 """
 
 import re
@@ -72,11 +72,10 @@ def has_overruled_keyword(text: str) -> bool:
 def reconcile_citations(limit: int = 500) -> int:
     """
     Resolves citations.cited_document_id for rows where it's still NULL, by
-    matching cited_reporter_citation against other documents'
-    neutral_citation or equivalent_citations. Meant to run periodically
-    (after each ingestion batch, or on a schedule) — a cited case may not
-    have existed in this database yet at promotion time. Returns the number
-    of rows resolved.
+    matching cited_reporter_citation against other documents' neutral_citation.
+    Meant to run periodically (after each ingestion batch, or on a schedule)
+    — a cited case may not have existed in this database yet at promotion
+    time. Returns the number of rows resolved.
     """
     resolved = 0
     with get_pooled_connection() as conn:
@@ -93,9 +92,8 @@ def reconcile_citations(limit: int = 500) -> int:
                 cur.execute("""
                     SELECT document_id FROM documents
                     WHERE neutral_citation = %s
-                       OR %s = ANY(equivalent_citations)
                     LIMIT 1;
-                """, (cited_reporter_citation, cited_reporter_citation))
+                """, (cited_reporter_citation,))
                 match = cur.fetchone()
                 if match:
                     cur.execute("UPDATE citations SET cited_document_id = %s WHERE citation_id = %s;", (match[0], citation_id))

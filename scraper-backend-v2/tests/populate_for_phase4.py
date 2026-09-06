@@ -113,7 +113,9 @@ def main():
             data_source = "SCI_WEBSITE" if case["court"] == "Supreme Court of India" else "ECOURTS"
             with patch("pipeline.extraction.call_llm_extraction", return_value=case["llm_result"]):
                 import os
-                os.environ["GROQ_API_KEY"] = "test-fake-key"
+                os.environ["AZURE_OPENAI_ENDPOINT"] = "https://test-fake-resource.openai.azure.com"
+                os.environ["AZURE_OPENAI_API_KEY"] = "test-fake-key"
+                os.environ["AZURE_OPENAI_DEPLOYMENT"] = "test-fake-deployment"
                 summary = batch_runner.run_batch(
                     OneRecordAdapter(pdf_path, case["llm_result"]["cases"][0]["case_number"], case.get("neutral_citation")),
                     court_id, case["court"][:4].upper(), "2026-01-01", "2026-12-31", data_source,

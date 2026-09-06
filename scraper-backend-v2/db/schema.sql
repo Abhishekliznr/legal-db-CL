@@ -43,13 +43,21 @@ CREATE TYPE ingestion_status_enum AS ENUM (
 );
 CREATE TYPE citation_treatment_enum AS ENUM (
     'Overruled', 'Affirmed', 'Distinguished', 'Followed',
-    'Referred', 'Relied Upon', 'Explained', 'Doubted'
+    'Referred', 'Relied Upon', 'Explained', 'Doubted',
+    'Discussed', 'Mentioned'
 );
 CREATE TYPE disposition_category_enum AS ENUM (
     'Allowed', 'Dismissed', 'Partly Allowed', 'Disposed',
     'Remanded', 'Withdrawn', 'Quashed', 'Set Aside', 'Other'
 );
 CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
+-- Outcome of THIS document on appeal/revision over the specific lower-forum
+-- order it reviews (case_appellate_history below) -- distinct from a
+-- citation's treatment, which is about persuasive precedent, not the order
+-- actually being appealed.
+CREATE TYPE appellate_outcome_enum AS ENUM (
+    'Affirmed', 'Reversed', 'Partly Reversed', 'Set Aside', 'Remanded', 'Modified'
+);
 
 -- ---------------------------------------------------------------------
 -- 2. MASTER / LOOKUP TABLES
@@ -61,7 +69,12 @@ CREATE TABLE courts (
     court_type      TEXT NOT NULL,               -- 'Supreme Court','High Court','Tribunal','District Court'
     state           TEXT,                        -- 'Delhi','Uttarakhand'
     ecourts_code    TEXT,                        -- eCourts internal court/establishment code
-    CONSTRAINT uq_courts_name UNIQUE (court_name)
+    court_code      TEXT,                        -- short code for our own internal_citation scheme
+                                                  -- below, e.g. 'SCIN', 'DHC' -- same convention already
+                                                  -- used ad hoc as a scraper request param (court_code
+                                                  -- on /api/scraper/start), now persisted properly
+    CONSTRAINT uq_courts_name UNIQUE (court_name),
+    CONSTRAINT uq_courts_code UNIQUE (court_code)
 );
 
 CREATE TABLE judges (
@@ -191,10 +204,12 @@ CREATE TABLE documents (
     doc_type            doc_type_enum NOT NULL DEFAULT 'CaseLaw',
     decision_type       decision_type_enum NOT NULL DEFAULT 'Judgment',
 
-    -- citation identifiers (nullable -- not every source has all of these)
-    neutral_citation    TEXT,               -- '2026:DHC:7372-DB'
-    manu_citation       TEXT,               -- 'MANU/UC/0058/2012' (only if manupatra-sourced)
-    equivalent_citations TEXT[],            -- ['2012 (79) ACC 149','2012(1)N.C.C.409']
+    neutral_citation    TEXT,               -- '2026:DHC:7372-DB' (nullable -- not every source has one)
+    internal_citation   TEXT,               -- our OWN citation, e.g. 'LIZNR/SCIN/0001/2026' -- generated
+                                             -- at promotion time (citation_sequences below), independent
+                                             -- of whether the court ever assigned a neutral_citation;
+                                             -- doubles as the safe public identifier for this document
+                                             -- (sequential document_id is never exposed externally)
 
     reserved_date       DATE,
     judgment_date        DATE NOT NULL,     -- "Date of Judgement"
@@ -203,6 +218,9 @@ CREATE TABLE documents (
     language            TEXT NOT NULL DEFAULT 'English',
 
     case_note_ai         TEXT,              -- AI-generated headnote/summary
+    ratio_decidendi       TEXT,             -- AI-extracted one-line binding principle -- distinct
+                                             -- from case_note_ai (a summary) and from the itemised
+                                             -- points in document_holdings below
     disposition_raw       TEXT,             -- verbatim: "the petition is dismissed"
     disposition_category  disposition_category_enum,
     favoring_party_side    party_side_enum, -- who effectively won, if determinable
@@ -229,6 +247,7 @@ ALTER TABLE raw_ingestions
 CREATE INDEX ix_documents_court_date ON documents(court_id, judgment_date);
 CREATE INDEX ix_documents_search ON documents USING GIN (search_vector);
 CREATE INDEX ix_documents_disposition ON documents(disposition_category);
+CREATE UNIQUE INDEX ux_documents_internal_citation ON documents(internal_citation) WHERE internal_citation IS NOT NULL;
 
 -- One row per CASE NUMBER / CNR (a document can own many of these --
 -- see the 10 connected W.P.(C) matters in the Railways judgment).
@@ -261,7 +280,7 @@ CREATE INDEX ix_cases_document ON cases(document_id);
 CREATE INDEX ix_cases_number_trgm ON cases USING GIN (case_number gin_trgm_ops);
 
 -- ---------------------------------------------------------------------
--- 5. RELATIONSHIP / JUNCTION TABLES
+-- 5. RELATIONSHIP / JUNCTION TABLES + EDITORIAL EXTRACTION LAYER
 -- ---------------------------------------------------------------------
 
 CREATE TABLE parties (
@@ -303,8 +322,13 @@ CREATE TABLE document_sections (
     document_id  BIGINT NOT NULL REFERENCES documents(document_id) ON DELETE CASCADE,
     section_id   BIGINT NOT NULL REFERENCES sections(section_id),
     context      TEXT,                 -- 'invoked for bail', 'definition of dealer'
+    is_primary   BOOLEAN NOT NULL DEFAULT FALSE,  -- editorially-chosen "lead" section, e.g.
+                                                   -- Manupatra's single "Relevant Section" line
     PRIMARY KEY (document_id, section_id)
 );
+
+-- At most one primary section per document.
+CREATE UNIQUE INDEX ux_document_sections_one_primary ON document_sections(document_id) WHERE is_primary;
 
 CREATE TABLE document_subjects (
     document_id BIGINT NOT NULL REFERENCES documents(document_id) ON DELETE CASCADE,
@@ -323,6 +347,89 @@ CREATE TABLE document_ministry_department (
     ministry_id   BIGINT REFERENCES ministries(ministry_id),
     department_id BIGINT REFERENCES departments(department_id),
     relation_type TEXT NOT NULL DEFAULT 'Party'   -- 'Party' | 'SubjectMatter'
+);
+
+-- Atomic per-(court, year) counter backing documents.internal_citation
+-- ('LIZNR/<court_code>/<seq>/<year>'). Resets every year, same convention
+-- as Manupatra's own MANU/XX/NNNN/YYYY scheme and the official INSC neutral
+-- citation -- NOT a lifetime running count (a decades-old court would have
+-- implausibly large numbers by now if it never reset). Claimed via
+-- INSERT ... ON CONFLICT DO UPDATE ... RETURNING next_seq, which Postgres
+-- serializes correctly under concurrent promotions via the row lock the
+-- UPDATE takes.
+CREATE TABLE citation_sequences (
+    court_id       BIGINT NOT NULL REFERENCES courts(court_id),
+    citation_year  INT NOT NULL,
+    next_seq       INT NOT NULL DEFAULT 1,
+    PRIMARY KEY (court_id, citation_year)
+);
+
+-- Held points: numbered holdings extracted from a judgment, each pinned to
+-- a paragraph in document_paragraphs below. Distinct from the single
+-- case_note_ai blob -- Manupatra shows these as a separate numbered "Held"
+-- list, each with its own pinpoint paragraph reference.
+CREATE TABLE document_holdings (
+    holding_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    document_id   BIGINT NOT NULL REFERENCES documents(document_id) ON DELETE CASCADE,
+    ordinal       SMALLINT NOT NULL,
+    holding_text  TEXT NOT NULL,
+    paragraph_ref TEXT,                -- e.g. '9' or '4, 8' -- free text like citations.paragraph_ref,
+                                        -- not a hard FK, since one holding can span several paragraphs
+    CONSTRAINT uq_document_holdings_ordinal UNIQUE (document_id, ordinal)
+);
+
+CREATE INDEX ix_document_holdings_document ON document_holdings(document_id);
+
+-- Appellate lineage: the specific lower-court/lower-forum order THIS
+-- document is reviewing, and what happened to it on appeal. Deliberately
+-- separate from `citations` -- a citation is "precedent this judgment
+-- discusses", this is "the order this judgment is literally sitting in
+-- appeal/revision over". Covers both Manupatra's "Prior History" line and
+-- its "Cases Affirmed/Reversed on Appeal" section -- same underlying fact,
+-- read two ways.
+CREATE TABLE case_appellate_history (
+    appellate_history_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    document_id           BIGINT NOT NULL REFERENCES documents(document_id) ON DELETE CASCADE,
+    prior_court_id         BIGINT REFERENCES courts(court_id),        -- set when the lower forum is itself a modeled court
+    prior_court_name       TEXT,                                      -- free-text fallback, e.g. 'Judicial Magistrate, Roorkee'
+    prior_case_number      TEXT,                                      -- e.g. 'CRRFC No. 1/2015 and CRLA No. 39/2015'
+    prior_order_date       DATE,
+    prior_document_id      BIGINT REFERENCES documents(document_id),  -- resolved link, if the lower court judgment is itself in the database
+    outcome                appellate_outcome_enum,
+    notes                  TEXT
+);
+
+CREATE INDEX ix_case_appellate_history_document ON case_appellate_history(document_id);
+CREATE INDEX ix_case_appellate_history_prior_doc ON case_appellate_history(prior_document_id);
+
+-- Reconstructed procedural timeline (FIR -> bail -> chargesheet -> ... ->
+-- judgment). Case-level, not document-level, since the procedural history
+-- belongs to the case number, not to whichever document eventually
+-- disposes it. `ordinal` carries the real ordering because some events
+-- (e.g. "post-investigation, exact date not stated in the judgment") have
+-- no usable date to sort by.
+CREATE TABLE case_timeline_events (
+    event_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    case_id         BIGINT NOT NULL REFERENCES cases(case_id) ON DELETE CASCADE,
+    ordinal         SMALLINT NOT NULL,
+    event_date      DATE,               -- nullable: not every event has a stated date
+    event_date_text TEXT,               -- fallback label, e.g. 'Post-investigation'
+    description     TEXT NOT NULL,
+    CONSTRAINT uq_case_timeline_events_ordinal UNIQUE (case_id, ordinal)
+);
+
+CREATE INDEX ix_case_timeline_events_case ON case_timeline_events(case_id);
+
+-- Paragraph-addressable judgment text. `documents.ocr_text` stays the
+-- source of truth (full raw text, always populated); this table is the
+-- structured overlay that makes `citations.paragraph_ref` and
+-- `document_holdings.paragraph_ref` actually anchorable in the UI, instead
+-- of the frontend regex-splitting `ocr_text` at render time.
+CREATE TABLE document_paragraphs (
+    document_id  BIGINT NOT NULL REFERENCES documents(document_id) ON DELETE CASCADE,
+    para_number  INT NOT NULL,
+    para_text    TEXT NOT NULL,
+    PRIMARY KEY (document_id, para_number)
 );
 
 -- The precedent / citation graph. This is where real "Overruled" status
@@ -389,8 +496,10 @@ SELECT
     d.disposition_category,
     d.disposition_raw,
     d.case_note_ai,
+    d.ratio_decidendi,
     d.overruled_keyword_present,
     d.neutral_citation,
+    d.internal_citation,
     d.pdf_url,
     d.search_vector,
     -- Derived treatment status (spec §5.3): the old schema stored this as a

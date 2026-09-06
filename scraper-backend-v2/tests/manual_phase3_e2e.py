@@ -87,8 +87,9 @@ def test_ocr_fallback_on_real_scanned_pdf():
 
 
 def test_extraction_no_api_key_uses_stub():
-    print("\n=== TEST: no GROQ_API_KEY falls back to Phase 1 stub ===")
-    os.environ.pop("GROQ_API_KEY", None)
+    print("\n=== TEST: no Azure OpenAI config falls back to Phase 1 stub ===")
+    for var in ("AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_API_KEY", "AZURE_OPENAI_DEPLOYMENT"):
+        os.environ.pop(var, None)
     record = RawJudgmentRecord(
         pdf_path=Path("/dev/null"), source_url="https://test/x.pdf",
         case_number_raw="C.A. No.-1 - 2026", party_name_raw="A VS B",
@@ -114,7 +115,9 @@ def test_extraction_no_api_key_uses_stub():
 
 def test_extraction_with_mocked_llm_call():
     print("\n=== TEST: real extraction path with a mocked LLM response ===")
-    os.environ["GROQ_API_KEY"] = "test-fake-key-not-real"
+    os.environ["AZURE_OPENAI_ENDPOINT"] = "https://test-fake-resource.openai.azure.com"
+    os.environ["AZURE_OPENAI_API_KEY"] = "test-fake-key-not-real"
+    os.environ["AZURE_OPENAI_DEPLOYMENT"] = "test-fake-deployment"
 
     fake_llm_response = {
         "case_note_ai": "The Supreme Court dismissed the appeal concerning arbitration under Section 34.",

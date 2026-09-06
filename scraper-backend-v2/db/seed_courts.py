@@ -15,52 +15,53 @@ Usage:
 
 from db.connection import get_pooled_connection
 
-# (court_name, state, ecourts_state_code)
+# (court_name, state, ecourts_state_code, court_code)
+# court_code is our own short code for documents.internal_citation
+# ('LIZNR/<court_code>/<seq>/<year>') -- same short-code convention already
+# used ad hoc as the scraper's court_code request param (e.g. "DHC" in
+# tests/manual_phase2_dispatch.py), now the persisted source of truth.
 _HIGH_COURTS = [
-    ("Allahabad High Court", "Uttar Pradesh", "9~13"),
-    ("Andhra Pradesh High Court", "Andhra Pradesh", "28~2"),
-    ("Bombay High Court", "Maharashtra", "27~1"),
-    ("Chhattisgarh High Court", "Chhattisgarh", "22~18"),
-    ("Calcutta High Court", "West Bengal", "19~16"),
-    ("Delhi High Court", "Delhi", "7~26"),
-    ("Gauhati High Court", "Assam", "18~6"),
-    ("Gujarat High Court", "Gujarat", "24~17"),
-    ("Himachal Pradesh High Court", "Himachal Pradesh", "2~5"),
-    ("High Court of Jammu, Kashmir and Ladakh", "Jammu and Kashmir", "1~12"),
-    ("Jharkhand High Court", "Jharkhand", "20~7"),
-    ("Karnataka High Court", "Karnataka", "29~3"),
-    ("Kerala High Court", "Kerala", "32~4"),
-    ("Madhya Pradesh High Court", "Madhya Pradesh", "23~2"),
-    ("Madras High Court", "Tamil Nadu", "33~10"),
-    ("Manipur High Court", "Manipur", "14~25"),
-    ("Meghalaya High Court", "Meghalaya", "17~21"),
-    ("Orissa High Court", "Odisha", "21~11"),
-    ("Patna High Court", "Bihar", "10~22"),
-    ("Punjab and Haryana High Court", "Punjab & Haryana", "3~18"),
-    ("Rajasthan High Court", "Rajasthan", "8~9"),
-    ("Sikkim High Court", "Sikkim", "11~24"),
-    ("Telangana High Court", "Telangana", "36~19"),
-    ("Tripura High Court", "Tripura", "16~20"),
-    ("Uttarakhand High Court", "Uttarakhand", "5~15"),
+    ("Allahabad High Court", "Uttar Pradesh", "9~13", "ALHC"),
+    ("Andhra Pradesh High Court", "Andhra Pradesh", "28~2", "APHC"),
+    ("Bombay High Court", "Maharashtra", "27~1", "BHC"),
+    ("Chhattisgarh High Court", "Chhattisgarh", "22~18", "CGHC"),
+    ("Calcutta High Court", "West Bengal", "19~16", "CHC"),
+    ("Delhi High Court", "Delhi", "7~26", "DHC"),
+    ("Gauhati High Court", "Assam", "18~6", "GHC"),
+    ("Gujarat High Court", "Gujarat", "24~17", "GJHC"),
+    ("Himachal Pradesh High Court", "Himachal Pradesh", "2~5", "HPHC"),
+    ("High Court of Jammu, Kashmir and Ladakh", "Jammu and Kashmir", "1~12", "JKHC"),
+    ("Jharkhand High Court", "Jharkhand", "20~7", "JHHC"),
+    ("Karnataka High Court", "Karnataka", "29~3", "KHC"),
+    ("Kerala High Court", "Kerala", "32~4", "KLHC"),
+    ("Madhya Pradesh High Court", "Madhya Pradesh", "23~2", "MPHC"),
+    ("Madras High Court", "Tamil Nadu", "33~10", "MHC"),
+    ("Manipur High Court", "Manipur", "14~25", "MNHC"),
+    ("Meghalaya High Court", "Meghalaya", "17~21", "MLHC"),
+    ("Orissa High Court", "Odisha", "21~11", "OHC"),
+    ("Patna High Court", "Bihar", "10~22", "PHC"),
+    ("Punjab and Haryana High Court", "Punjab & Haryana", "3~18", "PHHC"),
+    ("Rajasthan High Court", "Rajasthan", "8~9", "RHC"),
+    ("Sikkim High Court", "Sikkim", "11~24", "SKHC"),
+    ("Telangana High Court", "Telangana", "36~19", "THC"),
+    ("Tripura High Court", "Tripura", "16~20", "TRHC"),
+    ("Uttarakhand High Court", "Uttarakhand", "5~15", "UKHC"),
 ]
 
-_SUPREME_COURT = ("Supreme Court of India", None)
+_SUPREME_COURT = ("Supreme Court of India", None, "SCIN")
 
 
 def seed() -> None:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
+            court_name, state, court_code = _SUPREME_COURT
             cur.execute("""
-                INSERT INTO courts (court_name, court_type, state)
-                VALUES (%s, 'Supreme Court', %s)
-                ON CONFLICT (court_name) DO NOTHING
+                INSERT INTO courts (court_name, court_type, state, court_code)
+                VALUES (%s, 'Supreme Court', %s, %s)
+                ON CONFLICT (court_name) DO UPDATE SET court_code = EXCLUDED.court_code
                 RETURNING court_id;
-            """, _SUPREME_COURT)
-            row = cur.fetchone()
-            if row is None:
-                cur.execute("SELECT court_id FROM courts WHERE court_name = %s;", (_SUPREME_COURT[0],))
-                row = cur.fetchone()
-            sc_court_id = row[0]
+            """, (court_name, state, court_code))
+            sc_court_id = cur.fetchone()[0]
 
             cur.execute("""
                 INSERT INTO court_scrape_config (court_id, adapter, is_active)
@@ -68,18 +69,14 @@ def seed() -> None:
                 ON CONFLICT (court_id) DO NOTHING;
             """, (sc_court_id,))
 
-            for court_name, state, state_code in _HIGH_COURTS:
+            for court_name, state, state_code, court_code in _HIGH_COURTS:
                 cur.execute("""
-                    INSERT INTO courts (court_name, court_type, state)
-                    VALUES (%s, 'High Court', %s)
-                    ON CONFLICT (court_name) DO NOTHING
+                    INSERT INTO courts (court_name, court_type, state, court_code)
+                    VALUES (%s, 'High Court', %s, %s)
+                    ON CONFLICT (court_name) DO UPDATE SET court_code = EXCLUDED.court_code
                     RETURNING court_id;
-                """, (court_name, state))
-                row = cur.fetchone()
-                if row is None:
-                    cur.execute("SELECT court_id FROM courts WHERE court_name = %s;", (court_name,))
-                    row = cur.fetchone()
-                court_id = row[0]
+                """, (court_name, state, court_code))
+                court_id = cur.fetchone()[0]
 
                 cur.execute("""
                     INSERT INTO court_scrape_config (court_id, adapter, state_code, is_active)

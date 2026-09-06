@@ -32,6 +32,8 @@ def build_stub_extraction(record: RawJudgmentRecord) -> Dict[str, Any]:
     return {
         "extractor": "scraper_fields_stub_v1",
         "case_note_ai": None,
+        "decision_type": None,
+        "ratio_decidendi": None,
         "cases": [
             {
                 "case_number": record.case_number_raw,
@@ -40,8 +42,14 @@ def build_stub_extraction(record: RawJudgmentRecord) -> Dict[str, Any]:
             }
         ],
         "coram": coram,
+        "counsels": [],
+        "subjects": [],
         "provisions": [],
+        "relevant_section": None,
         "citations": [],
+        "held": [],
+        "prior_history": None,
+        "timeline": [],
         "disposition_category": None,
         "favoring_party_side": None,
         "neutral_citation": record.neutral_citation_raw,
