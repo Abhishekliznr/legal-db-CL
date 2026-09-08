@@ -6,7 +6,4 @@ __pycache__/
 .git/
 .gitignore
 .env
-*.pdf
-**/pdf/
-debug/
 *.log

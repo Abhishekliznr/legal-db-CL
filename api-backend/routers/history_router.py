@@ -11,6 +11,11 @@ user_id is opaque text supplied by the caller (legal-ui's Next.js server
 actions, keyed off the verified NextAuth session) — this service has no
 users table of its own and no auth layer; same trust model as the rest of
 api-backend (admin-ness / identity is enforced upstream, not here).
+
+Logic unchanged from the old api-backend — this feature is entirely
+independent of the case-law domain migration (spec §6), it just needed its
+own table (case_research_search_history, api-backend-only per
+db/schema.sql §9) and the new connection module.
 """
 
 import logging
@@ -20,9 +25,9 @@ import psycopg2
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
-import db_manager
+from db.connection import get_pooled_connection
 
-logger = logging.getLogger("api_backend.history")
+logger = logging.getLogger("api_backend_v2.history")
 
 router = APIRouter(tags=["Case Search & Details"])
 
@@ -51,9 +56,8 @@ def record_search_history(payload: RecordSearchHistoryRequest):
         raise HTTPException(status_code=400, detail="query must not be empty.")
 
     try:
-        with db_manager.get_pooled_connection() as conn:
+        with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                # Re-searching an existing query bumps it to the top rather than duplicating it.
                 cur.execute(
                     "DELETE FROM case_research_search_history WHERE user_id = %s AND lower(query) = lower(%s);",
                     (payload.user_id, query),
@@ -90,7 +94,7 @@ def get_search_history(
     limit: int = Query(10, ge=1, le=MAX_HISTORY_PER_USER),
 ):
     try:
-        with db_manager.get_pooled_connection() as conn:
+        with get_pooled_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     """
