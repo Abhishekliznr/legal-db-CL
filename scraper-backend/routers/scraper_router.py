@@ -1,103 +1,130 @@
 """
-Scraper Router: Dedicated Endpoints for Court Judgment Scraping & Azure Sync
------------------------------------------------------------------------------
-Handles:
-- POST /api/scraper/start         : Start background scraping job
-- GET  /api/scraper/status/{id}   : Get live execution status and stream logs
-- POST /api/scraper/cancel/{id}   : Cancel running scraping job
-- GET  /api/scraper/jobs          : List historical scraper execution runs
+Scraper control endpoints
+--------------------------
+- POST /api/scraper/start    : launch a background scrape+ingest batch
+- GET  /api/scraper/batches  : recent batch history
+- GET  /api/scraper/status   : raw_ingestions counts per pipeline stage
+
+`court_id` is the only thing a caller needs to supply for eCourts High
+Courts — state_code/bench_code are resolved from court_scrape_config
+(seeded via `python -m db.seed_courts`), not passed in the request. That's
+the entire point of court_scrape_config existing (spec §4.3): the caller
+shouldn't need to know an eCourts state code any more than they'd need to
+know which of the 25 old per-court scripts used to handle a given court.
 """
 
-from typing import Optional, List, Dict, Any
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
+import logging
+from datetime import date, timedelta
+from typing import Optional
+
+import psycopg2
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel, Field
 
-import db_manager
-import scraper_pipeline
+from adapters.ecourts.adapter import EcourtsAdapter
+from adapters.supreme_court.adapter import SupremeCourtAdapter
+from db import court_config
+from orchestrator import batch_runner, job_registry
 
-router = APIRouter(prefix="/api/scraper", tags=["Court Scraper Engine"])
+logger = logging.getLogger("scraper_backend_v2.scraper_router")
+
+router = APIRouter(prefix="/api/scraper", tags=["Scraper Control"])
+
+_ADAPTER_CLASSES = {
+    "supreme_court": SupremeCourtAdapter,
+    "ecourts": EcourtsAdapter,
+}
+
+# data_source_enum value each adapter's records get tagged with — resolved
+# here (not left to raw_ingestions/documents' DEFAULT 'ECOURTS') since that
+# default being silently relied upon was the actual bug: every source,
+# including Supreme Court, was landing as 'ECOURTS' in the DB.
+_DATA_SOURCE_BY_ADAPTER = {
+    "supreme_court": "SCI_WEBSITE",
+    "ecourts": "ECOURTS",
+}
 
 
-class ScraperJobRequest(BaseModel):
-    court_id: str = Field("SCIN", description="Court code: SCIN (Supreme Court of India)")
-    from_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD or DD-MM-YYYY)")
-    to_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD or DD-MM-YYYY)")
-    upload_azure: bool = Field(True, description="Upload PDFs and Bronze/Silver JSON to Azure Blob Storage")
-    stream_cloud: bool = Field(True, description="Stream directly to Azure and delete local temporary PDFs")
-    extract_metadata: bool = Field(True, description="Automatically run AI CaseNote and Statutory metadata extractor")
+class ScraperStartRequest(BaseModel):
+    court_id: int = Field(..., description="courts.court_id to scrape — its court_scrape_config row decides the adapter")
+    court_code: str = Field(..., description="Short code used in blob paths, e.g. 'SCIN' or 'DHC'")
+    from_date: Optional[str] = Field(None, description="YYYY-MM-DD; defaults to 7 days ago")
+    to_date: Optional[str] = Field(None, description="YYYY-MM-DD; defaults to today")
+    headless: bool = Field(True, description="Set False for a supervised dry run against a real browser window")
 
 
-@router.post("/start", response_model=Dict[str, Any])
-def start_scraper_job(req: ScraperJobRequest, background_tasks: BackgroundTasks):
-    """
-    Launches an automated court scraping job in the background.
-    Tracks execution in PostgreSQL and streams live logs.
-    """
+@router.post("/start")
+def start_scrape(req: ScraperStartRequest, background_tasks: BackgroundTasks):
     try:
-        from datetime import datetime
-        if not req.from_date:
-            req.from_date = datetime.now().strftime("%Y-%m-01")
-        if not req.to_date:
-            req.to_date = datetime.now().strftime("%Y-%m-%d")
+        config = court_config.get_court_scrape_config(req.court_id)
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while resolving court %s config", req.court_id)
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
 
-        job_id = db_manager.log_scraper_job_start(
-            court_id=req.court_id,
-            from_date=req.from_date,
-            to_date=req.to_date,
-            notes="Triggered via API"
+    if config is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No court_scrape_config for court_id={req.court_id}. Seed it first (PUT /api/courts/{{court_id}}/config or python -m db.seed_courts).",
         )
+    if not config["is_active"]:
+        raise HTTPException(status_code=400, detail=f"court_id={req.court_id} is marked inactive in court_scrape_config.")
 
-        if not job_id:
-            raise HTTPException(status_code=500, detail="Failed to initialize scraper job in database.")
+    adapter_class = _ADAPTER_CLASSES.get(config["adapter"])
+    if adapter_class is None:
+        raise HTTPException(status_code=500, detail=f"court_scrape_config has unknown adapter '{config['adapter']}'.")
 
-        background_tasks.add_task(
-            scraper_pipeline.run_pipeline_worker,
-            job_id=job_id,
-            court_id=req.court_id,
-            from_date=req.from_date,
-            to_date=req.to_date,
-            upload_azure=req.upload_azure,
-            stream_cloud=req.stream_cloud,
-            extract_metadata=req.extract_metadata
-        )
+    adapter_kwargs = {"headless": req.headless}
+    if config["adapter"] == "ecourts":
+        if not config["state_code"]:
+            raise HTTPException(status_code=400, detail=f"court_id={req.court_id} has adapter='ecourts' but no state_code configured.")
+        adapter_kwargs["state_code"] = config["state_code"]
+        adapter_kwargs["bench_code"] = config["bench_code"]
 
-        return {
-            "status": "success",
-            "job_id": job_id,
-            "court_id": req.court_id,
-            "from_date": req.from_date,
-            "to_date": req.to_date,
-            "message": f"Scraper job {job_id} launched successfully in background."
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    from_date = req.from_date or (date.today() - timedelta(days=7)).isoformat()
+    to_date = req.to_date or date.today().isoformat()
 
+    background_tasks.add_task(
+        _run_and_log, adapter_class(), req.court_id, req.court_code, from_date, to_date,
+        _DATA_SOURCE_BY_ADAPTER[config["adapter"]], adapter_kwargs,
+    )
 
-@router.get("/status/{job_id}", response_model=Dict[str, Any])
-def get_scraper_job_status(job_id: str):
-    """Retrieves current execution status, live progress, and log messages for a scraper job."""
-    job = db_manager.get_scraper_job(job_id)
-    if not job:
-        raise HTTPException(status_code=404, detail="Scraper job not found.")
-    return job
+    return {
+        "status": "started",
+        "adapter": config["adapter"],
+        "court_id": req.court_id,
+        "court_name": config["court_name"],
+        "from_date": from_date,
+        "to_date": to_date,
+        "message": "Batch running in the background — poll GET /api/scraper/batches for progress.",
+    }
 
 
-@router.post("/cancel/{job_id}", response_model=Dict[str, Any])
-def cancel_scraper_job(job_id: str):
-    """Cancels a running background scraping job."""
-    if job_id in scraper_pipeline.ACTIVE_JOBS:
-        scraper_pipeline.CANCEL_FLAGS[job_id] = True
-        return {"status": "success", "message": f"Cancellation requested for job {job_id}."}
-    else:
-        job = db_manager.get_scraper_job(job_id)
-        if job and job.get("status") == "RUNNING":
-            db_manager.log_scraper_job_finish(job_id, status="CANCELLED")
-            return {"status": "success", "message": f"Job {job_id} marked as cancelled."}
-        return {"status": "info", "message": f"Job {job_id} is not currently running."}
+def _run_and_log(adapter, court_id: int, court_code: str, from_date: str, to_date: str, data_source: str, adapter_kwargs: dict):
+    try:
+        batch_runner.run_batch(adapter, court_id, court_code, from_date, to_date, data_source, **adapter_kwargs)
+    except Exception:
+        logger.exception("Batch failed for court_id=%s %s -> %s", court_id, from_date, to_date)
 
 
-@router.get("/jobs", response_model=Dict[str, Any])
-def list_scraper_jobs(limit: int = Query(25, ge=1, le=100)):
-    """Lists recent scraper execution jobs and their statuses for admin dashboard history."""
-    jobs = db_manager.list_scraper_jobs(limit=limit)
-    return {"total": len(jobs), "jobs": jobs}
+@router.get("/batches")
+def list_batches(limit: int = 25):
+    try:
+        return {"batches": job_registry.list_recent_batches(limit=limit)}
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while listing batches")
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except Exception:
+        logger.exception("Unexpected error while listing batches")
+        raise HTTPException(status_code=500, detail="Failed to list batches.")
+
+
+@router.get("/status")
+def pipeline_status():
+    try:
+        return {"counts_by_status": job_registry.pipeline_status_counts()}
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while reading pipeline status")
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    except Exception:
+        logger.exception("Unexpected error while reading pipeline status")
+        raise HTTPException(status_code=500, detail="Failed to read pipeline status.")

@@ -1,40 +1,80 @@
 """
-Scraper Backend: Court Judgment Scraper & Ingestion FastAPI Application
+scraper-backend: Court Judgment Scraper & Ingestion Engine (rebuild)
 -------------------------------------------------------------------------
-Orchestrates:
-- 🕷️ Court Scraper Router  : /api/scraper/start|status|jobs|cancel
-- 🐘 Automatic Database Startup Verification (own copy of the DB schema)
-- 🌐 Static Landing Page at "/"
+Standalone FastAPI app — no shared code with api-backend or the old
+scraper-backend (docs/scraper-backend-revamp-spec.md §3.2). See that spec
+for the full architecture; this file wires up what exists so far:
 
-Heavy service (Playwright, PyMuPDF, ddddocr, Azure Blob) — kept separate
-and standalone from api-backend so the lightweight read/search API never
-needs a browser runtime. Both services point at the same PostgreSQL
-database, but ship independent copies of the DB connection/schema code.
+- Phase 0 (done): schema (db/schema.sql) + connection layer (db/connection.py)
+- Phase 1 (done): Supreme Court adapter, orchestrator, OCR + stub extraction +
+  promotion pipeline, scraper_router. The stub extraction stage gets replaced
+  by a real structured-output LLM call in Phase 3 — see pipeline/extraction.py.
+- Phase 2 (done): generic eCourts adapter for all 25 High Courts, driven by
+  court_scrape_config (seed via `python -m db.seed_courts`). scraper_router
+  now resolves the adapter + state/bench code from that config automatically.
+- Phase 3 (done): real OCR fallback (Tesseract, for scanned PDFs with no
+  text layer), real structured-output LLM extraction (pipeline/extraction.py,
+  replacing the Phase 1 stub — see pipeline/extraction_stub.py), the
+  normalization/ package (act/judge/party cleaning), and citation
+  finding + treatment reconciliation (pipeline/citator.py).
+- Phase 4 (done, separate service): api-backend/ reads what this service
+  writes — see legal-db/api-backend/.
+- Phase 5 (not yet started): cutover.
+
+Startup does NOT auto-apply the schema (unlike the old service) — run
+`python -m db.init_db init` explicitly once against a fresh database. Schema
+changes here are deliberate, not something that should happen silently on
+every container restart.
 """
 
+import logging
 import sys
 from pathlib import Path
 
-# Make this directory's own modules (db_manager, routers/) importable
-# regardless of the process's cwd when it was launched.
 _script_dir = Path(__file__).resolve().parent
 if str(_script_dir) not in sys.path:
     sys.path.insert(0, str(_script_dir))
+
+# Without this, Python's root logger defaults to WARNING — every
+# logger.info() call across this service (batch progress in
+# orchestrator/batch_runner.py, diagnostic table-header dumps in
+# adapters/supreme_court/adapter.py, etc.) would be silently swallowed.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(name)-40s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
+# The azure-storage-blob/azure-core SDK's HttpLoggingPolicy logs every
+# request/response — method, full URL, and every header — at INFO level by
+# default. Once the line above raises the root logger to INFO, that policy
+# starts firing on every blob upload, drowning out the pipeline's own
+# stage-by-stage logs in raw HTTP traffic (and, since Azure's auth headers
+# ride along in that same dump, it's a mild credential-hygiene problem too,
+# not just noise). storage/azure_blob.py already logs the actual reason
+# for any real upload failure at ERROR level, so nothing is lost by
+# quieting the SDK's own request/response tracing down to WARNING+.
+for _noisy_logger_name in (
+    "azure",
+    "azure.core.pipeline.policies.http_logging_policy",
+    "urllib3",
+    "urllib3.connectionpool",
+):
+    logging.getLogger(_noisy_logger_name).setLevel(logging.WARNING)
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-import db_manager
-from routers import scraper_router
+from db import connection
+from routers import court_config_router, scraper_router
 
 app = FastAPI(
-    title="Legal Court Scraper & Ingestion Engine",
-    description="Background court-judgment scraping, AI metadata extraction, and Azure Blob archiving.",
-    version="1.0.0"
+    title="Legal Court Scraper & Ingestion Engine (v2)",
+    description="Rebuild in progress — see legal-db/docs/scraper-backend-revamp-spec.md",
+    version="2.0.0-phase3",
 )
 
-# Allow CORS for development & cross-origin admin dashboard access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,45 +84,57 @@ app.add_middleware(
 )
 
 
-# ============================================================
-# STARTUP EVENT: AUTO-INITIALIZE SCHEMA & TABLES IF MISSING
-# ============================================================
-
 @app.on_event("startup")
 def on_startup():
-    """Automatically verifies and creates all PostgreSQL tables, extensions, and seed data on startup."""
+    # Deliberately non-fatal: if Postgres isn't reachable yet (e.g. the db
+    # container is still coming up despite the compose healthcheck, or a
+    # transient network blip), the app still starts and serves /health as
+    # "degraded" instead of crash-looping. A hard failure here would make
+    # /health's own graceful degradation unreachable.
     try:
-        print("🔍 Checking and verifying PostgreSQL tables & schema on startup...")
-        db_manager.init_database(drop_existing=False)
-        print("✅ Database schema & tables verified!")
+        connection.init_connection_pool()
     except Exception as e:
-        print(f"⚠️ Warning: Auto-initialization on startup encountered: {e}. Check PostgreSQL connection.")
+        print(f"WARNING: could not initialize DB connection pool at startup: {e}")
 
 
-# ============================================================
-# MOUNT MODULAR ROUTERS
-# ============================================================
+@app.on_event("shutdown")
+def on_shutdown():
+    connection.close_connection_pool()
 
+
+app.include_router(court_config_router.router)
 app.include_router(scraper_router.router)
 
-
-# ============================================================
-# STATIC LANDING PAGE
-# ============================================================
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
 @app.get("/", response_class=HTMLResponse)
 def serve_landing_page():
-    """Serves a minimal status page confirming the scraper backend is up and running."""
     index_file = STATIC_DIR / "index.html"
     if index_file.exists():
         return FileResponse(index_file)
-    return HTMLResponse("<h1>Legal Court Scraper & Ingestion Engine</h1><p>Visit <a href='/docs'>/docs</a> for API specifications.</p>")
+    return HTMLResponse("<h1>Legal Court Scraper & Ingestion Engine (v2)</h1><p>Visit <a href='/docs'>/docs</a>.</p>")
 
 
-# Health Check Endpoint
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "service": "scraper-backend", "version": "1.0.0"}
+    """
+    Verifies the app can actually reach Postgres, not just that the process
+    is up — a plain 200 with no DB check would hide a bad DB_HOST/DB_PORT.
+    """
+    try:
+        with connection.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1;")
+                cur.fetchone()
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {e}"
+
+    return {
+        "status": "healthy" if db_status == "connected" else "degraded",
+        "service": "scraper-backend",
+        "version": "2.0.0-phase3",
+        "database": db_status,
+    }

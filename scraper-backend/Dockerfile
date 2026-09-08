@@ -1,4 +1,4 @@
-# Heavy image: Playwright + Chromium, PyMuPDF, ddddocr, Azure Blob SDK.
+# Heavy image: Playwright + Chromium, PyMuPDF, ddddocr, Tesseract, Azure Blob SDK.
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     build-essential \
     libpq-dev \
+    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -20,5 +21,5 @@ RUN playwright install --with-deps chromium
 
 COPY . .
 
-EXPOSE 3000
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "3000"]
+EXPOSE 8001
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8001"]

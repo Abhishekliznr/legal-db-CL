@@ -1,11 +1,12 @@
+fastapi
+uvicorn
+psycopg2-binary
+python-dotenv
 playwright
 requests
 beautifulsoup4
-psycopg2-binary
-python-dotenv
-fastapi
-uvicorn
 Pillow
 ddddocr
 PyMuPDF
+pytesseract
 azure-storage-blob
