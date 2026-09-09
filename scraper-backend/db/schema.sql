@@ -62,6 +62,7 @@ CREATE TYPE disposition_category_enum AS ENUM (
     'Remanded', 'Withdrawn', 'Quashed', 'Set Aside', 'Other'
 );
 CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
+CREATE TYPE favouring_party_enum AS ENUM ('Petitioner', 'Respondent', 'Partly', 'Neither');
 
 -- ---------------------------------------------------------------------
 -- 2. MASTER / LOOKUP TABLES
@@ -239,6 +240,21 @@ CREATE TABLE cr_cases (
     orders             BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_orders.order_id
     subject            BIGINT REFERENCES cr_subjects(subject_id),  -- coarse Civil/Criminal/... tag
 
+    -- LLM-classified subsets of sections/rules/orders above (pipeline/llm_enrichment.py,
+    -- 2026-09-09), populated from paragraphs regex flagged as provision-bearing
+    -- (pipeline/regex_extraction.find_provision_paragraphs). "relevant" = the
+    -- operative provision(s) the case is actually charged/founded/appealed under;
+    -- "other" = everything else discussed (precedent, background, comparative
+    -- statutes). NOT guaranteed a strict partition of sections/rules/orders above —
+    -- the LLM resolves acts from wider context the regex-only extractor drops, so
+    -- these can contain provisions the unified columns above miss, and vice versa.
+    sections_relevant  BIGINT[] NOT NULL DEFAULT '{}',
+    sections_other     BIGINT[] NOT NULL DEFAULT '{}',
+    rules_relevant     BIGINT[] NOT NULL DEFAULT '{}',
+    rules_other        BIGINT[] NOT NULL DEFAULT '{}',
+    orders_relevant    BIGINT[] NOT NULL DEFAULT '{}',
+    orders_other       BIGINT[] NOT NULL DEFAULT '{}',
+
     case_note          TEXT,                     -- LLM-generated headnote (pipeline/llm_enrichment.py), Manupatra-style dash-separated digest
     conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading) -- see pipeline/regex_extraction.py
     judgement          TEXT,                     -- full opinion text after the "J U D G M E N T"/"O R D E R" heading
@@ -251,6 +267,7 @@ CREATE TABLE cr_cases (
     industries         BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_industries.industry_id -- LLM-classified (pipeline/llm_enrichment.py); no reliable regex signal exists for this field (see pipeline/regex_extraction.py's module docstring)
 
     disposition        disposition_category_enum,
+    favouring_party    favouring_party_enum,       -- LLM-classified (pipeline/llm_enrichment.py) -- which side the outcome favoured
     document_type      doc_type_enum NOT NULL DEFAULT 'CaseLaw',  -- constant for this adapter -- every sci.gov.in row is a court judgment/order, not extracted per-row
     case_category      BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_case_categories.category_id
 

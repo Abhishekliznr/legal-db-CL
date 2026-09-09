@@ -289,11 +289,18 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     routed to NEEDS_REVIEW (missing case_number) or PROMOTION_FAILED (an
     unexpected DB error).
 
+    sections/acts/rules/orders are deliberately left empty here (2026-09-09)
+    — regex's own act-name capture proved actively wrong at real production
+    scale (fragments like "Arbitrator Would Be Ineligible To Act" ending up
+    in cr_acts), not just low-recall, so those columns are now populated
+    entirely by pipeline/llm_enrichment.py's paragraph-filtered LLM call
+    after promotion, same treatment as case_note/industries already got.
+
     Unlike the old documents.judgment_date NOT NULL, a missing/unparseable
     judgment_date here does NOT block promotion — the row still gets
-    inserted (case_number, ocr_text, provisions etc. are all still useful),
-    just with judgment_date NULL and needs_review=TRUE so it's easy to find
-    and fix later instead of being silently dropped from the batch.
+    inserted (case_number, ocr_text, etc. are all still useful), just with
+    judgment_date NULL and needs_review=TRUE so it's easy to find and fix
+    later instead of being silently dropped from the batch.
     """
     ingestion = scrape_jobs.get_ingestion(ingestion_id)
     if ingestion is None:
@@ -323,7 +330,6 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
             rx.extract_disposition(ocr_text).get("disposition_category"), _VALID_DISPOSITION_CATEGORIES
         )
         subject_word = rx.extract_subject_from_jurisdiction(ocr_text)
-        provisions = rx.extract_provisions(ocr_text)
         conclusion = rx.extract_conclusion(ocr_text)
         judgement_body = rx.extract_judgment_body(ocr_text)
         classified_category = case_numbers.classify_category(case_number) is not None
@@ -334,7 +340,6 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
                 judge_ids = _resolve_bench(cur, bench_names)
                 judgment_by_id = _get_or_create_judge(cur, judgment_by_name) if judgment_by_name else None
-                act_ids, section_ids, rule_ids, order_ids = _resolve_provisions(cur, provisions)
                 subject_id = _get_or_create_subject(cur, subject_word) if subject_word else None
                 ministry_ids = _resolve_ministries(cur, petitioner, respondent)
                 category_ids = [_get_or_create_category(cur, case_number)] if classified_category else []
@@ -353,7 +358,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                     ) VALUES (
                         %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s,
+                        '{}', '{}', '{}', '{}', %s,
                         %s, %s, %s,
                         %s, %s,
                         %s, '{}',
@@ -365,7 +370,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                 """, (
                     liznr_id, court_id, case_number, petitioner, respondent,
                     judge_ids, judgment_by_id, judgment_date, record.extra.get("language"), record.neutral_citation_raw,
-                    section_ids, act_ids, rule_ids, order_ids, subject_id,
+                    subject_id,
                     conclusion, judgement_body, ocr_text,
                     record.source_url, ingestion["blob_pdf_id"],
                     ministry_ids,

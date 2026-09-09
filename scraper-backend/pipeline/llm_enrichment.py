@@ -1,7 +1,11 @@
 """
 PROMOTED -> enriched: fills the fields regex genuinely cannot get
-(cr_cases.case_note, cr_cases.industries) plus two low-coverage regex fallbacks
-(cr_cases.conclusion, cr_cases.disposition) with one compact LLM call per case.
+(cr_cases.case_note, cr_cases.industries, cr_cases.favouring_party) plus two
+low-coverage regex fallbacks (cr_cases.conclusion, cr_cases.disposition),
+plus a paragraph-filtered relevance classification of the provisions
+extract_provisions() already found (cr_cases.sections_relevant/_other etc.,
+2026-09-09 — see find_provision_paragraphs() in pipeline/regex_extraction.py)
+— all in one compact LLM call per case.
 
 Runs automatically right after promotion (orchestrator/batch_runner.py),
 not as a separate backfill pass — a deliberate choice: simpler pipeline,
@@ -51,10 +55,11 @@ from typing import Any, Dict, List, Optional
 import requests
 
 from db.connection import get_pooled_connection
+from normalization.acts import resolve_act
 from normalization.industries import CANONICAL_INDUSTRIES, resolve_industry
 from pipeline.extraction import _azure_config, _is_configured  # same Azure config/auth, reused not duplicated
-from pipeline.promotion import _get_or_create_industry, _get_or_create_ministry
-from pipeline.regex_extraction import KNOWN_MINISTRIES, resolve_ministry
+from pipeline.promotion import _get_or_create_industry, _get_or_create_ministry, _resolve_provisions
+from pipeline.regex_extraction import KNOWN_MINISTRIES, find_provision_paragraphs, resolve_ministry
 
 logger = logging.getLogger("scraper_backend_v2.llm_enrichment")
 
@@ -62,6 +67,8 @@ _VALID_DISPOSITION_CATEGORIES = {
     "Allowed", "Dismissed", "Partly Allowed", "Disposed",
     "Remanded", "Withdrawn", "Quashed", "Set Aside", "Other",
 }
+
+_VALID_FAVOURING_PARTIES = {"Petitioner", "Respondent", "Partly", "Neither"}
 
 # Head+tail excerpt budget -- see module docstring for why these specific
 # numbers (~70% smaller than pipeline/extraction.py's 8000+4000 budget).
@@ -98,7 +105,9 @@ You will receive a compact excerpt of a Supreme Court judgment (facts + concludi
   "conclusion": "1-3 sentences of ORDINARY prose (not dash-separated, unlike case_note) capturing the court's final concluding reasoning that leads directly to the disposition — or null if the excerpt doesn't clearly show this.",
   "industries": ["0 to 3 tags from this EXACT closed list, choose only industries the case is CENTRALLY about (a party's business, the subject of the dispute), not one a name/word merely appears near: {json.dumps(CANONICAL_INDUSTRIES)}. Empty list if none clearly apply — most criminal/service/constitutional matters have none."],
   "ministries": ["0 to 3 names from this EXACT closed list, naming a ministry ONLY when the case is substantively about that ministry's policy, regulation, or scheme — not merely because a ministry is a named party (that's already handled separately): {json.dumps(KNOWN_MINISTRIES)}. Empty list if none apply."],
-  "disposition_category": "one of Allowed, Dismissed, Partly Allowed, Disposed, Remanded, Withdrawn, Quashed, Set Aside, Other — or null if genuinely unclear from the excerpt. A regex classifier already handles most documents; this is only used as a fallback when that classifier found nothing, so answer independently from the excerpt rather than guessing to fill the field."
+  "disposition_category": "one of Allowed, Dismissed, Partly Allowed, Disposed, Remanded, Withdrawn, Quashed, Set Aside, Other — or null if genuinely unclear from the excerpt. A regex classifier already handles most documents; this is only used as a fallback when that classifier found nothing, so answer independently from the excerpt rather than guessing to fill the field.",
+  "favouring_party": "one of Petitioner, Respondent, Partly, Neither — or null if genuinely unclear. 'Petitioner': the petitioner's plea was substantially granted (appeal/petition allowed, conviction set aside, relief granted). 'Respondent': the petitioner's plea was rejected/dismissed, respondent's position upheld. 'Partly': a mixed outcome (partly allowed/partly dismissed). 'Neither': a procedural order with no substantive winner (adjournment, notice issued, interim direction, remand without a clear beneficiary).",
+  "provisions": "[{{'statute_name': '...', 'provision_type': 'section'|'rule'|'order', 'number': '...', 'relevance': 'RELEVANT'|'OTHER'}}] — extract EVERY section/rule/order/article reference found in the 'PARAGRAPHS CONTAINING STATUTORY REFERENCES' block below (if that block is absent, return an empty list — do NOT extract provisions from the judgment excerpt above it). 'RELEVANT' = the operative provision(s) this case is actually charged/founded/appealed under — the FIR/charge section, the writ-jurisdiction article, the appeal's own enabling section, i.e. what the petitioner's own case is brought under. 'OTHER' = every other section/rule/order/article mentioned in those paragraphs (precedent discussion, background/comparative statutes, procedural cross-references). Resolve the governing act from the surrounding paragraph text, not just the words immediately next to the number."
 }}
 
 Use ONLY facts present in the supplied excerpt and hints. Never invent a party, provision, date, or outcome that isn't there — use null/empty instead."""
@@ -116,13 +125,19 @@ def _build_user_content(case_row: Dict[str, Any]) -> str:
     hints = [f"Case number: {case_row['case_number']}"]
     if case_row.get("subject_name"):
         hints.append(f"Subject (coarse): {case_row['subject_name']}")
-    if case_row.get("act_names"):
-        hints.append(f"Provisions already identified: {', '.join(case_row['act_names'])}")
     if case_row.get("disposition"):
         hints.append(f"Disposition already determined by regex: {case_row['disposition']} (do not need to re-derive)")
 
     excerpt = _build_excerpt(case_row.get("ocr_text") or "")
-    return "KNOWN FACTS:\n" + "\n".join(hints) + f"\n\nJUDGMENT EXCERPT (facts + concluding portion only):\n{excerpt}"
+    content = "KNOWN FACTS:\n" + "\n".join(hints) + f"\n\nJUDGMENT EXCERPT (facts + concluding portion only):\n{excerpt}"
+
+    # Full OCR text, not the head+tail excerpt above -- provisions are
+    # typically cited in the reasoning section that excerpt excludes.
+    provision_paragraphs = find_provision_paragraphs(case_row.get("ocr_text") or "")
+    if provision_paragraphs:
+        content += f"\n\nPARAGRAPHS CONTAINING STATUTORY REFERENCES (extract provisions ONLY from here):\n{provision_paragraphs}"
+
+    return content
 
 
 def _parse_llm_json(raw_content: str) -> Optional[dict]:
@@ -173,8 +188,7 @@ def call_llm_enrichment(case_row: Dict[str, Any]) -> Optional[dict]:
 def _fetch_case_row(cur, case_id: int) -> Optional[Dict[str, Any]]:
     cur.execute("""
         SELECT c.case_number, c.ocr_text, c.disposition, c.ministries,
-               subj.subject_name,
-               (SELECT array_agg(DISTINCT a.act_name) FROM cr_acts a WHERE a.act_id = ANY(c.acts)) AS act_names
+               subj.subject_name
         FROM cr_cases c
         LEFT JOIN cr_subjects subj ON subj.subject_id = c.subject
         WHERE c.case_id = %s;
@@ -182,25 +196,29 @@ def _fetch_case_row(cur, case_id: int) -> Optional[Dict[str, Any]]:
     row = cur.fetchone()
     if row is None:
         return None
-    case_number, ocr_text, disposition, existing_ministry_ids, subject_name, act_names = row
+    case_number, ocr_text, disposition, existing_ministry_ids, subject_name = row
     return {
         "case_number": case_number,
         "ocr_text": ocr_text,
         "disposition": disposition,
         "existing_ministry_ids": existing_ministry_ids or [],
         "subject_name": subject_name,
-        "act_names": act_names or [],
     }
 
 
 def enrich_case(case_id: int) -> bool:
     """
     Fetches the already-promoted case, calls the LLM, and updates
-    case_note/conclusion/industries/ministries/disposition on it. Returns
-    True if the row was updated, False if enrichment was skipped or failed
-    (not configured, no ocr_text, call failed, bad JSON) -- never raises,
-    since a caller in the middle of a scrape batch must not lose the rest
-    of the batch over one enrichment failure.
+    case_note/conclusion/industries/ministries/disposition/favouring_party,
+    sections/acts/rules/orders (2026-09-09: this call is now the SOLE writer
+    of these -- promotion.py leaves them empty, see its own docstring), plus
+    the six provision relevance columns (sections/rules/orders_relevant/_other).
+    Returns True if the row was updated, False if enrichment was skipped or
+    failed (not configured, no ocr_text, call failed, bad JSON) -- never
+    raises, since a caller in the middle of a scrape batch must not lose the
+    rest of the batch over one enrichment failure. A case that never gets
+    successfully enriched simply has empty sections/acts/rules/orders --
+    deliberately preferred over the old regex path's confidently wrong data.
     """
     try:
         with get_pooled_connection() as conn:
@@ -239,18 +257,85 @@ def enrich_case(case_id: int) -> bool:
                 if llm_disposition not in _VALID_DISPOSITION_CATEGORIES:
                     llm_disposition = None
 
+                favouring_party = llm_result.get("favouring_party")
+                if favouring_party not in _VALID_FAVOURING_PARTIES:
+                    favouring_party = None
+
+                raw_provisions = llm_result.get("provisions")
+                if raw_provisions is not None and not isinstance(raw_provisions, list):
+                    logger.warning("[ENRICH] case_id=%s: 'provisions' was not a list (%r), treating as empty", case_id, type(raw_provisions))
+                    raw_provisions = []
+
+                relevant_provisions: List[Dict[str, Any]] = []
+                other_provisions: List[Dict[str, Any]] = []
+                for entry in (raw_provisions or []):
+                    number = str(entry.get("number") or "").strip()
+                    if not number:
+                        continue
+                    provision_type = entry.get("provision_type")
+                    if provision_type not in ("section", "rule", "order"):
+                        provision_type = "section"
+                    statute_name, short_code, year = resolve_act(entry.get("statute_name") or "")
+                    resolved = {
+                        "statute_name": statute_name,
+                        "short_code": short_code,
+                        "statute_year": year,
+                        "section_number": number,
+                        "provision_type": provision_type,
+                    }
+                    if (entry.get("relevance") or "").upper() == "RELEVANT":
+                        relevant_provisions.append(resolved)
+                    else:
+                        other_provisions.append(resolved)
+
+                act_ids_relevant, sections_relevant, rules_relevant, orders_relevant = _resolve_provisions(cur, relevant_provisions)
+                act_ids_other, sections_other, rules_other, orders_other = _resolve_provisions(cur, other_provisions)
+
+                # These become the actual cr_cases.sections/acts/rules/orders --
+                # promotion.py no longer populates them (its regex-based act-name
+                # capture proved actively wrong at production scale, not just
+                # low-recall -- see promote_ingestion()'s docstring). An act can
+                # legitimately appear in both buckets (e.g. IPC via a RELEVANT
+                # charge section and an OTHER precedent section), so dedupe it;
+                # a given section/rule/order number is only ever in one bucket,
+                # so those are safe to just concatenate.
+                all_acts = list(dict.fromkeys(act_ids_relevant + act_ids_other))
+                all_sections = sections_relevant + sections_other
+                all_rules = rules_relevant + rules_other
+                all_orders = orders_relevant + orders_other
+
                 cur.execute("""
                     UPDATE cr_cases SET
                         case_note = COALESCE(%s, case_note),
                         conclusion = COALESCE(conclusion, %s),
                         industries = %s,
                         ministries = %s,
-                        disposition = COALESCE(disposition, %s)
+                        disposition = COALESCE(disposition, %s),
+                        favouring_party = %s,
+                        sections = %s,
+                        acts = %s,
+                        rules = %s,
+                        orders = %s,
+                        sections_relevant = %s,
+                        sections_other = %s,
+                        rules_relevant = %s,
+                        rules_other = %s,
+                        orders_relevant = %s,
+                        orders_other = %s
                     WHERE case_id = %s;
-                """, (case_note, conclusion, industry_ids, ministry_ids, llm_disposition, case_id))
+                """, (
+                    case_note, conclusion, industry_ids, ministry_ids, llm_disposition, favouring_party,
+                    all_sections, all_acts, all_rules, all_orders,
+                    sections_relevant, sections_other, rules_relevant, rules_other, orders_relevant, orders_other,
+                    case_id,
+                ))
             conn.commit()
-        logger.info("[ENRICH] case_id=%s: done — case_note=%s industries=%d ministries=%d",
-                    case_id, "set" if case_note else "unchanged", len(industry_ids), len(ministry_ids))
+        logger.info(
+            "[ENRICH] case_id=%s: done — case_note=%s industries=%d ministries=%d provisions_relevant=%d provisions_other=%d",
+            case_id, "set" if case_note else "unchanged", len(industry_ids), len(ministry_ids),
+            len(sections_relevant) + len(rules_relevant) + len(orders_relevant),
+            len(sections_other) + len(rules_other) + len(orders_other),
+        )
         return True
     except Exception:
         logger.exception("[ENRICH] case_id=%s: unhandled exception", case_id)

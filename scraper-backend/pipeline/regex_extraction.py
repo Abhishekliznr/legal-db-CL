@@ -3,12 +3,13 @@ Regex-only extraction for Supreme Court judgments — an LLM-free alternative
 source for the fields sci.gov.in's own results table and its judgments'
 formulaic structure already expose deterministically.
 
-Deliberately NOT wired into pipeline/extraction.py or pipeline/promotion.py
-yet, and writes nothing to the database — the domain schema (db/schema.sql)
-is being redesigned, so nothing here should be persisted against tables that
-are about to change shape. This module is pure functions only: feed it a
-raw scraper cell or OCR text, get back parsed fields, and it becomes the
-new pipeline's non-LLM extraction step once the schema settles.
+Wired into pipeline/promotion.py as of the 2026-09-08 schema rewrite — this
+is the non-LLM extraction step (case number/parties/dates/coram/provisions),
+with pipeline/llm_enrichment.py filling in the handful of fields regex
+genuinely can't get (case_note, industries, ministries, and now provision
+relevance — see find_provision_paragraphs() below). This module stays pure
+functions only regardless: feed it a raw scraper cell or OCR text, get back
+parsed fields; the caller (promotion.py) does the actual DB writes.
 
 Coverage was checked against 102 real judgment PDFs already sitting in
 legal-db/scraper-backend/app/SUPREME_COURT_OF_INDIA_SCRAPER/pdf/ (the old
@@ -243,9 +244,18 @@ def extract_judgment_body(ocr_text: str) -> Optional[str]:
 # to regex it. This is a genuine regex-vs-LLM tradeoff, not a bug: keep
 # provisions with a resolved act name, drop bare section numbers with no
 # nearby act rather than guessing.
+#
+# The leading \b is load-bearing, not decorative -- without it the trigger
+# alternation matches as a bare substring, confirmed via real false
+# positives: "Rs. 5000" matches trigger "s." (inside "R" + "s."), and "a
+# mental disorder 5 years later" matches trigger "order" (inside
+# "dis"+"order"). Both are extremely common in Indian judgments (rupee
+# amounts, medical/psychological narration) and were silently inflating the
+# candidate pool for both extract_provisions() and find_provision_paragraphs()
+# below before this was caught (2026-09-09).
 _PROVISION_PATTERN = re.compile(
     r"""
-    (?P<trigger>u/s\.?|under\s+section|section|sections|sec\.|s\.|article|articles|rule|rules|order)\s*
+    \b(?P<trigger>u/s\.?|under\s+section|section|sections|sec\.|s\.|article|articles|rule|rules|order)\s*
     (?P<number>[0-9]+[A-Za-z]?(?:\s*\([0-9A-Za-z]+\))*)
     (?:\s*(?:of|,)?\s*(?:the\s+)?(?P<act>[A-Z][A-Za-z.,&\s]{2,60}?\b(?:Act|Code|Rules|Constitution|Sanhita|Adhiniyam)\b|IPC|CrPC|CPC|NDPS|POCSO|IEA))?
     """,
@@ -329,6 +339,77 @@ def extract_provisions(ocr_text: str, max_results: int = 30) -> List[Dict[str, O
             break
 
     return results
+
+
+def find_provision_paragraphs(
+    ocr_text: str,
+    max_paragraphs: int = 15,
+    max_chars: int = 4000,
+    context_chars: int = 200,
+) -> str:
+    """
+    Finds every paragraph (or, when the document isn't reliably numbered, a
+    fixed-width window) containing at least one _PROVISION_PATTERN trigger,
+    and returns them concatenated as a single block — the filtered context
+    pipeline/llm_enrichment.py feeds its LLM call for provision extraction,
+    instead of the full OCR text or the head+tail excerpt used for
+    case_note/conclusion. Provisions are typically cited in the reasoning
+    section in the *middle* of a judgment, which that head+tail excerpt
+    deliberately excludes (see llm_enrichment.py's own docstring) — this
+    function exists specifically to still reach that text, without paying
+    for the full OCR text on every call.
+
+    extract_provisions() above only emits a result when an act name is
+    found immediately adjacent to a match; this function makes no such
+    requirement — it only needs a trigger word (section/rule/order/article)
+    to flag a paragraph as worth sending to the LLM, which then resolves
+    the act from the full paragraph's context, not just an 80-char window.
+
+    Returns "" if the document has no provision references anywhere
+    (cheap short-circuit) so callers can skip adding an empty section to
+    the prompt.
+    """
+    if not ocr_text or not _PROVISION_PATTERN.search(ocr_text):
+        return ""
+
+    chunks: List[str] = []
+    total_chars = 0
+
+    paragraphs = split_into_paragraphs(ocr_text)
+    if paragraphs:
+        for para_number, para_text in paragraphs:
+            if not _PROVISION_PATTERN.search(para_text):
+                continue
+            chunk = f"[Para {para_number}] {para_text}"
+            chunks.append(chunk)
+            total_chars += len(chunk)
+            if len(chunks) >= max_paragraphs or total_chars >= max_chars:
+                break
+    else:
+        # No reliable paragraph numbering (common for short Orders) --
+        # fall back to a fixed-context window around each match, same
+        # mechanics as pipeline/citator.py's find_citation_candidates(),
+        # merging overlapping spans so two nearby triggers don't duplicate
+        # the same sentence twice.
+        spans: List[List[int]] = []
+        for match in _PROVISION_PATTERN.finditer(ocr_text):
+            start = max(0, match.start() - context_chars)
+            end = min(len(ocr_text), match.end() + context_chars)
+            if spans and start <= spans[-1][1]:
+                spans[-1][1] = max(spans[-1][1], end)
+            else:
+                spans.append([start, end])
+
+        for start, end in spans:
+            chunk = re.sub(r"\s+", " ", ocr_text[start:end]).strip()
+            if not chunk:
+                continue
+            chunks.append(chunk)
+            total_chars += len(chunk)
+            if len(chunks) >= max_paragraphs or total_chars >= max_chars:
+                break
+
+    return "\n\n".join(chunks)
 
 
 # Disposition keyword bank, checked in priority order against real
