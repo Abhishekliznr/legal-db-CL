@@ -11,11 +11,11 @@ Handles:
 - GET/POST/PATCH/DELETE /api/cases/searches[/{field_id}] : CRUD for the advanced
                                       boolean search-builder field definitions.
 
-Rewritten again 2026-09-08 for the flattened `cases` schema (db/schema.sql's
-rewrite note) — both endpoints now read `case_search_view` (this service's
+Rewritten again 2026-09-08 for the flattened `cr_cases` schema (db/schema.sql's
+rewrite note) — both endpoints now read `cr_case_search_view` (this service's
 own convenience view resolving cases' id-arrays to display names; NOT the
 same view the pre-rewrite schema had, and scraper-backend has no
-equivalent). Free-text search uses `cases.search_vector` (re-added to the
+equivalent). Free-text search uses `cr_cases.search_vector` (re-added to the
 schema specifically because this router needs it — the flattened schema's
 first draft omitted it).
 
@@ -260,7 +260,7 @@ def execute_case_search(
 
             where_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
 
-            cur.execute(f"SELECT COUNT(*) FROM case_search_view v {where_sql};", params)
+            cur.execute(f"SELECT COUNT(*) FROM cr_case_search_view v {where_sql};", params)
             total_records = cur.fetchone()[0]
 
             offset = (page - 1) * limit
@@ -273,7 +273,7 @@ def execute_case_search(
                        v.language, v.disposition, v.subject_name, v.category_names,
                        v.case_note, v.blob_pdf_id, v.source_pdf_url, v.court_name,
                        v.petitioner, v.respondent, v.bench_names, v.act_names
-                FROM case_search_view v
+                FROM cr_case_search_view v
                 {where_sql}
                 {order_sql}
                 LIMIT %s OFFSET %s;
@@ -393,7 +393,7 @@ def get_configuration_driven_search_fields(include_inactive: bool = Query(False)
                 where = "" if include_inactive else "WHERE is_active"
                 cur.execute(f"""
                     SELECT id, key, label, placeholder, combinator, is_active, display_order
-                    FROM search_field_definitions {where} ORDER BY display_order;
+                    FROM cr_search_field_definitions {where} ORDER BY display_order;
                 """)
                 return SearchFieldsResponse(fields=[_row_to_search_field(r) for r in cur.fetchall()])
     except psycopg2.OperationalError:
@@ -410,7 +410,7 @@ def create_search_field(payload: SearchFieldCreate):
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO search_field_definitions (key, label, placeholder, combinator, is_active, display_order)
+                    INSERT INTO cr_search_field_definitions (key, label, placeholder, combinator, is_active, display_order)
                     VALUES (%s, %s, %s, %s, %s, %s)
                     RETURNING id, key, label, placeholder, combinator, is_active, display_order;
                 """, (payload.key, payload.label, payload.placeholder, payload.combinator, payload.isActive, payload.displayOrder))
@@ -432,7 +432,7 @@ def get_search_field(field_id: UUID):
     try:
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT id, key, label, placeholder, combinator, is_active, display_order FROM search_field_definitions WHERE id = %s;", (str(field_id),))
+                cur.execute("SELECT id, key, label, placeholder, combinator, is_active, display_order FROM cr_search_field_definitions WHERE id = %s;", (str(field_id),))
                 row = cur.fetchone()
                 if not row:
                     raise HTTPException(status_code=404, detail="Search field not found.")
@@ -460,15 +460,15 @@ def update_search_field(field_id: UUID, payload: SearchFieldUpdate):
     try:
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT id FROM search_field_definitions WHERE id = %s;", (str(field_id),))
+                cur.execute("SELECT id FROM cr_search_field_definitions WHERE id = %s;", (str(field_id),))
                 if not cur.fetchone():
                     raise HTTPException(status_code=404, detail="Search field not found.")
                 if set_clauses:
                     set_clauses.append("updated_at = CURRENT_TIMESTAMP")
                     params.append(str(field_id))
-                    cur.execute(f"UPDATE search_field_definitions SET {', '.join(set_clauses)} WHERE id = %s;", params)
+                    cur.execute(f"UPDATE cr_search_field_definitions SET {', '.join(set_clauses)} WHERE id = %s;", params)
                 conn.commit()
-                cur.execute("SELECT id, key, label, placeholder, combinator, is_active, display_order FROM search_field_definitions WHERE id = %s;", (str(field_id),))
+                cur.execute("SELECT id, key, label, placeholder, combinator, is_active, display_order FROM cr_search_field_definitions WHERE id = %s;", (str(field_id),))
                 return _row_to_search_field(cur.fetchone())
     except HTTPException:
         raise
@@ -487,7 +487,7 @@ def delete_search_field(field_id: UUID):
     try:
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("DELETE FROM search_field_definitions WHERE id = %s RETURNING id;", (str(field_id),))
+                cur.execute("DELETE FROM cr_search_field_definitions WHERE id = %s RETURNING id;", (str(field_id),))
                 deleted = cur.fetchone()
                 conn.commit()
                 if not deleted:
@@ -528,7 +528,7 @@ def get_case_detail(case_id: str):
                            v.ocr_text, v.blob_pdf_id, v.source_pdf_url, v.court_name, v.court_id,
                            v.petitioner, v.respondent, v.bench_names, v.subject_name, v.category_names,
                            v.ministry_names, v.needs_review
-                    FROM case_search_view v
+                    FROM cr_case_search_view v
                     WHERE {id_clause}v.case_number = %s OR v.liznr_id = %s;
                 """, (*id_params, case_id, case_id))
                 row = cur.fetchone()
@@ -546,25 +546,25 @@ def get_case_detail(case_id: str):
                 judges = [{"name": j, "role": None} for j in (bench_names or [])]
 
                 # Provisions reconstructed from the raw id arrays (not carried
-                # by case_search_view) -- sections/rules/orders each resolve
-                # back to `acts` for the act name that goes with each number.
+                # by cr_case_search_view) -- sections/rules/orders each resolve
+                # back to `cr_acts` for the act name that goes with each number.
                 cur.execute("""
                     SELECT a.act_name, s.section_number
-                    FROM cases c
-                    JOIN sections s ON s.section_id = ANY(c.sections)
-                    JOIN acts a ON a.act_id = s.act_id
+                    FROM cr_cases c
+                    JOIN cr_sections s ON s.section_id = ANY(c.sections)
+                    JOIN cr_acts a ON a.act_id = s.act_id
                     WHERE c.case_id = %s
                     UNION ALL
                     SELECT a.act_name, r.rule_number
-                    FROM cases c
-                    JOIN rules r ON r.rule_id = ANY(c.rules)
-                    JOIN acts a ON a.act_id = r.act_id
+                    FROM cr_cases c
+                    JOIN cr_rules r ON r.rule_id = ANY(c.rules)
+                    JOIN cr_acts a ON a.act_id = r.act_id
                     WHERE c.case_id = %s
                     UNION ALL
                     SELECT a.act_name, o.order_number
-                    FROM cases c
-                    JOIN orders o ON o.order_id = ANY(c.orders)
-                    JOIN acts a ON a.act_id = o.act_id
+                    FROM cr_cases c
+                    JOIN cr_orders o ON o.order_id = ANY(c.orders)
+                    JOIN cr_acts a ON a.act_id = o.act_id
                     WHERE c.case_id = %s;
                 """, (db_case_id, db_case_id, db_case_id))
                 provisions = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]

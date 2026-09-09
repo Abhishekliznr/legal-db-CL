@@ -1,5 +1,5 @@
 """
-Seeds `filter_definitions` + `search_field_definitions` — the admin-managed
+Seeds `cr_filter_definitions` + `cr_search_field_definitions` — the admin-managed
 metadata GET /api/cases/filters and GET /api/cases/searches serve.
 (ON CONFLICT (key) DO NOTHING, so this is a no-op against an already-seeded
 DB and never clobbers an admin's edits).
@@ -42,16 +42,16 @@ def seed() -> None:
             # all, so a pre-existing 'treatment_status' row would otherwise
             # linger forever and keep showing up (with permanently empty
             # options, since filter_router.py no longer computes it).
-            cur.execute("DELETE FROM filter_definitions WHERE key = 'treatment_status';")
+            cur.execute("DELETE FROM cr_filter_definitions WHERE key = 'treatment_status';")
 
             cur.executemany("""
-                INSERT INTO filter_definitions (key, label, type, selection_mode, query_key, data_source, is_searchable, display_order)
+                INSERT INTO cr_filter_definitions (key, label, type, selection_mode, query_key, data_source, is_searchable, display_order)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (key) DO NOTHING;
             """, _FILTER_DEFINITIONS)
 
             cur.executemany("""
-                INSERT INTO search_field_definitions (key, label, placeholder, combinator, display_order)
+                INSERT INTO cr_search_field_definitions (key, label, placeholder, combinator, display_order)
                 VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (key) DO NOTHING;
             """, _SEARCH_FIELD_DEFINITIONS)

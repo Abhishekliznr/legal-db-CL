@@ -78,7 +78,7 @@ def main() -> None:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO courts (court_name, court_type, court_code)
+                INSERT INTO cr_courts (court_name, court_type, court_code)
                 VALUES ('Supreme Court of India', 'Supreme Court', 'SCIN')
                 ON CONFLICT (court_name) DO UPDATE SET court_name = EXCLUDED.court_name
                 RETURNING court_id;
@@ -115,7 +115,7 @@ def main() -> None:
             print(f"Already ingested (checksum dedup) — looking up existing ingestion for {filename}")
             with get_pooled_connection() as conn:
                 with conn.cursor() as cur:
-                    cur.execute("SELECT ingestion_id FROM raw_ingestions WHERE file_checksum = %s;", (checksum,))
+                    cur.execute("SELECT ingestion_id FROM cr_raw_ingestions WHERE file_checksum = %s;", (checksum,))
                     ingestion_id = cur.fetchone()[0]
 
         record = RawJudgmentRecord(
@@ -148,28 +148,28 @@ def main() -> None:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
             for case_id in case_ids:
-                cur.execute("SELECT * FROM cases WHERE case_id = %s;", (case_id,))
+                cur.execute("SELECT * FROM cr_cases WHERE case_id = %s;", (case_id,))
                 columns = [desc[0] for desc in cur.description]
                 row = dict(zip(columns, cur.fetchone()))
 
                 # Resolve array-of-id columns to human-readable names for the printout.
-                cur.execute("SELECT full_name FROM judges WHERE judge_id = ANY(%s);", (row["bench"],))
+                cur.execute("SELECT full_name FROM cr_judges WHERE judge_id = ANY(%s);", (row["bench"],))
                 bench_names = [r[0] for r in cur.fetchall()]
                 judgment_by_name = None
                 if row["judgment_by"]:
-                    cur.execute("SELECT full_name FROM judges WHERE judge_id = %s;", (row["judgment_by"],))
+                    cur.execute("SELECT full_name FROM cr_judges WHERE judge_id = %s;", (row["judgment_by"],))
                     judgment_by_name = cur.fetchone()[0]
-                cur.execute("SELECT act_name FROM acts WHERE act_id = ANY(%s);", (row["acts"],))
+                cur.execute("SELECT act_name FROM cr_acts WHERE act_id = ANY(%s);", (row["acts"],))
                 act_names = [r[0] for r in cur.fetchall()]
-                cur.execute("SELECT section_number FROM sections WHERE section_id = ANY(%s);", (row["sections"],))
+                cur.execute("SELECT section_number FROM cr_sections WHERE section_id = ANY(%s);", (row["sections"],))
                 section_numbers = [r[0] for r in cur.fetchall()]
                 subject_name = None
                 if row["subject"]:
-                    cur.execute("SELECT subject_name FROM subjects WHERE subject_id = %s;", (row["subject"],))
+                    cur.execute("SELECT subject_name FROM cr_subjects WHERE subject_id = %s;", (row["subject"],))
                     subject_name = cur.fetchone()[0]
-                cur.execute("SELECT ministry_name FROM ministries WHERE ministry_id = ANY(%s);", (row["ministries"],))
+                cur.execute("SELECT ministry_name FROM cr_ministries WHERE ministry_id = ANY(%s);", (row["ministries"],))
                 ministry_names = [r[0] for r in cur.fetchall()]
-                cur.execute("SELECT category_name FROM case_categories WHERE category_id = ANY(%s);", (row["case_category"],))
+                cur.execute("SELECT category_name FROM cr_case_categories WHERE category_id = ANY(%s);", (row["case_category"],))
                 category_names = [r[0] for r in cur.fetchall()]
 
                 print(f"\n--- case_id={case_id} ---")
@@ -205,7 +205,7 @@ def main() -> None:
     print("=" * 90)
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM cases;")
+            cur.execute("SELECT COUNT(*) FROM cr_cases;")
             count_before = cur.fetchone()[0]
     for (filename, case_number_raw, party_name_raw, bench_raw, judge_raw,
          decision_date_raw, neutral_citation_raw, advocate_raw, language) in _FIXTURES:
@@ -221,7 +221,7 @@ def main() -> None:
         print(f"{filename}: re-ingest returned ingestion_id={ingestion_id} (None = correctly deduped)")
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM cases;")
+            cur.execute("SELECT COUNT(*) FROM cr_cases;")
             count_after = cur.fetchone()[0]
     print(f"cases count before={count_before}, after={count_after} (should be equal)")
 

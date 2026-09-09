@@ -10,8 +10,10 @@ for the full architecture; this file wires up what exists so far:
   promotion pipeline, scraper_router. The stub extraction stage gets replaced
   by a real structured-output LLM call in Phase 3 — see pipeline/extraction.py.
 - Phase 2 (done): generic eCourts adapter for all 25 High Courts, driven by
-  court_scrape_config (seed via `python -m db.seed_courts`). scraper_router
-  now resolves the adapter + state/bench code from that config automatically.
+  cr_court_scrape_config (auto-seeded at startup if empty — see
+  db/seed_courts.py's ensure_seeded() below — or manually via
+  `python -m db.seed_courts`). scraper_router now resolves the adapter +
+  state/bench code from that config automatically.
 - Phase 3 (done): real OCR fallback (Tesseract, for scanned PDFs with no
   text layer), real structured-output LLM extraction (pipeline/extraction.py,
   replacing the Phase 1 stub — see pipeline/extraction_stub.py), the
@@ -21,10 +23,11 @@ for the full architecture; this file wires up what exists so far:
   writes — see legal-db/api-backend/.
 - Phase 5 (not yet started): cutover.
 
-Startup does NOT auto-apply the schema (unlike the old service) — run
-`python -m db.init_db init` explicitly once against a fresh database. Schema
-changes here are deliberate, not something that should happen silently on
-every container restart.
+Startup auto-applies the schema via db/init_db.py's `ensure_schema()`: it
+checks for the core `cases` table and only runs schema.sql the first time
+it's missing (a fresh database), so it's safe to call on every container
+restart without ever re-running schema.sql's non-idempotent CREATE
+TYPE/CREATE TABLE statements against a database that already has them.
 """
 
 import logging
@@ -95,6 +98,30 @@ def on_startup():
         connection.init_connection_pool()
     except Exception as e:
         print(f"WARNING: could not initialize DB connection pool at startup: {e}")
+        return
+
+    # ensure_schema() only creates anything the first time it sees a
+    # database without the core `cases` table; every later restart (and
+    # a shared-DB deployment where this already ran once) is a cheap
+    # no-op. Non-fatal for the same reason as the pool init above.
+    try:
+        from db.init_db import ensure_schema
+        ensure_schema()
+    except Exception as e:
+        print(f"WARNING: could not ensure DB schema at startup: {e}")
+
+    # Same startup-safe shape as ensure_schema() above: seeds the Supreme
+    # Court + 25 High Courts only the first time cr_courts is empty, so a
+    # fresh database is immediately usable (POST /api/scraper/start needs
+    # a real court_id to dispatch against) without a separate manual
+    # `python -m db.seed_courts` step. Scraper-backend only — it's the
+    # actual write-owner of cr_courts/cr_court_scrape_config; api-backend
+    # stays read-only and has no seed script of its own.
+    try:
+        from db.seed_courts import ensure_seeded
+        ensure_seeded()
+    except Exception as e:
+        print(f"WARNING: could not ensure courts are seeded at startup: {e}")
 
 
 @app.on_event("shutdown")

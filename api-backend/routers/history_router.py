@@ -14,7 +14,7 @@ api-backend (admin-ness / identity is enforced upstream, not here).
 
 Logic unchanged from the old api-backend — this feature is entirely
 independent of the case-law domain migration (spec §6), it just needed its
-own table (case_research_search_history, api-backend-only per
+own table (cr_search_history, api-backend-only per
 db/schema.sql §9) and the new connection module.
 """
 
@@ -59,18 +59,18 @@ def record_search_history(payload: RecordSearchHistoryRequest):
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "DELETE FROM case_research_search_history WHERE user_id = %s AND lower(query) = lower(%s);",
+                    "DELETE FROM cr_search_history WHERE user_id = %s AND lower(query) = lower(%s);",
                     (payload.user_id, query),
                 )
                 cur.execute(
-                    "INSERT INTO case_research_search_history (user_id, query) VALUES (%s, %s);",
+                    "INSERT INTO cr_search_history (user_id, query) VALUES (%s, %s);",
                     (payload.user_id, query),
                 )
                 cur.execute(
                     """
-                    DELETE FROM case_research_search_history
+                    DELETE FROM cr_search_history
                     WHERE user_id = %s AND id NOT IN (
-                        SELECT id FROM case_research_search_history
+                        SELECT id FROM cr_search_history
                         WHERE user_id = %s
                         ORDER BY created_at DESC
                         LIMIT %s
@@ -99,7 +99,7 @@ def get_search_history(
                 cur.execute(
                     """
                     SELECT id, query, created_at
-                    FROM case_research_search_history
+                    FROM cr_search_history
                     WHERE user_id = %s
                     ORDER BY created_at DESC
                     LIMIT %s;

@@ -1,6 +1,6 @@
 """
-Seeds `courts` + `court_scrape_config` for the Supreme Court and all 25 High
-Courts (spec §4.3, §8 Phase 2 "a data-entry task, not a code port").
+Seeds `cr_courts` + `cr_court_scrape_config` for the Supreme Court and all 25
+High Courts (spec §4.3, §8 Phase 2 "a data-entry task, not a code port").
 
 state_code values below were read out of the old scraper-backend's 25
 per-court scripts (each one had a `{COURT}_STATE_CODE = "X~Y"` constant) —
@@ -16,7 +16,7 @@ Usage:
 from db.connection import get_pooled_connection
 
 # (court_name, state, ecourts_state_code, court_code)
-# court_code is our own short code for cases.liznr_id
+# court_code is our own short code for cr_cases.liznr_id
 # ('LIZNR/<court_code>/<seq>/<year>') -- same short-code convention already
 # used ad hoc as the scraper's court_code request param (e.g. "DHC" in
 # tests/manual_phase2_dispatch.py), now the persisted source of truth.
@@ -56,7 +56,7 @@ def seed() -> None:
         with conn.cursor() as cur:
             court_name, state, court_code = _SUPREME_COURT
             cur.execute("""
-                INSERT INTO courts (court_name, court_type, state, court_code)
+                INSERT INTO cr_courts (court_name, court_type, state, court_code)
                 VALUES (%s, 'Supreme Court', %s, %s)
                 ON CONFLICT (court_name) DO UPDATE SET court_code = EXCLUDED.court_code
                 RETURNING court_id;
@@ -64,14 +64,14 @@ def seed() -> None:
             sc_court_id = cur.fetchone()[0]
 
             cur.execute("""
-                INSERT INTO court_scrape_config (court_id, adapter, is_active)
+                INSERT INTO cr_court_scrape_config (court_id, adapter, is_active)
                 VALUES (%s, 'supreme_court', TRUE)
                 ON CONFLICT (court_id) DO NOTHING;
             """, (sc_court_id,))
 
             for court_name, state, state_code, court_code in _HIGH_COURTS:
                 cur.execute("""
-                    INSERT INTO courts (court_name, court_type, state, court_code)
+                    INSERT INTO cr_courts (court_name, court_type, state, court_code)
                     VALUES (%s, 'High Court', %s, %s)
                     ON CONFLICT (court_name) DO UPDATE SET court_code = EXCLUDED.court_code
                     RETURNING court_id;
@@ -79,13 +79,34 @@ def seed() -> None:
                 court_id = cur.fetchone()[0]
 
                 cur.execute("""
-                    INSERT INTO court_scrape_config (court_id, adapter, state_code, is_active)
+                    INSERT INTO cr_court_scrape_config (court_id, adapter, state_code, is_active)
                     VALUES (%s, 'ecourts', %s, TRUE)
                     ON CONFLICT (court_id) DO UPDATE SET state_code = EXCLUDED.state_code;
                 """, (court_id, state_code))
 
         conn.commit()
     print(f"Seeded {1 + len(_HIGH_COURTS)} courts (Supreme Court + {len(_HIGH_COURTS)} High Courts).")
+
+
+def ensure_seeded() -> None:
+    """
+    Startup-safe entry point: seeds courts/court_scrape_config only the
+    first time this runs against a database with no cr_courts rows yet;
+    every later call is a cheap no-op. seed() itself is already idempotent
+    (ON CONFLICT DO UPDATE throughout) so calling it unconditionally would
+    also be safe, but this skips even the no-op INSERT round-trips on every
+    restart once a database is already seeded.
+    """
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT EXISTS (SELECT 1 FROM cr_courts);")
+            already_seeded = cur.fetchone()[0]
+
+    if already_seeded:
+        print("cr_courts already has rows, skipping auto-seed.")
+        return
+    print("No courts found — seeding courts/court_scrape_config for the first time...")
+    seed()
 
 
 if __name__ == "__main__":

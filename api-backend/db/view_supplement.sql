@@ -1,5 +1,5 @@
 -- =====================================================================
--- API-BACKEND-V2-ONLY SUPPLEMENT: case_search_view
+-- API-BACKEND-V2-ONLY SUPPLEMENT: cr_case_search_view
 --
 -- Split out (rather than only living in schema.sql, where it started) so
 -- it can be applied on its own via `python -m db.init_db ensure-view` —
@@ -13,7 +13,7 @@
 -- as every other "kept in sync by hand" pair in this codebase.
 -- =====================================================================
 
-CREATE OR REPLACE VIEW case_search_view AS
+CREATE OR REPLACE VIEW cr_case_search_view AS
 SELECT
     c.case_id,
     c.liznr_id,
@@ -47,14 +47,14 @@ SELECT
     jb.full_name AS judgment_by_name,
     subj.subject_name,
     (SELECT array_agg(j.full_name ORDER BY j.full_name)
-       FROM judges j WHERE j.judge_id = ANY(c.bench)) AS bench_names,
+       FROM cr_judges j WHERE j.judge_id = ANY(c.bench)) AS bench_names,
     (SELECT array_agg(DISTINCT a.act_name)
-       FROM acts a WHERE a.act_id = ANY(c.acts)) AS act_names,
+       FROM cr_acts a WHERE a.act_id = ANY(c.acts)) AS act_names,
     (SELECT array_agg(DISTINCT cc.category_name)
-       FROM case_categories cc WHERE cc.category_id = ANY(c.case_category)) AS category_names,
+       FROM cr_case_categories cc WHERE cc.category_id = ANY(c.case_category)) AS category_names,
     (SELECT array_agg(DISTINCT m.ministry_name)
-       FROM ministries m WHERE m.ministry_id = ANY(c.ministries)) AS ministry_names
-FROM cases c
-JOIN courts crt ON crt.court_id = c.court_id
-LEFT JOIN judges jb ON jb.judge_id = c.judgment_by
-LEFT JOIN subjects subj ON subj.subject_id = c.subject;
+       FROM cr_ministries m WHERE m.ministry_id = ANY(c.ministries)) AS ministry_names
+FROM cr_cases c
+JOIN cr_courts crt ON crt.court_id = c.court_id
+LEFT JOIN cr_judges jb ON jb.judge_id = c.judgment_by
+LEFT JOIN cr_subjects subj ON subj.subject_id = c.subject;

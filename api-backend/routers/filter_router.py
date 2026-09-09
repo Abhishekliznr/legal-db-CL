@@ -18,19 +18,19 @@ Two kinds of filters, distinguished by `dataSource`:
   SQL-injection risk. CRUD on these rows only controls presentation
   (label/order/active/queryKey).
 - "static" (any new filter an admin creates) — options are real rows in the
-  `filter_options` table.
+  `cr_filter_options` table.
 
-Rewritten again 2026-09-08 for the flattened `cases` schema (array columns
-instead of junction tables — see db/schema.sql's rewrite note). Only
-`_compute_database_options()` changes: `judge`/`act` now unnest
-`cases.bench`/`cases.acts` instead of joining document_coram/
-document_sections; `judgment_year` reads `cases.judgment_date` directly
+Rewritten again 2026-09-08 for the flattened `cr_cases` schema (array
+columns instead of junction tables — see db/schema.sql's rewrite note).
+Only `_compute_database_options()` changes: `judge`/`act` now unnest
+`cr_cases.bench`/`cr_cases.acts` instead of joining document_coram/
+document_sections; `judgment_year` reads `cr_cases.judgment_date` directly
 (no more separate `documents` table). `treatment_status` is REMOVED
 entirely, not just querying different tables — it read a column computed
 from the `citations` table (which citation, if any, treated the document
 as Overruled/Doubted/Distinguished), and citation/treatment tracking isn't
 modeled by this pipeline iteration at all. db/seed_filters.py no longer
-seeds that filter_definitions row, and self-heals a database that already
+seeds that cr_filter_definitions row, and self-heals a database that already
 has one from before this change.
 """
 
@@ -123,8 +123,8 @@ def _compute_database_options(cur, key: str) -> List[dict]:
     if key == "court":
         cur.execute("""
             SELECT c.court_id::text, c.court_name, COUNT(ca.case_id)
-            FROM courts c
-            LEFT JOIN cases ca ON ca.court_id = c.court_id
+            FROM cr_courts c
+            LEFT JOIN cr_cases ca ON ca.court_id = c.court_id
             GROUP BY c.court_id, c.court_name
             ORDER BY COUNT(ca.case_id) DESC;
         """)
@@ -133,8 +133,8 @@ def _compute_database_options(cur, key: str) -> List[dict]:
     if key == "judge":
         cur.execute("""
             SELECT j.full_name, COUNT(DISTINCT c.case_id)
-            FROM judges j
-            JOIN cases c ON j.judge_id = ANY(c.bench)
+            FROM cr_judges j
+            JOIN cr_cases c ON j.judge_id = ANY(c.bench)
             GROUP BY j.full_name
             ORDER BY COUNT(DISTINCT c.case_id) DESC
             LIMIT 30;
@@ -144,8 +144,8 @@ def _compute_database_options(cur, key: str) -> List[dict]:
     if key == "act":
         cur.execute("""
             SELECT a.act_name, COUNT(DISTINCT c.case_id)
-            FROM acts a
-            JOIN cases c ON a.act_id = ANY(c.acts)
+            FROM cr_acts a
+            JOIN cr_cases c ON a.act_id = ANY(c.acts)
             GROUP BY a.act_name
             ORDER BY COUNT(DISTINCT c.case_id) DESC
             LIMIT 30;
@@ -155,7 +155,7 @@ def _compute_database_options(cur, key: str) -> List[dict]:
     if key == "judgment_year":
         cur.execute("""
             SELECT EXTRACT(YEAR FROM judgment_date)::INT AS yr, COUNT(*)
-            FROM cases
+            FROM cr_cases
             WHERE judgment_date IS NOT NULL
             GROUP BY yr
             ORDER BY yr DESC;
@@ -167,17 +167,17 @@ def _compute_database_options(cur, key: str) -> List[dict]:
 
 def _fetch_static_options(cur, filter_id, include_inactive: bool = False) -> List[dict]:
     if include_inactive:
-        cur.execute("SELECT value, label FROM filter_options WHERE filter_id = %s ORDER BY display_order;", (str(filter_id),))
+        cur.execute("SELECT value, label FROM cr_filter_options WHERE filter_id = %s ORDER BY display_order;", (str(filter_id),))
     else:
-        cur.execute("SELECT value, label FROM filter_options WHERE filter_id = %s AND is_active ORDER BY display_order;", (str(filter_id),))
+        cur.execute("SELECT value, label FROM cr_filter_options WHERE filter_id = %s AND is_active ORDER BY display_order;", (str(filter_id),))
     return [{"value": r[0], "label": r[1]} for r in cur.fetchall()]
 
 
-def _replace_filter_options(cur, filter_id, options: List[FilterOptionInput]):
-    cur.execute("DELETE FROM filter_options WHERE filter_id = %s;", (str(filter_id),))
+def _replace_cr_filter_options(cur, filter_id, options: List[FilterOptionInput]):
+    cur.execute("DELETE FROM cr_filter_options WHERE filter_id = %s;", (str(filter_id),))
     if options:
         cur.executemany(
-            "INSERT INTO filter_options (filter_id, value, label, display_order) VALUES (%s, %s, %s, %s);",
+            "INSERT INTO cr_filter_options (filter_id, value, label, display_order) VALUES (%s, %s, %s, %s);",
             [(str(filter_id), opt.value, opt.label, idx) for idx, opt in enumerate(options)],
         )
 
@@ -185,7 +185,7 @@ def _replace_filter_options(cur, filter_id, options: List[FilterOptionInput]):
 def _build_filter_definition(cur, filter_id, include_inactive_options: bool = False) -> Optional[FilterDefinition]:
     cur.execute("""
         SELECT id, key, label, type, selection_mode, query_key, data_source, is_active, is_searchable, display_order
-        FROM filter_definitions WHERE id = %s;
+        FROM cr_filter_definitions WHERE id = %s;
     """, (str(filter_id),))
     row = cur.fetchone()
     if not row:
@@ -214,7 +214,7 @@ def get_configuration_driven_filters(include_inactive: bool = Query(False)):
                 where = "" if include_inactive else "WHERE is_active"
                 cur.execute(f"""
                     SELECT id, key, label, type, selection_mode, query_key, data_source, is_active, is_searchable, display_order
-                    FROM filter_definitions {where} ORDER BY display_order;
+                    FROM cr_filter_definitions {where} ORDER BY display_order;
                 """)
                 rows = cur.fetchall()
 
@@ -247,14 +247,14 @@ def create_filter(payload: FilterCreate):
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO filter_definitions (key, label, type, selection_mode, query_key, data_source, is_active, is_searchable, display_order)
+                    INSERT INTO cr_filter_definitions (key, label, type, selection_mode, query_key, data_source, is_active, is_searchable, display_order)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING id;
                 """, (payload.key, payload.label, payload.type, payload.selectionMode, payload.queryKey,
                       payload.dataSource, payload.isActive, payload.isSearchable, payload.displayOrder))
                 filter_id = cur.fetchone()[0]
                 if payload.dataSource == "static" and payload.options:
-                    _replace_filter_options(cur, filter_id, payload.options)
+                    _replace_cr_filter_options(cur, filter_id, payload.options)
                 conn.commit()
                 return _build_filter_definition(cur, filter_id, include_inactive_options=True)
     except HTTPException:
@@ -297,7 +297,7 @@ def update_filter(filter_id: UUID, payload: FilterUpdate):
     try:
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT data_source FROM filter_definitions WHERE id = %s;", (str(filter_id),))
+                cur.execute("SELECT data_source FROM cr_filter_definitions WHERE id = %s;", (str(filter_id),))
                 row = cur.fetchone()
                 if not row:
                     raise HTTPException(status_code=404, detail="Filter not found.")
@@ -319,11 +319,11 @@ def update_filter(filter_id: UUID, payload: FilterUpdate):
                 if set_clauses:
                     set_clauses.append("updated_at = CURRENT_TIMESTAMP")
                     params.append(str(filter_id))
-                    cur.execute(f"UPDATE filter_definitions SET {', '.join(set_clauses)} WHERE id = %s;", params)
+                    cur.execute(f"UPDATE cr_filter_definitions SET {', '.join(set_clauses)} WHERE id = %s;", params)
 
                 if options_provided:
                     option_inputs = [FilterOptionInput(**opt) for opt in (options or [])]
-                    _replace_filter_options(cur, filter_id, option_inputs)
+                    _replace_cr_filter_options(cur, filter_id, option_inputs)
 
                 conn.commit()
                 return _build_filter_definition(cur, filter_id, include_inactive_options=True)
@@ -344,7 +344,7 @@ def delete_filter(filter_id: UUID):
     try:
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("DELETE FROM filter_definitions WHERE id = %s RETURNING id;", (str(filter_id),))
+                cur.execute("DELETE FROM cr_filter_definitions WHERE id = %s RETURNING id;", (str(filter_id),))
                 deleted = cur.fetchone()
                 conn.commit()
                 if not deleted:

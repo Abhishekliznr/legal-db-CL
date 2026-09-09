@@ -3,7 +3,7 @@ Manual Phase 2 dispatch check — NOT a pytest suite, run directly.
 
 Verifies the config-driven dispatch in routers/scraper_router.py: given a
 court_id, it resolves the right adapter class and the right state_code/
-bench_code from court_scrape_config, without actually running a scrape
+bench_code from cr_court_scrape_config, without actually running a scrape
 (the real EcourtsAdapter/SupremeCourtAdapter network logic still needs a
 live dry run — see the "NOT LIVE-VERIFIED" notes in each adapter module).
 
@@ -26,7 +26,7 @@ import api
 def _court_id_for(name: str) -> int:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT court_id FROM courts WHERE court_name = %s;", (name,))
+            cur.execute("SELECT court_id FROM cr_courts WHERE court_name = %s;", (name,))
             row = cur.fetchone()
             assert row is not None, f"court not seeded: {name}"
             return row[0]
@@ -39,14 +39,14 @@ def main():
 
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT count(*) FROM courts;")
+            cur.execute("SELECT count(*) FROM cr_courts;")
             total = cur.fetchone()[0]
             print(f"Total seeded courts: {total}")
             assert total == 26, f"expected 26 (1 Supreme Court + 25 High Courts), got {total}"
 
-            cur.execute("SELECT count(*) FROM court_scrape_config WHERE adapter = 'ecourts';")
+            cur.execute("SELECT count(*) FROM cr_court_scrape_config WHERE adapter = 'ecourts';")
             ecourts_count = cur.fetchone()[0]
-            print(f"court_scrape_config rows with adapter='ecourts': {ecourts_count}")
+            print(f"cr_court_scrape_config rows with adapter='ecourts': {ecourts_count}")
             assert ecourts_count == 25
 
     with TestClient(api.app) as client:
@@ -76,7 +76,7 @@ def main():
 
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("UPDATE court_scrape_config SET is_active = FALSE WHERE court_id = %s;", (delhi_court_id,))
+                cur.execute("UPDATE cr_court_scrape_config SET is_active = FALSE WHERE court_id = %s;", (delhi_court_id,))
             conn.commit()
 
         r = client.post("/api/scraper/start", json={"court_id": delhi_court_id, "court_code": "DHC"})
@@ -85,7 +85,7 @@ def main():
 
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("UPDATE court_scrape_config SET is_active = TRUE, state_code = NULL WHERE court_id = %s;", (delhi_court_id,))
+                cur.execute("UPDATE cr_court_scrape_config SET is_active = TRUE, state_code = NULL WHERE court_id = %s;", (delhi_court_id,))
             conn.commit()
 
         r = client.post("/api/scraper/start", json={"court_id": delhi_court_id, "court_code": "DHC"})

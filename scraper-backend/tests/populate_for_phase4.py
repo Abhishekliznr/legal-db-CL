@@ -30,7 +30,7 @@ def _make_pdf(path: Path, text: str) -> None:
 def _court_id_for(name: str) -> int:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT court_id FROM courts WHERE court_name = %s;", (name,))
+            cur.execute("SELECT court_id FROM cr_courts WHERE court_name = %s;", (name,))
             return cur.fetchone()[0]
 
 

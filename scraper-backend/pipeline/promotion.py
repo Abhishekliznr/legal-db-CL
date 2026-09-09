@@ -1,15 +1,15 @@
 """
 OCR_DONE -> PROMOTED.
 
-Rewritten 2026-09-08 for the flattened `cases` schema and the regex-first
+Rewritten 2026-09-08 for the flattened `cr_cases` schema and the regex-first
 extraction approach (pipeline/regex_extraction.py) — there is no separate
 LLM-extraction stage in this pipeline iteration, so this module reads
 straight from the scraper's own RawJudgmentRecord (table-cell fields) plus
-raw_ingestions.ocr_text (OCR-text fields), not from a raw_ai_extraction
+cr_raw_ingestions.ocr_text (OCR-text fields), not from a raw_ai_extraction
 JSON envelope the way the old LLM-driven promotion.py did.
 
 case_note and industries are left NULL/empty by THIS function (see
-cases.industries' comment in db/schema.sql and pipeline/regex_extraction.py's
+cr_cases.industries' comment in db/schema.sql and pipeline/regex_extraction.py's
 module docstring for why industries specifically has no regex source) —
 pipeline/llm_enrichment.py fills both in immediately afterward
 (orchestrator/batch_runner.py calls it right after promote_ingestion()
@@ -54,114 +54,124 @@ def _validate_enum(value: Optional[str], allowed: set) -> Optional[str]:
 
 
 # ---------------------------------------------------------------------
-# get-or-create lookup helpers. Array columns on `cases` (bench, sections,
+# get-or-create lookup helpers. Array columns on `cr_cases` (bench, sections,
 # acts, rules, orders, ministries, case_category) mean Postgres can't
 # FK-constrain membership the way the old junction tables did — these
 # helpers are where that integrity actually gets enforced instead.
+#
+# Each does INSERT ... ON CONFLICT (<natural key>) DO NOTHING RETURNING
+# <id>, falling back to a SELECT only when nothing came back (another
+# concurrent promotion won the race) — the same pattern
+# _claim_citation_sequence below already uses correctly. A plain
+# SELECT-then-INSERT (the previous shape here) lets two concurrent
+# promotions both pass the SELECT before either INSERTs, so the loser's
+# INSERT throws an unhandled UniqueViolation; INSERT ... ON CONFLICT
+# takes a row lock on the conflicting key, so the loser blocks until the
+# winner commits and then safely reads back the winner's row instead.
 # ---------------------------------------------------------------------
 
 def _get_or_create_judge(cur, cleaned_name: str) -> int:
-    cur.execute("SELECT judge_id FROM judges WHERE normalized_name = %s;", (cleaned_name,))
+    cur.execute(
+        "INSERT INTO cr_judges (full_name, normalized_name) VALUES (%s, %s) ON CONFLICT (normalized_name) DO NOTHING RETURNING judge_id;",
+        (cleaned_name, cleaned_name),
+    )
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute(
-        "INSERT INTO judges (full_name, normalized_name) VALUES (%s, %s) RETURNING judge_id;",
-        (cleaned_name, cleaned_name),
-    )
+    cur.execute("SELECT judge_id FROM cr_judges WHERE normalized_name = %s;", (cleaned_name,))
     return cur.fetchone()[0]
 
 
 def _get_or_create_act(cur, act_name: str, short_code: Optional[str], act_year: Optional[int]) -> int:
     cur.execute(
-        "SELECT act_id FROM acts WHERE act_name = %s AND (act_year = %s OR (act_year IS NULL AND %s IS NULL));",
-        (act_name, act_year, act_year),
+        "INSERT INTO cr_acts (act_name, act_year, short_code) VALUES (%s, %s, %s) ON CONFLICT (act_name, act_year) DO NOTHING RETURNING act_id;",
+        (act_name, act_year, short_code),
     )
     row = cur.fetchone()
     if row:
         return row[0]
     cur.execute(
-        "INSERT INTO acts (act_name, act_year, short_code) VALUES (%s, %s, %s) RETURNING act_id;",
-        (act_name, act_year, short_code),
+        "SELECT act_id FROM cr_acts WHERE act_name = %s AND (act_year = %s OR (act_year IS NULL AND %s IS NULL));",
+        (act_name, act_year, act_year),
     )
     return cur.fetchone()[0]
 
 
 def _get_or_create_section(cur, act_id: int, section_number: str) -> int:
-    cur.execute("SELECT section_id FROM sections WHERE act_id = %s AND section_number = %s;", (act_id, section_number))
+    cur.execute(
+        "INSERT INTO cr_sections (act_id, section_number) VALUES (%s, %s) ON CONFLICT (act_id, section_number) DO NOTHING RETURNING section_id;",
+        (act_id, section_number),
+    )
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute(
-        "INSERT INTO sections (act_id, section_number) VALUES (%s, %s) RETURNING section_id;",
-        (act_id, section_number),
-    )
+    cur.execute("SELECT section_id FROM cr_sections WHERE act_id = %s AND section_number = %s;", (act_id, section_number))
     return cur.fetchone()[0]
 
 
 def _get_or_create_rule(cur, act_id: int, rule_number: str) -> int:
-    cur.execute("SELECT rule_id FROM rules WHERE act_id = %s AND rule_number = %s;", (act_id, rule_number))
+    cur.execute(
+        "INSERT INTO cr_rules (act_id, rule_number) VALUES (%s, %s) ON CONFLICT (act_id, rule_number) DO NOTHING RETURNING rule_id;",
+        (act_id, rule_number),
+    )
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute(
-        "INSERT INTO rules (act_id, rule_number) VALUES (%s, %s) RETURNING rule_id;",
-        (act_id, rule_number),
-    )
+    cur.execute("SELECT rule_id FROM cr_rules WHERE act_id = %s AND rule_number = %s;", (act_id, rule_number))
     return cur.fetchone()[0]
 
 
 def _get_or_create_order(cur, act_id: int, order_number: str) -> int:
-    cur.execute("SELECT order_id FROM orders WHERE act_id = %s AND order_number = %s;", (act_id, order_number))
+    cur.execute(
+        "INSERT INTO cr_orders (act_id, order_number) VALUES (%s, %s) ON CONFLICT (act_id, order_number) DO NOTHING RETURNING order_id;",
+        (act_id, order_number),
+    )
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute(
-        "INSERT INTO orders (act_id, order_number) VALUES (%s, %s) RETURNING order_id;",
-        (act_id, order_number),
-    )
+    cur.execute("SELECT order_id FROM cr_orders WHERE act_id = %s AND order_number = %s;", (act_id, order_number))
     return cur.fetchone()[0]
 
 
 def _get_or_create_subject(cur, subject_name: str) -> int:
-    cur.execute("SELECT subject_id FROM subjects WHERE subject_name = %s;", (subject_name,))
+    cur.execute(
+        "INSERT INTO cr_subjects (subject_name) VALUES (%s) ON CONFLICT (subject_name) DO NOTHING RETURNING subject_id;",
+        (subject_name,),
+    )
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute(
-        "INSERT INTO subjects (subject_name) VALUES (%s) RETURNING subject_id;",
-        (subject_name,),
-    )
+    cur.execute("SELECT subject_id FROM cr_subjects WHERE subject_name = %s;", (subject_name,))
     return cur.fetchone()[0]
 
 
 def _get_or_create_ministry(cur, ministry_name: str) -> int:
-    cur.execute("SELECT ministry_id FROM ministries WHERE ministry_name = %s;", (ministry_name,))
+    cur.execute(
+        "INSERT INTO cr_ministries (ministry_name) VALUES (%s) ON CONFLICT (ministry_name) DO NOTHING RETURNING ministry_id;",
+        (ministry_name,),
+    )
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute(
-        "INSERT INTO ministries (ministry_name) VALUES (%s) RETURNING ministry_id;",
-        (ministry_name,),
-    )
+    cur.execute("SELECT ministry_id FROM cr_ministries WHERE ministry_name = %s;", (ministry_name,))
     return cur.fetchone()[0]
 
 
 # Not called from anywhere in THIS module -- promotion never populates
-# cases.industries (no regex signal exists for it, see
+# cr_cases.industries (no regex signal exists for it, see
 # pipeline/regex_extraction.py's module docstring). Lives here anyway,
 # alongside every other get-or-create lookup helper, since
 # pipeline/llm_enrichment.py imports it rather than duplicating the same
-# 8 lines a second time.
+# lines a second time.
 def _get_or_create_industry(cur, industry_name: str) -> int:
-    cur.execute("SELECT industry_id FROM industries WHERE industry_name = %s;", (industry_name,))
+    cur.execute(
+        "INSERT INTO cr_industries (industry_name) VALUES (%s) ON CONFLICT (industry_name) DO NOTHING RETURNING industry_id;",
+        (industry_name,),
+    )
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute(
-        "INSERT INTO industries (industry_name) VALUES (%s) RETURNING industry_id;",
-        (industry_name,),
-    )
+    cur.execute("SELECT industry_id FROM cr_industries WHERE industry_name = %s;", (industry_name,))
     return cur.fetchone()[0]
 
 
@@ -170,14 +180,14 @@ def _get_or_create_category(cur, case_number: Optional[str]) -> Optional[int]:
     if not classified:
         return None
     code, name = classified
-    cur.execute("SELECT category_id FROM case_categories WHERE category_code = %s;", (code,))
+    cur.execute(
+        "INSERT INTO cr_case_categories (category_code, category_name) VALUES (%s, %s) ON CONFLICT (category_code) DO NOTHING RETURNING category_id;",
+        (code, name),
+    )
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute(
-        "INSERT INTO case_categories (category_code, category_name) VALUES (%s, %s) RETURNING category_id;",
-        (code, name),
-    )
+    cur.execute("SELECT category_id FROM cr_case_categories WHERE category_code = %s;", (code,))
     return cur.fetchone()[0]
 
 
@@ -238,26 +248,26 @@ LIZNR_ID_PREFIX = "LIZNR"
 def _claim_citation_sequence(cur, court_id: int, year: int) -> int:
     """
     Atomically claims and returns the next per-(court, year) sequence
-    number, resetting each year (see citation_sequences in schema.sql).
+    number, resetting each year (see cr_citation_sequences in schema.sql).
     The INSERT ... ON CONFLICT DO UPDATE takes a row lock, so concurrent
     promotions for the same court/year serialize correctly instead of
     racing to the same number.
     """
     cur.execute("""
-        INSERT INTO citation_sequences (court_id, citation_year, next_seq)
+        INSERT INTO cr_citation_sequences (court_id, citation_year, next_seq)
         VALUES (%s, %s, 1)
         ON CONFLICT (court_id, citation_year)
-        DO UPDATE SET next_seq = citation_sequences.next_seq + 1
+        DO UPDATE SET next_seq = cr_citation_sequences.next_seq + 1
         RETURNING next_seq;
     """, (court_id, year))
     return cur.fetchone()[0]
 
 
 def _build_liznr_id(cur, court_id: int, year: int) -> Optional[str]:
-    """None when the court has no court_code yet (schema.sql's courts.court_code is
+    """None when the court has no court_code yet (schema.sql's cr_courts.court_code is
     nullable) -- a case simply goes without one rather than blocking promotion
     on an unrelated backfill."""
-    cur.execute("SELECT court_code FROM courts WHERE court_id = %s;", (court_id,))
+    cur.execute("SELECT court_code FROM cr_courts WHERE court_id = %s;", (court_id,))
     row = cur.fetchone()
     court_code = row[0] if row else None
     if not court_code:
@@ -267,12 +277,12 @@ def _build_liznr_id(cur, court_id: int, year: int) -> Optional[str]:
 
 
 class PromotionSkipped(Exception):
-    """Raised when an ingestion can't be promoted at all (missing case_number, NOT NULL on `cases`) — row goes to NEEDS_REVIEW, not a crash."""
+    """Raised when an ingestion can't be promoted at all (missing case_number, NOT NULL on `cr_cases`) — row goes to NEEDS_REVIEW, not a crash."""
 
 
 def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[int]:
     """
-    Promotes one OCR_DONE raw_ingestions row into a single `cases` row,
+    Promotes one OCR_DONE cr_raw_ingestions row into a single `cr_cases` row,
     using RawJudgmentRecord (table-cell fields, already scraped) and
     ocr_text (OCR-text fields, via pipeline/regex_extraction.py) — no LLM
     call in this pipeline iteration. Returns the new case_id, or None if
@@ -287,7 +297,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     """
     ingestion = scrape_jobs.get_ingestion(ingestion_id)
     if ingestion is None:
-        raise ValueError(f"No raw_ingestions row with ingestion_id={ingestion_id}")
+        raise ValueError(f"No cr_raw_ingestions row with ingestion_id={ingestion_id}")
 
     ocr_text = ingestion["ocr_text"] or ""
     court_id = ingestion["court_id"]
@@ -297,7 +307,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     try:
         case_number = (record.case_number_raw or "").strip()
         if not case_number:
-            raise PromotionSkipped("case_number_raw is missing/blank — required NOT NULL on cases")
+            raise PromotionSkipped("case_number_raw is missing/blank — required NOT NULL on cr_cases")
 
         judgment_date = _parse_date(record.decision_date_raw)
         needs_review = judgment_date is None
@@ -331,7 +341,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                 category_ids = [c for c in category_ids if c is not None]
 
                 cur.execute("""
-                    INSERT INTO cases (
+                    INSERT INTO cr_cases (
                         liznr_id, court_id, case_number, petitioner, respondent,
                         bench, judgment_by, judgment_date, language, neutral_citation,
                         sections, acts, rules, orders, subject,
@@ -365,18 +375,27 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                 row = cur.fetchone()
                 if row is None:
                     # Already promoted from a prior run of this exact (court_id, case_number) -- not an error.
+                    # Status update happens on this same cursor, before the single commit below, so the
+                    # (no-op) cases INSERT and the NEEDS_REVIEW status flip land in one transaction.
+                    scrape_jobs.update_status_in_tx(
+                        cur, ingestion_id, status="NEEDS_REVIEW",
+                        error_message="case_number already exists for this court — likely a re-run",
+                    )
                     conn.commit()
                     logger.info(
                         "[PROMOTE] ingestion_id=%s: case_number=%r already exists for court_id=%s — likely a re-run, routed to NEEDS_REVIEW",
                         ingestion_id, case_number, court_id,
                     )
-                    scrape_jobs.update_status(ingestion_id, status="NEEDS_REVIEW", error_message="case_number already exists for this court — likely a re-run")
                     return None
                 case_id = row[0]
 
+                # Same cursor/transaction as the cases INSERT above — a crash between
+                # committing the case and updating raw_ingestions can no longer leave a
+                # promoted case with no case_id back-reference on its ingestion row.
+                scrape_jobs.update_status_in_tx(cur, ingestion_id, status="PROMOTED", case_id=case_id)
+
             conn.commit()
 
-        scrape_jobs.update_status(ingestion_id, status="PROMOTED", case_id=case_id)
         logger.info(
             "[PROMOTE] ingestion_id=%s: done — case_id=%s liznr_id=%s disposition=%s needs_review=%s",
             ingestion_id, case_id, liznr_id, disposition, needs_review,

@@ -58,9 +58,9 @@ def get_connection_params() -> dict:
 
 def get_connection():
     """
-    Fresh, unpooled connection. Used for ingestion transactions that are
-    held for the duration of a scrape/promotion run rather than a single
-    short request.
+    Fresh, unpooled connection. Used by db/init_db.py's schema-management
+    commands (init/ensure-schema), which run standalone DDL outside the
+    request pool.
     """
     return psycopg2.connect(**get_connection_params())
 
@@ -71,12 +71,31 @@ def get_connection():
 
 _pool: "Optional[psycopg2.pool.ThreadedConnectionPool]" = None
 
+_DEFAULT_POOL_MIN_CONN = 2
+_DEFAULT_POOL_MAX_CONN = 10
 
-def init_connection_pool(minconn: int = 2, maxconn: int = 20) -> None:
-    """Creates the process-wide connection pool. Call once, at app startup."""
+
+def init_connection_pool(minconn: Optional[int] = None, maxconn: Optional[int] = None) -> None:
+    """
+    Creates the process-wide connection pool. Call once, at app startup.
+
+    minconn/maxconn default to DB_POOL_MIN_CONN/DB_POOL_MAX_CONN (2/10) so
+    pool size is a per-deployment env var, not a code change. Sizing math
+    when scaling horizontally: total connections this service can open
+    against Postgres is (replica count) x maxconn — add api-backend's own
+    (replica count x its maxconn) on top if sharing one Postgres instance,
+    and keep the sum comfortably under Postgres's max_connections (default
+    100, minus ~3 reserved for superuser/replication). Scaling out replica
+    count means *lowering* DB_POOL_MAX_CONN to compensate, not leaving it
+    at a per-process default and letting the product grow unchecked.
+    """
     global _pool
     if _pool is not None:
         return
+    if minconn is None:
+        minconn = int(os.environ.get("DB_POOL_MIN_CONN", _DEFAULT_POOL_MIN_CONN))
+    if maxconn is None:
+        maxconn = int(os.environ.get("DB_POOL_MAX_CONN", _DEFAULT_POOL_MAX_CONN))
     _pool = psycopg2.pool.ThreadedConnectionPool(minconn, maxconn, **get_connection_params())
 
 

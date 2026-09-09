@@ -1,6 +1,6 @@
 """
-CRUD for `courts` + `court_scrape_config` — the table that turns "25 Python
-files" into "25 rows" (docs/scraper-backend-revamp-spec.md §4.3).
+CRUD for `cr_courts` + `cr_court_scrape_config` — the table that turns "25
+Python files" into "25 rows" (docs/scraper-backend-revamp-spec.md §4.3).
 
 This module has no dependency on the adapters/orchestrator/pipeline
 packages — it's pure config data, usable (and seedable) before any scraper
@@ -21,8 +21,8 @@ def list_courts(active_only: bool = False) -> List[Dict[str, Any]]:
                 SELECT c.court_id, c.court_name, c.court_type, c.state, c.ecourts_code,
                        csc.adapter, csc.state_code, csc.bench_code, csc.is_active,
                        csc.last_scraped_to, csc.notes
-                FROM courts c
-                LEFT JOIN court_scrape_config csc ON csc.court_id = c.court_id
+                FROM cr_courts c
+                LEFT JOIN cr_court_scrape_config csc ON csc.court_id = c.court_id
                 {where}
                 ORDER BY c.court_name;
             """)
@@ -41,8 +41,8 @@ def get_court_scrape_config(court_id: int) -> Optional[Dict[str, Any]]:
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT c.court_id, c.court_name, csc.adapter, csc.state_code, csc.bench_code, csc.is_active
-                FROM courts c
-                JOIN court_scrape_config csc ON csc.court_id = c.court_id
+                FROM cr_courts c
+                JOIN cr_court_scrape_config csc ON csc.court_id = c.court_id
                 WHERE c.court_id = %s;
             """, (court_id,))
             row = cur.fetchone()
@@ -67,7 +67,7 @@ def upsert_court_scrape_config(
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO court_scrape_config (court_id, adapter, state_code, bench_code, is_active, notes)
+                INSERT INTO cr_court_scrape_config (court_id, adapter, state_code, bench_code, is_active, notes)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (court_id) DO UPDATE SET
                     adapter = EXCLUDED.adapter,
@@ -84,7 +84,7 @@ def update_watermark(court_id: int, last_scraped_to) -> None:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE court_scrape_config SET last_scraped_to = %s WHERE court_id = %s;",
+                "UPDATE cr_court_scrape_config SET last_scraped_to = %s WHERE court_id = %s;",
                 (last_scraped_to, court_id),
             )
         conn.commit()

@@ -15,11 +15,11 @@
 -- reads or writes this.
 -- =====================================================================
 
-CREATE TABLE IF NOT EXISTS case_research_search_history (
+CREATE TABLE IF NOT EXISTS cr_search_history (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id     TEXT NOT NULL,      -- opaque caller-supplied id (legal-ui's NextAuth session), no users table here
     query       TEXT NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS ix_case_research_search_history_user ON case_research_search_history(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS ix_cr_search_history_user ON cr_search_history(user_id, created_at DESC);

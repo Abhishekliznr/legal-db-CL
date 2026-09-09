@@ -10,13 +10,15 @@ service reads from.
 Phase 4 (spec §6): filter_router/search_router/stats_router rewritten
 against the new schema (documents/cases split, case_search_view,
 tsvector full-text search); history_router ported with its own
-api-backend-only table (case_research_search_history).
+api-backend-only table (cr_case_research_search_history).
 
-Startup does NOT auto-apply the schema — run `python -m db.init_db init`
-explicitly once. In a shared-DB deployment, only ONE of api-backend /
-scraper-backend should actually run that (see db/schema.sql's header);
-this service still verifies the schema is *present* at startup without
-trying to (re)create it.
+Startup auto-applies the schema via db/init_db.py's `ensure_schema()`.
+That only actually creates anything the first time it runs against a
+database missing the core `cases` table (standalone); once that table
+exists — including in a shared-DB deployment where scraper-backend
+already created it (see db/schema.sql's header) — it never re-runs
+schema.sql's non-idempotent CREATE TYPE/CREATE TABLE again, and instead
+just idempotently ensures api-backend's own supplement tables/view exist.
 """
 
 import sys
@@ -59,6 +61,18 @@ def on_startup():
         connection.init_connection_pool()
     except Exception as e:
         print(f"WARNING: could not initialize DB connection pool at startup: {e}")
+        return
+
+    # ensure_schema() only creates anything the first time it sees a
+    # database without the core `cases` table; every later startup (and
+    # a shared-DB deployment where scraper-backend already created it)
+    # is a cheap no-op / idempotent supplement check. Non-fatal for the
+    # same reason as the pool init above.
+    try:
+        from db.init_db import ensure_schema
+        ensure_schema()
+    except Exception as e:
+        print(f"WARNING: could not ensure DB schema at startup: {e}")
 
 
 @app.on_event("shutdown")

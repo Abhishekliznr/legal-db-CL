@@ -17,7 +17,7 @@
 -- config, not case data, seeded by db/seed_filters.py.
 -- =====================================================================
 
-CREATE TABLE IF NOT EXISTS filter_definitions (
+CREATE TABLE IF NOT EXISTS cr_filter_definitions (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key             TEXT UNIQUE NOT NULL,
     label           TEXT NOT NULL,
@@ -32,9 +32,9 @@ CREATE TABLE IF NOT EXISTS filter_definitions (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS filter_options (
+CREATE TABLE IF NOT EXISTS cr_filter_options (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    filter_id       UUID NOT NULL REFERENCES filter_definitions(id) ON DELETE CASCADE,
+    filter_id       UUID NOT NULL REFERENCES cr_filter_definitions(id) ON DELETE CASCADE,
     value           TEXT NOT NULL,
     label           TEXT NOT NULL,
     display_order   INT NOT NULL DEFAULT 0,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS filter_options (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS search_field_definitions (
+CREATE TABLE IF NOT EXISTS cr_search_field_definitions (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key             TEXT UNIQUE NOT NULL,
     label           TEXT NOT NULL,
@@ -55,19 +55,19 @@ CREATE TABLE IF NOT EXISTS search_field_definitions (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS ix_filter_options_filter_id ON filter_options(filter_id);
+CREATE INDEX IF NOT EXISTS ix_cr_filter_options_filter_id ON cr_filter_options(filter_id);
 
 -- touch_updated_at() already exists either way (api-backend's own
--- schema.sql defines it for cases/raw_ingestions, and so does scraper-
--- backend-v2's in the shared-DB shape) -- redefined here too via CREATE OR
--- REPLACE purely so this file has zero assumptions about which `init` ran
--- first, not because it's actually missing in the shared-DB case.
+-- schema.sql defines it for cr_cases/cr_raw_ingestions, and so does
+-- scraper-backend-v2's in the shared-DB shape) -- redefined here too via
+-- CREATE OR REPLACE purely so this file has zero assumptions about which
+-- `init` ran first, not because it's actually missing in the shared-DB case.
 CREATE OR REPLACE FUNCTION touch_updated_at() RETURNS trigger AS $$
 BEGIN NEW.updated_at := now(); RETURN NEW; END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER trg_filter_definitions_touch BEFORE UPDATE ON filter_definitions
+CREATE OR REPLACE TRIGGER trg_cr_filter_definitions_touch BEFORE UPDATE ON cr_filter_definitions
 FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 
-CREATE OR REPLACE TRIGGER trg_search_field_definitions_touch BEFORE UPDATE ON search_field_definitions
+CREATE OR REPLACE TRIGGER trg_cr_search_field_definitions_touch BEFORE UPDATE ON cr_search_field_definitions
 FOR EACH ROW EXECUTE FUNCTION touch_updated_at();

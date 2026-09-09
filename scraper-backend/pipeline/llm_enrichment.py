@@ -1,7 +1,7 @@
 """
 PROMOTED -> enriched: fills the fields regex genuinely cannot get
-(cases.case_note, cases.industries) plus two low-coverage regex fallbacks
-(cases.conclusion, cases.disposition) with one compact LLM call per case.
+(cr_cases.case_note, cr_cases.industries) plus two low-coverage regex fallbacks
+(cr_cases.conclusion, cr_cases.disposition) with one compact LLM call per case.
 
 Runs automatically right after promotion (orchestrator/batch_runner.py),
 not as a separate backfill pass — a deliberate choice: simpler pipeline,
@@ -174,9 +174,9 @@ def _fetch_case_row(cur, case_id: int) -> Optional[Dict[str, Any]]:
     cur.execute("""
         SELECT c.case_number, c.ocr_text, c.disposition, c.ministries,
                subj.subject_name,
-               (SELECT array_agg(DISTINCT a.act_name) FROM acts a WHERE a.act_id = ANY(c.acts)) AS act_names
-        FROM cases c
-        LEFT JOIN subjects subj ON subj.subject_id = c.subject
+               (SELECT array_agg(DISTINCT a.act_name) FROM cr_acts a WHERE a.act_id = ANY(c.acts)) AS act_names
+        FROM cr_cases c
+        LEFT JOIN cr_subjects subj ON subj.subject_id = c.subject
         WHERE c.case_id = %s;
     """, (case_id,))
     row = cur.fetchone()
@@ -240,7 +240,7 @@ def enrich_case(case_id: int) -> bool:
                     llm_disposition = None
 
                 cur.execute("""
-                    UPDATE cases SET
+                    UPDATE cr_cases SET
                         case_note = COALESCE(%s, case_note),
                         conclusion = COALESCE(conclusion, %s),
                         industries = %s,

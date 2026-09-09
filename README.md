@@ -8,5 +8,5 @@ This repository holds two **fully standalone** services. Each owns its own Docke
 Each service ships with its own bundled PostgreSQL container (`docker-compose.yml` inside each folder) so it can run entirely on its own. If you want `api-backend` to serve the cases `scraper-backend` ingests, point both services' `DB_CONNECTION` at the same external PostgreSQL database instead of running each one's bundled `db` container.
 
 ## 👥 Contributors & Maintainers
-* **Backend & Scraper Engineer**: Abdeali ([@Abdey21](https://github.com/Abdey21))
+* **Backend & Scraper Engineer**: Mohnish Vishwakarma ([@MohnishLiznr](https://github.com/MohnishLiznr))
 * **Organization**: [Liznr Labs Org](https://github.com/LiznrLabsOrg)
