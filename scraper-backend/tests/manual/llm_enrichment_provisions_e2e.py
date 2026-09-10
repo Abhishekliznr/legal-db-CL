@@ -19,13 +19,13 @@ already applied:
 
     export DATABASE_TYPE=postgres DB_HOST=localhost DB_PORT=5433 \\
            DB_NAME=<throwaway_db> DB_USER=postgres DB_PASSWORD=x
-    python3 tests/manual_llm_enrichment_provisions_e2e.py
+    python3 tests/manual/llm_enrichment_provisions_e2e.py
 """
 
 import sys
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
@@ -98,9 +98,11 @@ def main():
         conn.commit()
 
     # Monkeypatch call_llm_enrichment BEFORE enrich_case runs -- no Azure
-    # config is ever read, no real HTTP request is ever made.
+    # config is ever read, no real HTTP request is ever made. Matches the
+    # 2026-09-10 EnrichmentCallResult(data, status, error) contract and the
+    # optional user_content kwarg enrich_case now calls it with.
     original = llm_enrichment.call_llm_enrichment
-    llm_enrichment.call_llm_enrichment = lambda case_row: dict(_MOCK_LLM_RESULT)
+    llm_enrichment.call_llm_enrichment = lambda case_row, user_content=None: llm_enrichment.EnrichmentCallResult(dict(_MOCK_LLM_RESULT), "DONE", None)
     try:
         ok = llm_enrichment.enrich_case(case_id)
     finally:
@@ -167,7 +169,7 @@ def main():
     # Not-configured / call-fails path: confirm enrich_case() degrades
     # cleanly and does NOT touch the new columns when the LLM call itself
     # returns None (still mocked -- still zero real HTTP calls).
-    llm_enrichment.call_llm_enrichment = lambda case_row: None
+    llm_enrichment.call_llm_enrichment = lambda case_row, user_content=None: llm_enrichment.EnrichmentCallResult(None, "FAILED", "mocked failure")
     try:
         ok2 = llm_enrichment.enrich_case(case_id)
     finally:

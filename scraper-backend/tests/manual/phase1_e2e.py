@@ -12,7 +12,7 @@ one row in `courts`:
 
     export DATABASE_TYPE=postgres DB_HOST=localhost DB_PORT=5432 \\
            DB_NAME=liznrlegal DB_USER=postgres DB_PASSWORD=testpass
-    python3 tests/manual_phase1_e2e.py <court_id>
+    python3 tests/manual/phase1_e2e.py <court_id>
 """
 
 import sys

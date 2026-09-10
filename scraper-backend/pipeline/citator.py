@@ -37,9 +37,10 @@ _OVERRULED_KEYWORDS = re.compile(
 
 def find_citation_candidates(text: str, context_chars: int = 150) -> List[Dict[str, str]]:
     """
-    Returns raw citation-looking strings with surrounding context, for
-    pipeline/extraction.py to hand to the LLM as "here are citation-shaped
-    strings found in the text — classify any that are real case citations."
+    Returns raw citation-looking strings with surrounding context, meant to
+    feed a future LLM call as "here are citation-shaped strings found in
+    the text — classify any that are real case citations." Not currently
+    called by any pipeline stage — see this module's docstring.
     Not a source of truth on its own; a candidate list only.
     """
     if not text:

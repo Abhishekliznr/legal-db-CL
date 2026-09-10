@@ -1,9 +1,9 @@
 """
 Party name cleaning — strips procedural noise ("THROUGH ITS SECRETARY",
-trailing alias markers) and normalizes whitespace/casing. Post-LLM
-normalization, not extraction: pipeline/extraction.py identifies who the
-parties are; this only cleans the name string before it's written to the
-`parties` table.
+trailing alias markers) and normalizes whitespace/casing. No LLM involved:
+pipeline/regex_extraction.py's parse_party_names() splits the adapter's raw
+party_name_raw cell into petitioner/respondent; this only cleans each name
+string before pipeline/promotion.py writes it to the `parties` table.
 """
 
 import re

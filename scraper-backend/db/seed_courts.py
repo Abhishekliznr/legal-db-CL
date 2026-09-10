@@ -19,7 +19,7 @@ from db.connection import get_pooled_connection
 # court_code is our own short code for cr_cases.liznr_id
 # ('LIZNR/<court_code>/<seq>/<year>') -- same short-code convention already
 # used ad hoc as the scraper's court_code request param (e.g. "DHC" in
-# tests/manual_phase2_dispatch.py), now the persisted source of truth.
+# tests/manual/phase2_dispatch.py), now the persisted source of truth.
 _HIGH_COURTS = [
     ("Allahabad High Court", "Uttar Pradesh", "9~13", "ALHC"),
     ("Andhra Pradesh High Court", "Andhra Pradesh", "28~2", "APHC"),

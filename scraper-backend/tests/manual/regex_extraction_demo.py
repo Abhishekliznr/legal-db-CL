@@ -26,7 +26,7 @@ Two sections:
 
 Run from the scraper-backend directory:
 
-    python3 tests/manual_regex_extraction_demo.py [N]
+    python3 tests/manual/regex_extraction_demo.py [N]
 
 N (default 5) is how many PDFs to show OCR-text fields for.
 """
@@ -38,7 +38,7 @@ from pathlib import Path
 # Defensive: works whether invoked as `python3 tests/manual_...py` (cwd
 # somewhere else) or from the scraper-backend root as the existing
 # manual_phase*.py scripts assume.
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 

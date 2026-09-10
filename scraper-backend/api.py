@@ -6,22 +6,23 @@ scraper-backend (docs/scraper-backend-revamp-spec.md §3.2). See that spec
 for the full architecture; this file wires up what exists so far:
 
 - Phase 0 (done): schema (db/schema.sql) + connection layer (db/connection.py)
-- Phase 1 (done): Supreme Court adapter, orchestrator, OCR + stub extraction +
-  promotion pipeline, scraper_router. The stub extraction stage gets replaced
-  by a real structured-output LLM call in Phase 3 — see pipeline/extraction.py.
+- Phase 1 (done): Supreme Court adapter, orchestrator, OCR + promotion
+  pipeline, scraper_router.
 - Phase 2 (done): generic eCourts adapter for all 25 High Courts, driven by
   cr_court_scrape_config (auto-seeded at startup if empty — see
   db/seed_courts.py's ensure_seeded() below — or manually via
   `python -m db.seed_courts`). scraper_router now resolves the adapter +
   state/bench code from that config automatically.
 - Phase 3 (done): real OCR fallback (Tesseract, for scanned PDFs with no
-  text layer), real structured-output LLM extraction (pipeline/extraction.py,
-  replacing the Phase 1 stub — see pipeline/extraction_stub.py), the
-  normalization/ package (act/judge/party cleaning), and citation
-  finding + treatment reconciliation (pipeline/citator.py).
+  text layer), the normalization/ package (act/judge/party cleaning).
+  Rewritten 2026-09-08: LLM-based extraction (pipeline/extraction.py) was
+  replaced by regex-first extraction straight into promotion
+  (pipeline/regex_extraction.py) plus a separate post-promotion enrichment
+  pass (pipeline/llm_enrichment.py) for case_note/industries/provisions.
 - Phase 4 (done, separate service): api-backend/ reads what this service
   writes — see legal-db/api-backend/.
-- Phase 5 (not yet started): cutover.
+- Phase 5 (done): cutover — this is the only scraper-backend now, no
+  separate old service or -v2 directory.
 
 Startup auto-applies the schema via db/init_db.py's `ensure_schema()`: it
 checks for the core `cases` table and only runs schema.sql the first time

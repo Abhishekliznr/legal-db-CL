@@ -15,13 +15,13 @@ Run against a real Postgres with schema.sql already applied:
 
     export DATABASE_TYPE=postgres DB_HOST=localhost DB_PORT=5432 \\
            DB_NAME=<db> DB_USER=<user> DB_PASSWORD=<password>
-    python3 tests/manual_promotion_e2e.py
+    python3 tests/manual/promotion_e2e.py
 """
 
 import sys
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 

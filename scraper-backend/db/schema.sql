@@ -117,9 +117,14 @@ CREATE TABLE cr_industries (
 CREATE TABLE cr_acts (
     act_id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_name        TEXT NOT NULL,               -- 'Indian Penal Code, 1860'
-    act_year        INT,
+    act_year        INT,                         -- NULL for undated acts, e.g. 'Constitution of India'
     short_code      TEXT,                        -- 'IPC', 'CrPC'
-    CONSTRAINT uq_cr_acts_name_year UNIQUE (act_name, act_year)
+    -- NULLS NOT DISTINCT (Postgres 15+, this schema's target -- see file
+    -- header) so two act_year-less rows for the same act_name (e.g. the
+    -- Constitution) actually conflict on insert instead of silently
+    -- duplicating -- see db/migrations/0002_dedupe_acts_nulls_not_distinct.sql
+    -- for the fix against an already-populated database.
+    CONSTRAINT uq_cr_acts_name_year UNIQUE NULLS NOT DISTINCT (act_name, act_year)
 );
 
 -- Sections/Rules/Orders are kept as three separate lookup tables (matching
@@ -273,6 +278,17 @@ CREATE TABLE cr_cases (
 
     needs_review       BOOLEAN NOT NULL DEFAULT FALSE,  -- set when judgment_date couldn't be parsed or another required signal was missing
 
+    -- Enrichment status tracking (pipeline/llm_enrichment.py, 2026-09-10
+    -- rewrite; see db/migrations/0001_add_case_enrichment_status.sql for
+    -- the ALTER-based version of this against an already-populated DB) --
+    -- makes an LLM enrichment failure queryable/retryable instead of
+    -- indistinguishable from "case genuinely has no provisions".
+    enrichment_status    TEXT NOT NULL DEFAULT 'PENDING'
+                         CHECK (enrichment_status IN ('PENDING', 'DONE', 'FAILED', 'TRUNCATED', 'SKIPPED')),
+    enrichment_error     TEXT,
+    enriched_at          TIMESTAMPTZ,
+    enrichment_attempts  INTEGER NOT NULL DEFAULT 0,
+
     search_vector      tsvector,                  -- maintained by trg_cr_cases_search_vector below -- api-backend's
                                                     -- free-text search has nothing to query without this; the flattened
                                                     -- schema's first draft (2026-09-08) omitted it entirely, a real gap
@@ -295,6 +311,7 @@ CREATE INDEX ix_cr_cases_number_trgm ON cr_cases USING GIN (case_number gin_trgm
 CREATE INDEX ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
 CREATE INDEX ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
 CREATE UNIQUE INDEX ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
+CREATE INDEX ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
 
 -- Atomic per-(court, year) counter backing cr_cases.liznr_id
 -- ('LIZNR/<court_code>/<seq>/<year>'). Resets every year, same convention

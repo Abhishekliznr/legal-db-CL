@@ -12,7 +12,7 @@ db.seed_courts` already run:
 
     export DATABASE_TYPE=postgres DB_HOST=localhost DB_PORT=5432 \\
            DB_NAME=liznrlegal DB_USER=postgres DB_PASSWORD=testpass
-    python3 -m tests.manual_phase2_dispatch
+    python3 -m tests.manual.phase2_dispatch
 """
 
 from unittest.mock import patch

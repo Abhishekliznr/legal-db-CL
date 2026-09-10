@@ -276,6 +276,57 @@ def _build_liznr_id(cur, court_id: int, year: int) -> Optional[str]:
     return f"{LIZNR_ID_PREFIX}/{court_code}/{seq:04d}/{year}"
 
 
+def _assign_liznr_id(cur, case_id: int, court_id: int, year: int) -> Optional[str]:
+    """
+    Claims the next per-(court, year) citation sequence number and writes it
+    onto an ALREADY-INSERTED cr_cases row, in the caller's own transaction.
+
+    Must only be called once `case_id` is known to refer to a real, newly
+    inserted row (never on promote_ingestion's ON CONFLICT DO NOTHING branch,
+    and never while judgment_date is NULL) -- claiming a sequence number and
+    then not committing it against a real row permanently burns that number
+    (2026-09-10 fix: the previous code claimed the sequence via
+    _build_liznr_id BEFORE the cr_cases INSERT, so a re-run that hit the
+    ON CONFLICT branch still committed the incremented cr_citation_sequences
+    row, leaving a permanent gap in LIZNR/<court>/<seq>/<year>).
+    """
+    liznr_id = _build_liznr_id(cur, court_id, year)
+    if liznr_id is not None:
+        cur.execute("UPDATE cr_cases SET liznr_id = %s WHERE case_id = %s;", (liznr_id, case_id))
+    return liznr_id
+
+
+def assign_liznr_id_for_reviewed_case(case_id: int) -> Optional[str]:
+    """
+    For a case promoted with judgment_date NULL (promote_ingestion leaves
+    liznr_id NULL and needs_review=TRUE in that case, deliberately never
+    guessing a year from date.today() -- see promote_ingestion's docstring)
+    whose judgment_date has since been corrected by review: claims a
+    citation sequence number and writes the resulting liznr_id, in one
+    transaction. No-op (returns None) if the case doesn't exist or still
+    has no judgment_date; returns the existing id without reclaiming a new
+    one if the case somehow already has a liznr_id.
+    """
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT court_id, judgment_date, liznr_id FROM cr_cases WHERE case_id = %s;", (case_id,))
+            row = cur.fetchone()
+            if row is None:
+                logger.warning("[PROMOTE] case_id=%s: assign_liznr_id_for_reviewed_case — no such case", case_id)
+                return None
+            court_id, judgment_date, existing_liznr_id = row
+            if existing_liznr_id is not None:
+                logger.info("[PROMOTE] case_id=%s: already has liznr_id=%s, not reassigning", case_id, existing_liznr_id)
+                return existing_liznr_id
+            if judgment_date is None:
+                logger.info("[PROMOTE] case_id=%s: judgment_date still NULL, cannot assign a liznr_id yet", case_id)
+                return None
+
+            liznr_id = _assign_liznr_id(cur, case_id, court_id, judgment_date.year)
+        conn.commit()
+    return liznr_id
+
+
 class PromotionSkipped(Exception):
     """Raised when an ingestion can't be promoted at all (missing case_number, NOT NULL on `cr_cases`) — row goes to NEEDS_REVIEW, not a crash."""
 
@@ -301,6 +352,16 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     inserted (case_number, ocr_text, etc. are all still useful), just with
     judgment_date NULL and needs_review=TRUE so it's easy to find and fix
     later instead of being silently dropped from the batch.
+
+    liznr_id (2026-09-10 fix) is left NULL in that same case rather than
+    built off date.today().year -- a fabricated year would stay permanently
+    wrong even after the real judgment_date is fixed in review, since a
+    citation number, once issued, is never reassigned. Once the date is
+    corrected, call assign_liznr_id_for_reviewed_case(case_id) to assign one
+    for real. When judgment_date IS known, the citation sequence number is
+    only claimed AFTER this INSERT is confirmed to have landed a new row
+    (never on the ON CONFLICT/re-run branch below) -- claiming one earlier
+    and then discarding it on a re-run permanently burns that number.
     """
     ingestion = scrape_jobs.get_ingestion(ingestion_id)
     if ingestion is None:
@@ -336,8 +397,6 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                liznr_id = _build_liznr_id(cur, court_id, (judgment_date or date.today()).year)
-
                 judge_ids = _resolve_bench(cur, bench_names)
                 judgment_by_id = _get_or_create_judge(cur, judgment_by_name) if judgment_by_name else None
                 subject_id = _get_or_create_subject(cur, subject_word) if subject_word else None
@@ -368,7 +427,12 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                     ON CONFLICT (court_id, case_number) DO NOTHING
                     RETURNING case_id;
                 """, (
-                    liznr_id, court_id, case_number, petitioner, respondent,
+                    # liznr_id starts NULL -- assigned below, AFTER we know this INSERT
+                    # actually landed a new row, not on the ON CONFLICT (re-run) branch.
+                    # See _assign_liznr_id's docstring for why: claiming a citation
+                    # sequence number before knowing the INSERT will land burns that
+                    # number forever on every re-run.
+                    None, court_id, case_number, petitioner, respondent,
                     judge_ids, judgment_by_id, judgment_date, record.extra.get("language"), record.neutral_citation_raw,
                     subject_id,
                     conclusion, judgement_body, ocr_text,
@@ -393,6 +457,14 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                     )
                     return None
                 case_id = row[0]
+
+                # Only claim a citation sequence number now that we know the INSERT
+                # actually landed a new row -- and only when judgment_date is real:
+                # assigning one against date.today().year for a NULL-date row would
+                # stay wrong forever after the date is later fixed in review (the row
+                # is already flagged via needs_review=TRUE above; a later corrected
+                # promotion can call assign_liznr_id_for_reviewed_case(case_id)).
+                liznr_id = _assign_liznr_id(cur, case_id, court_id, judgment_date.year) if judgment_date is not None else None
 
                 # Same cursor/transaction as the cases INSERT above — a crash between
                 # committing the case and updating raw_ingestions can no longer leave a

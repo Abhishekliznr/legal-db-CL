@@ -150,7 +150,7 @@ def parse_judgment_cell(raw: Optional[str]) -> Dict[str, Optional[str]]:
 # nothing to split at all), e.g. "HON'BLE MRS. JUSTICE B.V. NAGARATHNA
 # HON'BLE MR. JUSTICE SATISH CHANDRA SHARMA" -- confirmed against real
 # sci.gov.in rows (see the table-cell fields demoed in
-# tests/manual_regex_extraction_demo.py). Splitting on a lookahead for
+# tests/manual/regex_extraction_demo.py). Splitting on a lookahead for
 # "HON'BLE" keeps the delimiter word attached to the segment that follows
 # it, which normalization.judges.clean_judge_name already strips along with
 # every other honorific.
@@ -239,7 +239,7 @@ def extract_judgment_body(ocr_text: str) -> Optional[str]:
 # resolve which act a bare "Section 302" belongs to when no act name is
 # nearby -- that ambiguity is exactly why the old scraper-backend's
 # equivalent function returned untyped text snippets instead of committing
-# to a specific statute, and why pipeline/extraction.py's LLM prompt asks
+# to a specific statute, and why pipeline/llm_enrichment.py's LLM prompt asks
 # for provisions as {statute_name, section_number} pairs rather than trying
 # to regex it. This is a genuine regex-vs-LLM tradeoff, not a bug: keep
 # provisions with a resolved act name, drop bare section numbers with no

@@ -7,9 +7,9 @@ type in a fixed, mechanical format Indian courts have used for decades --
 this is a regex/lookup job, not something worth asking an LLM to re-derive
 from the full judgment text it already read the case number out of.
 
-Downstream of pipeline/extraction.py, same as normalization/acts.py and
-normalization/judges.py -- the LLM identifies the case number; this module
-only classifies the string it already extracted.
+Downstream of the adapter's raw case_number_raw field (no LLM involved --
+the results table already gives the case number as plain text); this
+module only classifies the string, called from pipeline/promotion.py.
 """
 
 import re

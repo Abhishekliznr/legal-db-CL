@@ -17,13 +17,13 @@ Confirms:
    paragraph shape still are.
 
 Run:
-    python3 tests/manual_provision_paragraphs_demo.py
+    python3 tests/manual/provision_paragraphs_demo.py
 """
 
 import sys
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
