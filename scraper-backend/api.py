@@ -68,6 +68,7 @@ for _noisy_logger_name in (
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from db import connection
@@ -136,13 +137,20 @@ app.include_router(scraper_router.router)
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 
 @app.get("/", response_class=HTMLResponse)
 def serve_landing_page():
     index_file = STATIC_DIR / "index.html"
+
     if index_file.exists():
         return FileResponse(index_file)
-    return HTMLResponse("<h1>Legal Court Scraper & Ingestion Engine (v2)</h1><p>Visit <a href='/docs'>/docs</a>.</p>")
+
+    return HTMLResponse(
+        "<h1>Legal Court Scraper & Ingestion Engine (v2)</h1>"
+        "<p>Visit <a href='/docs'>/docs</a>.</p>"
+    )
 
 
 @app.get("/health")
