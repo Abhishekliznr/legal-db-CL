@@ -19,6 +19,11 @@ exists — including in a shared-DB deployment where scraper-backend
 already created it (see db/schema.sql's header) — it never re-runs
 schema.sql's non-idempotent CREATE TYPE/CREATE TABLE again, and instead
 just idempotently ensures api-backend's own supplement tables/view exist.
+
+Startup also runs db/seed_filters.py's `seed()` right after — populates
+cr_filter_definitions/cr_search_field_definitions (what /api/cases/filters
+and /api/cases/searches serve) via ON CONFLICT (key) DO NOTHING, so it's a
+no-op on an already-seeded DB and never clobbers an admin's edits.
 """
 
 import sys
@@ -30,6 +35,7 @@ if str(_script_dir) not in sys.path:
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from db import connection
@@ -74,6 +80,16 @@ def on_startup():
     except Exception as e:
         print(f"WARNING: could not ensure DB schema at startup: {e}")
 
+    # seed() is ON CONFLICT DO NOTHING against cr_filter_definitions/
+    # cr_search_field_definitions, so this is a no-op once seeded and safe
+    # to run on every startup — same non-fatal pattern as ensure_schema()
+    # above, since a fresh/unseeded DB shouldn't crash-loop the container.
+    try:
+        from db.seed_filters import seed as seed_filters
+        seed_filters()
+    except Exception as e:
+        print(f"WARNING: could not seed filter/search-field definitions at startup: {e}")
+
 
 @app.on_event("shutdown")
 def on_shutdown():
@@ -90,6 +106,9 @@ app.include_router(search_router.router)
 
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)

@@ -43,6 +43,7 @@ SELECT
     c.blob_pdf_id,
     c.source_pdf_url,
     c.needs_review,
+    c.favouring_party,
     c.search_vector,
     jb.full_name AS judgment_by_name,
     subj.subject_name,
@@ -53,7 +54,11 @@ SELECT
     (SELECT array_agg(DISTINCT cc.category_name)
        FROM cr_case_categories cc WHERE cc.category_id = ANY(c.case_category)) AS category_names,
     (SELECT array_agg(DISTINCT m.ministry_name)
-       FROM cr_ministries m WHERE m.ministry_id = ANY(c.ministries)) AS ministry_names
+       FROM cr_ministries m WHERE m.ministry_id = ANY(c.ministries)) AS ministry_names,
+    -- LLM-classified (llm_enrichment.py); no reliable regex signal exists
+    -- for this field -- see db/schema.sql's cr_cases.industries comment.
+    (SELECT array_agg(DISTINCT i.industry_name)
+       FROM cr_industries i WHERE i.industry_id = ANY(c.industries)) AS industry_names
 FROM cr_cases c
 JOIN cr_courts crt ON crt.court_id = c.court_id
 LEFT JOIN cr_judges jb ON jb.judge_id = c.judgment_by

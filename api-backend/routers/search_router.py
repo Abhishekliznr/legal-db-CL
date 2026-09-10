@@ -8,8 +8,8 @@ Handles:
                                       doesn't render the QUERY method. See /openapi.json
                                       under paths./api/cases.query, or curl -X QUERY.
 - GET  /api/cases/{case_id}        : Full case metadata + provisions.
-- GET/POST/PATCH/DELETE /api/cases/searches[/{field_id}] : CRUD for the advanced
-                                      boolean search-builder field definitions.
+- GET  /api/cases/searches          : Advanced boolean search-builder field
+                                      definitions (read-only).
 
 Rewritten again 2026-09-08 for the flattened `cr_cases` schema (db/schema.sql's
 rewrite note) — both endpoints now read `cr_case_search_view` (this service's
@@ -27,11 +27,20 @@ history, and procedural timeline. A case number can also no longer own
 several distinct case numbers under one document (the old documents/cases
 split) — one row IS one case now, so `document_id` as a separate concept is
 gone too; `case_id` is the only identifier.
+
+Updated 2026-09-10 for scraper-backend's llm_enrichment.py rewrite, which
+now actually populates fields this router previously had no data for:
+`favouring_party` (list + detail), `industries` (detail), and a
+relevant/other split of the provisions the case cites — CaseDetail's
+`relevant_provisions`/`other_provisions`, resolved the same way as the
+existing `provisions` field but from `cr_cases.sections_relevant/_other`
+(and the matching rules_/orders_ columns) instead of the unified
+sections/rules/orders arrays. See db/schema.sql's cr_cases comment for why
+these aren't guaranteed a strict partition of `provisions`.
 """
 
 import logging
 from typing import Optional, List, Dict, Any, Union
-from uuid import UUID
 
 import psycopg2
 from fastapi import APIRouter, HTTPException, Query
@@ -105,6 +114,7 @@ class CaseListItem(BaseModel):
     subject: Optional[str] = None
     case_category: List[str] = []
     case_note: Optional[str] = None
+    favouring_party: Optional[str] = None
     # Two separate fields, not one merged "pdf_url" -- blob_pdf_id is a bare
     # path within the blob container (e.g. "SCIN/<checksum>.pdf"), not a
     # usable URL on its own; the frontend prepends the account+container
@@ -149,6 +159,16 @@ class CaseDetail(BaseModel):
     subject: Optional[str] = None
     case_category: List[str] = []
     ministries: List[str] = []
+    industries: List[str] = []
+    favouring_party: Optional[str] = None
+    # Same shape as `provisions` (the unified sections/rules/orders union),
+    # but the LLM-classified subset (llm_enrichment.py's sections_relevant/
+    # _other etc.) -- "relevant" = the operative provision(s) the case is
+    # actually charged/founded/appealed under, "other" = everything else
+    # discussed. Not guaranteed a strict partition of `provisions` above --
+    # see db/schema.sql's cr_cases.sections_relevant comment.
+    relevant_provisions: List[ProvisionSummary] = []
+    other_provisions: List[ProvisionSummary] = []
     needs_review: bool = False
 
 
@@ -250,6 +270,23 @@ def execute_case_search(
                         where_clauses.append("v.disposition::text = ANY(%s)")
                         params.append(val_list)
 
+                    elif f_key == "favouring_party":
+                        # Same enum-cast reasoning as disposition above.
+                        where_clauses.append("v.favouring_party::text = ANY(%s)")
+                        params.append(val_list)
+
+                    elif f_key in ("industry", "industries"):
+                        industry_likes = [f"%{str(i).strip()}%" for i in val_list if str(i).strip()]
+                        if industry_likes:
+                            where_clauses.append("EXISTS (SELECT 1 FROM unnest(COALESCE(v.industry_names, ARRAY[]::text[])) ind WHERE ind ILIKE ANY(%s))")
+                            params.append(industry_likes)
+
+                    elif f_key in ("ministry", "ministries"):
+                        ministry_likes = [f"%{str(m).strip()}%" for m in val_list if str(m).strip()]
+                        if ministry_likes:
+                            where_clauses.append("EXISTS (SELECT 1 FROM unnest(COALESCE(v.ministry_names, ARRAY[]::text[])) mn WHERE mn ILIKE ANY(%s))")
+                            params.append(ministry_likes)
+
             # 3. Date range
             if from_date:
                 where_clauses.append("v.judgment_date >= %s")
@@ -272,7 +309,7 @@ def execute_case_search(
                 SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
                        v.language, v.disposition, v.subject_name, v.category_names,
                        v.case_note, v.blob_pdf_id, v.source_pdf_url, v.court_name,
-                       v.petitioner, v.respondent, v.bench_names, v.act_names
+                       v.petitioner, v.respondent, v.bench_names, v.act_names, v.favouring_party
                 FROM cr_case_search_view v
                 {where_sql}
                 {order_sql}
@@ -285,7 +322,7 @@ def execute_case_search(
                 (case_id, case_number, liznr_id, neutral_citation, judgment_date,
                  language, disposition, subject_name, category_names,
                  case_note, blob_pdf_id, source_pdf_url, court_name,
-                 petitioner, respondent, bench_names, act_names) = r
+                 petitioner, respondent, bench_names, act_names, favouring_party) = r
 
                 parties = ([{"name": petitioner, "role": "PETITIONER"}] if petitioner else []) + \
                           ([{"name": respondent, "role": "RESPONDENT"}] if respondent else [])
@@ -302,6 +339,7 @@ def execute_case_search(
                     "subject": subject_name,
                     "case_category": category_names or [],
                     "case_note": case_note,
+                    "favouring_party": favouring_party,
                     "blob_pdf_id": blob_pdf_id,
                     "source_pdf_url": source_pdf_url,
                     "court_name": court_name,
@@ -362,24 +400,6 @@ class SearchFieldsResponse(BaseModel):
     fields: List[SearchFieldDefinition]
 
 
-class SearchFieldCreate(BaseModel):
-    key: str
-    label: str
-    placeholder: str = "Search items..."
-    combinator: str
-    isActive: bool = True
-    displayOrder: int = 0
-
-
-class SearchFieldUpdate(BaseModel):
-    key: Optional[str] = None
-    label: Optional[str] = None
-    placeholder: Optional[str] = None
-    combinator: Optional[str] = None
-    isActive: Optional[bool] = None
-    displayOrder: Optional[int] = None
-
-
 def _row_to_search_field(row) -> SearchFieldDefinition:
     f_id, key, label, placeholder, combinator, is_active, display_order = row
     return SearchFieldDefinition(id=str(f_id), key=key, label=label, placeholder=placeholder, combinator=combinator, isActive=is_active, displayOrder=display_order)
@@ -402,105 +422,6 @@ def get_configuration_driven_search_fields(include_inactive: bool = Query(False)
     except Exception:
         logger.exception("Unexpected error while loading search fields")
         raise HTTPException(status_code=500, detail="Failed to load search field metadata.")
-
-
-@router.post("/api/cases/searches", response_model=SearchFieldDefinition, status_code=201)
-def create_search_field(payload: SearchFieldCreate):
-    try:
-        with get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO cr_search_field_definitions (key, label, placeholder, combinator, is_active, display_order)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    RETURNING id, key, label, placeholder, combinator, is_active, display_order;
-                """, (payload.key, payload.label, payload.placeholder, payload.combinator, payload.isActive, payload.displayOrder))
-                row = cur.fetchone()
-                conn.commit()
-                return _row_to_search_field(row)
-    except psycopg2.errors.UniqueViolation:
-        raise HTTPException(status_code=409, detail=f"A search field with key '{payload.key}' already exists.")
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while creating search field")
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while creating search field")
-        raise HTTPException(status_code=500, detail="Failed to create search field.")
-
-
-@router.get("/api/cases/searches/{field_id}", response_model=SearchFieldDefinition)
-def get_search_field(field_id: UUID):
-    try:
-        with get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT id, key, label, placeholder, combinator, is_active, display_order FROM cr_search_field_definitions WHERE id = %s;", (str(field_id),))
-                row = cur.fetchone()
-                if not row:
-                    raise HTTPException(status_code=404, detail="Search field not found.")
-                return _row_to_search_field(row)
-    except HTTPException:
-        raise
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while loading search field %s", field_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while loading search field %s", field_id)
-        raise HTTPException(status_code=500, detail="Failed to load search field.")
-
-
-@router.patch("/api/cases/searches/{field_id}", response_model=SearchFieldDefinition)
-def update_search_field(field_id: UUID, payload: SearchFieldUpdate):
-    updates = payload.model_dump(exclude_unset=True)
-    column_map = {"key": "key", "label": "label", "placeholder": "placeholder", "combinator": "combinator", "isActive": "is_active", "displayOrder": "display_order"}
-    set_clauses, params = [], []
-    for field_name, column in column_map.items():
-        if field_name in updates:
-            set_clauses.append(f"{column} = %s")
-            params.append(updates[field_name])
-
-    try:
-        with get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT id FROM cr_search_field_definitions WHERE id = %s;", (str(field_id),))
-                if not cur.fetchone():
-                    raise HTTPException(status_code=404, detail="Search field not found.")
-                if set_clauses:
-                    set_clauses.append("updated_at = CURRENT_TIMESTAMP")
-                    params.append(str(field_id))
-                    cur.execute(f"UPDATE cr_search_field_definitions SET {', '.join(set_clauses)} WHERE id = %s;", params)
-                conn.commit()
-                cur.execute("SELECT id, key, label, placeholder, combinator, is_active, display_order FROM cr_search_field_definitions WHERE id = %s;", (str(field_id),))
-                return _row_to_search_field(cur.fetchone())
-    except HTTPException:
-        raise
-    except psycopg2.errors.UniqueViolation:
-        raise HTTPException(status_code=409, detail="A search field with that key already exists.")
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while updating search field %s", field_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while updating search field %s", field_id)
-        raise HTTPException(status_code=500, detail="Failed to update search field.")
-
-
-@router.delete("/api/cases/searches/{field_id}", status_code=204)
-def delete_search_field(field_id: UUID):
-    try:
-        with get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("DELETE FROM cr_search_field_definitions WHERE id = %s RETURNING id;", (str(field_id),))
-                deleted = cur.fetchone()
-                conn.commit()
-                if not deleted:
-                    raise HTTPException(status_code=404, detail="Search field not found.")
-                return None
-    except HTTPException:
-        raise
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while deleting search field %s", field_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while deleting search field %s", field_id)
-        raise HTTPException(status_code=500, detail="Failed to delete search field.")
 
 
 # ============================================================
@@ -527,7 +448,7 @@ def get_case_detail(case_id: str):
                            v.language, v.disposition, v.document_type, v.case_note, v.conclusion, v.judgement,
                            v.ocr_text, v.blob_pdf_id, v.source_pdf_url, v.court_name, v.court_id,
                            v.petitioner, v.respondent, v.bench_names, v.subject_name, v.category_names,
-                           v.ministry_names, v.needs_review
+                           v.ministry_names, v.industry_names, v.favouring_party, v.needs_review
                     FROM cr_case_search_view v
                     WHERE {id_clause}v.case_number = %s OR v.liznr_id = %s;
                 """, (*id_params, case_id, case_id))
@@ -539,7 +460,7 @@ def get_case_detail(case_id: str):
                  language, disposition, document_type, case_note, conclusion, judgement,
                  ocr_text, blob_pdf_id, source_pdf_url, court_name, court_id,
                  petitioner, respondent, bench_names, subject_name, category_names,
-                 ministry_names, needs_review) = row
+                 ministry_names, industry_names, favouring_party, needs_review) = row
 
                 parties = ([{"name": petitioner, "role": "PETITIONER"}] if petitioner else []) + \
                           ([{"name": respondent, "role": "RESPONDENT"}] if respondent else [])
@@ -569,6 +490,52 @@ def get_case_detail(case_id: str):
                 """, (db_case_id, db_case_id, db_case_id))
                 provisions = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
 
+                # LLM-classified relevant/other subsets (sections_relevant/
+                # _other etc. -- see db/schema.sql's cr_cases comment) --
+                # same act-name/number resolution as `provisions` above, run
+                # against the separate id arrays.
+                cur.execute("""
+                    SELECT a.act_name, s.section_number
+                    FROM cr_cases c
+                    JOIN cr_sections s ON s.section_id = ANY(c.sections_relevant)
+                    JOIN cr_acts a ON a.act_id = s.act_id
+                    WHERE c.case_id = %s
+                    UNION ALL
+                    SELECT a.act_name, r.rule_number
+                    FROM cr_cases c
+                    JOIN cr_rules r ON r.rule_id = ANY(c.rules_relevant)
+                    JOIN cr_acts a ON a.act_id = r.act_id
+                    WHERE c.case_id = %s
+                    UNION ALL
+                    SELECT a.act_name, o.order_number
+                    FROM cr_cases c
+                    JOIN cr_orders o ON o.order_id = ANY(c.orders_relevant)
+                    JOIN cr_acts a ON a.act_id = o.act_id
+                    WHERE c.case_id = %s;
+                """, (db_case_id, db_case_id, db_case_id))
+                relevant_provisions = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
+
+                cur.execute("""
+                    SELECT a.act_name, s.section_number
+                    FROM cr_cases c
+                    JOIN cr_sections s ON s.section_id = ANY(c.sections_other)
+                    JOIN cr_acts a ON a.act_id = s.act_id
+                    WHERE c.case_id = %s
+                    UNION ALL
+                    SELECT a.act_name, r.rule_number
+                    FROM cr_cases c
+                    JOIN cr_rules r ON r.rule_id = ANY(c.rules_other)
+                    JOIN cr_acts a ON a.act_id = r.act_id
+                    WHERE c.case_id = %s
+                    UNION ALL
+                    SELECT a.act_name, o.order_number
+                    FROM cr_cases c
+                    JOIN cr_orders o ON o.order_id = ANY(c.orders_other)
+                    JOIN cr_acts a ON a.act_id = o.act_id
+                    WHERE c.case_id = %s;
+                """, (db_case_id, db_case_id, db_case_id))
+                other_provisions = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
+
                 return {
                     "id": str(db_case_id), "case_number": case_number, "liznr_id": liznr_id,
                     "neutral_citation": neutral_citation,
@@ -579,8 +546,10 @@ def get_case_detail(case_id: str):
                     "blob_pdf_id": blob_pdf_id, "source_pdf_url": source_pdf_url,
                     "court_name": court_name, "court_id": str(court_id) if court_id else None,
                     "parties": parties, "judges": judges, "provisions": provisions,
+                    "relevant_provisions": relevant_provisions, "other_provisions": other_provisions,
                     "subject": subject_name, "case_category": category_names or [],
-                    "ministries": ministry_names or [], "needs_review": needs_review,
+                    "ministries": ministry_names or [], "industries": industry_names or [],
+                    "favouring_party": favouring_party, "needs_review": needs_review,
                 }
     except HTTPException:
         raise

@@ -4,10 +4,17 @@ metadata GET /api/cases/filters and GET /api/cases/searches serve.
 (ON CONFLICT (key) DO NOTHING, so this is a no-op against an already-seeded
 DB and never clobbers an admin's edits).
 
-4 filter rows now, not 5 — `treatment_status` dropped in the 2026-09-08
-schema rewrite: it read a computed column off `citations`, which no longer
-exists (citation/treatment tracking isn't modeled by this pipeline
-iteration at all). See routers/filter_router.py's module docstring.
+`treatment_status` dropped in the 2026-09-08 schema rewrite: it read a
+computed column off `citations`, which no longer exists (citation/treatment
+tracking isn't modeled by this pipeline iteration at all). See
+routers/filter_router.py's module docstring.
+
+2026-09-10: added disposition/favouring_party/industry/ministry — scraper-
+backend's llm_enrichment.py rewrite now actually populates these fields at
+meaningful volume (previously industries/favouring_party had no extraction
+path at all, and disposition had no filter facet even though the regex
+classifier populated it). See routers/filter_router.py's
+`_compute_database_options()` for the dispatch SQL each key runs.
 
 Usage:
     python -m db.seed_filters
@@ -21,6 +28,10 @@ _FILTER_DEFINITIONS = [
     ("judge", "Judge / Bench", "select", "multi", None, "database", True, 1),
     ("act", "Act / Law", "select", "multi", None, "database", True, 2),
     ("judgment_year", "Judgment Year", "select", "multi", None, "database", False, 3),
+    ("disposition", "Disposition", "select", "multi", None, "database", False, 4),
+    ("favouring_party", "Favouring Party", "select", "multi", None, "database", False, 5),
+    ("industry", "Industry", "select", "multi", None, "database", True, 6),
+    ("ministry", "Ministry / Department", "select", "multi", None, "database", True, 7),
 ]
 
 # (key, label, placeholder, combinator, display_order)

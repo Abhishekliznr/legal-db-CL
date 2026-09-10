@@ -78,6 +78,7 @@ CREATE TYPE disposition_category_enum AS ENUM (
     'Remanded', 'Withdrawn', 'Quashed', 'Set Aside', 'Other'
 );
 CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
+CREATE TYPE favouring_party_enum AS ENUM ('Petitioner', 'Respondent', 'Partly', 'Neither');
 
 -- ---------------------------------------------------------------------
 -- 2. MASTER / LOOKUP TABLES
@@ -134,7 +135,12 @@ CREATE TABLE cr_acts (
     act_name        TEXT NOT NULL,               -- 'Indian Penal Code, 1860'
     act_year        INT,
     short_code      TEXT,                        -- 'IPC', 'CrPC'
-    CONSTRAINT uq_cr_acts_name_year UNIQUE (act_name, act_year)
+    -- NULLS NOT DISTINCT (Postgres 15+, this schema's target) so two
+    -- act_year-less rows for the same act_name (e.g. the Constitution)
+    -- actually conflict on insert instead of silently duplicating -- see
+    -- scraper-backend/db/migrations/0002_dedupe_acts_nulls_not_distinct.sql
+    -- for the fix against an already-populated database.
+    CONSTRAINT uq_cr_acts_name_year UNIQUE NULLS NOT DISTINCT (act_name, act_year)
 );
 
 -- Sections/Rules/Orders are kept as three separate lookup tables (matching
@@ -245,22 +251,49 @@ CREATE TABLE cr_cases (
     orders             BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_orders.order_id
     subject            BIGINT REFERENCES cr_subjects(subject_id),
 
-    case_note          TEXT,                     -- LLM-generated headnote -- NULL until the LLM pass is wired back in
-    conclusion         TEXT,                     -- regex, low coverage
+    -- LLM-classified subsets of sections/rules/orders above
+    -- (scraper-backend/pipeline/llm_enrichment.py), populated from
+    -- paragraphs regex flagged as provision-bearing. "relevant" = the
+    -- operative provision(s) the case is actually charged/founded/appealed
+    -- under; "other" = everything else discussed (precedent, background,
+    -- comparative statutes). NOT guaranteed a strict partition of
+    -- sections/rules/orders above -- the LLM resolves acts from wider
+    -- context the regex-only extractor drops, so these can contain
+    -- provisions the unified columns above miss, and vice versa.
+    sections_relevant  BIGINT[] NOT NULL DEFAULT '{}',
+    sections_other     BIGINT[] NOT NULL DEFAULT '{}',
+    rules_relevant     BIGINT[] NOT NULL DEFAULT '{}',
+    rules_other        BIGINT[] NOT NULL DEFAULT '{}',
+    orders_relevant    BIGINT[] NOT NULL DEFAULT '{}',
+    orders_other       BIGINT[] NOT NULL DEFAULT '{}',
+
+    case_note          TEXT,                     -- LLM-generated headnote (llm_enrichment.py), Manupatra-style dash-separated digest
+    conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading), LLM fallback if regex found nothing
     judgement          TEXT,                     -- full opinion text after the "J U D G M E N T"/"O R D E R" heading
     ocr_text           TEXT,
 
     source_pdf_url     TEXT,
     blob_pdf_id       TEXT,
 
-    ministries         BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_ministries.ministry_id
-    industries         BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_industries.industry_id -- always empty for now
+    ministries         BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_ministries.ministry_id, matched against petitioner/respondent only
+    industries         BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_industries.industry_id -- LLM-classified (llm_enrichment.py); no reliable regex signal exists for this field
 
     disposition        disposition_category_enum,
+    favouring_party    favouring_party_enum,       -- LLM-classified (llm_enrichment.py) -- which side the outcome favoured
     document_type      doc_type_enum NOT NULL DEFAULT 'CaseLaw',
     case_category      BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_case_categories.category_id
 
     needs_review       BOOLEAN NOT NULL DEFAULT FALSE,
+
+    -- Enrichment status tracking (llm_enrichment.py, 2026-09-10 rewrite) --
+    -- makes an LLM enrichment failure queryable/retryable instead of
+    -- indistinguishable from "case genuinely has no provisions". Internal
+    -- pipeline-ops data, not exposed by any router response below.
+    enrichment_status    TEXT NOT NULL DEFAULT 'PENDING'
+                         CHECK (enrichment_status IN ('PENDING', 'DONE', 'FAILED', 'TRUNCATED', 'SKIPPED')),
+    enrichment_error     TEXT,
+    enriched_at          TIMESTAMPTZ,
+    enrichment_attempts  INTEGER NOT NULL DEFAULT 0,
 
     search_vector      tsvector,                  -- maintained by trg_cr_cases_search_vector below
 
@@ -281,6 +314,7 @@ CREATE INDEX ix_cr_cases_number_trgm ON cr_cases USING GIN (case_number gin_trgm
 CREATE INDEX ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
 CREATE INDEX ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
 CREATE UNIQUE INDEX ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
+CREATE INDEX ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
 
 CREATE TABLE cr_citation_sequences (
     court_id       BIGINT NOT NULL REFERENCES cr_courts(court_id),

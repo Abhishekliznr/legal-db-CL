@@ -1,24 +1,20 @@
 """
-Filter Router: Configuration-Driven Filter Metadata API + CRUD
+Filter Router: Configuration-Driven Filter Metadata API (read-only)
 -------------------------------------------------------------------
 Provides:
 - GET    /api/cases/filters             : Active filter definitions with live/static options.
                                            ?include_inactive=true also returns inactive ones
                                            (admin use) with their options embedded.
-- POST   /api/cases/filters              : Create a filter definition.
-- GET    /api/cases/filters/{filter_id}  : Get one filter definition with its options.
-- PATCH  /api/cases/filters/{filter_id}  : Partially update a filter definition.
-- DELETE /api/cases/filters/{filter_id}  : Delete a filter definition (cascades its options).
 
 Two kinds of filters, distinguished by `dataSource`:
-- "database" (the 5 built-in filters: court, treatment_status, judge, act,
-  judgment_year) — options are always computed live via the fixed,
-  whitelisted SQL in `_compute_database_options()`, dispatched by `key`.
-  This dispatch is NOT admin-configurable; that's what keeps it free of
-  SQL-injection risk. CRUD on these rows only controls presentation
-  (label/order/active/queryKey).
-- "static" (any new filter an admin creates) — options are real rows in the
-  `cr_filter_options` table.
+- "database" (built-in filters: court, judge, act, judgment_year,
+  disposition, favouring_party, industry, ministry — see
+  db/seed_filters.py's `_FILTER_DEFINITIONS`) — options are always computed
+  live via the fixed, whitelisted SQL in `_compute_database_options()`,
+  dispatched by `key`. This dispatch is NOT admin-configurable; that's what
+  keeps it free of SQL-injection risk.
+- "static" (any filter defined directly in the database) — options are real
+  rows in the `cr_filter_options` table.
 
 Rewritten again 2026-09-08 for the flattened `cr_cases` schema (array
 columns instead of junction tables — see db/schema.sql's rewrite note).
@@ -32,11 +28,19 @@ as Overruled/Doubted/Distinguished), and citation/treatment tracking isn't
 modeled by this pipeline iteration at all. db/seed_filters.py no longer
 seeds that cr_filter_definitions row, and self-heals a database that already
 has one from before this change.
+
+Extended 2026-09-10 for scraper-backend's llm_enrichment.py rewrite, which
+now actually populates `cr_cases.disposition` (LLM fallback, on top of the
+existing regex classifier)/`favouring_party`/`industries` at meaningful
+volume — four new dispatch keys added to `_compute_database_options()`
+(disposition, favouring_party, industry, ministry; `ministry` existed as
+data before but had no filter facet). `industry`/`favouring_party` option
+lists can be sparse until enrichment has caught up on the whole corpus,
+since both are LLM-only with no regex fallback.
 """
 
 import logging
-from typing import List, Literal, Optional
-from uuid import UUID
+from typing import List, Optional
 
 import psycopg2
 from fastapi import APIRouter, HTTPException, Query
@@ -59,11 +63,6 @@ class FilterOption(BaseModel):
     count: Optional[int] = Field(None, description="Only present for 'database'-sourced filters; 'static' options have no live count.")
 
 
-class FilterOptionInput(BaseModel):
-    label: str
-    value: str
-
-
 class FilterDefinition(BaseModel):
     id: str
     key: str
@@ -76,32 +75,6 @@ class FilterDefinition(BaseModel):
     isSearchable: bool = False
     displayOrder: int
     options: List[FilterOption] = []
-
-
-class FilterCreate(BaseModel):
-    key: str
-    label: str
-    type: str = "select"
-    selectionMode: str = "multi"
-    dataSource: Literal["database", "static"] = "database"
-    queryKey: Optional[str] = None
-    isActive: bool = True
-    isSearchable: bool = False
-    displayOrder: int = 0
-    options: Optional[List[FilterOptionInput]] = None
-
-
-class FilterUpdate(BaseModel):
-    key: Optional[str] = None
-    label: Optional[str] = None
-    type: Optional[str] = None
-    selectionMode: Optional[str] = None
-    dataSource: Optional[Literal["database", "static"]] = None
-    queryKey: Optional[str] = None
-    isActive: Optional[bool] = None
-    isSearchable: Optional[bool] = None
-    displayOrder: Optional[int] = None
-    options: Optional[List[FilterOptionInput]] = None
 
 
 class DateRangeFilter(BaseModel):
@@ -162,6 +135,51 @@ def _compute_database_options(cur, key: str) -> List[dict]:
         """)
         return [{"value": str(r[0]), "label": str(r[0]), "count": r[1]} for r in cur.fetchall()]
 
+    if key == "disposition":
+        cur.execute("""
+            SELECT disposition::text, COUNT(*)
+            FROM cr_cases
+            WHERE disposition IS NOT NULL
+            GROUP BY disposition
+            ORDER BY COUNT(*) DESC;
+        """)
+        return [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
+
+    if key == "favouring_party":
+        cur.execute("""
+            SELECT favouring_party::text, COUNT(*)
+            FROM cr_cases
+            WHERE favouring_party IS NOT NULL
+            GROUP BY favouring_party
+            ORDER BY COUNT(*) DESC;
+        """)
+        return [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
+
+    if key == "industry":
+        # LLM-classified (scraper-backend/pipeline/llm_enrichment.py) — no
+        # reliable regex signal exists for this field, so counts here can be
+        # sparse until enrichment has run over most of the corpus.
+        cur.execute("""
+            SELECT i.industry_name, COUNT(DISTINCT c.case_id)
+            FROM cr_industries i
+            JOIN cr_cases c ON i.industry_id = ANY(c.industries)
+            GROUP BY i.industry_name
+            ORDER BY COUNT(DISTINCT c.case_id) DESC
+            LIMIT 30;
+        """)
+        return [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
+
+    if key == "ministry":
+        cur.execute("""
+            SELECT m.ministry_name, COUNT(DISTINCT c.case_id)
+            FROM cr_ministries m
+            JOIN cr_cases c ON m.ministry_id = ANY(c.ministries)
+            GROUP BY m.ministry_name
+            ORDER BY COUNT(DISTINCT c.case_id) DESC
+            LIMIT 30;
+        """)
+        return [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
+
     return []
 
 
@@ -171,35 +189,6 @@ def _fetch_static_options(cur, filter_id, include_inactive: bool = False) -> Lis
     else:
         cur.execute("SELECT value, label FROM cr_filter_options WHERE filter_id = %s AND is_active ORDER BY display_order;", (str(filter_id),))
     return [{"value": r[0], "label": r[1]} for r in cur.fetchall()]
-
-
-def _replace_cr_filter_options(cur, filter_id, options: List[FilterOptionInput]):
-    cur.execute("DELETE FROM cr_filter_options WHERE filter_id = %s;", (str(filter_id),))
-    if options:
-        cur.executemany(
-            "INSERT INTO cr_filter_options (filter_id, value, label, display_order) VALUES (%s, %s, %s, %s);",
-            [(str(filter_id), opt.value, opt.label, idx) for idx, opt in enumerate(options)],
-        )
-
-
-def _build_filter_definition(cur, filter_id, include_inactive_options: bool = False) -> Optional[FilterDefinition]:
-    cur.execute("""
-        SELECT id, key, label, type, selection_mode, query_key, data_source, is_active, is_searchable, display_order
-        FROM cr_filter_definitions WHERE id = %s;
-    """, (str(filter_id),))
-    row = cur.fetchone()
-    if not row:
-        return None
-    f_id, key, label, ftype, selection_mode, query_key, data_source, is_active, is_searchable, display_order = row
-    options = (
-        _compute_database_options(cur, key) if data_source == "database"
-        else _fetch_static_options(cur, f_id, include_inactive=include_inactive_options)
-    )
-    return FilterDefinition(
-        id=str(f_id), key=key, label=label, type=ftype, selectionMode=selection_mode,
-        dataSource=data_source, queryKey=query_key, isActive=is_active, isSearchable=is_searchable,
-        displayOrder=display_order, options=options,
-    )
 
 
 # ============================================================
@@ -237,124 +226,3 @@ def get_configuration_driven_filters(include_inactive: bool = Query(False)):
     except Exception:
         logger.exception("Unexpected error while loading filters")
         raise HTTPException(status_code=500, detail="Failed to load filter metadata.")
-
-
-@router.post("/api/cases/filters", response_model=FilterDefinition, response_model_exclude_none=True, status_code=201)
-def create_filter(payload: FilterCreate):
-    if payload.dataSource == "database" and payload.options:
-        raise HTTPException(status_code=400, detail="Cannot set `options` on a 'database'-sourced filter; its options are always computed live.")
-    try:
-        with get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO cr_filter_definitions (key, label, type, selection_mode, query_key, data_source, is_active, is_searchable, display_order)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    RETURNING id;
-                """, (payload.key, payload.label, payload.type, payload.selectionMode, payload.queryKey,
-                      payload.dataSource, payload.isActive, payload.isSearchable, payload.displayOrder))
-                filter_id = cur.fetchone()[0]
-                if payload.dataSource == "static" and payload.options:
-                    _replace_cr_filter_options(cur, filter_id, payload.options)
-                conn.commit()
-                return _build_filter_definition(cur, filter_id, include_inactive_options=True)
-    except HTTPException:
-        raise
-    except psycopg2.errors.UniqueViolation:
-        raise HTTPException(status_code=409, detail=f"A filter with key '{payload.key}' already exists.")
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while creating filter")
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while creating filter")
-        raise HTTPException(status_code=500, detail="Failed to create filter.")
-
-
-@router.get("/api/cases/filters/{filter_id}", response_model=FilterDefinition, response_model_exclude_none=True)
-def get_filter(filter_id: UUID):
-    try:
-        with get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                result = _build_filter_definition(cur, filter_id, include_inactive_options=True)
-                if result is None:
-                    raise HTTPException(status_code=404, detail="Filter not found.")
-                return result
-    except HTTPException:
-        raise
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while loading filter %s", filter_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while loading filter %s", filter_id)
-        raise HTTPException(status_code=500, detail="Failed to load filter.")
-
-
-@router.patch("/api/cases/filters/{filter_id}", response_model=FilterDefinition, response_model_exclude_none=True)
-def update_filter(filter_id: UUID, payload: FilterUpdate):
-    updates = payload.model_dump(exclude_unset=True)
-    options_provided = "options" in updates
-    options = updates.pop("options", None)
-
-    try:
-        with get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT data_source FROM cr_filter_definitions WHERE id = %s;", (str(filter_id),))
-                row = cur.fetchone()
-                if not row:
-                    raise HTTPException(status_code=404, detail="Filter not found.")
-                effective_data_source = updates.get("dataSource", row[0])
-                if effective_data_source == "database" and options_provided:
-                    raise HTTPException(status_code=400, detail="Cannot set `options` on a 'database'-sourced filter.")
-
-                column_map = {
-                    "key": "key", "label": "label", "type": "type", "selectionMode": "selection_mode",
-                    "queryKey": "query_key", "dataSource": "data_source", "isActive": "is_active",
-                    "isSearchable": "is_searchable", "displayOrder": "display_order",
-                }
-                set_clauses, params = [], []
-                for field_name, column in column_map.items():
-                    if field_name in updates:
-                        set_clauses.append(f"{column} = %s")
-                        params.append(updates[field_name])
-
-                if set_clauses:
-                    set_clauses.append("updated_at = CURRENT_TIMESTAMP")
-                    params.append(str(filter_id))
-                    cur.execute(f"UPDATE cr_filter_definitions SET {', '.join(set_clauses)} WHERE id = %s;", params)
-
-                if options_provided:
-                    option_inputs = [FilterOptionInput(**opt) for opt in (options or [])]
-                    _replace_cr_filter_options(cur, filter_id, option_inputs)
-
-                conn.commit()
-                return _build_filter_definition(cur, filter_id, include_inactive_options=True)
-    except HTTPException:
-        raise
-    except psycopg2.errors.UniqueViolation:
-        raise HTTPException(status_code=409, detail="A filter with that key already exists.")
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while updating filter %s", filter_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while updating filter %s", filter_id)
-        raise HTTPException(status_code=500, detail="Failed to update filter.")
-
-
-@router.delete("/api/cases/filters/{filter_id}", status_code=204)
-def delete_filter(filter_id: UUID):
-    try:
-        with get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("DELETE FROM cr_filter_definitions WHERE id = %s RETURNING id;", (str(filter_id),))
-                deleted = cur.fetchone()
-                conn.commit()
-                if not deleted:
-                    raise HTTPException(status_code=404, detail="Filter not found.")
-                return None
-    except HTTPException:
-        raise
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while deleting filter %s", filter_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while deleting filter %s", filter_id)
-        raise HTTPException(status_code=500, detail="Failed to delete filter.")

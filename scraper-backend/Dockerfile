@@ -21,5 +21,5 @@ RUN playwright install --with-deps chromium
 
 COPY . .
 
-EXPOSE 8001
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8001"]
+EXPOSE 3000
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "3000"]
