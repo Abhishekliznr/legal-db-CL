@@ -20,7 +20,9 @@ class RawJudgmentRecord:
     One scraped judgment, PDF already downloaded to a local temp path.
     Nothing here is trusted as final metadata — these are whatever fields
     the court's results table exposes without extra clicks. Real structured
-    parsing happens later in the pipeline (pipeline/extraction.py), not here.
+    parsing happens later in the pipeline (pipeline/regex_extraction.py,
+    with pipeline/llm_enrichment.py filling the handful of fields regex
+    can't), not here.
     """
 
     pdf_path: Path

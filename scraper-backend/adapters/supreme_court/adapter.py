@@ -161,8 +161,19 @@ def _solve_and_submit_captcha(page, from_input, to_input, batch_from: str, batch
 
 def _scrape_one_batch(page, batch_from: str, batch_to: str, download_dir: Path) -> Iterator[RawJudgmentRecord]:
     logger.info("[SCRAPE] sub-batch %s -> %s: loading search page", batch_from, batch_to)
-    page.goto(SEARCH_URL, wait_until="networkidle", timeout=60000)
+    response = page.goto(SEARCH_URL, wait_until="networkidle", timeout=60000)
     page.wait_for_timeout(2000)
+
+    # sci.gov.in sits behind an Akamai edge WAF that can 403 the request before any of our HTML
+    # ever loads (seen in practice: "Access Denied" / errors.edgesuite.net) — that failure mode
+    # looks identical to a missing #from_date locator below, but the fix is completely different
+    # (wait and retry / slow down request rate, not a selector update), so it's worth telling
+    # apart instead of reporting both as "page structure may have changed".
+    if response is not None and response.status >= 400:
+        raise RuntimeError(
+            f"sci.gov.in returned HTTP {response.status} for {SEARCH_URL} (page title: {_clean_text(page.title())!r}) "
+            "— likely a WAF/rate-limit block, not a page structure change. Wait before retrying."
+        )
 
     from_input = page.locator("#from_date")
     to_input = page.locator("#to_date")

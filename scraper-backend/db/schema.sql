@@ -166,10 +166,17 @@ CREATE TABLE cr_scrape_batches (
     date_from       DATE NOT NULL,
     date_to         DATE NOT NULL,
     requested_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-    status          TEXT NOT NULL DEFAULT 'RUNNING',   -- RUNNING / COMPLETED / FAILED
+    status          TEXT NOT NULL DEFAULT 'RUNNING',   -- RUNNING / COMPLETED / FAILED / CANCELLED
     total_found     INT DEFAULT 0,
     total_downloaded INT DEFAULT 0,
-    total_promoted  INT DEFAULT 0
+    total_promoted  INT DEFAULT 0,
+    -- Set by POST /api/scraper/batches/{id}/cancel; orchestrator/batch_runner.py's per-record
+    -- loop polls this between records and stops early once true (see db/migrations/0003).
+    cancel_requested BOOLEAN NOT NULL DEFAULT FALSE,
+    -- NULL while RUNNING; set once by finish_batch() alongside `status`. Without this there is
+    -- no way to compute how long a finished batch actually took — only requested_at exists
+    -- otherwise (see db/migrations/0004).
+    finished_at     TIMESTAMPTZ
 );
 
 -- One row per PDF actually pulled off the court site, BEFORE it becomes a

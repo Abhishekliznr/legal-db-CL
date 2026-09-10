@@ -77,7 +77,7 @@ from routers import court_config_router, scraper_router
 app = FastAPI(
     title="Legal Court Scraper & Ingestion Engine (v2)",
     description="Rebuild in progress — see legal-db/docs/scraper-backend-revamp-spec.md",
-    version="2.0.0-phase3",
+    version="2.0.0",
 )
 
 app.add_middleware(
@@ -171,6 +171,6 @@ def health_check():
     return {
         "status": "healthy" if db_status == "connected" else "degraded",
         "service": "scraper-backend",
-        "version": "2.0.0-phase3",
+        "version": "2.0.0",
         "database": db_status,
     }

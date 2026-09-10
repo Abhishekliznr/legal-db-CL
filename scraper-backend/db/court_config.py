@@ -18,7 +18,7 @@ def list_courts(active_only: bool = False) -> List[Dict[str, Any]]:
         with conn.cursor() as cur:
             where = "WHERE csc.is_active" if active_only else ""
             cur.execute(f"""
-                SELECT c.court_id, c.court_name, c.court_type, c.state, c.ecourts_code,
+                SELECT c.court_id, c.court_name, c.court_type, c.state, c.ecourts_code, c.court_code,
                        csc.adapter, csc.state_code, csc.bench_code, csc.is_active,
                        csc.last_scraped_to, csc.notes
                 FROM cr_courts c

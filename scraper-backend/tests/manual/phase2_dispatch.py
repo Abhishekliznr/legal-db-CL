@@ -52,7 +52,7 @@ def main():
     with TestClient(api.app) as client:
         # Mock the actual batch execution — we're only testing dispatch, not
         # a live scrape (which needs real network access this sandbox lacks).
-        with patch("routers.scraper_router.batch_runner.run_batch") as mock_run:
+        with patch("routers.scraper_router.batch_runner.run_batch"):
             r = client.post("/api/scraper/start", json={
                 "court_id": sc_court_id, "court_code": "SCIN",
                 "from_date": "2026-01-01", "to_date": "2026-01-05",

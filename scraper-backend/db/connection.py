@@ -22,7 +22,6 @@ except ImportError:
 
 import psycopg2
 import psycopg2.pool
-from psycopg2.extras import RealDictCursor  # noqa: F401 (re-exported for callers)
 
 
 SUPPORTED_DATABASE_TYPES = {"postgres"}

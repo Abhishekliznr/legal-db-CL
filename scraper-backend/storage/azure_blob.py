@@ -52,9 +52,9 @@ def upload_pdf(local_path: Union[str, Path], blob_name: str) -> Optional[str]:
     being installed all looked identical: a quiet None, with raw_ingestions.
     blob_path ending up NULL and no way to tell which of those five things
     actually happened). Matches the same self-diagnosing-on-failure pattern
-    already applied to pipeline/extraction.py's Groq call and
-    pipeline/promotion.py's date parsing after two rounds of exactly this
-    kind of silent failure being hard to debug live.
+    already applied to pipeline/promotion.py's date parsing and
+    pipeline/llm_enrichment.py's Azure OpenAI call, after repeated rounds of
+    exactly this kind of silent failure being hard to debug live.
     """
     if not is_configured():
         return None  # not an error — Azure simply isn't configured, expected in local dev
