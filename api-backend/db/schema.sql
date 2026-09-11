@@ -57,10 +57,13 @@
 -- ---------------------------------------------------------------------
 -- 0. EXTENSIONS
 -- ---------------------------------------------------------------------
+-- unaccent/btree_gin/pgcrypto were dropped here (2026-09-11): none of them
+-- is actually referenced anywhere in this schema or the routers/ code (no
+-- unaccent() call, no composite btree+GIN index). gen_random_uuid() is
+-- called (filters_supplement.sql, supplement.sql) but Postgres 13+ ships it
+-- in core, so pgcrypto isn't needed for it either. pg_trgm is the only one
+-- genuinely load-bearing: the three gin_trgm_ops indexes below need it.
 CREATE EXTENSION IF NOT EXISTS pg_trgm;      -- fuzzy name / party search
-CREATE EXTENSION IF NOT EXISTS unaccent;     -- normalize names for search
-CREATE EXTENSION IF NOT EXISTS btree_gin;    -- composite GIN indexes
-CREATE EXTENSION IF NOT EXISTS pgcrypto;     -- gen_random_uuid() used by operational tables below
 
 -- ---------------------------------------------------------------------
 -- 1. ENUMS  (only for genuinely closed, stable vocabularies;
