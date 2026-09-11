@@ -80,6 +80,8 @@ app = FastAPI(
     version="2.0.0",
 )
 
+logger = logging.getLogger("scraper_backend_v2.startup")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -98,8 +100,8 @@ def on_startup():
     # /health's own graceful degradation unreachable.
     try:
         connection.init_connection_pool()
-    except Exception as e:
-        print(f"WARNING: could not initialize DB connection pool at startup: {e}")
+    except Exception:
+        logger.exception("Could not initialize DB connection pool at startup")
         return
 
     # ensure_schema() only creates anything the first time it sees a
@@ -109,8 +111,8 @@ def on_startup():
     try:
         from db.init_db import ensure_schema
         ensure_schema()
-    except Exception as e:
-        print(f"WARNING: could not ensure DB schema at startup: {e}")
+    except Exception:
+        logger.exception("Could not ensure DB schema at startup")
 
     # Same startup-safe shape as ensure_schema() above: seeds the Supreme
     # Court + 25 High Courts only the first time cr_courts is empty, so a
@@ -122,8 +124,8 @@ def on_startup():
     try:
         from db.seed_courts import ensure_seeded
         ensure_seeded()
-    except Exception as e:
-        print(f"WARNING: could not ensure courts are seeded at startup: {e}")
+    except Exception:
+        logger.exception("Could not ensure courts are seeded at startup")
 
 
 @app.on_event("shutdown")

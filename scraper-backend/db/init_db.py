@@ -95,23 +95,43 @@ def _core_schema_exists(conn) -> bool:
         return cur.fetchone()[0]
 
 
+# Arbitrary fixed key for the session-level advisory lock below. Any bigint
+# works as long as it's unique within this database — picked by hashing
+# the string "scraper_backend_v2.ensure_schema" mod 2^31 and truncating,
+# no significance beyond being a stable constant.
+_ENSURE_SCHEMA_LOCK_KEY = 279_460_113
+
+
 def ensure_schema() -> None:
     """
     Startup-safe entry point: applies schema.sql the first time this runs
     against a fresh database, then is a no-op on every later call (including
     a shared-DB deployment where the *other* service already applied it).
+
+    Holds a session-level Postgres advisory lock for the whole check+apply
+    so that two instances starting concurrently against the same empty
+    database (a rolling deploy, or >1 replica cold-starting together)
+    serialize instead of both racing schema.sql's non-idempotent CREATE
+    TYPE/CREATE TABLE statements — that race previously left the database
+    with zero cr_ tables when both transactions stepped on each other and
+    aborted, while the app still came up "healthy" (see api.py's on_startup,
+    which treats this as non-fatal).
     """
     conn = get_connection()
     try:
-        exists = _core_schema_exists(conn)
+        with conn.cursor() as cur:
+            cur.execute("SELECT pg_advisory_lock(%s);", (_ENSURE_SCHEMA_LOCK_KEY,))
+        try:
+            if _core_schema_exists(conn):
+                print("Schema already present, skipping auto-init.")
+                return
+            print("No schema detected — applying schema.sql for the first time...")
+            init_database(drop_existing=False)
+        finally:
+            with conn.cursor() as cur:
+                cur.execute("SELECT pg_advisory_unlock(%s);", (_ENSURE_SCHEMA_LOCK_KEY,))
     finally:
         conn.close()
-
-    if exists:
-        print("Schema already present, skipping auto-init.")
-        return
-    print("No schema detected — applying schema.sql for the first time...")
-    init_database(drop_existing=False)
 
 
 def main() -> None:
