@@ -93,7 +93,7 @@ END $$;
 -- 2. MASTER / LOOKUP TABLES
 -- ---------------------------------------------------------------------
 
-CREATE TABLE cr_courts (
+CREATE TABLE IF NOT EXISTS cr_courts (
     court_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     court_name      TEXT NOT NULL,               -- 'High Court of Delhi at New Delhi'
     court_type      TEXT NOT NULL,               -- 'Supreme Court','High Court','Tribunal','District Court'
@@ -105,33 +105,33 @@ CREATE TABLE cr_courts (
     CONSTRAINT uq_cr_courts_code UNIQUE (court_code)
 );
 
-CREATE TABLE cr_judges (
+CREATE TABLE IF NOT EXISTS cr_judges (
     judge_id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     full_name         TEXT NOT NULL,             -- 'Anil Kshetarpal'
     normalized_name   TEXT NOT NULL,             -- upper, honorifics/punctuation stripped
     CONSTRAINT uq_cr_judges_normalized UNIQUE (normalized_name)
 );
 
-CREATE TABLE cr_case_categories (
+CREATE TABLE IF NOT EXISTS cr_case_categories (
     category_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     category_code   TEXT NOT NULL,   -- 'W.P.(C)', 'CRL.M.A.', 'CRP', 'CS(OS)'
     category_name   TEXT NOT NULL,   -- 'Writ Petition (Civil)', 'Criminal Miscellaneous Application'
     CONSTRAINT uq_cr_case_categories_code UNIQUE (category_code)
 );
 
-CREATE TABLE cr_subjects (
+CREATE TABLE IF NOT EXISTS cr_subjects (
     subject_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     subject_name      TEXT NOT NULL,             -- 'Civil', 'Criminal' (coarse, regex-derived for now)
     CONSTRAINT uq_cr_subjects_name UNIQUE (subject_name)
 );
 
-CREATE TABLE cr_ministries (
+CREATE TABLE IF NOT EXISTS cr_ministries (
     ministry_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ministry_name   TEXT NOT NULL,               -- 'Ministry of Railways', 'Cabinet Division'
     CONSTRAINT uq_cr_ministries_name UNIQUE (ministry_name)
 );
 
-CREATE TABLE cr_industries (
+CREATE TABLE IF NOT EXISTS cr_industries (
     industry_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     industry_name   TEXT NOT NULL,
     CONSTRAINT uq_cr_industries_name UNIQUE (industry_name)
@@ -139,7 +139,7 @@ CREATE TABLE cr_industries (
 
 -- Renamed from the old `statutes` -- same concept (a named Act/Code), just
 -- matching the field name the new `cr_cases.acts` array actually points at.
-CREATE TABLE cr_acts (
+CREATE TABLE IF NOT EXISTS cr_acts (
     act_id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_name        TEXT NOT NULL,               -- 'Indian Penal Code, 1860'
     act_year        INT,                         -- NULL for undated acts, e.g. 'Constitution of India'
@@ -160,21 +160,21 @@ CREATE TABLE cr_acts (
 -- interchangeable numbers under one bucket. All three resolve back to
 -- `cr_acts` (see pipeline/regex_extraction.py's extract_provisions(), which
 -- tags each match with which of the three it is).
-CREATE TABLE cr_sections (
+CREATE TABLE IF NOT EXISTS cr_sections (
     section_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT NOT NULL REFERENCES cr_acts(act_id),
     section_number  TEXT NOT NULL,               -- '308', '482', '2(l)', '226'
     CONSTRAINT uq_cr_sections_act_number UNIQUE (act_id, section_number)
 );
 
-CREATE TABLE cr_rules (
+CREATE TABLE IF NOT EXISTS cr_rules (
     rule_id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable: standalone rules (e.g. a High Court's own Rules of Practice) may not resolve to a named Act
     rule_number     TEXT NOT NULL,
     CONSTRAINT uq_cr_rules_act_number UNIQUE (act_id, rule_number)
 );
 
-CREATE TABLE cr_orders (
+CREATE TABLE IF NOT EXISTS cr_orders (
     order_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable, same reasoning as rules.act_id
     order_number    TEXT NOT NULL,                    -- 'XXI' (CPC's Order XXI)
@@ -185,7 +185,7 @@ CREATE TABLE cr_orders (
 -- 3. PIPELINE TABLE (scrape/OCR staging)
 -- ---------------------------------------------------------------------
 
-CREATE TABLE cr_scrape_batches (
+CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     batch_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     court_id        BIGINT REFERENCES cr_courts(court_id),
     date_from       DATE NOT NULL,
@@ -211,7 +211,7 @@ CREATE TABLE cr_scrape_batches (
 -- staged through a separate LLM-extraction step the way the old pipeline
 -- was. That LLM step comes back later as an update to specific `cr_cases`
 -- columns (case_note, industries), not as a cr_raw_ingestions stage again.
-CREATE TABLE cr_raw_ingestions (
+CREATE TABLE IF NOT EXISTS cr_raw_ingestions (
     ingestion_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     batch_id          BIGINT REFERENCES cr_scrape_batches(batch_id),
     court_id          BIGINT REFERENCES cr_courts(court_id),
@@ -238,8 +238,8 @@ CREATE TABLE cr_raw_ingestions (
     CONSTRAINT uq_cr_raw_ingestions_checksum UNIQUE (file_checksum)
 );
 
-CREATE INDEX ix_cr_raw_ingestions_status ON cr_raw_ingestions(status);
-CREATE INDEX ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batch_id);
+CREATE INDEX IF NOT EXISTS ix_cr_raw_ingestions_status ON cr_raw_ingestions(status);
+CREATE INDEX IF NOT EXISTS ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batch_id);
 
 -- ---------------------------------------------------------------------
 -- 4. CORE TABLE
@@ -253,7 +253,7 @@ CREATE INDEX ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batch_id);
 -- can't FK-constrain the contents of an array column, so referential
 -- integrity into judges/acts/sections/etc. is enforced in application code
 -- (pipeline/promotion.py's get-or-create helpers), not by the database.
-CREATE TABLE cr_cases (
+CREATE TABLE IF NOT EXISTS cr_cases (
     case_id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     liznr_id           TEXT,                     -- our own citation, e.g. 'LIZNR/SCIN/0001/2026' -- generated
                                                   -- at promotion time (citation_sequences below); doubles as
@@ -332,18 +332,21 @@ CREATE TABLE cr_cases (
     CONSTRAINT uq_cr_cases_court_number UNIQUE (court_id, case_number)
 );
 
-ALTER TABLE cr_raw_ingestions
-    ADD CONSTRAINT fk_cr_raw_ingestions_case
-    FOREIGN KEY (case_id) REFERENCES cr_cases(case_id);
+DO $$ BEGIN
+    ALTER TABLE cr_raw_ingestions
+        ADD CONSTRAINT fk_cr_raw_ingestions_case
+        FOREIGN KEY (case_id) REFERENCES cr_cases(case_id);
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
 
-CREATE INDEX ix_cr_cases_court_date ON cr_cases(court_id, judgment_date);
-CREATE INDEX ix_cr_cases_disposition ON cr_cases(disposition);
-CREATE INDEX ix_cr_cases_search ON cr_cases USING GIN (search_vector);
-CREATE INDEX ix_cr_cases_number_trgm ON cr_cases USING GIN (case_number gin_trgm_ops);
-CREATE INDEX ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
-CREATE INDEX ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
-CREATE UNIQUE INDEX ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
-CREATE INDEX ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
+CREATE INDEX IF NOT EXISTS ix_cr_cases_court_date ON cr_cases(court_id, judgment_date);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_disposition ON cr_cases(disposition);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_search ON cr_cases USING GIN (search_vector);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_number_trgm ON cr_cases USING GIN (case_number gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
 
 -- Atomic per-(court, year) counter backing cr_cases.liznr_id
 -- ('LIZNR/<court_code>/<seq>/<year>'). Resets every year, same convention
@@ -351,7 +354,7 @@ CREATE INDEX ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichme
 -- citation. Claimed via INSERT ... ON CONFLICT DO UPDATE ... RETURNING
 -- next_seq, which Postgres serializes correctly under concurrent
 -- promotions via the row lock the UPDATE takes.
-CREATE TABLE cr_citation_sequences (
+CREATE TABLE IF NOT EXISTS cr_citation_sequences (
     court_id       BIGINT NOT NULL REFERENCES cr_courts(court_id),
     citation_year  INT NOT NULL,
     next_seq       INT NOT NULL DEFAULT 1,
@@ -379,7 +382,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_cr_cases_search_vector
+CREATE OR REPLACE TRIGGER trg_cr_cases_search_vector
 BEFORE INSERT OR UPDATE ON cr_cases
 FOR EACH ROW EXECUTE FUNCTION cr_cases_search_vector_update();
 
@@ -387,10 +390,10 @@ CREATE OR REPLACE FUNCTION touch_updated_at() RETURNS trigger AS $$
 BEGIN NEW.updated_at := now(); RETURN NEW; END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_cr_cases_touch BEFORE UPDATE ON cr_cases
+CREATE OR REPLACE TRIGGER trg_cr_cases_touch BEFORE UPDATE ON cr_cases
 FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 
-CREATE TRIGGER trg_cr_raw_ingestions_touch BEFORE UPDATE ON cr_raw_ingestions
+CREATE OR REPLACE TRIGGER trg_cr_raw_ingestions_touch BEFORE UPDATE ON cr_raw_ingestions
 FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 
 -- =====================================================================
@@ -409,7 +412,7 @@ FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 
 -- One row per court that gets scraped. Turns "25 Python files" into
 -- "25 rows".
-CREATE TABLE cr_court_scrape_config (
+CREATE TABLE IF NOT EXISTS cr_court_scrape_config (
     court_id        BIGINT PRIMARY KEY REFERENCES cr_courts(court_id),
     adapter         TEXT NOT NULL,              -- 'supreme_court' | 'ecourts'
     state_code      TEXT,                       -- eCourts state_code select value (e.g. '7~26' for Delhi)

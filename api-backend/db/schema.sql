@@ -107,7 +107,7 @@ END $$;
 -- 2. MASTER / LOOKUP TABLES
 -- ---------------------------------------------------------------------
 
-CREATE TABLE cr_courts (
+CREATE TABLE IF NOT EXISTS cr_courts (
     court_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     court_name      TEXT NOT NULL,               -- 'High Court of Delhi at New Delhi'
     court_type      TEXT NOT NULL,               -- 'Supreme Court','High Court','Tribunal','District Court'
@@ -119,33 +119,33 @@ CREATE TABLE cr_courts (
     CONSTRAINT uq_cr_courts_code UNIQUE (court_code)
 );
 
-CREATE TABLE cr_judges (
+CREATE TABLE IF NOT EXISTS cr_judges (
     judge_id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     full_name         TEXT NOT NULL,             -- 'Anil Kshetarpal'
     normalized_name   TEXT NOT NULL,             -- upper, honorifics/punctuation stripped
     CONSTRAINT uq_cr_judges_normalized UNIQUE (normalized_name)
 );
 
-CREATE TABLE cr_case_categories (
+CREATE TABLE IF NOT EXISTS cr_case_categories (
     category_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     category_code   TEXT NOT NULL,   -- 'W.P.(C)', 'CRL.M.A.', 'CRP', 'CS(OS)'
     category_name   TEXT NOT NULL,   -- 'Writ Petition (Civil)', 'Criminal Miscellaneous Application'
     CONSTRAINT uq_cr_case_categories_code UNIQUE (category_code)
 );
 
-CREATE TABLE cr_subjects (
+CREATE TABLE IF NOT EXISTS cr_subjects (
     subject_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     subject_name      TEXT NOT NULL,             -- 'Civil', 'Criminal' (coarse, regex-derived for now)
     CONSTRAINT uq_cr_subjects_name UNIQUE (subject_name)
 );
 
-CREATE TABLE cr_ministries (
+CREATE TABLE IF NOT EXISTS cr_ministries (
     ministry_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ministry_name   TEXT NOT NULL,               -- 'Ministry of Railways', 'Cabinet Division'
     CONSTRAINT uq_cr_ministries_name UNIQUE (ministry_name)
 );
 
-CREATE TABLE cr_industries (
+CREATE TABLE IF NOT EXISTS cr_industries (
     industry_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     industry_name   TEXT NOT NULL,
     CONSTRAINT uq_cr_industries_name UNIQUE (industry_name)
@@ -153,7 +153,7 @@ CREATE TABLE cr_industries (
 
 -- Renamed from the old `statutes` -- same concept (a named Act/Code), just
 -- matching the field name `cr_cases.acts` actually points at.
-CREATE TABLE cr_acts (
+CREATE TABLE IF NOT EXISTS cr_acts (
     act_id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_name        TEXT NOT NULL,               -- 'Indian Penal Code, 1860'
     act_year        INT,
@@ -173,21 +173,21 @@ CREATE TABLE cr_acts (
 -- different things a legal researcher filters by separately, not
 -- interchangeable numbers under one bucket. All three resolve back to
 -- `cr_acts`.
-CREATE TABLE cr_sections (
+CREATE TABLE IF NOT EXISTS cr_sections (
     section_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT NOT NULL REFERENCES cr_acts(act_id),
     section_number  TEXT NOT NULL,               -- '308', '482', '2(l)', '226'
     CONSTRAINT uq_cr_sections_act_number UNIQUE (act_id, section_number)
 );
 
-CREATE TABLE cr_rules (
+CREATE TABLE IF NOT EXISTS cr_rules (
     rule_id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable: standalone rules may not resolve to a named Act
     rule_number     TEXT NOT NULL,
     CONSTRAINT uq_cr_rules_act_number UNIQUE (act_id, rule_number)
 );
 
-CREATE TABLE cr_orders (
+CREATE TABLE IF NOT EXISTS cr_orders (
     order_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable, same reasoning as rules.act_id
     order_number    TEXT NOT NULL,                    -- 'XXI' (CPC's Order XXI)
@@ -200,7 +200,7 @@ CREATE TABLE cr_orders (
 --    api-backend database has a complete schema to apply.
 -- ---------------------------------------------------------------------
 
-CREATE TABLE cr_scrape_batches (
+CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     batch_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     court_id        BIGINT REFERENCES cr_courts(court_id),
     date_from       DATE NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE cr_scrape_batches (
     total_promoted  INT DEFAULT 0
 );
 
-CREATE TABLE cr_raw_ingestions (
+CREATE TABLE IF NOT EXISTS cr_raw_ingestions (
     ingestion_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     batch_id          BIGINT REFERENCES cr_scrape_batches(batch_id),
     court_id          BIGINT REFERENCES cr_courts(court_id),
@@ -239,8 +239,8 @@ CREATE TABLE cr_raw_ingestions (
     CONSTRAINT uq_cr_raw_ingestions_checksum UNIQUE (file_checksum)
 );
 
-CREATE INDEX ix_cr_raw_ingestions_status ON cr_raw_ingestions(status);
-CREATE INDEX ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batch_id);
+CREATE INDEX IF NOT EXISTS ix_cr_raw_ingestions_status ON cr_raw_ingestions(status);
+CREATE INDEX IF NOT EXISTS ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batch_id);
 
 -- ---------------------------------------------------------------------
 -- 4. CORE TABLE
@@ -252,7 +252,7 @@ CREATE INDEX ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batch_id);
 -- FK-constrain array contents, so referential integrity into judges/acts/
 -- sections/etc. is enforced in scraper-backend's application code
 -- (pipeline/promotion.py's get-or-create helpers), not by the database.
-CREATE TABLE cr_cases (
+CREATE TABLE IF NOT EXISTS cr_cases (
     case_id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     liznr_id           TEXT,                     -- our own citation, e.g. 'LIZNR/SCIN/0001/2026'
     court_id           BIGINT NOT NULL REFERENCES cr_courts(court_id),
@@ -326,20 +326,23 @@ CREATE TABLE cr_cases (
     CONSTRAINT uq_cr_cases_court_number UNIQUE (court_id, case_number)
 );
 
-ALTER TABLE cr_raw_ingestions
-    ADD CONSTRAINT fk_cr_raw_ingestions_case
-    FOREIGN KEY (case_id) REFERENCES cr_cases(case_id);
+DO $$ BEGIN
+    ALTER TABLE cr_raw_ingestions
+        ADD CONSTRAINT fk_cr_raw_ingestions_case
+        FOREIGN KEY (case_id) REFERENCES cr_cases(case_id);
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
 
-CREATE INDEX ix_cr_cases_court_date ON cr_cases(court_id, judgment_date);
-CREATE INDEX ix_cr_cases_disposition ON cr_cases(disposition);
-CREATE INDEX ix_cr_cases_search ON cr_cases USING GIN (search_vector);
-CREATE INDEX ix_cr_cases_number_trgm ON cr_cases USING GIN (case_number gin_trgm_ops);
-CREATE INDEX ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
-CREATE INDEX ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
-CREATE UNIQUE INDEX ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
-CREATE INDEX ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
+CREATE INDEX IF NOT EXISTS ix_cr_cases_court_date ON cr_cases(court_id, judgment_date);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_disposition ON cr_cases(disposition);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_search ON cr_cases USING GIN (search_vector);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_number_trgm ON cr_cases USING GIN (case_number gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
 
-CREATE TABLE cr_citation_sequences (
+CREATE TABLE IF NOT EXISTS cr_citation_sequences (
     court_id       BIGINT NOT NULL REFERENCES cr_courts(court_id),
     citation_year  INT NOT NULL,
     next_seq       INT NOT NULL DEFAULT 1,
@@ -361,7 +364,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_cr_cases_search_vector
+CREATE OR REPLACE TRIGGER trg_cr_cases_search_vector
 BEFORE INSERT OR UPDATE ON cr_cases
 FOR EACH ROW EXECUTE FUNCTION cr_cases_search_vector_update();
 
@@ -369,10 +372,10 @@ CREATE OR REPLACE FUNCTION touch_updated_at() RETURNS trigger AS $$
 BEGIN NEW.updated_at := now(); RETURN NEW; END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_cr_cases_touch BEFORE UPDATE ON cr_cases
+CREATE OR REPLACE TRIGGER trg_cr_cases_touch BEFORE UPDATE ON cr_cases
 FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 
-CREATE TRIGGER trg_cr_raw_ingestions_touch BEFORE UPDATE ON cr_raw_ingestions
+CREATE OR REPLACE TRIGGER trg_cr_raw_ingestions_touch BEFORE UPDATE ON cr_raw_ingestions
 FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 
 -- ---------------------------------------------------------------------
@@ -391,7 +394,7 @@ FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 --    service never writes to it).
 -- =====================================================================
 
-CREATE TABLE cr_court_scrape_config (
+CREATE TABLE IF NOT EXISTS cr_court_scrape_config (
     court_id        BIGINT PRIMARY KEY REFERENCES cr_courts(court_id),
     adapter         TEXT NOT NULL,
     state_code      TEXT,
