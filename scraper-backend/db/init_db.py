@@ -23,6 +23,7 @@ from pathlib import Path
 from db.connection import get_connection
 
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
+MIGRATIONS_DIR = Path(__file__).resolve().parent / "migrations"
 
 # Reverse-dependency order so FK/type drops don't fail. Includes both the
 # current schema's own tables (cr_-prefixed, 2026-09-09 rename) AND every
@@ -95,6 +96,35 @@ def _core_schema_exists(conn) -> bool:
         return cur.fetchone()[0]
 
 
+def apply_migrations() -> None:
+    """
+    Applies every db/migrations/*.sql file, in filename order, every time
+    this is called. Each migration file is written to be idempotent
+    (ADD COLUMN IF NOT EXISTS, or a guarded DO block) and a documented no-op
+    once already applied — see each file's own header — so re-running the
+    full set on every startup is safe.
+
+    This exists because schema.sql's CREATE TABLE IF NOT EXISTS only fires
+    the first time a table is created — it never adds a column schema.sql
+    gained after that table already existed on disk (e.g. cr_scrape_batches
+    predating cancel_requested/finished_at, added by 0003/0004 below).
+    Without this, an existing table just silently keeps its old shape
+    forever, surfacing later as a column-does-not-exist error from whatever
+    query first reads the missing column, instead of anything catching it
+    at startup.
+    """
+    for path in sorted(MIGRATIONS_DIR.glob("*.sql")):
+        sql = path.read_text(encoding="utf-8")
+        conn = get_connection()
+        try:
+            print(f"Applying migration {path.name}...")
+            with conn.cursor() as cur:
+                cur.execute(sql)
+            conn.commit()
+        finally:
+            conn.close()
+
+
 # Arbitrary fixed key for the session-level advisory lock below. Any bigint
 # works as long as it's unique within this database — picked by hashing
 # the string "scraper_backend_v2.ensure_schema" mod 2^31 and truncating,
@@ -105,8 +135,10 @@ _ENSURE_SCHEMA_LOCK_KEY = 279_460_113
 def ensure_schema() -> None:
     """
     Startup-safe entry point: applies schema.sql the first time this runs
-    against a fresh database, then is a no-op on every later call (including
-    a shared-DB deployment where the *other* service already applied it).
+    against a fresh database, then applies db/migrations/*.sql (idempotent,
+    safe on every call — see apply_migrations()) either way, so an existing
+    table missing a column a later migration added gets brought up to date
+    automatically instead of failing at query time in some unrelated router.
 
     Holds a session-level Postgres advisory lock for the whole check+apply
     so that two instances starting concurrently against the same empty
@@ -124,9 +156,10 @@ def ensure_schema() -> None:
         try:
             if _core_schema_exists(conn):
                 print("Schema already present, skipping auto-init.")
-                return
-            print("No schema detected — applying schema.sql for the first time...")
-            init_database(drop_existing=False)
+            else:
+                print("No schema detected — applying schema.sql for the first time...")
+                init_database(drop_existing=False)
+            apply_migrations()
         finally:
             with conn.cursor() as cur:
                 cur.execute("SELECT pg_advisory_unlock(%s);", (_ENSURE_SCHEMA_LOCK_KEY,))
@@ -141,13 +174,16 @@ def main() -> None:
     init_parser = subparsers.add_parser("init", help="Apply schema.sql")
     init_parser.add_argument("--drop", action="store_true", help="Drop existing tables/types first")
 
-    subparsers.add_parser("ensure-schema", help="Apply schema.sql only if not already present (safe to re-run)")
+    subparsers.add_parser("ensure-schema", help="Apply schema.sql (if missing) + all migrations (safe to re-run)")
+    subparsers.add_parser("migrate", help="Apply db/migrations/*.sql only, in order (idempotent, safe to re-run)")
 
     args = parser.parse_args()
     if args.command == "init":
         init_database(drop_existing=args.drop)
     elif args.command == "ensure-schema":
         ensure_schema()
+    elif args.command == "migrate":
+        apply_migrations()
     else:
         parser.print_help()
 

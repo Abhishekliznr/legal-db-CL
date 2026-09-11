@@ -209,7 +209,9 @@ CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     status          TEXT NOT NULL DEFAULT 'RUNNING',
     total_found     INT DEFAULT 0,
     total_downloaded INT DEFAULT 0,
-    total_promoted  INT DEFAULT 0
+    total_promoted  INT DEFAULT 0,
+    cancel_requested BOOLEAN NOT NULL DEFAULT FALSE,
+    finished_at     TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS cr_raw_ingestions (
