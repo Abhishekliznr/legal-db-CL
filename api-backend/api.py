@@ -24,6 +24,11 @@ Startup also runs db/seed_filters.py's `seed()` right after — populates
 cr_filter_definitions/cr_search_field_definitions (what /api/cases/filters
 and /api/cases/searches serve) via ON CONFLICT (key) DO NOTHING, so it's a
 no-op on an already-seeded DB and never clobbers an admin's edits.
+
+Startup is fail-fast: if Postgres can't be reached, or the schema check/init
+itself fails, on_startup() raises and FastAPI/uvicorn refuses to come up —
+see on_startup()'s docstring for why a "start anyway and report degraded"
+shape is wrong for this specific failure class.
 """
 
 import sys
@@ -60,30 +65,54 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup():
-    # Non-fatal, matching scraper-backend's api.py — a DB hiccup at
-    # startup shouldn't crash-loop the container when /health can just
-    # report "degraded" instead.
+    """
+    Fail-fast on database/schema problems: an app that "starts anyway" with
+    no DB or a broken schema doesn't serve traffic correctly, it just fails
+    every request instead of failing loudly once at boot. docker-compose.yml
+    already has `depends_on: db: condition: service_healthy` (so Postgres is
+    up before this container even starts) and `restart: always` on this
+    service, so raising here is safe — the container gets restarted by
+    Docker instead of limping along "degraded", and a real config problem
+    (bad DB_HOST/DB_PORT/credentials, or a schema that failed to apply)
+    shows up immediately in `docker logs` / `docker compose ps` instead of
+    being discovered later as mysterious request failures. Same pattern as
+    scraper-backend's api.py.
+    """
     try:
         connection.init_connection_pool()
-    except Exception as e:
-        print(f"WARNING: could not initialize DB connection pool at startup: {e}")
-        return
+        with connection.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1;")
+    except Exception as exc:
+        print(f"ERROR: could not connect to the database at startup: {exc}")
+        raise RuntimeError(
+            "api-backend startup aborted: could not connect to Postgres. "
+            "Check DATABASE_TYPE/DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASSWORD "
+            f"and that the database is reachable. Underlying error: {exc}"
+        ) from exc
 
     # ensure_schema() only creates anything the first time it sees a
     # database without the core `cases` table; every later startup (and
     # a shared-DB deployment where scraper-backend already created it)
-    # is a cheap no-op / idempotent supplement check. Non-fatal for the
-    # same reason as the pool init above.
+    # is a cheap no-op / idempotent supplement check. A failure here means
+    # the schema is missing/broken AND couldn't be auto-applied (e.g. a
+    # permissions issue or a malformed schema.sql) — that's not a state
+    # this app should ever serve traffic in.
     try:
         from db.init_db import ensure_schema
         ensure_schema()
-    except Exception as e:
-        print(f"WARNING: could not ensure DB schema at startup: {e}")
+    except Exception as exc:
+        print(f"ERROR: could not ensure DB schema at startup: {exc}")
+        raise RuntimeError(
+            "api-backend startup aborted: database schema check/init "
+            f"failed. Underlying error: {exc}"
+        ) from exc
 
-    # seed() is ON CONFLICT DO NOTHING against cr_filter_definitions/
-    # cr_search_field_definitions, so this is a no-op once seeded and safe
-    # to run on every startup — same non-fatal pattern as ensure_schema()
-    # above, since a fresh/unseeded DB shouldn't crash-loop the container.
+    # Seeding filter/search-field definitions is not a schema-integrity
+    # concern — an unseeded DB just means /api/cases/filters and
+    # /api/cases/searches return empty lists until seed_filters() runs
+    # (ON CONFLICT DO NOTHING, safe to retry), not that the app is broken.
+    # Stays non-fatal.
     try:
         from db.seed_filters import seed as seed_filters
         seed_filters()
@@ -121,6 +150,16 @@ def serve_landing_page():
 
 @app.get("/health")
 def health_check():
+    """
+    Verifies the app can actually reach Postgres, not just that the process
+    is up — a plain 200 with no DB check would hide a bad DB_HOST/DB_PORT.
+
+    Bad config at boot no longer reaches here at all: on_startup() now fails
+    the container before it ever starts serving (see its docstring). This
+    endpoint's "degraded" status covers a DB that goes away *after* a
+    successful startup (e.g. Postgres restarting, a transient network
+    blip) — a real runtime signal, not a substitute for the startup gate.
+    """
     try:
         with connection.get_pooled_connection() as conn:
             with conn.cursor() as cur:

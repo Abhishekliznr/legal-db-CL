@@ -29,6 +29,11 @@ checks for the core `cases` table and only runs schema.sql the first time
 it's missing (a fresh database), so it's safe to call on every container
 restart without ever re-running schema.sql's non-idempotent CREATE
 TYPE/CREATE TABLE statements against a database that already has them.
+
+Startup is fail-fast: if Postgres can't be reached, or the schema check/init
+itself fails, on_startup() raises and FastAPI/uvicorn refuses to come up —
+see on_startup()'s docstring for why a "start anyway and report degraded"
+shape is wrong for this specific failure class.
 """
 
 import logging
@@ -93,34 +98,59 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup():
-    # Deliberately non-fatal: if Postgres isn't reachable yet (e.g. the db
-    # container is still coming up despite the compose healthcheck, or a
-    # transient network blip), the app still starts and serves /health as
-    # "degraded" instead of crash-looping. A hard failure here would make
-    # /health's own graceful degradation unreachable.
+    """
+    Fail-fast on database/schema problems: an app that "starts anyway" with
+    no DB or a broken schema doesn't serve traffic correctly, it just fails
+    every request instead of failing loudly once at boot. docker-compose.yml
+    already has `depends_on: db: condition: service_healthy` (so Postgres is
+    up before this container even starts) and `restart: always` on this
+    service, so raising here is safe — the container gets restarted by
+    Docker instead of limping along "degraded", and a real config problem
+    (bad DB_HOST/DB_PORT/credentials, or a schema that failed to apply)
+    shows up immediately in `docker logs` / `docker compose ps` instead of
+    being discovered later as mysterious request failures.
+    """
     try:
         connection.init_connection_pool()
-    except Exception:
-        logger.exception("Could not initialize DB connection pool at startup")
-        return
+        with connection.get_pooled_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1;")
+    except Exception as exc:
+        logger.exception("Could not connect to the database at startup")
+        raise RuntimeError(
+            "scraper-backend startup aborted: could not connect to Postgres. "
+            "Check DATABASE_TYPE/DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASSWORD "
+            f"and that the database is reachable. Underlying error: {exc}"
+        ) from exc
 
     # ensure_schema() only creates anything the first time it sees a
     # database without the core `cases` table; every later restart (and
     # a shared-DB deployment where this already ran once) is a cheap
-    # no-op. Non-fatal for the same reason as the pool init above.
+    # no-op. A failure here means the schema is missing AND couldn't be
+    # auto-applied (e.g. a permissions issue or a malformed schema.sql) —
+    # that's not a state the app should ever serve traffic in.
     try:
         from db.init_db import ensure_schema
         ensure_schema()
-    except Exception:
+    except Exception as exc:
         logger.exception("Could not ensure DB schema at startup")
+        raise RuntimeError(
+            "scraper-backend startup aborted: database schema check/init "
+            f"failed. Underlying error: {exc}"
+        ) from exc
 
-    # Same startup-safe shape as ensure_schema() above: seeds the Supreme
-    # Court + 25 High Courts only the first time cr_courts is empty, so a
-    # fresh database is immediately usable (POST /api/scraper/start needs
-    # a real court_id to dispatch against) without a separate manual
-    # `python -m db.seed_courts` step. Scraper-backend only — it's the
-    # actual write-owner of cr_courts/cr_court_scrape_config; api-backend
-    # stays read-only and has no seed script of its own.
+    # Seeds the Supreme Court + 25 High Courts only the first time cr_courts
+    # is empty, so a fresh database is immediately usable (POST
+    # /api/scraper/start needs a real court_id to dispatch against) without
+    # a separate manual `python -m db.seed_courts` step. Scraper-backend
+    # only — it's the actual write-owner of cr_courts/cr_court_scrape_config;
+    # api-backend stays read-only and has no seed script of its own.
+    #
+    # Unlike the DB connection and schema checks above, this stays
+    # non-fatal: reference data (courts) isn't a schema-integrity concern —
+    # an empty cr_courts table just means POST /api/scraper/start needs a
+    # manual `python -m db.seed_courts` before it's usable, not that the
+    # app is in a broken state.
     try:
         from db.seed_courts import ensure_seeded
         ensure_seeded()
@@ -160,6 +190,12 @@ def health_check():
     """
     Verifies the app can actually reach Postgres, not just that the process
     is up — a plain 200 with no DB check would hide a bad DB_HOST/DB_PORT.
+
+    Bad config at boot no longer reaches here at all: on_startup() now fails
+    the container before it ever starts serving (see its docstring). This
+    endpoint's "degraded" status covers a DB that goes away *after* a
+    successful startup (e.g. Postgres restarting, a transient network
+    blip) — a real runtime signal, not a substitute for the startup gate.
     """
     try:
         with connection.get_pooled_connection() as conn:
