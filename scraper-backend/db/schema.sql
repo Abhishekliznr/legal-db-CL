@@ -32,9 +32,11 @@
 --
 -- Standalone: this is scraper-backend's OWN copy. api-backend keeps its
 -- own separate copy, kept in sync by hand — no shared package between
--- services. Intended to run ONCE against an empty database — CREATE TYPE
--- has no IF NOT EXISTS in Postgres, so re-running this without dropping
--- first will fail with "type already exists". Use
+-- services. Intended to run ONCE against an empty database — the enum
+-- types below are wrapped in DO blocks so re-running is safe for THEM
+-- (see §1), but the CREATE TABLE statements still aren't idempotent, so
+-- re-running this without dropping first will still fail with
+-- "relation already exists" on the tables. Use
 -- `python -m db.init_db init --drop` for a clean local re-init.
 -- =====================================================================
 
@@ -54,18 +56,38 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;      -- fuzzy name / party search
 --            everything else is a lookup table so you can add values
 --            without a migration)
 -- ---------------------------------------------------------------------
-CREATE TYPE doc_type_enum        AS ENUM ('CaseLaw', 'BusinessPolicy');
-CREATE TYPE ingestion_status_enum AS ENUM (
-    'QUEUED', 'DOWNLOADED', 'DOWNLOAD_FAILED',
-    'OCR_DONE', 'OCR_FAILED',
-    'PROMOTED', 'PROMOTION_FAILED', 'NEEDS_REVIEW'
-);
-CREATE TYPE disposition_category_enum AS ENUM (
-    'Allowed', 'Dismissed', 'Partly Allowed', 'Disposed',
-    'Remanded', 'Withdrawn', 'Quashed', 'Set Aside', 'Other'
-);
-CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
-CREATE TYPE favouring_party_enum AS ENUM ('Petitioner', 'Respondent', 'Partly', 'Neither');
+-- Postgres has no CREATE TYPE IF NOT EXISTS, so each is wrapped in a
+-- DO block that swallows only duplicate_object — this is what actually
+-- makes schema.sql safe to re-run against a database that already has the
+-- types but not the tables (e.g. cr_cases got dropped/recreated separately
+-- from these types at some point) instead of aborting the whole script.
+DO $$ BEGIN
+    CREATE TYPE doc_type_enum AS ENUM ('CaseLaw', 'BusinessPolicy');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE ingestion_status_enum AS ENUM (
+        'QUEUED', 'DOWNLOADED', 'DOWNLOAD_FAILED',
+        'OCR_DONE', 'OCR_FAILED',
+        'PROMOTED', 'PROMOTION_FAILED', 'NEEDS_REVIEW'
+    );
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE disposition_category_enum AS ENUM (
+        'Allowed', 'Dismissed', 'Partly Allowed', 'Disposed',
+        'Remanded', 'Withdrawn', 'Quashed', 'Set Aside', 'Other'
+    );
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE favouring_party_enum AS ENUM ('Petitioner', 'Respondent', 'Partly', 'Neither');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
 
 -- ---------------------------------------------------------------------
 -- 2. MASTER / LOOKUP TABLES

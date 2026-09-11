@@ -177,6 +177,19 @@ def _core_schema_exists(conn) -> bool:
         return cur.fetchone()[0]
 
 
+# Same fixed key as scraper-backend's db/init_db.py — deliberately NOT a
+# separate per-service key. Both services share one Postgres instance in
+# production (see connection.py's pool-sizing note), and both run this same
+# check-then-apply-non-idempotent-DDL dance at startup, so the lock has to
+# be held across services, not just across replicas of one service, or two
+# instances (api-backend vs scraper-backend, or two replicas of the same
+# service during a rolling deploy) can still both see `cr_cases` missing at
+# the same time and race each other's CREATE TYPE — which is exactly the
+# "type already exists" crash this lock exists to prevent. Keep this
+# literal value identical to scraper-backend's _ENSURE_SCHEMA_LOCK_KEY.
+_ENSURE_SCHEMA_LOCK_KEY = 279_460_113
+
+
 def ensure_schema() -> None:
     """
     Startup-safe entry point: picks standalone vs shared-DB automatically.
@@ -190,22 +203,39 @@ def ensure_schema() -> None:
       shared-DB deployment where api-backend's own tables/view aren't
       there yet.
 
+    Holds a session-level Postgres advisory lock for the whole check+apply
+    so that two instances starting concurrently against the same database
+    (two replicas of this service cold-starting together, a rolling deploy
+    overlap, or a race against scraper-backend's own ensure_schema in the
+    shared-DB deployment) serialize instead of both racing schema.sql's
+    non-idempotent CREATE TYPE/CREATE TABLE statements.
+
     Safe to call on every app startup either way.
     """
-    conn = get_connection()
+    lock_conn = get_connection()
     try:
-        core_exists = _core_schema_exists(conn)
-    finally:
-        conn.close()
+        with lock_conn.cursor() as cur:
+            cur.execute("SELECT pg_advisory_lock(%s);", (_ENSURE_SCHEMA_LOCK_KEY,))
+        try:
+            conn = get_connection()
+            try:
+                core_exists = _core_schema_exists(conn)
+            finally:
+                conn.close()
 
-    if not core_exists:
-        print("No schema detected — applying schema.sql + all supplements for the first time...")
-        init_database(drop_existing=False)
-    else:
-        print("Core schema already present — ensuring api-backend's own supplement tables/view exist...")
-        ensure_supplement()
-        ensure_filters()
-        ensure_view()
+            if not core_exists:
+                print("No schema detected — applying schema.sql + all supplements for the first time...")
+                init_database(drop_existing=False)
+            else:
+                print("Core schema already present — ensuring api-backend's own supplement tables/view exist...")
+                ensure_supplement()
+                ensure_filters()
+                ensure_view()
+        finally:
+            with lock_conn.cursor() as cur:
+                cur.execute("SELECT pg_advisory_unlock(%s);", (_ENSURE_SCHEMA_LOCK_KEY,))
+    finally:
+        lock_conn.close()
 
 
 def main() -> None:

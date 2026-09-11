@@ -44,10 +44,10 @@
 -- responses entirely rather than return always-empty placeholders.
 --
 -- Only ONE of the two services should actually run `python -m db.init_db
--- init` against a given Postgres instance in a shared-DB deployment
--- (CREATE TYPE has no IF NOT EXISTS, so running it from both would fail on
--- the second run) — scraper-backend is the natural owner since it's the
--- write side and existed first. api-backend then runs `ensure-supplement`
+-- init` against a given Postgres instance in a shared-DB deployment —
+-- the CREATE TABLE statements below still aren't idempotent even though
+-- the enum types now are (see §1) — scraper-backend is the natural owner
+-- since it's the write side and existed first. api-backend then runs `ensure-supplement`
 -- (cr_search_history) and `ensure-filters` (the three filter/
 -- search tables) against that same database. Each service's own
 -- docker-compose.yml still spins up its own separate Postgres for local dev
@@ -70,18 +70,38 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;      -- fuzzy name / party search
 --            everything else is a lookup table so you can add values
 --            without a migration)
 -- ---------------------------------------------------------------------
-CREATE TYPE doc_type_enum        AS ENUM ('CaseLaw', 'BusinessPolicy');
-CREATE TYPE ingestion_status_enum AS ENUM (
-    'QUEUED', 'DOWNLOADED', 'DOWNLOAD_FAILED',
-    'OCR_DONE', 'OCR_FAILED',
-    'PROMOTED', 'PROMOTION_FAILED', 'NEEDS_REVIEW'
-);
-CREATE TYPE disposition_category_enum AS ENUM (
-    'Allowed', 'Dismissed', 'Partly Allowed', 'Disposed',
-    'Remanded', 'Withdrawn', 'Quashed', 'Set Aside', 'Other'
-);
-CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
-CREATE TYPE favouring_party_enum AS ENUM ('Petitioner', 'Respondent', 'Partly', 'Neither');
+-- Postgres has no CREATE TYPE IF NOT EXISTS, so each is wrapped in a
+-- DO block that swallows only duplicate_object — this is what actually
+-- makes schema.sql safe to re-run against a database that already has the
+-- types but not the tables (e.g. cr_cases got dropped/recreated separately
+-- from these types at some point) instead of aborting the whole script.
+DO $$ BEGIN
+    CREATE TYPE doc_type_enum AS ENUM ('CaseLaw', 'BusinessPolicy');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE ingestion_status_enum AS ENUM (
+        'QUEUED', 'DOWNLOADED', 'DOWNLOAD_FAILED',
+        'OCR_DONE', 'OCR_FAILED',
+        'PROMOTED', 'PROMOTION_FAILED', 'NEEDS_REVIEW'
+    );
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE disposition_category_enum AS ENUM (
+        'Allowed', 'Dismissed', 'Partly Allowed', 'Disposed',
+        'Remanded', 'Withdrawn', 'Quashed', 'Set Aside', 'Other'
+    );
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE favouring_party_enum AS ENUM ('Petitioner', 'Respondent', 'Partly', 'Neither');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
 
 -- ---------------------------------------------------------------------
 -- 2. MASTER / LOOKUP TABLES
