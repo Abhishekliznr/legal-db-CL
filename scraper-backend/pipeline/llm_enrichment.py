@@ -73,6 +73,7 @@ import requests
 from db.connection import get_pooled_connection
 from normalization.acts import resolve_act
 from normalization.industries import CANONICAL_INDUSTRIES, resolve_industry
+from normalization.ocr_artifacts import strip_ocr_noise as _strip_ocr_noise
 from pipeline.azure_openai import azure_config, is_configured
 from pipeline.promotion import _get_or_create_industry, _get_or_create_ministry, _resolve_provisions
 from pipeline.regex_extraction import KNOWN_MINISTRIES, find_provision_paragraphs, resolve_ministry
@@ -113,31 +114,6 @@ _CONCLUSION_HEADING_RE = re.compile(
     r"^[\s\d.]*(?:FINAL\s+)?(?:CONCLUSIONS?|OPERATIVE|RESULT|RELIEF)\b[^\n]*$",
     re.MULTILINE,
 )
-
-# A digital-signature block, e.g. "Digitally signed by\nJohn Doe\nDate: ...
-# \nReason: ...\nSignature Not Verified" -- boilerplate that otherwise eats
-# into the head excerpt's budget on every e-filed judgment. Capped span so
-# a missing closing marker can't make this scan an unbounded distance.
-_SIGNATURE_BLOCK_RE = re.compile(r"Digitally signed by.{0,500}?Signature Not Verified", re.IGNORECASE | re.DOTALL)
-
-# A table-of-contents line with dot leaders, e.g. "Conclusion .......... 42".
-_DOT_LEADER_LINE_RE = re.compile(r"^.*\.{5,}.*$\n?", re.MULTILINE)
-
-# A line containing only a 1-3 digit page number.
-_PAGE_NUMBER_LINE_RE = re.compile(r"^[ \t]*\d{1,3}[ \t]*$\n?", re.MULTILINE)
-
-
-def _strip_ocr_noise(text: str) -> str:
-    """Removes signature blocks, dot-leader TOC lines, bare page-number lines, and collapses blank runs -- boilerplate that otherwise displaces real content from the head/tail excerpt budget."""
-    if not text:
-        return ""
-    cleaned = _SIGNATURE_BLOCK_RE.sub("", text)
-    cleaned = _DOT_LEADER_LINE_RE.sub("", cleaned)
-    cleaned = _PAGE_NUMBER_LINE_RE.sub("", cleaned)
-    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
-    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
-    return cleaned.strip()
-
 
 def _build_excerpt(ocr_text: str) -> Tuple[str, str]:
     """

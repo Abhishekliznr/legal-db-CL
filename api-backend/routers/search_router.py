@@ -37,9 +37,44 @@ existing `provisions` field but from `cr_cases.sections_relevant/_other`
 (and the matching rules_/orders_ columns) instead of the unified
 sections/rules/orders arrays. See db/schema.sql's cr_cases comment for why
 these aren't guaranteed a strict partition of `provisions`.
+
+Updated 2026-09-11: both endpoints now project every field
+`cr_case_search_view` exposes except `judgement`/`ocr_text` on the list
+endpoint (full opinion text and raw OCR text are detail-only — too large
+per row on a paginated list). Also reverses the 2026-09-08 "URL
+construction is a frontend concern" decision for the PDF blob: this
+service now also returns `blob_pdf_url`, `blob_pdf_id` resolved against
+BLOB_BASE_URL/BLOB_CONTAINER env vars server-side (null if either is
+unset) — `blob_pdf_id` itself is kept as-is for callers that already
+build their own link.
+
+Updated 2026-09-12: `get_case_detail`'s own SELECT had silently never
+actually fetched `judgement`/`ocr_text` (both were declared on `CaseDetail`
+and unconditionally serialized as null; `tests/manual_phase4_e2e.py`'s
+`detail["ocr_text"]` assertion was accordingly broken) — fixed alongside
+adding `structured_content` (scraper-backend's parsers/judgment_parser.py
+output, mirrored onto this service's own `cr_cases`/`cr_case_search_view`
+copies), also detail-only for the same payload-size reason as
+`judgement`/`ocr_text`.
+
+Updated 2026-09-13: `cr_case_search_view` gained a `provisions` column
+(act+section/rule/order pairs, resolved the same way `get_case_detail`'s
+unified `provisions` is — not the _relevant/_other LLM subsets) since the
+existing `act_names` here is act-level only, with no section attached.
+`CaseListItem.provisions` projects it so the frontend's case-research quick
+view can show per-act sections without a second request to the detail
+endpoint.
+
+Also `get_case_detail`'s `provisions`/`relevant_provisions`/`other_provisions`
+(the UNION ALL of sections/rules/orders, unified and LLM-classified) are
+replaced with `sections`/`rules`/`orders`, each already split by kind and
+carrying only the unified (non-_relevant/_other) set -- the detail page
+now renders one row per kind and dropped the relevant/other split, and nothing
+else read those fields.
 """
 
 import logging
+import os
 from typing import Optional, List, Dict, Any, Union
 
 import psycopg2
@@ -51,6 +86,15 @@ from db.connection import get_pooled_connection
 logger = logging.getLogger("api_backend_v2.search")
 
 router = APIRouter(tags=["Case Search & Details"])
+
+_BLOB_BASE_URL = os.environ.get("BLOB_BASE_URL", "").strip().rstrip("/")
+_BLOB_CONTAINER = os.environ.get("BLOB_CONTAINER", "").strip().strip("/")
+
+
+def _build_blob_pdf_url(blob_pdf_id: Optional[str]) -> Optional[str]:
+    if not blob_pdf_id or not _BLOB_BASE_URL or not _BLOB_CONTAINER:
+        return None
+    return f"{_BLOB_BASE_URL}/{_BLOB_CONTAINER}/{blob_pdf_id}"
 
 
 # ============================================================
@@ -111,21 +155,30 @@ class CaseListItem(BaseModel):
     judgment_date: Optional[str] = None
     language: Optional[str] = None
     disposition: Optional[str] = None
+    document_type: Optional[str] = None
     subject: Optional[str] = None
     case_category: List[str] = []
     case_note: Optional[str] = None
+    conclusion: Optional[str] = None
     favouring_party: Optional[str] = None
-    # Two separate fields, not one merged "pdf_url" -- blob_pdf_id is a bare
-    # path within the blob container (e.g. "SCIN/<checksum>.pdf"), not a
-    # usable URL on its own; the frontend prepends the account+container
-    # base URL itself. source_pdf_url is already a complete URL (the
-    # court's own site) and can be used as-is.
+    # blob_pdf_id is the bare path within the blob container (e.g.
+    # "SCIN/<checksum>.pdf"); blob_pdf_url is that path resolved against
+    # BLOB_BASE_URL/BLOB_CONTAINER server-side, null if either env var is
+    # unset. source_pdf_url is already a complete URL (the court's own
+    # site) and can be used as-is.
     blob_pdf_id: Optional[str] = None
+    blob_pdf_url: Optional[str] = None
     source_pdf_url: Optional[str] = None
     court_name: str
+    court_id: Optional[str] = None
+    judgment_by: Optional[str] = None
     parties: List[PartySummary] = []
     judges: List[JudgeSummary] = []
     acts: List[str] = []
+    provisions: List[ProvisionSummary] = []
+    ministries: List[str] = []
+    industries: List[str] = []
+    needs_review: bool = False
 
 
 class CaseSearchResponse(BaseModel):
@@ -149,26 +202,33 @@ class CaseDetail(BaseModel):
     conclusion: Optional[str] = None
     judgement: Optional[str] = None
     ocr_text: Optional[str] = None
+    # Deterministic StructuredJudgment JSON (scraper-backend's
+    # parsers/judgment_parser.py) -- numbered paragraphs/headings/document
+    # extracts/citations/statutory references/final order, each paragraph
+    # addressable via its own "number" field for deep links/annotations.
+    # NULL for cases promoted before this column existed; frontends should
+    # fall back to rendering `judgement` as plain text in that case.
+    structured_content: Optional[Dict[str, Any]] = None
     blob_pdf_id: Optional[str] = None
+    blob_pdf_url: Optional[str] = None
     source_pdf_url: Optional[str] = None
     court_name: str
     court_id: Optional[str] = None
+    judgment_by: Optional[str] = None
     parties: List[PartySummary] = []
     judges: List[JudgeSummary] = []
-    provisions: List[ProvisionSummary] = []
+    # Split by provision kind (unified sections/rules/orders arrays -- not
+    # the LLM-classified _relevant/_other subsets, dropped 2026-09-13 since
+    # no frontend view rendered that split) so the detail page can show one
+    # row per kind instead of one flat "provisions" list.
+    sections: List[ProvisionSummary] = []
+    rules: List[ProvisionSummary] = []
+    orders: List[ProvisionSummary] = []
     subject: Optional[str] = None
     case_category: List[str] = []
     ministries: List[str] = []
     industries: List[str] = []
     favouring_party: Optional[str] = None
-    # Same shape as `provisions` (the unified sections/rules/orders union),
-    # but the LLM-classified subset (llm_enrichment.py's sections_relevant/
-    # _other etc.) -- "relevant" = the operative provision(s) the case is
-    # actually charged/founded/appealed under, "other" = everything else
-    # discussed. Not guaranteed a strict partition of `provisions` above --
-    # see db/schema.sql's cr_cases.sections_relevant comment.
-    relevant_provisions: List[ProvisionSummary] = []
-    other_provisions: List[ProvisionSummary] = []
     needs_review: bool = False
 
 
@@ -307,9 +367,11 @@ def execute_case_search(
 
             cur.execute(f"""
                 SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
-                       v.language, v.disposition, v.subject_name, v.category_names,
-                       v.case_note, v.blob_pdf_id, v.source_pdf_url, v.court_name,
-                       v.petitioner, v.respondent, v.bench_names, v.act_names, v.favouring_party
+                       v.language, v.disposition, v.document_type, v.subject_name, v.category_names,
+                       v.case_note, v.conclusion, v.blob_pdf_id, v.source_pdf_url, v.court_name,
+                       v.court_id, v.judgment_by_name, v.petitioner, v.respondent, v.bench_names,
+                       v.act_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review,
+                       v.provisions
                 FROM cr_case_search_view v
                 {where_sql}
                 {order_sql}
@@ -320,9 +382,11 @@ def execute_case_search(
             results = []
             for r in rows:
                 (case_id, case_number, liznr_id, neutral_citation, judgment_date,
-                 language, disposition, subject_name, category_names,
-                 case_note, blob_pdf_id, source_pdf_url, court_name,
-                 petitioner, respondent, bench_names, act_names, favouring_party) = r
+                 language, disposition, document_type, subject_name, category_names,
+                 case_note, conclusion, blob_pdf_id, source_pdf_url, court_name,
+                 court_id, judgment_by_name, petitioner, respondent, bench_names,
+                 act_names, ministry_names, industry_names, favouring_party, needs_review,
+                 provisions) = r
 
                 parties = ([{"name": petitioner, "role": "PETITIONER"}] if petitioner else []) + \
                           ([{"name": respondent, "role": "RESPONDENT"}] if respondent else [])
@@ -336,16 +400,25 @@ def execute_case_search(
                     "judgment_date": judgment_date.strftime("%Y-%m-%d") if judgment_date else None,
                     "language": language,
                     "disposition": disposition,
+                    "document_type": document_type,
                     "subject": subject_name,
                     "case_category": category_names or [],
                     "case_note": case_note,
+                    "conclusion": conclusion,
                     "favouring_party": favouring_party,
                     "blob_pdf_id": blob_pdf_id,
+                    "blob_pdf_url": _build_blob_pdf_url(blob_pdf_id),
                     "source_pdf_url": source_pdf_url,
                     "court_name": court_name,
+                    "court_id": str(court_id) if court_id else None,
+                    "judgment_by": judgment_by_name,
                     "parties": parties,
                     "judges": judges,
                     "acts": act_names or [],
+                    "provisions": provisions or [],
+                    "ministries": ministry_names or [],
+                    "industries": industry_names or [],
+                    "needs_review": needs_review,
                 })
 
             return {"total": total_records, "page": page, "limit": limit, "total_pages": total_pages, "results": results}
@@ -445,10 +518,11 @@ def get_case_detail(case_id: str):
                 id_params = [valid_int_id] if valid_int_id is not None else []
                 cur.execute(f"""
                     SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
-                           v.language, v.disposition, v.document_type, v.case_note, v.conclusion, v.judgement,
-                           v.ocr_text, v.blob_pdf_id, v.source_pdf_url, v.court_name, v.court_id,
-                           v.petitioner, v.respondent, v.bench_names, v.subject_name, v.category_names,
-                           v.ministry_names, v.industry_names, v.favouring_party, v.needs_review
+                           v.language, v.disposition, v.document_type, v.case_note, v.conclusion,
+                           v.judgement, v.ocr_text, v.structured_content,
+                           v.blob_pdf_id, v.source_pdf_url, v.court_name, v.court_id,
+                           v.judgment_by_name, v.petitioner, v.respondent, v.bench_names, v.subject_name,
+                           v.category_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review
                     FROM cr_case_search_view v
                     WHERE {id_clause}v.case_number = %s OR v.liznr_id = %s;
                 """, (*id_params, case_id, case_id))
@@ -457,96 +531,61 @@ def get_case_detail(case_id: str):
                     raise HTTPException(status_code=404, detail="Case not found.")
 
                 (db_case_id, case_number, liznr_id, neutral_citation, judgment_date,
-                 language, disposition, document_type, case_note, conclusion, judgement,
-                 ocr_text, blob_pdf_id, source_pdf_url, court_name, court_id,
-                 petitioner, respondent, bench_names, subject_name, category_names,
-                 ministry_names, industry_names, favouring_party, needs_review) = row
+                 language, disposition, document_type, case_note, conclusion,
+                 judgement, ocr_text, structured_content,
+                 blob_pdf_id, source_pdf_url, court_name, court_id,
+                 judgment_by_name, petitioner, respondent, bench_names, subject_name,
+                 category_names, ministry_names, industry_names, favouring_party, needs_review) = row
 
                 parties = ([{"name": petitioner, "role": "PETITIONER"}] if petitioner else []) + \
                           ([{"name": respondent, "role": "RESPONDENT"}] if respondent else [])
                 judges = [{"name": j, "role": None} for j in (bench_names or [])]
 
-                # Provisions reconstructed from the raw id arrays (not carried
-                # by cr_case_search_view) -- sections/rules/orders each resolve
-                # back to `cr_acts` for the act name that goes with each number.
+                # Sections/rules/orders reconstructed from the raw id arrays
+                # (not carried by cr_case_search_view), each resolved back to
+                # `cr_acts` for the act name that goes with each number. Kept
+                # as three separate queries (not the old UNION ALL "provisions"
+                # blob) so the detail page can render one row per kind.
                 cur.execute("""
                     SELECT a.act_name, s.section_number
                     FROM cr_cases c
                     JOIN cr_sections s ON s.section_id = ANY(c.sections)
                     JOIN cr_acts a ON a.act_id = s.act_id
-                    WHERE c.case_id = %s
-                    UNION ALL
+                    WHERE c.case_id = %s;
+                """, (db_case_id,))
+                sections = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
+
+                cur.execute("""
                     SELECT a.act_name, r.rule_number
                     FROM cr_cases c
                     JOIN cr_rules r ON r.rule_id = ANY(c.rules)
                     JOIN cr_acts a ON a.act_id = r.act_id
-                    WHERE c.case_id = %s
-                    UNION ALL
+                    WHERE c.case_id = %s;
+                """, (db_case_id,))
+                rules = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
+
+                cur.execute("""
                     SELECT a.act_name, o.order_number
                     FROM cr_cases c
                     JOIN cr_orders o ON o.order_id = ANY(c.orders)
                     JOIN cr_acts a ON a.act_id = o.act_id
                     WHERE c.case_id = %s;
-                """, (db_case_id, db_case_id, db_case_id))
-                provisions = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
-
-                # LLM-classified relevant/other subsets (sections_relevant/
-                # _other etc. -- see db/schema.sql's cr_cases comment) --
-                # same act-name/number resolution as `provisions` above, run
-                # against the separate id arrays.
-                cur.execute("""
-                    SELECT a.act_name, s.section_number
-                    FROM cr_cases c
-                    JOIN cr_sections s ON s.section_id = ANY(c.sections_relevant)
-                    JOIN cr_acts a ON a.act_id = s.act_id
-                    WHERE c.case_id = %s
-                    UNION ALL
-                    SELECT a.act_name, r.rule_number
-                    FROM cr_cases c
-                    JOIN cr_rules r ON r.rule_id = ANY(c.rules_relevant)
-                    JOIN cr_acts a ON a.act_id = r.act_id
-                    WHERE c.case_id = %s
-                    UNION ALL
-                    SELECT a.act_name, o.order_number
-                    FROM cr_cases c
-                    JOIN cr_orders o ON o.order_id = ANY(c.orders_relevant)
-                    JOIN cr_acts a ON a.act_id = o.act_id
-                    WHERE c.case_id = %s;
-                """, (db_case_id, db_case_id, db_case_id))
-                relevant_provisions = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
-
-                cur.execute("""
-                    SELECT a.act_name, s.section_number
-                    FROM cr_cases c
-                    JOIN cr_sections s ON s.section_id = ANY(c.sections_other)
-                    JOIN cr_acts a ON a.act_id = s.act_id
-                    WHERE c.case_id = %s
-                    UNION ALL
-                    SELECT a.act_name, r.rule_number
-                    FROM cr_cases c
-                    JOIN cr_rules r ON r.rule_id = ANY(c.rules_other)
-                    JOIN cr_acts a ON a.act_id = r.act_id
-                    WHERE c.case_id = %s
-                    UNION ALL
-                    SELECT a.act_name, o.order_number
-                    FROM cr_cases c
-                    JOIN cr_orders o ON o.order_id = ANY(c.orders_other)
-                    JOIN cr_acts a ON a.act_id = o.act_id
-                    WHERE c.case_id = %s;
-                """, (db_case_id, db_case_id, db_case_id))
-                other_provisions = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
+                """, (db_case_id,))
+                orders = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
 
                 return {
                     "id": str(db_case_id), "case_number": case_number, "liznr_id": liznr_id,
                     "neutral_citation": neutral_citation,
                     "judgment_date": judgment_date.strftime("%Y-%m-%d") if judgment_date else None,
                     "language": language, "disposition": disposition, "document_type": document_type,
-                    "case_note": case_note, "conclusion": conclusion, "judgement": judgement,
-                    "ocr_text": ocr_text,
-                    "blob_pdf_id": blob_pdf_id, "source_pdf_url": source_pdf_url,
+                    "case_note": case_note, "conclusion": conclusion,
+                    "judgement": judgement, "ocr_text": ocr_text, "structured_content": structured_content,
+                    "blob_pdf_id": blob_pdf_id, "blob_pdf_url": _build_blob_pdf_url(blob_pdf_id),
+                    "source_pdf_url": source_pdf_url,
                     "court_name": court_name, "court_id": str(court_id) if court_id else None,
-                    "parties": parties, "judges": judges, "provisions": provisions,
-                    "relevant_provisions": relevant_provisions, "other_provisions": other_provisions,
+                    "judgment_by": judgment_by_name,
+                    "parties": parties, "judges": judges,
+                    "sections": sections, "rules": rules, "orders": orders,
                     "subject": subject_name, "case_category": category_names or [],
                     "ministries": ministry_names or [], "industries": industry_names or [],
                     "favouring_party": favouring_party, "needs_review": needs_review,

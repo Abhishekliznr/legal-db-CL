@@ -296,6 +296,11 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading), LLM fallback if regex found nothing
     judgement          TEXT,                     -- full opinion text after the "J U D G M E N T"/"O R D E R" heading
     ocr_text           TEXT,
+    -- Deterministic StructuredJudgment JSON from scraper-backend's
+    -- parsers/judgment_parser.py (numbered paragraphs, headings, document
+    -- extracts, citations, statutory references, final order) -- mirrored
+    -- here for schema parity only, this service never writes it.
+    structured_content JSONB,
 
     source_pdf_url     TEXT,
     blob_pdf_id       TEXT,

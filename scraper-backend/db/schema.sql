@@ -295,7 +295,17 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     case_note          TEXT,                     -- LLM-generated headnote (pipeline/llm_enrichment.py), Manupatra-style dash-separated digest
     conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading) -- see pipeline/regex_extraction.py
     judgement          TEXT,                     -- full opinion text after the "J U D G M E N T"/"O R D E R" heading
-    ocr_text           TEXT,                     -- final OCR text, source of truth for judgement/conclusion/provisions above
+    ocr_text           TEXT,                     -- final OCR text, source of truth for judgement/conclusion/provisions above -- NEVER overwritten by parsing/enrichment
+    -- Deterministic structural parse of ocr_text (parsers/judgment_parser.py,
+    -- 2026-09-12) -- StructuredJudgment JSON (parsers/schema.py): numbered
+    -- paragraphs (each addressable as "para-N" for deep links/annotations),
+    -- headings, document extracts (FIR/recovery memo/etc.), citations,
+    -- statutory references, final order, and removed OCR artifacts. Computed
+    -- once at promotion time from ocr_text alone -- no LLM involved, and
+    -- never mutated by pipeline/llm_enrichment.py's later enrichment pass.
+    -- NULL for rows promoted before this column existed (see
+    -- db/migrations/0005_add_structured_content.sql for backfill guidance).
+    structured_content JSONB,
 
     source_pdf_url     TEXT,
     blob_pdf_id       TEXT,

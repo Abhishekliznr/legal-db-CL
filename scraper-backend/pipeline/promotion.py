@@ -21,10 +21,13 @@ import re
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+from psycopg2.extras import Json
+
 from adapters.base import RawJudgmentRecord
 from db import scrape_jobs
 from db.connection import get_pooled_connection
 from normalization import case_numbers, judges, parties
+from parsers.judgment_parser import parse_judgment
 from pipeline import regex_extraction as rx
 
 logger = logging.getLogger("scraper_backend_v2.promotion")
@@ -395,6 +398,19 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
         judgement_body = rx.extract_judgment_body(ocr_text)
         classified_category = case_numbers.classify_category(case_number) is not None
 
+        # Deterministic structural parse of the raw OCR text (parsers/judgment_parser.py)
+        # -- entirely separate from, and computed before, pipeline/llm_enrichment.py's
+        # later LLM pass. Never raises: a parser bug degrades to one unstructured
+        # section holding the verbatim ocr_text (see parse_judgment's own docstring),
+        # so it can never block promotion or lose the source text.
+        structured_content = parse_judgment(
+            ocr_text,
+            bench=bench_names,
+            judgment_date=judgment_date.isoformat() if judgment_date else None,
+            case_number=case_number,
+            neutral_citation=record.neutral_citation_raw,
+        )
+
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
                 judge_ids = _resolve_bench(cur, bench_names)
@@ -409,7 +425,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         liznr_id, court_id, case_number, petitioner, respondent,
                         bench, judgment_by, judgment_date, language, neutral_citation,
                         sections, acts, rules, orders, subject,
-                        conclusion, judgement, ocr_text,
+                        conclusion, judgement, ocr_text, structured_content,
                         source_pdf_url, blob_pdf_id,
                         ministries, industries,
                         disposition, document_type, case_category,
@@ -418,7 +434,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s,
                         '{}', '{}', '{}', '{}', %s,
-                        %s, %s, %s,
+                        %s, %s, %s, %s,
                         %s, %s,
                         %s, '{}',
                         %s, 'CaseLaw', %s,
@@ -435,7 +451,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                     None, court_id, case_number, petitioner, respondent,
                     judge_ids, judgment_by_id, judgment_date, record.extra.get("language"), record.neutral_citation_raw,
                     subject_id,
-                    conclusion, judgement_body, ocr_text,
+                    conclusion, judgement_body, ocr_text, Json(structured_content),
                     record.source_url, ingestion["blob_pdf_id"],
                     ministry_ids,
                     disposition, category_ids,

@@ -147,7 +147,7 @@ def main():
         assert detail["case_category"] == ["Criminal Appeal"]
         assert {p["name"] for p in detail["parties"]} == {"PARDESHIRAM", "STATE OF M.P. (NOW CHHATTISGARH)"}
         assert {j["name"] for j in detail["judges"]} == {"HEMANT GUPTA", "S. RAVINDRA BHAT"}
-        section_numbers = {p["section"] for p in detail["provisions"] if p["act_name"] == "Indian Penal Code, 1860"}
+        section_numbers = {p["section"] for p in detail["sections"] if p["act_name"] == "Indian Penal Code, 1860"}
         assert {"302", "300", "304"} <= section_numbers
         assert detail["ministries"] == []
         assert detail["needs_review"] is False

@@ -58,7 +58,34 @@ SELECT
     -- LLM-classified (llm_enrichment.py); no reliable regex signal exists
     -- for this field -- see db/schema.sql's cr_cases.industries comment.
     (SELECT array_agg(DISTINCT i.industry_name)
-       FROM cr_industries i WHERE i.industry_id = ANY(c.industries)) AS industry_names
+       FROM cr_industries i WHERE i.industry_id = ANY(c.industries)) AS industry_names,
+    -- Appended at the END, not alongside judgement/ocr_text above where it
+    -- would read more naturally -- CREATE OR REPLACE VIEW refuses to
+    -- reorder/insert a column into an existing view's column list (Postgres
+    -- error: "cannot change name of view column ... to ..."), only to add
+    -- one at the very end. See db/schema.sql's cr_cases.structured_content
+    -- comment for what this actually is.
+    c.structured_content,
+    -- act_names above is act-level only (c.acts, no section attached) --
+    -- this resolves the actual per-provision act+number pairs the same way
+    -- get_case_detail's `provisions` does (unified sections/rules/orders,
+    -- not the _relevant/_other LLM subsets), so the list/search endpoint can
+    -- show "Act — Section" instead of just bare act names.
+    (SELECT jsonb_agg(jsonb_build_object('act_name', prov.act_name, 'section', prov.section_number))
+       FROM (
+           SELECT a.act_name, s.section_number
+           FROM cr_sections s JOIN cr_acts a ON a.act_id = s.act_id
+           WHERE s.section_id = ANY(c.sections)
+           UNION ALL
+           SELECT a.act_name, r.rule_number
+           FROM cr_rules r JOIN cr_acts a ON a.act_id = r.act_id
+           WHERE r.rule_id = ANY(c.rules)
+           UNION ALL
+           SELECT a.act_name, o.order_number
+           FROM cr_orders o JOIN cr_acts a ON a.act_id = o.act_id
+           WHERE o.order_id = ANY(c.orders)
+       ) prov
+    ) AS provisions
 FROM cr_cases c
 JOIN cr_courts crt ON crt.court_id = c.court_id
 LEFT JOIN cr_judges jb ON jb.judge_id = c.judgment_by
