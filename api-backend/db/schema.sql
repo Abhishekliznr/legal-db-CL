@@ -37,11 +37,16 @@
 -- Real, permanent feature loss from this rewrite, not yet reintroduced by
 -- anything: citation/treatment tracking (`citations` table is gone —
 -- `treatment_status`/`cited_by`/`citations_made` no longer exist anywhere),
--- advocate/counsel data (`case_counsels`/`advocates` gone, no advocate
--- column on `cr_cases` at all), and holdings/timeline/prior-appellate-history
--- (all LLM-envelope fields the old schema modeled that this iteration
--- doesn't store). routers/*.py were rewritten to drop these from API
--- responses entirely rather than return always-empty placeholders.
+-- and holdings/timeline/prior-appellate-history (all LLM-envelope fields
+-- the old schema modeled that this iteration doesn't store). routers/*.py
+-- were rewritten to drop these from API responses entirely rather than
+-- return always-empty placeholders.
+--
+-- Advocate/counsel data (`case_counsels`/`advocates` gone) was reintroduced
+-- 2026-09-13 as flat `petitioner_advocate`/`respondent_advocate` columns on
+-- `cr_cases` (db/migrations/0007_add_advocates_filing_year.sql), matching
+-- this schema's flat-columns-over-junction-tables shape rather than
+-- restoring the old separate tables.
 --
 -- Only ONE of the two services should actually run `python -m db.init_db
 -- init` against a given Postgres instance in a shared-DB deployment —
@@ -262,6 +267,20 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     case_number        TEXT NOT NULL,
     petitioner         TEXT,
     respondent         TEXT,
+    petitioner_advocate TEXT,  -- regex-parsed from the SCI results table's "Petitioner/Respondent
+                               -- Advocate" cell (pipeline/regex_extraction.parse_advocates) --
+                               -- reintroduces the advocate data the 2026-09-08 flattening dropped
+    respondent_advocate TEXT,  -- frequently NULL even when petitioner_advocate isn't -- see
+                               -- parse_advocates' own docstring on why the respondent side is so
+                               -- often simply missing from the source cell, not a parsing failure
+
+    -- Filing year only (not a full filing DATE -- sci.gov.in's judgments-by-date
+    -- search table has no such column; the real filing/registration date lives
+    -- behind a separate per-case Case Status lookup this adapter doesn't call).
+    -- Parsed straight out of case_number (e.g. "... of 2021") via
+    -- normalization.case_numbers.extract_filing_year -- good enough for a coarse
+    -- case-age-in-years figure without a second scrape per case.
+    filing_year        INTEGER,
 
     bench              BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_judges.judge_id, full coram in bench order
     judgment_by        BIGINT REFERENCES cr_judges(judge_id),
@@ -296,11 +315,6 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading), LLM fallback if regex found nothing
     judgement          TEXT,                     -- full opinion text after the "J U D G M E N T"/"O R D E R" heading
     ocr_text           TEXT,
-    -- Deterministic StructuredJudgment JSON from scraper-backend's
-    -- parsers/judgment_parser.py (numbered paragraphs, headings, document
-    -- extracts, citations, statutory references, final order) -- mirrored
-    -- here for schema parity only, this service never writes it.
-    structured_content JSONB,
 
     source_pdf_url     TEXT,
     blob_pdf_id       TEXT,

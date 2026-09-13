@@ -51,11 +51,7 @@ build their own link.
 Updated 2026-09-12: `get_case_detail`'s own SELECT had silently never
 actually fetched `judgement`/`ocr_text` (both were declared on `CaseDetail`
 and unconditionally serialized as null; `tests/manual_phase4_e2e.py`'s
-`detail["ocr_text"]` assertion was accordingly broken) — fixed alongside
-adding `structured_content` (scraper-backend's parsers/judgment_parser.py
-output, mirrored onto this service's own `cr_cases`/`cr_case_search_view`
-copies), also detail-only for the same payload-size reason as
-`judgement`/`ocr_text`.
+`detail["ocr_text"]` assertion was accordingly broken) — fixed.
 
 Updated 2026-09-13: `cr_case_search_view` gained a `provisions` column
 (act+section/rule/order pairs, resolved the same way `get_case_detail`'s
@@ -135,6 +131,7 @@ class SearchRequestModel(BaseModel):
 class PartySummary(BaseModel):
     name: Optional[str] = None
     role: Optional[str] = None
+    advocate: Optional[str] = None
 
 
 class JudgeSummary(BaseModel):
@@ -179,6 +176,9 @@ class CaseListItem(BaseModel):
     ministries: List[str] = []
     industries: List[str] = []
     needs_review: bool = False
+    # Filing year only, parsed from case_number -- see db/schema.sql's
+    # cr_cases.filing_year comment for why this isn't a full filing date.
+    filing_year: Optional[int] = None
 
 
 class CaseSearchResponse(BaseModel):
@@ -202,13 +202,6 @@ class CaseDetail(BaseModel):
     conclusion: Optional[str] = None
     judgement: Optional[str] = None
     ocr_text: Optional[str] = None
-    # Deterministic StructuredJudgment JSON (scraper-backend's
-    # parsers/judgment_parser.py) -- numbered paragraphs/headings/document
-    # extracts/citations/statutory references/final order, each paragraph
-    # addressable via its own "number" field for deep links/annotations.
-    # NULL for cases promoted before this column existed; frontends should
-    # fall back to rendering `judgement` as plain text in that case.
-    structured_content: Optional[Dict[str, Any]] = None
     blob_pdf_id: Optional[str] = None
     blob_pdf_url: Optional[str] = None
     source_pdf_url: Optional[str] = None
@@ -230,6 +223,7 @@ class CaseDetail(BaseModel):
     industries: List[str] = []
     favouring_party: Optional[str] = None
     needs_review: bool = False
+    filing_year: Optional[int] = None
 
 
 # ============================================================
@@ -369,7 +363,8 @@ def execute_case_search(
                 SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
                        v.language, v.disposition, v.document_type, v.subject_name, v.category_names,
                        v.case_note, v.conclusion, v.blob_pdf_id, v.source_pdf_url, v.court_name,
-                       v.court_id, v.judgment_by_name, v.petitioner, v.respondent, v.bench_names,
+                       v.court_id, v.judgment_by_name, v.petitioner, v.respondent,
+                       v.petitioner_advocate, v.respondent_advocate, v.filing_year, v.bench_names,
                        v.act_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review,
                        v.provisions
                 FROM cr_case_search_view v
@@ -384,12 +379,13 @@ def execute_case_search(
                 (case_id, case_number, liznr_id, neutral_citation, judgment_date,
                  language, disposition, document_type, subject_name, category_names,
                  case_note, conclusion, blob_pdf_id, source_pdf_url, court_name,
-                 court_id, judgment_by_name, petitioner, respondent, bench_names,
+                 court_id, judgment_by_name, petitioner, respondent,
+                 petitioner_advocate, respondent_advocate, filing_year, bench_names,
                  act_names, ministry_names, industry_names, favouring_party, needs_review,
                  provisions) = r
 
-                parties = ([{"name": petitioner, "role": "PETITIONER"}] if petitioner else []) + \
-                          ([{"name": respondent, "role": "RESPONDENT"}] if respondent else [])
+                parties = ([{"name": petitioner, "role": "PETITIONER", "advocate": petitioner_advocate}] if petitioner else []) + \
+                          ([{"name": respondent, "role": "RESPONDENT", "advocate": respondent_advocate}] if respondent else [])
                 judges = [{"name": j, "role": None} for j in (bench_names or [])]
 
                 results.append({
@@ -419,6 +415,7 @@ def execute_case_search(
                     "ministries": ministry_names or [],
                     "industries": industry_names or [],
                     "needs_review": needs_review,
+                    "filing_year": filing_year,
                 })
 
             return {"total": total_records, "page": page, "limit": limit, "total_pages": total_pages, "results": results}
@@ -519,9 +516,11 @@ def get_case_detail(case_id: str):
                 cur.execute(f"""
                     SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
                            v.language, v.disposition, v.document_type, v.case_note, v.conclusion,
-                           v.judgement, v.ocr_text, v.structured_content,
+                           v.judgement, v.ocr_text,
                            v.blob_pdf_id, v.source_pdf_url, v.court_name, v.court_id,
-                           v.judgment_by_name, v.petitioner, v.respondent, v.bench_names, v.subject_name,
+                           v.judgment_by_name, v.petitioner, v.respondent,
+                           v.petitioner_advocate, v.respondent_advocate, v.filing_year,
+                           v.bench_names, v.subject_name,
                            v.category_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review
                     FROM cr_case_search_view v
                     WHERE {id_clause}v.case_number = %s OR v.liznr_id = %s;
@@ -532,13 +531,15 @@ def get_case_detail(case_id: str):
 
                 (db_case_id, case_number, liznr_id, neutral_citation, judgment_date,
                  language, disposition, document_type, case_note, conclusion,
-                 judgement, ocr_text, structured_content,
+                 judgement, ocr_text,
                  blob_pdf_id, source_pdf_url, court_name, court_id,
-                 judgment_by_name, petitioner, respondent, bench_names, subject_name,
+                 judgment_by_name, petitioner, respondent,
+                 petitioner_advocate, respondent_advocate, filing_year,
+                 bench_names, subject_name,
                  category_names, ministry_names, industry_names, favouring_party, needs_review) = row
 
-                parties = ([{"name": petitioner, "role": "PETITIONER"}] if petitioner else []) + \
-                          ([{"name": respondent, "role": "RESPONDENT"}] if respondent else [])
+                parties = ([{"name": petitioner, "role": "PETITIONER", "advocate": petitioner_advocate}] if petitioner else []) + \
+                          ([{"name": respondent, "role": "RESPONDENT", "advocate": respondent_advocate}] if respondent else [])
                 judges = [{"name": j, "role": None} for j in (bench_names or [])]
 
                 # Sections/rules/orders reconstructed from the raw id arrays
@@ -579,7 +580,7 @@ def get_case_detail(case_id: str):
                     "judgment_date": judgment_date.strftime("%Y-%m-%d") if judgment_date else None,
                     "language": language, "disposition": disposition, "document_type": document_type,
                     "case_note": case_note, "conclusion": conclusion,
-                    "judgement": judgement, "ocr_text": ocr_text, "structured_content": structured_content,
+                    "judgement": judgement, "ocr_text": ocr_text,
                     "blob_pdf_id": blob_pdf_id, "blob_pdf_url": _build_blob_pdf_url(blob_pdf_id),
                     "source_pdf_url": source_pdf_url,
                     "court_name": court_name, "court_id": str(court_id) if court_id else None,
@@ -589,6 +590,7 @@ def get_case_detail(case_id: str):
                     "subject": subject_name, "case_category": category_names or [],
                     "ministries": ministry_names or [], "industries": industry_names or [],
                     "favouring_party": favouring_party, "needs_review": needs_review,
+                    "filing_year": filing_year,
                 }
     except HTTPException:
         raise

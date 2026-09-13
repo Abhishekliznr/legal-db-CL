@@ -20,6 +20,9 @@ SELECT
     c.case_number,
     c.petitioner,
     c.respondent,
+    c.petitioner_advocate,
+    c.respondent_advocate,
+    c.filing_year,
     c.court_id,
     crt.court_name,
     c.judgment_date,
@@ -59,13 +62,6 @@ SELECT
     -- for this field -- see db/schema.sql's cr_cases.industries comment.
     (SELECT array_agg(DISTINCT i.industry_name)
        FROM cr_industries i WHERE i.industry_id = ANY(c.industries)) AS industry_names,
-    -- Appended at the END, not alongside judgement/ocr_text above where it
-    -- would read more naturally -- CREATE OR REPLACE VIEW refuses to
-    -- reorder/insert a column into an existing view's column list (Postgres
-    -- error: "cannot change name of view column ... to ..."), only to add
-    -- one at the very end. See db/schema.sql's cr_cases.structured_content
-    -- comment for what this actually is.
-    c.structured_content,
     -- act_names above is act-level only (c.acts, no section attached) --
     -- this resolves the actual per-provision act+number pairs the same way
     -- get_case_detail's `provisions` does (unified sections/rules/orders,
