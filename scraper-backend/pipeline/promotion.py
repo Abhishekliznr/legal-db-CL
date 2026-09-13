@@ -21,13 +21,10 @@ import re
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-from psycopg2.extras import Json
-
 from adapters.base import RawJudgmentRecord
 from db import scrape_jobs
 from db.connection import get_pooled_connection
-from normalization import case_numbers, judges, parties
-from parsers.judgment_parser import parse_judgment
+from normalization import advocates, case_numbers, judges, parties
 from pipeline import regex_extraction as rx
 
 logger = logging.getLogger("scraper_backend_v2.promotion")
@@ -387,6 +384,12 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
         petitioner = parties.clean_party_name(party_names["petitioner"]) if party_names["petitioner"] else None
         respondent = parties.clean_party_name(party_names["respondent"]) if party_names["respondent"] else None
 
+        advocate_names = rx.parse_advocates(record.extra.get("advocate_raw"))
+        petitioner_advocate = advocates.clean_advocate_name(advocate_names["petitioner_advocate"]) or None
+        respondent_advocate = advocates.clean_advocate_name(advocate_names["respondent_advocate"]) or None
+
+        filing_year = case_numbers.extract_filing_year(case_number)
+
         bench_names = rx.parse_bench(record.extra.get("bench_raw"))
         judgment_by_name = judges.clean_judge_name(record.judge_raw) if record.judge_raw else None
 
@@ -397,19 +400,6 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
         conclusion = rx.extract_conclusion(ocr_text)
         judgement_body = rx.extract_judgment_body(ocr_text)
         classified_category = case_numbers.classify_category(case_number) is not None
-
-        # Deterministic structural parse of the raw OCR text (parsers/judgment_parser.py)
-        # -- entirely separate from, and computed before, pipeline/llm_enrichment.py's
-        # later LLM pass. Never raises: a parser bug degrades to one unstructured
-        # section holding the verbatim ocr_text (see parse_judgment's own docstring),
-        # so it can never block promotion or lose the source text.
-        structured_content = parse_judgment(
-            ocr_text,
-            bench=bench_names,
-            judgment_date=judgment_date.isoformat() if judgment_date else None,
-            case_number=case_number,
-            neutral_citation=record.neutral_citation_raw,
-        )
 
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
@@ -423,18 +413,20 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                 cur.execute("""
                     INSERT INTO cr_cases (
                         liznr_id, court_id, case_number, petitioner, respondent,
+                        petitioner_advocate, respondent_advocate, filing_year,
                         bench, judgment_by, judgment_date, language, neutral_citation,
                         sections, acts, rules, orders, subject,
-                        conclusion, judgement, ocr_text, structured_content,
+                        conclusion, judgement, ocr_text,
                         source_pdf_url, blob_pdf_id,
                         ministries, industries,
                         disposition, document_type, case_category,
                         needs_review
                     ) VALUES (
                         %s, %s, %s, %s, %s,
+                        %s, %s, %s,
                         %s, %s, %s, %s, %s,
                         '{}', '{}', '{}', '{}', %s,
-                        %s, %s, %s, %s,
+                        %s, %s, %s,
                         %s, %s,
                         %s, '{}',
                         %s, 'CaseLaw', %s,
@@ -449,9 +441,10 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                     # sequence number before knowing the INSERT will land burns that
                     # number forever on every re-run.
                     None, court_id, case_number, petitioner, respondent,
+                    petitioner_advocate, respondent_advocate, filing_year,
                     judge_ids, judgment_by_id, judgment_date, record.extra.get("language"), record.neutral_citation_raw,
                     subject_id,
-                    conclusion, judgement_body, ocr_text, Json(structured_content),
+                    conclusion, judgement_body, ocr_text,
                     record.source_url, ingestion["blob_pdf_id"],
                     ministry_ids,
                     disposition, category_ids,

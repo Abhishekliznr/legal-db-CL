@@ -5,11 +5,8 @@ a court PDF's text layer emits but that carries no legal meaning of its own
 numbers).
 
 Moved out of pipeline/llm_enrichment.py (2026-09-10 rewrite introduced
-these for its own excerpt-building) so parsers/judgment_parser.py can reuse
-the exact same, already-verified patterns instead of re-deriving its own —
-two independently-tuned artifact regexes drifting apart over time is worse
-than one shared definition. llm_enrichment.py now imports from here too;
-behavior is unchanged, only the location moved.
+these for its own excerpt-building) into a shared module; llm_enrichment.py
+now imports from here too, behavior unchanged, only the location moved.
 """
 
 import re

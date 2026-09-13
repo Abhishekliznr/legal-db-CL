@@ -31,8 +31,19 @@ _CATEGORY_PATTERNS = [
     (re.compile(r"c\.?\s*s\.?\s*\(os\)", re.I), "CS(OS)", "Civil Suit (Original Side)"),
 ]
 
-# "... of 2021" (SC's own convention) or "61/2012" (eCourts/HC convention).
-_YEAR_PATTERN = re.compile(r"\bof\s+(\d{4})\b|/\s*(\d{4})\b", re.I)
+# "... of 2021" (case text's own convention) or "61/2012" (eCourts/HC
+# convention) were the only two forms this was built against -- neither
+# ever matched, since sci.gov.in's actual results-table "Case Number" cell
+# (confirmed live 2026-09-13 against real production rows, e.g. "Crl.A.
+# No.-001434-001438 - 2017", "SLP(C) No.-008442 - 2021") uses a THIRD
+# convention: a trailing " - YYYY" at the very end of the string, with the
+# case's own number (itself hyphen-separated, e.g. "001434-001438") coming
+# before it. The trailing-anchor alternative below requires end-of-string
+# specifically so it can't misfire on one of THOSE internal hyphens --
+# "001438" is 6 digits, so \b(\d{4})\b can't partially match inside it
+# either way, but anchoring to "$" also means a stray trailing annotation
+# after the year would break this, which hasn't been observed.
+_YEAR_PATTERN = re.compile(r"\bof\s+(\d{4})\b|/\s*(\d{4})\b|-\s*(\d{4})\s*$", re.I)
 
 _MIN_YEAR, _MAX_YEAR = 1950, 2100
 

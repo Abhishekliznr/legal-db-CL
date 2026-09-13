@@ -76,29 +76,32 @@ def parse_party_names(party_name_raw: Optional[str]) -> Dict[str, Optional[str]]
     return {"petitioner": petitioner or None, "respondent": respondent or None}
 
 
-# The advocate cell is far less structured than the party cell -- observed
-# real values are hyphen-separated ("Petitioner Adv Name - Respondent Adv
-# Name") but the respondent side is frequently just missing (no trailing
-# "- ..." at all) rather than present-but-blank, matching the user's own
-# observation that petitioner-side advocate names are far more often on
-# record than respondent-side ones. NOT verified against a large real
-# sample of this specific column's values (adapters/supreme_court/adapter.py
-# only ever stored this raw, unparsed, into extra["advocate_raw"] -- see
-# its module docstring) -- treat this split as a reasonable first pass to
-# be corrected against real values once a larger sample is on hand.
-_ADVOCATE_SPLIT = re.compile(r"\s*-\s*")
+# CORRECTED 2026-09-13 against real production cr_cases rows: the initial
+# hyphen-only split above was never verified against a real sample and was
+# wrong -- real advocate_raw values use a run of underscores ("__") as the
+# petitioner/respondent separator, e.g. "PASHUPATHI NATH RAZDAN__" (only
+# petitioner side present) or a bare "__" (neither side present, but the
+# site still emits the separator). The hyphen-only split left "__" as an
+# unsplit trailing remnant glued onto the one real name present, or as the
+# entire "name" when both sides were blank -- confirmed via real
+# petitioner_advocate values literally stored as "__" and "PASHUPATHI NATH
+# RAZDAN __" before this fix. Splitting on hyphen too (kept from the
+# original guess, unconfirmed but harmless) in case some rows do use it.
+_ADVOCATE_SPLIT = re.compile(r"\s*-\s*|_+")
 
 
 def parse_advocates(advocate_raw: Optional[str]) -> Dict[str, Optional[str]]:
     """
-    Splits the results table's "Petitioner/Respondent Advocate" cell by "-".
-    A single un-hyphenated value is treated as the petitioner's advocate
-    (the side that's almost always present), never the respondent's.
+    Splits the results table's "Petitioner/Respondent Advocate" cell on its
+    "__" separator (or "-", less commonly). A single un-separated value is
+    treated as the petitioner's advocate (the side that's almost always
+    present), never the respondent's. A cell that's only the bare separator
+    itself (no real name on either side) yields both fields None.
     """
     if not advocate_raw or not advocate_raw.strip():
         return {"petitioner_advocate": None, "respondent_advocate": None}
 
-    parts = [p.strip(" .") for p in _ADVOCATE_SPLIT.split(advocate_raw.strip()) if p.strip(" .")]
+    parts = [p.strip(" ._") for p in _ADVOCATE_SPLIT.split(advocate_raw.strip()) if p.strip(" ._")]
     if not parts:
         return {"petitioner_advocate": None, "respondent_advocate": None}
     if len(parts) == 1:

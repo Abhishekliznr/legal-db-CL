@@ -263,6 +263,20 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     case_number        TEXT NOT NULL,
     petitioner         TEXT,
     respondent         TEXT,
+    petitioner_advocate TEXT,  -- regex-parsed from the SCI results table's "Petitioner/Respondent
+                               -- Advocate" cell (pipeline/regex_extraction.parse_advocates) --
+                               -- reintroduces the advocate data the 2026-09-08 flattening dropped
+    respondent_advocate TEXT,  -- frequently NULL even when petitioner_advocate isn't -- see
+                               -- parse_advocates' own docstring on why the respondent side is so
+                               -- often simply missing from the source cell, not a parsing failure
+
+    -- Filing year only (not a full filing DATE -- sci.gov.in's judgments-by-date
+    -- search table has no such column; the real filing/registration date lives
+    -- behind a separate per-case Case Status lookup this adapter doesn't call).
+    -- Parsed straight out of case_number (e.g. "... of 2021") via
+    -- normalization.case_numbers.extract_filing_year -- good enough for a coarse
+    -- case-age-in-years figure without a second scrape per case.
+    filing_year        INTEGER,
 
     bench              BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_judges.judge_id, full coram in bench order
     judgment_by        BIGINT REFERENCES cr_judges(judge_id),  -- single judge_id -- who authored/signed
@@ -296,16 +310,6 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading) -- see pipeline/regex_extraction.py
     judgement          TEXT,                     -- full opinion text after the "J U D G M E N T"/"O R D E R" heading
     ocr_text           TEXT,                     -- final OCR text, source of truth for judgement/conclusion/provisions above -- NEVER overwritten by parsing/enrichment
-    -- Deterministic structural parse of ocr_text (parsers/judgment_parser.py,
-    -- 2026-09-12) -- StructuredJudgment JSON (parsers/schema.py): numbered
-    -- paragraphs (each addressable as "para-N" for deep links/annotations),
-    -- headings, document extracts (FIR/recovery memo/etc.), citations,
-    -- statutory references, final order, and removed OCR artifacts. Computed
-    -- once at promotion time from ocr_text alone -- no LLM involved, and
-    -- never mutated by pipeline/llm_enrichment.py's later enrichment pass.
-    -- NULL for rows promoted before this column existed (see
-    -- db/migrations/0005_add_structured_content.sql for backfill guidance).
-    structured_content JSONB,
 
     source_pdf_url     TEXT,
     blob_pdf_id       TEXT,
