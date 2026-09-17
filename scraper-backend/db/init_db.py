@@ -36,6 +36,7 @@ MIGRATIONS_DIR = Path(__file__).resolve().parent / "migrations"
 # before either rewrite, with no separate manual cleanup step required.
 _DROP_TABLES_SQL = """
 DROP TABLE IF EXISTS
+    cr_schema_migrations,
     cr_court_scrape_config,
     cr_citation_sequences, cr_cases, cr_raw_ingestions, cr_scrape_batches,
     cr_orders, cr_rules, cr_sections, cr_acts, cr_industries, cr_ministries,
@@ -96,30 +97,56 @@ def _core_schema_exists(conn) -> bool:
         return cur.fetchone()[0]
 
 
+def _ensure_migrations_table(conn) -> None:
+    with conn.cursor() as cur:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS cr_schema_migrations (
+                filename    TEXT PRIMARY KEY,
+                applied_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+            );
+        """)
+    conn.commit()
+
+
 def apply_migrations() -> None:
     """
-    Applies every db/migrations/*.sql file, in filename order, every time
-    this is called. Each migration file is written to be idempotent
-    (ADD COLUMN IF NOT EXISTS, or a guarded DO block) and a documented no-op
-    once already applied — see each file's own header — so re-running the
-    full set on every startup is safe.
+    Applies each db/migrations/*.sql file, in filename order, exactly once
+    ever — recording it in cr_schema_migrations right after it runs, in the
+    same transaction, and skipping any filename already recorded there.
 
-    This exists because schema.sql's CREATE TABLE IF NOT EXISTS only fires
-    the first time a table is created — it never adds a column schema.sql
-    gained after that table already existed on disk (e.g. cr_scrape_batches
-    predating cancel_requested/finished_at, added by 0003/0004 below).
-    Without this, an existing table just silently keeps its old shape
-    forever, surfacing later as a column-does-not-exist error from whatever
-    query first reads the missing column, instead of anything catching it
-    at startup.
+    This used to re-run every file on every startup instead (each one
+    "idempotent" in the sense of not erroring twice), which was fine for
+    additive ones (ADD COLUMN IF NOT EXISTS) but wrong for
+    0006_drop_structured_content.sql's `DROP VIEW IF EXISTS
+    cr_case_search_view` — not erroring on a second run isn't the same as
+    being harmless to run again: that view belongs to api-backend, which
+    only ever recreates it at its OWN startup. Every scraper-backend
+    restart that didn't happen to coincide with an api-backend restart
+    silently dropped the view and left every /api/cases search failing
+    with `UndefinedTable: relation "cr_case_search_view" does not exist`
+    until someone noticed and manually re-ran api-backend's `ensure-view`
+    (or restarted it). Run-once tracking closes that off for this and any
+    future migration with a similarly one-shot statement.
     """
+    conn = get_connection()
+    try:
+        _ensure_migrations_table(conn)
+        with conn.cursor() as cur:
+            cur.execute("SELECT filename FROM cr_schema_migrations;")
+            already_applied = {row[0] for row in cur.fetchall()}
+    finally:
+        conn.close()
+
     for path in sorted(MIGRATIONS_DIR.glob("*.sql")):
+        if path.name in already_applied:
+            continue
         sql = path.read_text(encoding="utf-8")
         conn = get_connection()
         try:
-            print(f"Applying migration {path.name}...")
+            print(f"Applying migration {path.name} (first time)...")
             with conn.cursor() as cur:
                 cur.execute(sql)
+                cur.execute("INSERT INTO cr_schema_migrations (filename) VALUES (%s);", (path.name,))
             conn.commit()
         finally:
             conn.close()
@@ -135,8 +162,9 @@ _ENSURE_SCHEMA_LOCK_KEY = 279_460_113
 def ensure_schema() -> None:
     """
     Startup-safe entry point: applies schema.sql the first time this runs
-    against a fresh database, then applies db/migrations/*.sql (idempotent,
-    safe on every call — see apply_migrations()) either way, so an existing
+    against a fresh database, then applies any not-yet-applied
+    db/migrations/*.sql files either way (see apply_migrations() — each
+    file runs exactly once, tracked in cr_schema_migrations), so an existing
     table missing a column a later migration added gets brought up to date
     automatically instead of failing at query time in some unrelated router.
 
@@ -174,8 +202,8 @@ def main() -> None:
     init_parser = subparsers.add_parser("init", help="Apply schema.sql")
     init_parser.add_argument("--drop", action="store_true", help="Drop existing tables/types first")
 
-    subparsers.add_parser("ensure-schema", help="Apply schema.sql (if missing) + all migrations (safe to re-run)")
-    subparsers.add_parser("migrate", help="Apply db/migrations/*.sql only, in order (idempotent, safe to re-run)")
+    subparsers.add_parser("ensure-schema", help="Apply schema.sql (if missing) + any unapplied migrations (safe to re-run)")
+    subparsers.add_parser("migrate", help="Apply any unapplied db/migrations/*.sql, in order, each exactly once")
 
     args = parser.parse_args()
     if args.command == "init":
