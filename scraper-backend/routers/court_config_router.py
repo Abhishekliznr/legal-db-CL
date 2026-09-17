@@ -3,14 +3,15 @@ Admin CRUD for `courts` + `court_scrape_config`
 -------------------------------------------------
 - GET  /api/courts                    : list courts + their scrape config
 - PUT  /api/courts/{court_id}/config  : create/update a court's scrape config
-                                         (adapter, state/bench codes, active flag)
+                                         (adapter, free-form config, active flag)
 
 No scraping happens through this router — it only manages the config rows
-that Phase 1/2's orchestrator will read once the adapters exist.
+that routers/scraper_router.py's `_ADAPTER_REGISTRY` reads once the
+adapters exist.
 """
 
 import logging
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import psycopg2
 from fastapi import APIRouter, HTTPException
@@ -24,9 +25,8 @@ router = APIRouter(prefix="/api/courts", tags=["Court Scrape Config"])
 
 
 class CourtScrapeConfigUpdate(BaseModel):
-    adapter: str = Field(..., description="'supreme_court' or 'ecourts'")
-    state_code: Optional[str] = Field(None, description="eCourts state_code select value, e.g. '7~26' for Delhi")
-    bench_code: Optional[str] = Field(None, description="eCourts dist_code select value")
+    adapter: str = Field(..., description="Adapter name, e.g. 'supreme_court' — must match a key in routers/scraper_router.py's _ADAPTER_REGISTRY")
+    config: Optional[Dict[str, Any]] = Field(None, description="That adapter's own free-form settings (stored as JSONB), e.g. whatever a High Court's own adapter needs beyond headless")
     is_active: bool = True
     notes: Optional[str] = None
 
@@ -53,8 +53,7 @@ def upsert_court_config(court_id: int, payload: CourtScrapeConfigUpdate):
         court_config.upsert_court_scrape_config(
             court_id=court_id,
             adapter=payload.adapter,
-            state_code=payload.state_code,
-            bench_code=payload.bench_code,
+            config=payload.config,
             is_active=payload.is_active,
             notes=payload.notes,
         )

@@ -4,7 +4,7 @@ PROMOTED -> enriched: fills the fields regex genuinely cannot get
 low-coverage regex fallbacks (cr_cases.conclusion, cr_cases.disposition),
 plus a paragraph-filtered relevance classification of the provisions
 extract_provisions() already found (cr_cases.sections_relevant/_other etc.,
-2026-09-09 — see find_provision_paragraphs() in pipeline/regex_extraction.py)
+2026-09-09 — see enrich_case()'s provision_block parameter below)
 — all in one Azure OpenAI Structured Outputs call per case.
 
 Runs automatically right after promotion (orchestrator/batch_runner.py),
@@ -71,12 +71,12 @@ from typing import Any, Dict, List, NamedTuple, Optional, Tuple
 import requests
 
 from db.connection import get_pooled_connection
+from db.lookups import get_or_create_industry, get_or_create_ministry, resolve_provisions
 from normalization.acts import resolve_act
 from normalization.industries import CANONICAL_INDUSTRIES, resolve_industry
+from normalization.ministries import KNOWN_MINISTRIES, resolve_ministry
 from normalization.ocr_artifacts import strip_ocr_noise as _strip_ocr_noise
 from pipeline.azure_openai import azure_config, is_configured
-from pipeline.promotion import _get_or_create_industry, _get_or_create_ministry, _resolve_provisions
-from pipeline.regex_extraction import KNOWN_MINISTRIES, find_provision_paragraphs, resolve_ministry
 
 logger = logging.getLogger("scraper_backend_v2.llm_enrichment")
 
@@ -499,8 +499,17 @@ def call_llm_enrichment(case_row: Dict[str, Any], user_content: Optional[str] = 
 # Prompt assembly
 # ---------------------------------------------------------------------
 
-def _build_user_content(case_row: Dict[str, Any]) -> Tuple[str, bool]:
-    """Returns (user_content, has_provision_block) -- the caller needs to know whether a provision-paragraph block was actually sent, since provision columns are only written when it was (see enrich_case)."""
+def _build_user_content(case_row: Dict[str, Any], provision_block: str = "") -> Tuple[str, bool]:
+    """
+    Returns (user_content, has_provision_block) -- the caller needs to know
+    whether a provision-paragraph block was actually sent, since provision
+    columns are only written when it was (see enrich_case).
+
+    `provision_block` is supplied by the caller (enrich_case), built by
+    whichever court's own extraction module found the case's OCR text --
+    this module has no court-specific extraction logic of its own, by
+    design (see this module's own docstring).
+    """
     ocr_text = case_row.get("ocr_text") or ""
 
     hints = [f"Case number: {case_row['case_number']}"]
@@ -519,7 +528,6 @@ def _build_user_content(case_row: Dict[str, Any]) -> Tuple[str, bool]:
     excerpt, mode = _build_excerpt(ocr_text)
     content = "KNOWN FACTS:\n" + "\n".join(hints) + f"\n\nJUDGMENT TEXT [{mode}]:\n{excerpt}"
 
-    provision_block = find_provision_paragraphs(ocr_text, max_paragraphs=200, max_chars=_PROVISION_BLOCK_MAX_CHARS)
     has_provision_block = bool(provision_block)
     if has_provision_block:
         if len(provision_block) > _PROVISION_BLOCK_MAX_CHARS:
@@ -595,7 +603,7 @@ def find_cases_needing_enrichment(limit: int = 100) -> List[int]:
             return [row[0] for row in cur.fetchall()]
 
 
-def enrich_case(case_id: int) -> bool:
+def enrich_case(case_id: int, provision_block: str = "") -> bool:
     """
     Fetches the already-promoted case on a short-lived connection, makes
     the LLM call with NO database connection held (the call can take up to
@@ -604,6 +612,14 @@ def enrich_case(case_id: int) -> bool:
     row was actually updated with a successful enrichment; never raises --
     a caller in the middle of a scrape batch must not lose the rest of the
     batch over one enrichment failure.
+
+    `provision_block` is this court's own paragraph-filtered excerpt of the
+    OCR text around statutory references (e.g. Supreme Court's
+    adapters.supreme_court.extraction.find_provision_paragraphs) — this
+    module has no extraction logic of its own (see module docstring), so
+    the orchestrator passes it in per-court. Omit it (or pass "") to skip
+    provision extraction for this call; provision columns are then simply
+    left untouched, same as today when no block was found.
     """
     try:
         with get_pooled_connection() as conn:
@@ -623,7 +639,7 @@ def enrich_case(case_id: int) -> bool:
         _write_status(case_id, "SKIPPED", "no ocr_text")
         return False
 
-    user_content, has_provision_block = _build_user_content(case_row)
+    user_content, has_provision_block = _build_user_content(case_row, provision_block=provision_block)
     result = call_llm_enrichment(case_row, user_content=user_content)
 
     if result.status == "NOT_CONFIGURED":
@@ -665,12 +681,12 @@ def enrich_case(case_id: int) -> bool:
                 for raw in (llm_result.get("industries") or [])[:3]:
                     resolved = resolve_industry(raw)
                     if resolved:
-                        industry_ids.append(_get_or_create_industry(cur, resolved))
+                        industry_ids.append(get_or_create_industry(cur, resolved))
 
                 for raw in (llm_result.get("ministries") or [])[:3]:
                     resolved = resolve_ministry(raw)
                     if resolved:
-                        new_id = _get_or_create_ministry(cur, resolved)
+                        new_id = get_or_create_ministry(cur, resolved)
                         if new_id not in ministry_ids:
                             ministry_ids.append(new_id)
 
@@ -726,8 +742,8 @@ def enrich_case(case_id: int) -> bool:
                 sections_relevant = sections_other = rules_relevant = rules_other = []
                 orders_relevant = orders_other = []
                 if has_provision_block:
-                    act_ids_relevant, sections_relevant, rules_relevant, orders_relevant = _resolve_provisions(cur, relevant_provisions)
-                    act_ids_other, sections_other, rules_other, orders_other = _resolve_provisions(cur, other_provisions)
+                    act_ids_relevant, sections_relevant, rules_relevant, orders_relevant = resolve_provisions(cur, relevant_provisions)
+                    act_ids_other, sections_other, rules_other, orders_other = resolve_provisions(cur, other_provisions)
                     all_acts = list(dict.fromkeys(act_ids_relevant + act_ids_other))
                     all_sections = sections_relevant + sections_other
                     all_rules = rules_relevant + rules_other

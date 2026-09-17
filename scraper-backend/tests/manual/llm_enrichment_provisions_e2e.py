@@ -63,7 +63,7 @@ _MOCK_LLM_RESULT = {
 }
 
 
-def _setup_case(cur) -> int:
+def _setup_case(cur):
     cur.execute(
         "INSERT INTO cr_courts (court_name, court_type) VALUES ('Test Court', 'Supreme Court') "
         "ON CONFLICT (court_name) DO UPDATE SET court_type = EXCLUDED.court_type RETURNING court_id;"
@@ -86,7 +86,7 @@ def _setup_case(cur) -> int:
         """,
         (court_id, ocr_text),
     )
-    return cur.fetchone()[0]
+    return cur.fetchone()[0], ocr_text
 
 
 def main():
@@ -94,7 +94,7 @@ def main():
 
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            case_id = _setup_case(cur)
+            case_id, ocr_text = _setup_case(cur)
         conn.commit()
 
     # Monkeypatch call_llm_enrichment BEFORE enrich_case runs -- no Azure
@@ -104,7 +104,12 @@ def main():
     original = llm_enrichment.call_llm_enrichment
     llm_enrichment.call_llm_enrichment = lambda case_row, user_content=None: llm_enrichment.EnrichmentCallResult(dict(_MOCK_LLM_RESULT), "DONE", None)
     try:
-        ok = llm_enrichment.enrich_case(case_id)
+        # provision_block is supplied by the caller since 2026-09-17 (this
+        # module has no extraction logic of its own) -- a real caller would
+        # build it via that court's own extraction module (e.g.
+        # adapters.supreme_court.extraction.find_provision_paragraphs); the
+        # synthetic ocr_text stands in for that here.
+        ok = llm_enrichment.enrich_case(case_id, provision_block=ocr_text)
     finally:
         llm_enrichment.call_llm_enrichment = original
 

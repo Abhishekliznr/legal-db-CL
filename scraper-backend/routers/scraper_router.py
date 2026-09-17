@@ -2,6 +2,7 @@
 Scraper control endpoints
 --------------------------
 - POST /api/scraper/start                        : launch a background scrape+ingest batch
+- POST /api/scraper/mp/start                      : same, for MPHC specifically — takes {year} instead of {court_id, court_code, from_date, to_date}
 - GET  /api/scraper/batches                       : recent batch history
 - GET  /api/scraper/batches/{batch_id}             : one batch's header/summary fields
 - GET  /api/scraper/batches/{batch_id}/records      : per-record (cr_raw_ingestions) breakdown for one batch
@@ -9,17 +10,19 @@ Scraper control endpoints
 - GET  /api/scraper/batches/{batch_id}/logs/stream  : SSE tail of that batch's in-memory log buffer
 - GET  /api/scraper/status                        : raw_ingestions counts per pipeline stage
 
-`court_id` is the only thing a caller needs to supply for eCourts High
-Courts — state_code/bench_code are resolved from court_scrape_config
-(seeded via `python -m db.seed_courts`), not passed in the request. That's
-the entire point of court_scrape_config existing (spec §4.3): the caller
-shouldn't need to know an eCourts state code any more than they'd need to
-know which of the 25 old per-court scripts used to handle a given court.
+`court_id` is the only thing a caller needs to supply — which adapter to
+run, which of that court's own extraction/promotion functions to call, and
+which data_source value to tag records with are all resolved from
+`court_scrape_config.adapter` via `_ADAPTER_REGISTRY` below, not passed in
+the request. `_ADAPTER_REGISTRY` is the one place a new court gets wired
+up: adding a court means adding one entry here, not touching this router's
+logic.
 """
 
 import asyncio
 import json
 import logging
+from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Optional
 
@@ -28,10 +31,15 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from adapters.ecourts.adapter import EcourtsAdapter
+from adapters.base import ScraperAdapter
+from adapters.high_courts.mp.adapter import MPHighCourtAdapter
+from adapters.high_courts.mp.promotion import promote_ingestion as _mp_promote
 from adapters.supreme_court.adapter import SupremeCourtAdapter
+from adapters.supreme_court.extraction import find_provision_paragraphs as _sc_find_provisions
+from adapters.supreme_court.promotion import promote_ingestion as _sc_promote
 from db import court_config, scrape_jobs
 from orchestrator import batch_runner, job_registry, live_logs
+from orchestrator.batch_runner import FindProvisionsFn, PromoteFn
 
 logger = logging.getLogger("scraper_backend_v2.scraper_router")
 
@@ -43,18 +51,32 @@ _LOG_STREAM_POLL_SECONDS = 1.0
 
 router = APIRouter(prefix="/api/scraper", tags=["Scraper Control"])
 
-_ADAPTER_CLASSES = {
-    "supreme_court": SupremeCourtAdapter,
-    "ecourts": EcourtsAdapter,
-}
 
-# data_source_enum value each adapter's records get tagged with — resolved
-# here (not left to raw_ingestions/documents' DEFAULT 'ECOURTS') since that
-# default being silently relied upon was the actual bug: every source,
-# including Supreme Court, was landing as 'ECOURTS' in the DB.
-_DATA_SOURCE_BY_ADAPTER = {
-    "supreme_court": "SCI_WEBSITE",
-    "ecourts": "ECOURTS",
+@dataclass(frozen=True)
+class AdapterSpec:
+    adapter_class: type  # implements adapters.base.ScraperAdapter
+    promote_fn: PromoteFn  # this court's own cr_cases promotion, e.g. adapters.supreme_court.promotion.promote_ingestion
+    data_source: str  # data_source_enum value new records get tagged with — resolved here, never left to a DB column DEFAULT (a prior real bug: every source silently landed as 'ECOURTS')
+    find_provisions_fn: Optional[FindProvisionsFn] = None  # optional: this court's OCR-text provision-paragraph finder, fed to pipeline.llm_enrichment.enrich_case
+    run_enrichment: bool = True  # False for a court whose pipeline doesn't use LLM enrichment yet (e.g. Madhya Pradesh, as of this writing) — see batch_runner.run_batch's own docstring
+
+
+# The one place a new court gets registered. Each entry names that court's
+# own adapter + extraction/promotion pipeline (adapters/high_courts/<code>/
+# for a High Court) — nothing generic here, by design (see adapters/__init__.py).
+_ADAPTER_REGISTRY = {
+    "supreme_court": AdapterSpec(
+        adapter_class=SupremeCourtAdapter,
+        promote_fn=_sc_promote,
+        find_provisions_fn=_sc_find_provisions,
+        data_source="SCI_WEBSITE",
+    ),
+    "high_court_mp": AdapterSpec(
+        adapter_class=MPHighCourtAdapter,
+        promote_fn=_mp_promote,
+        data_source="MPHC_WEBSITE",
+        run_enrichment=False,  # no LLM enrichment for MP yet — see adapters/high_courts/mp/promotion.py's own docstring
+    ),
 }
 
 
@@ -66,52 +88,55 @@ class ScraperStartRequest(BaseModel):
     headless: bool = Field(True, description="Set False for a supervised dry run against a real browser window")
 
 
-@router.post("/start")
-def start_scrape(req: ScraperStartRequest, background_tasks: BackgroundTasks):
+def _dispatch_batch(
+    court_id: int,
+    court_code: str,
+    from_date: str,
+    to_date: str,
+    headless: bool,
+    background_tasks: BackgroundTasks,
+) -> dict:
+    """Shared by every /start-shaped endpoint: resolves court_scrape_config -> _ADAPTER_REGISTRY, creates the batch row, schedules the background run. Raises HTTPException on any resolution failure."""
     try:
-        config = court_config.get_court_scrape_config(req.court_id)
+        config = court_config.get_court_scrape_config(court_id)
     except psycopg2.OperationalError:
-        logger.exception("Database connection failed while resolving court %s config", req.court_id)
+        logger.exception("Database connection failed while resolving court %s config", court_id)
         raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
 
     if config is None:
         raise HTTPException(
             status_code=404,
-            detail=f"No court_scrape_config for court_id={req.court_id}. Seed it first (PUT /api/courts/{{court_id}}/config or python -m db.seed_courts).",
+            detail=f"No court_scrape_config for court_id={court_id}. Seed it first (PUT /api/courts/{{court_id}}/config or python -m db.seed_courts).",
         )
     if not config["is_active"]:
-        raise HTTPException(status_code=400, detail=f"court_id={req.court_id} is marked inactive in court_scrape_config.")
+        raise HTTPException(status_code=400, detail=f"court_id={court_id} is marked inactive in court_scrape_config.")
 
-    adapter_class = _ADAPTER_CLASSES.get(config["adapter"])
-    if adapter_class is None:
-        raise HTTPException(status_code=500, detail=f"court_scrape_config has unknown adapter '{config['adapter']}'.")
+    spec = _ADAPTER_REGISTRY.get(config["adapter"])
+    if spec is None:
+        raise HTTPException(status_code=500, detail=f"court_scrape_config has unknown adapter '{config['adapter']}' — not in _ADAPTER_REGISTRY.")
 
-    adapter_kwargs = {"headless": req.headless}
-    if config["adapter"] == "ecourts":
-        if not config["state_code"]:
-            raise HTTPException(status_code=400, detail=f"court_id={req.court_id} has adapter='ecourts' but no state_code configured.")
-        adapter_kwargs["state_code"] = config["state_code"]
-        adapter_kwargs["bench_code"] = config["bench_code"]
-
-    from_date = req.from_date or (date.today() - timedelta(days=7)).isoformat()
-    to_date = req.to_date or date.today().isoformat()
+    # config["config"] is that court's own free-form settings (JSONB), e.g.
+    # whatever adapters/high_courts/<code>/adapter.py needs beyond headless —
+    # nothing generic depends on its shape, each adapter's scrape() reads
+    # only the keys it defined.
+    adapter_kwargs = {"headless": headless, **(config.get("config") or {})}
 
     # Created here, synchronously, rather than inside the background task itself — so the
     # response below can hand batch_id straight back to the caller (the admin UI navigates to
     # /admin/scraping/history/{batch_id} on this response) instead of it only existing once the
     # background task happens to get scheduled.
-    batch_id = scrape_jobs.create_batch(req.court_id, batch_runner.to_date(from_date), batch_runner.to_date(to_date))
+    batch_id = scrape_jobs.create_batch(court_id, batch_runner.to_date(from_date), batch_runner.to_date(to_date))
 
     background_tasks.add_task(
-        _run_and_log, adapter_class(), batch_id, req.court_id, req.court_code, from_date, to_date,
-        _DATA_SOURCE_BY_ADAPTER[config["adapter"]], adapter_kwargs,
+        _run_and_log, spec.adapter_class(), spec.promote_fn, spec.find_provisions_fn, spec.run_enrichment,
+        batch_id, court_id, court_code, from_date, to_date, spec.data_source, adapter_kwargs,
     )
 
     return {
         "status": "started",
         "batch_id": batch_id,
         "adapter": config["adapter"],
-        "court_id": req.court_id,
+        "court_id": court_id,
         "court_name": config["court_name"],
         "from_date": from_date,
         "to_date": to_date,
@@ -119,9 +144,54 @@ def start_scrape(req: ScraperStartRequest, background_tasks: BackgroundTasks):
     }
 
 
-def _run_and_log(adapter, batch_id: int, court_id: int, court_code: str, from_date: str, to_date: str, data_source: str, adapter_kwargs: dict):
+@router.post("/start")
+def start_scrape(req: ScraperStartRequest, background_tasks: BackgroundTasks):
+    from_date = req.from_date or (date.today() - timedelta(days=7)).isoformat()
+    to_date = req.to_date or date.today().isoformat()
+    return _dispatch_batch(req.court_id, req.court_code, from_date, to_date, req.headless, background_tasks)
+
+
+class MPScraperStartRequest(BaseModel):
+    year: int = Field(..., ge=1956, le=date.today().year, description="ILR year to search on portal.mphc.gov.in/ilrs, e.g. 2024")
+    headless: bool = Field(True, description="Set False for a supervised dry run against a real browser window")
+
+
+@router.post("/mp/start")
+def start_mp_scrape(req: MPScraperStartRequest, background_tasks: BackgroundTasks):
+    """
+    Convenience endpoint for Madhya Pradesh High Court specifically — takes
+    just a year (MP is queried by ILR year, not a date range; see
+    adapters/high_courts/mp/adapter.py's _year_from_range) instead of
+    requiring the caller to know MPHC's court_id or construct a date range
+    themselves. Equivalent to POST /start with court_id resolved from
+    court_code='MPHC' and from_date/to_date spanning Jan 1 - Dec 31 of `year`.
+    """
+    court_id = court_config.get_court_id_by_code("MPHC")
+    if court_id is None:
+        raise HTTPException(status_code=404, detail="No court with court_code='MPHC' — seed it first (python -m db.seed_courts).")
+    from_date = f"{req.year}-01-01"
+    to_date = f"{req.year}-12-31"
+    return _dispatch_batch(court_id, "MPHC", from_date, to_date, req.headless, background_tasks)
+
+
+def _run_and_log(
+    adapter: ScraperAdapter,
+    promote_fn: PromoteFn,
+    find_provisions_fn: Optional[FindProvisionsFn],
+    run_enrichment: bool,
+    batch_id: int,
+    court_id: int,
+    court_code: str,
+    from_date: str,
+    to_date: str,
+    data_source: str,
+    adapter_kwargs: dict,
+):
     try:
-        batch_runner.run_batch(adapter, batch_id, court_id, court_code, from_date, to_date, data_source, **adapter_kwargs)
+        batch_runner.run_batch(
+            adapter, promote_fn, batch_id, court_id, court_code, from_date, to_date, data_source,
+            find_provisions_fn=find_provisions_fn, run_enrichment=run_enrichment, **adapter_kwargs,
+        )
     except Exception:
         logger.exception("Batch %s failed for court_id=%s %s -> %s", batch_id, court_id, from_date, to_date)
 

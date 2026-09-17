@@ -1,9 +1,10 @@
 import hashlib
 import logging
-from typing import Optional
+from typing import Callable, Optional
 
-from adapters.base import RawJudgmentRecord, ScraperAdapter
-from adapters.supreme_court.exceptions import (
+from adapters.base import (
+    RawJudgmentRecord,
+    ScraperAdapter,
     SourceAccessError,
     SourceRateLimitError,
     SourceStructureChangedError,
@@ -11,8 +12,11 @@ from adapters.supreme_court.exceptions import (
 )
 from db import scrape_jobs
 from orchestrator import live_logs
-from pipeline import llm_enrichment, ocr, promotion
+from pipeline import llm_enrichment, ocr
 from storage import azure_blob
+
+PromoteFn = Callable[[int, RawJudgmentRecord], Optional[int]]
+FindProvisionsFn = Callable[[str], str]
 
 logger = logging.getLogger("scraper_backend_v2.orchestrator")
 
@@ -41,14 +45,35 @@ def _source_failure_status(exc: Exception) -> str:
 
 def run_batch(
     adapter: ScraperAdapter,
+    promote_fn: PromoteFn,
     batch_id: int,
     court_id: int,
     court_code: str,
     date_from: str,
     date_to: str,
     data_source: str,
+    find_provisions_fn: Optional[FindProvisionsFn] = None,
+    run_enrichment: bool = True,
     **adapter_kwargs,
 ) -> dict:
+    """
+    `promote_fn` and `find_provisions_fn` are this court's own extraction/
+    promotion pipeline (e.g. adapters.supreme_court.promotion.promote_ingestion
+    and adapters.supreme_court.extraction.find_provision_paragraphs) —
+    resolved by the caller (routers/scraper_router.py's adapter registry)
+    the same way `adapter` already is, so this orchestrator stays entirely
+    court-agnostic. `find_provisions_fn` is optional: omit it for a court
+    whose extraction module doesn't have one yet — enrichment simply runs
+    without a provision-paragraph block in that case (see
+    pipeline.llm_enrichment.enrich_case's own docstring).
+
+    `run_enrichment=False` skips the pipeline.llm_enrichment.enrich_case(...)
+    call entirely for every record in this batch — promotion still runs and
+    the case is still written, there's just no LLM enrichment pass. This is
+    the on/off switch for a court whose pipeline doesn't use LLM enrichment
+    yet (e.g. Madhya Pradesh, as of this writing) without needing any
+    pipeline.llm_enrichment.py changes to turn it on later.
+    """
     live_logs.start_batch(batch_id)
     _log(
         batch_id,
@@ -117,7 +142,7 @@ def run_batch(
             total_downloaded += 1
 
             try:
-                case_id = _run_pipeline_for_one(batch_id, ingestion_id, record)
+                case_id = _run_pipeline_for_one(batch_id, ingestion_id, record, promote_fn, find_provisions_fn, run_enrichment)
             except Exception:
                 logger.exception(
                     "[BATCH %s] [PIPELINE] ingestion_id=%s: unhandled exception",
@@ -249,17 +274,30 @@ def _run_pipeline_for_one(
     batch_id: int,
     ingestion_id: int,
     record: RawJudgmentRecord,
+    promote_fn: PromoteFn,
+    find_provisions_fn: Optional[FindProvisionsFn],
+    run_enrichment: bool,
 ) -> Optional[int]:
     ocr.process_ingestion_ocr(ingestion_id, record.pdf_path)
 
-    if scrape_jobs.get_ingestion(ingestion_id)["status"] != "OCR_DONE":
+    ingestion = scrape_jobs.get_ingestion(ingestion_id)
+    if ingestion["status"] != "OCR_DONE":
         return None
 
-    case_id = promotion.promote_ingestion(ingestion_id, record)
+    case_id = promote_fn(ingestion_id, record)
 
-    if case_id is not None:
+    if case_id is not None and run_enrichment:
+        provision_block = ""
+        if find_provisions_fn is not None:
+            try:
+                provision_block = find_provisions_fn(ingestion["ocr_text"] or "")
+            except Exception:
+                logger.exception(
+                    "[ENRICH] case_id=%s: find_provisions_fn raised; enriching without a provision block",
+                    case_id,
+                )
         try:
-            llm_enrichment.enrich_case(case_id)
+            llm_enrichment.enrich_case(case_id, provision_block=provision_block)
             _log(batch_id, "info", "[ENRICH] case_id=%s: enrichment finished", case_id)
         except Exception:
             logger.exception(

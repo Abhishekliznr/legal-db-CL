@@ -79,7 +79,7 @@ class FakeCursor:
     execute() just records calls and asserts %s-placeholder/param parity.
     fetchone() returns queued rows first (used to seed the one-time case
     row fetch in _fetch_case_row), then falls back to an auto-incrementing
-    fake id -- every get-or-create helper in pipeline/promotion.py does an
+    fake id -- every get-or-create helper in db/lookups.py does an
     INSERT...RETURNING (or a follow-up SELECT) expecting exactly one id
     back, and none of these tests care what the id actually is.
     """
@@ -419,7 +419,11 @@ def test_enrich_case_provision_dedupe_relevant_wins(azure_env, monkeypatch):
     ]
     monkeypatch.setattr(le.requests, "post", MagicMock(return_value=_chat_response(json.dumps(result_with_dupe_provisions))))
 
-    ok = le.enrich_case(1)
+    # provision_block is supplied by the caller since 2026-09-17 (this
+    # module no longer extracts one itself -- see enrich_case's docstring);
+    # a real caller would build it from this court's own extraction module,
+    # here just the same ocr_text stands in for that.
+    ok = le.enrich_case(1, provision_block=ocr_text)
     assert ok is True
 
     update_sql, update_params = cursor.executed[-1]

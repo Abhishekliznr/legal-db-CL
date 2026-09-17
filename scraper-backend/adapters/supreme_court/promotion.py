@@ -2,14 +2,14 @@
 OCR_DONE -> PROMOTED.
 
 Rewritten 2026-09-08 for the flattened `cr_cases` schema and the regex-first
-extraction approach (pipeline/regex_extraction.py) — there is no separate
+extraction approach (adapters/supreme_court/extraction.py) — there is no separate
 LLM-extraction stage in this pipeline iteration, so this module reads
 straight from the scraper's own RawJudgmentRecord (table-cell fields) plus
 cr_raw_ingestions.ocr_text (OCR-text fields), not from a raw_ai_extraction
 JSON envelope the way the old LLM-driven promotion.py did.
 
 case_note and industries are left NULL/empty by THIS function (see
-cr_cases.industries' comment in db/schema.sql and pipeline/regex_extraction.py's
+cr_cases.industries' comment in db/schema.sql and adapters/supreme_court/extraction.py's
 module docstring for why industries specifically has no regex source) —
 pipeline/llm_enrichment.py fills both in immediately afterward
 (orchestrator/batch_runner.py calls it right after promote_ingestion()
@@ -17,19 +17,18 @@ returns a case_id), not as part of promotion's own transaction.
 """
 
 import logging
-import re
-from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Optional
 
 from adapters.base import RawJudgmentRecord
 from db import scrape_jobs
 from db.connection import get_pooled_connection
+from db.lookups import get_or_create_category, get_or_create_judge, get_or_create_ministry, get_or_create_subject, resolve_bench
 from normalization import advocates, case_numbers, judges, parties
-from pipeline import regex_extraction as rx
+from normalization.dates import parse_date
+from normalization.ministries import find_ministry_in_party_name
+from adapters.supreme_court import extraction as rx
 
 logger = logging.getLogger("scraper_backend_v2.promotion")
-
-_DATE_FORMATS = ("%Y-%m-%d", "%d-%m-%Y", "%d.%m.%Y", "%d/%m/%Y", "%d-%b-%Y", "%d %B %Y", "%d %b %Y")
 
 _VALID_DISPOSITION_CATEGORIES = {
     "Allowed", "Dismissed", "Partly Allowed", "Disposed",
@@ -37,206 +36,26 @@ _VALID_DISPOSITION_CATEGORIES = {
 }
 
 
-def _parse_date(value: Optional[str]) -> Optional[date]:
-    if not value:
-        return None
-    cleaned = re.sub(r"(\d{1,2})(st|nd|rd|th)", r"\1", value, flags=re.IGNORECASE).replace(",", "").strip()
-    for fmt in _DATE_FORMATS:
-        try:
-            return datetime.strptime(cleaned, fmt).date()
-        except ValueError:
-            continue
-    return None
-
-
 def _validate_enum(value: Optional[str], allowed: set) -> Optional[str]:
     return value if value in allowed else None
 
 
-# ---------------------------------------------------------------------
-# get-or-create lookup helpers. Array columns on `cr_cases` (bench, sections,
-# acts, rules, orders, ministries, case_category) mean Postgres can't
-# FK-constrain membership the way the old junction tables did — these
-# helpers are where that integrity actually gets enforced instead.
-#
-# Each does INSERT ... ON CONFLICT (<natural key>) DO NOTHING RETURNING
-# <id>, falling back to a SELECT only when nothing came back (another
-# concurrent promotion won the race) — the same pattern
-# _claim_citation_sequence below already uses correctly. A plain
-# SELECT-then-INSERT (the previous shape here) lets two concurrent
-# promotions both pass the SELECT before either INSERTs, so the loser's
-# INSERT throws an unhandled UniqueViolation; INSERT ... ON CONFLICT
-# takes a row lock on the conflicting key, so the loser blocks until the
-# winner commits and then safely reads back the winner's row instead.
-# ---------------------------------------------------------------------
-
-def _get_or_create_judge(cur, cleaned_name: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_judges (full_name, normalized_name) VALUES (%s, %s) ON CONFLICT (normalized_name) DO NOTHING RETURNING judge_id;",
-        (cleaned_name, cleaned_name),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT judge_id FROM cr_judges WHERE normalized_name = %s;", (cleaned_name,))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_act(cur, act_name: str, short_code: Optional[str], act_year: Optional[int]) -> int:
-    cur.execute(
-        "INSERT INTO cr_acts (act_name, act_year, short_code) VALUES (%s, %s, %s) ON CONFLICT (act_name, act_year) DO NOTHING RETURNING act_id;",
-        (act_name, act_year, short_code),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute(
-        "SELECT act_id FROM cr_acts WHERE act_name = %s AND (act_year = %s OR (act_year IS NULL AND %s IS NULL));",
-        (act_name, act_year, act_year),
-    )
-    return cur.fetchone()[0]
-
-
-def _get_or_create_section(cur, act_id: int, section_number: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_sections (act_id, section_number) VALUES (%s, %s) ON CONFLICT (act_id, section_number) DO NOTHING RETURNING section_id;",
-        (act_id, section_number),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT section_id FROM cr_sections WHERE act_id = %s AND section_number = %s;", (act_id, section_number))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_rule(cur, act_id: int, rule_number: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_rules (act_id, rule_number) VALUES (%s, %s) ON CONFLICT (act_id, rule_number) DO NOTHING RETURNING rule_id;",
-        (act_id, rule_number),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT rule_id FROM cr_rules WHERE act_id = %s AND rule_number = %s;", (act_id, rule_number))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_order(cur, act_id: int, order_number: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_orders (act_id, order_number) VALUES (%s, %s) ON CONFLICT (act_id, order_number) DO NOTHING RETURNING order_id;",
-        (act_id, order_number),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT order_id FROM cr_orders WHERE act_id = %s AND order_number = %s;", (act_id, order_number))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_subject(cur, subject_name: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_subjects (subject_name) VALUES (%s) ON CONFLICT (subject_name) DO NOTHING RETURNING subject_id;",
-        (subject_name,),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT subject_id FROM cr_subjects WHERE subject_name = %s;", (subject_name,))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_ministry(cur, ministry_name: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_ministries (ministry_name) VALUES (%s) ON CONFLICT (ministry_name) DO NOTHING RETURNING ministry_id;",
-        (ministry_name,),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT ministry_id FROM cr_ministries WHERE ministry_name = %s;", (ministry_name,))
-    return cur.fetchone()[0]
-
-
-# Not called from anywhere in THIS module -- promotion never populates
-# cr_cases.industries (no regex signal exists for it, see
-# pipeline/regex_extraction.py's module docstring). Lives here anyway,
-# alongside every other get-or-create lookup helper, since
-# pipeline/llm_enrichment.py imports it rather than duplicating the same
-# lines a second time.
-def _get_or_create_industry(cur, industry_name: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_industries (industry_name) VALUES (%s) ON CONFLICT (industry_name) DO NOTHING RETURNING industry_id;",
-        (industry_name,),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT industry_id FROM cr_industries WHERE industry_name = %s;", (industry_name,))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_category(cur, case_number: Optional[str]) -> Optional[int]:
-    classified = case_numbers.classify_category(case_number)
-    if not classified:
-        return None
-    code, name = classified
-    cur.execute(
-        "INSERT INTO cr_case_categories (category_code, category_name) VALUES (%s, %s) ON CONFLICT (category_code) DO NOTHING RETURNING category_id;",
-        (code, name),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT category_id FROM cr_case_categories WHERE category_code = %s;", (code,))
-    return cur.fetchone()[0]
-
-
-def _resolve_provisions(cur, provisions: List[Dict[str, Any]]) -> Tuple[List[int], List[int], List[int], List[int]]:
-    """Returns (act_ids, section_ids, rule_ids, order_ids), each de-duplicated, act_ids covering every act referenced by any of the other three."""
-    act_ids: List[int] = []
-    section_ids: List[int] = []
-    rule_ids: List[int] = []
-    order_ids: List[int] = []
-    seen_acts = set()
-
-    for provision in provisions:
-        act_id = _get_or_create_act(cur, provision["statute_name"], provision["short_code"], provision["statute_year"])
-        if act_id not in seen_acts:
-            seen_acts.add(act_id)
-            act_ids.append(act_id)
-
-        number = provision["section_number"]
-        provision_type = provision["provision_type"]
-        if provision_type == "rule":
-            rule_ids.append(_get_or_create_rule(cur, act_id, number))
-        elif provision_type == "order":
-            order_ids.append(_get_or_create_order(cur, act_id, number))
-        else:
-            section_ids.append(_get_or_create_section(cur, act_id, number))
-
-    return act_ids, section_ids, rule_ids, order_ids
-
-
-def _resolve_bench(cur, bench_names: List[str]) -> List[int]:
-    judge_ids = []
-    seen = set()
-    for name in bench_names:
-        if name in seen:
-            continue
-        seen.add(name)
-        judge_ids.append(_get_or_create_judge(cur, name))
-    return judge_ids
-
+# get-or-create lookup helpers (judges, acts, sections/rules/orders,
+# subjects, ministries, industries, case categories) live in db/lookups.py
+# — schema-wide, shared with pipeline/llm_enrichment.py, not specific to
+# this court's promotion pipeline. Only the ministry resolution below
+# (which fields feed the lookup, using this court's own extracted party
+# names) is Supreme-Court-specific and stays here.
 
 def _resolve_ministries(cur, petitioner: Optional[str], respondent: Optional[str]) -> List[int]:
-    """Scoped to the parsed party names only, never the whole OCR text — see regex_extraction.find_ministry_in_party_name's own docstring on why."""
+    """Scoped to the parsed party names only, never the whole OCR text — see normalization.ministries.find_ministry_in_party_name's own docstring on why."""
     ministry_ids = []
     seen = set()
     for party_name in (petitioner, respondent):
-        ministry_name = rx.find_ministry_in_party_name(party_name)
+        ministry_name = find_ministry_in_party_name(party_name)
         if ministry_name and ministry_name not in seen:
             seen.add(ministry_name)
-            ministry_ids.append(_get_or_create_ministry(cur, ministry_name))
+            ministry_ids.append(get_or_create_ministry(cur, ministry_name))
     return ministry_ids
 
 
@@ -335,7 +154,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     """
     Promotes one OCR_DONE cr_raw_ingestions row into a single `cr_cases` row,
     using RawJudgmentRecord (table-cell fields, already scraped) and
-    ocr_text (OCR-text fields, via pipeline/regex_extraction.py) — no LLM
+    ocr_text (OCR-text fields, via adapters/supreme_court/extraction.py) — no LLM
     call in this pipeline iteration. Returns the new case_id, or None if
     routed to NEEDS_REVIEW (missing case_number) or PROMOTION_FAILED (an
     unexpected DB error).
@@ -377,7 +196,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
         if not case_number:
             raise PromotionSkipped("case_number_raw is missing/blank — required NOT NULL on cr_cases")
 
-        judgment_date = _parse_date(record.decision_date_raw)
+        judgment_date = parse_date(record.decision_date_raw)
         needs_review = judgment_date is None
 
         party_names = rx.parse_party_names(record.party_name_raw)
@@ -403,11 +222,11 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                judge_ids = _resolve_bench(cur, bench_names)
-                judgment_by_id = _get_or_create_judge(cur, judgment_by_name) if judgment_by_name else None
-                subject_id = _get_or_create_subject(cur, subject_word) if subject_word else None
+                judge_ids = resolve_bench(cur, bench_names)
+                judgment_by_id = get_or_create_judge(cur, judgment_by_name) if judgment_by_name else None
+                subject_id = get_or_create_subject(cur, subject_word) if subject_word else None
                 ministry_ids = _resolve_ministries(cur, petitioner, respondent)
-                category_ids = [_get_or_create_category(cur, case_number)] if classified_category else []
+                category_ids = [get_or_create_category(cur, case_number)] if classified_category else []
                 category_ids = [c for c in category_ids if c is not None]
 
                 cur.execute("""
