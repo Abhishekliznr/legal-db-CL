@@ -1,4 +1,4 @@
-# Heavy image: Playwright + Chromium, PyMuPDF, ddddocr, Azure Blob SDK.
+# Heavy image: Playwright + Chromium, PyMuPDF, ddddocr, Tesseract, Azure Blob SDK.
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     build-essential \
     libpq-dev \
+    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -1,11 +1,10 @@
-# Lean image: case search/filter API only — no Playwright, no browser runtime.
+# Lightweight image: read-only DB API, no Playwright/OCR/AI dependencies.
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
     build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*

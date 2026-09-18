@@ -1,3 +1,0 @@
-"""
-FastAPI Modular Routers Package
-"""

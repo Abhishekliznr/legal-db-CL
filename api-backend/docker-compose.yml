@@ -1,41 +1,54 @@
 services:
-  # 1. PostgreSQL Database Service — own instance for api-backend
+  # 1. PostgreSQL Database Service — own instance for api-backend, for
+  #    local dev/standalone use. Exposed on host port 5435 so it can run
+  #    alongside api-backend's (5432), the old scraper-backend's (5433), and
+  #    scraper-backend's (5434) without a port clash. In a real
+  #    deployment where api-backend reads scraper-backend's data,
+  #    override DB_HOST/DB_PORT below to point at that instance instead and
+  #    drop this `db` service (see db/schema.sql's header on which service
+  #    should own schema init in that setup).
   db:
     image: postgres:15-alpine
-    container_name: legal_api_postgres_db
+    container_name: legal_api_v2_postgres_db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "1234"
-      POSTGRES_DB: legal_db
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DB: ${DB_NAME:-liznrlegal}
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
-      - api_postgres_data:/var/lib/postgresql/data
+      - api_v2_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d legal_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-liznrlegal}" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  # 2. API Backend — case search, filters & citator (lightweight, no Playwright)
+  # 2. api-backend — case search, filters, stats & history (lightweight,
+  #    read-only). Standalone: no shared code or containers with
+  #    scraper-backend or the old api-backend/scraper-backend.
   api-backend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: legal_api_backend
+    container_name: legal_api_v2_backend
     restart: always
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - "8080:8000"
+      - "8083:8000"
     environment:
-      - DB_CONNECTION=postgresql://postgres:1234@db:5432/legal_db
+      - DATABASE_TYPE=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-liznrlegal}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-changeme}
     volumes:
-      # Mount current directory so code changes persist immediately
       - .:/app
       - /app/__pycache__
 
 volumes:
-  api_postgres_data:
+  api_v2_postgres_data:

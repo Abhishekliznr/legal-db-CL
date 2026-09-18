@@ -5,31 +5,92 @@ Handles:
 - QUERY /api/cases                 : Structured JSON search (filters, search fields, page,
                                       limit, sort in the request body, per RFC 10008).
                                       NOT visible in Swagger UI (/docs) - swagger-ui-dist
-                                      doesn't render the QUERY method yet. It IS present in
-                                      /openapi.json under paths./api/cases.query. See the
-                                      handler's docstring below for a curl example.
-- GET  /api/cases/{case_id}        : Full judgment metadata, provisions, and citations
-- GET/POST/PATCH/DELETE /api/cases/searches[/{field_id}] : CRUD for the advanced
-                                      boolean search-builder field definitions
-                                      (all/any/exact/none/text) backing GET's public
-                                      contract.
+                                      doesn't render the QUERY method. See /openapi.json
+                                      under paths./api/cases.query, or curl -X QUERY.
+- GET  /api/cases/{case_id}        : Full case metadata + provisions.
+- GET  /api/cases/searches          : Advanced boolean search-builder field
+                                      definitions (read-only).
+
+Rewritten again 2026-09-08 for the flattened `cr_cases` schema (db/schema.sql's
+rewrite note) — both endpoints now read `cr_case_search_view` (this service's
+own convenience view resolving cases' id-arrays to display names; NOT the
+same view the pre-rewrite schema had, and scraper-backend has no
+equivalent). Free-text search uses `cr_cases.search_vector` (re-added to the
+schema specifically because this router needs it — the flattened schema's
+first draft omitted it).
+
+Permanently dropped from every response below, not just renamed — no
+backing data exists for any of these in the current pipeline (see
+db/schema.sql's rewrite note): advocates/counsel, citations made/cited-by
+and the treatment_status field they computed, holdings, prior appellate
+history, and procedural timeline. A case number can also no longer own
+several distinct case numbers under one document (the old documents/cases
+split) — one row IS one case now, so `document_id` as a separate concept is
+gone too; `case_id` is the only identifier.
+
+Updated 2026-09-10 for scraper-backend's llm_enrichment.py rewrite, which
+now actually populates fields this router previously had no data for:
+`favouring_party` (list + detail), `industries` (detail), and a
+relevant/other split of the provisions the case cites — CaseDetail's
+`relevant_provisions`/`other_provisions`, resolved the same way as the
+existing `provisions` field but from `cr_cases.sections_relevant/_other`
+(and the matching rules_/orders_ columns) instead of the unified
+sections/rules/orders arrays. See db/schema.sql's cr_cases comment for why
+these aren't guaranteed a strict partition of `provisions`.
+
+Updated 2026-09-11: both endpoints now project every field
+`cr_case_search_view` exposes except `judgement`/`ocr_text` on the list
+endpoint (full opinion text and raw OCR text are detail-only — too large
+per row on a paginated list). Also reverses the 2026-09-08 "URL
+construction is a frontend concern" decision for the PDF blob: this
+service now also returns `blob_pdf_url`, `blob_pdf_id` resolved against
+BLOB_BASE_URL/BLOB_CONTAINER env vars server-side (null if either is
+unset) — `blob_pdf_id` itself is kept as-is for callers that already
+build their own link.
+
+Updated 2026-09-12: `get_case_detail`'s own SELECT had silently never
+actually fetched `judgement`/`ocr_text` (both were declared on `CaseDetail`
+and unconditionally serialized as null; `tests/manual_phase4_e2e.py`'s
+`detail["ocr_text"]` assertion was accordingly broken) — fixed.
+
+Updated 2026-09-13: `cr_case_search_view` gained a `provisions` column
+(act+section/rule/order pairs, resolved the same way `get_case_detail`'s
+unified `provisions` is — not the _relevant/_other LLM subsets) since the
+existing `act_names` here is act-level only, with no section attached.
+`CaseListItem.provisions` projects it so the frontend's case-research quick
+view can show per-act sections without a second request to the detail
+endpoint.
+
+Also `get_case_detail`'s `provisions`/`relevant_provisions`/`other_provisions`
+(the UNION ALL of sections/rules/orders, unified and LLM-classified) are
+replaced with `sections`/`rules`/`orders`, each already split by kind and
+carrying only the unified (non-_relevant/_other) set -- the detail page
+now renders one row per kind and dropped the relevant/other split, and nothing
+else read those fields.
 """
 
 import logging
-import uuid
-from collections import defaultdict
+import os
 from typing import Optional, List, Dict, Any, Union
-from uuid import UUID
 
 import psycopg2
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
-import db_manager
+from db.connection import get_pooled_connection
 
-logger = logging.getLogger("api_backend.search")
+logger = logging.getLogger("api_backend_v2.search")
 
 router = APIRouter(tags=["Case Search & Details"])
+
+_BLOB_BASE_URL = os.environ.get("BLOB_BASE_URL", "").strip().rstrip("/")
+_BLOB_CONTAINER = os.environ.get("BLOB_CONTAINER", "").strip().strip("/")
+
+
+def _build_blob_pdf_url(blob_pdf_id: Optional[str]) -> Optional[str]:
+    if not blob_pdf_id or not _BLOB_BASE_URL or not _BLOB_CONTAINER:
+        return None
+    return f"{_BLOB_BASE_URL}/{_BLOB_CONTAINER}/{blob_pdf_id}"
 
 
 # ============================================================
@@ -37,30 +98,30 @@ router = APIRouter(tags=["Case Search & Details"])
 # ============================================================
 
 class SearchQueryModel(BaseModel):
-    text: Optional[str] = Field(None, description="General free text query")
-    all: Optional[List[str]] = Field(None, description="All of these words must appear (AND)")
-    any: Optional[List[str]] = Field(None, description="Any of these words may appear (OR)")
-    exact: Optional[str] = Field(None, description="Exact phrase matching")
-    none: Optional[List[str]] = Field(None, description="None of these words may appear (NOT)")
+    text: Optional[str] = None
+    all: Optional[List[str]] = None
+    any: Optional[List[str]] = None
+    exact: Optional[str] = None
+    none: Optional[List[str]] = None
 
 
 class SearchDateRangeModel(BaseModel):
-    from_date: Optional[str] = Field(None, alias="from", description="Start date (YYYY-MM-DD)")
-    to_date: Optional[str] = Field(None, alias="to", description="End date (YYYY-MM-DD)")
+    from_date: Optional[str] = Field(None, alias="from")
+    to_date: Optional[str] = Field(None, alias="to")
 
 
 class SearchSortModel(BaseModel):
-    field: Optional[str] = Field("date", description="Sort field: relevance, date, court")
-    direction: Optional[str] = Field("desc", description="Sort direction: asc or desc")
+    field: Optional[str] = "date"
+    direction: Optional[str] = "desc"
 
 
 class SearchRequestModel(BaseModel):
-    query: Optional[Union[SearchQueryModel, str]] = Field(None, description="Text query or structured search")
-    filters: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Filter keys mapped to list of selected values")
-    date: Optional[SearchDateRangeModel] = Field(None, description="Decision date range")
-    sort: Optional[SearchSortModel] = Field(default_factory=SearchSortModel, description="Sorting options")
-    page: int = Field(1, ge=1, description="Page number")
-    limit: int = Field(20, ge=1, le=100, description="Results per page")
+    query: Optional[Union[SearchQueryModel, str]] = None
+    filters: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    date: Optional[SearchDateRangeModel] = None
+    sort: Optional[SearchSortModel] = Field(default_factory=SearchSortModel)
+    page: int = Field(1, ge=1)
+    limit: int = Field(20, ge=1, le=100)
 
 
 # ============================================================
@@ -70,6 +131,7 @@ class SearchRequestModel(BaseModel):
 class PartySummary(BaseModel):
     name: Optional[str] = None
     role: Optional[str] = None
+    advocate: Optional[str] = None
 
 
 class JudgeSummary(BaseModel):
@@ -77,56 +139,46 @@ class JudgeSummary(BaseModel):
     role: Optional[str] = None
 
 
-class AdvocateSummary(BaseModel):
-    name: Optional[str] = None
-    representing: Optional[str] = None
-
-
 class ProvisionSummary(BaseModel):
     act_name: Optional[str] = None
     section: Optional[str] = None
-    full_text: Optional[str] = None
-
-
-class CitationSummary(BaseModel):
-    citation: Optional[str] = None
-    treatment: Optional[str] = None
-
-
-class CitationMade(BaseModel):
-    citation: Optional[str] = None
-    treatment: Optional[str] = None
-    cited_case_id: Optional[str] = None
-
-
-class CitedByItem(BaseModel):
-    case_number: Optional[str] = None
-    citation: Optional[str] = None
-    treatment: Optional[str] = None
-    case_id: Optional[str] = None
 
 
 class CaseListItem(BaseModel):
     id: str
-    diary_number: Optional[str] = None
     case_number: Optional[str] = None
-    cnr: Optional[str] = None
+    liznr_id: Optional[str] = None
     neutral_citation: Optional[str] = None
     judgment_date: Optional[str] = None
-    case_category: Optional[str] = None
+    language: Optional[str] = None
+    disposition: Optional[str] = None
     document_type: Optional[str] = None
-    treatment_status: str = "GOOD_LAW"
-    overruled: Optional[bool] = None
-    is_reported: Optional[bool] = None
-    reporting_status: Optional[str] = None
-    case_note_ai: Optional[str] = None
-    pdf_path: Optional[str] = None
-    pdf_url: Optional[str] = None
+    subject: Optional[str] = None
+    case_category: List[str] = []
+    case_note: Optional[str] = None
+    conclusion: Optional[str] = None
+    favouring_party: Optional[str] = None
+    # blob_pdf_id is the bare path within the blob container (e.g.
+    # "SCIN/<checksum>.pdf"); blob_pdf_url is that path resolved against
+    # BLOB_BASE_URL/BLOB_CONTAINER server-side, null if either env var is
+    # unset. source_pdf_url is already a complete URL (the court's own
+    # site) and can be used as-is.
+    blob_pdf_id: Optional[str] = None
+    blob_pdf_url: Optional[str] = None
+    source_pdf_url: Optional[str] = None
     court_name: str
+    court_id: Optional[str] = None
+    judgment_by: Optional[str] = None
     parties: List[PartySummary] = []
     judges: List[JudgeSummary] = []
+    acts: List[str] = []
     provisions: List[ProvisionSummary] = []
-    citations: List[CitationSummary] = []
+    ministries: List[str] = []
+    industries: List[str] = []
+    needs_review: bool = False
+    # Filing year only, parsed from case_number -- see db/schema.sql's
+    # cr_cases.filing_year comment for why this isn't a full filing date.
+    filing_year: Optional[int] = None
 
 
 class CaseSearchResponse(BaseModel):
@@ -139,88 +191,44 @@ class CaseSearchResponse(BaseModel):
 
 class CaseDetail(BaseModel):
     id: str
-    diary_number: Optional[str] = None
     case_number: Optional[str] = None
-    cnr: Optional[str] = None
+    liznr_id: Optional[str] = None
     neutral_citation: Optional[str] = None
     judgment_date: Optional[str] = None
-    registration_date: Optional[str] = None
-    case_category: Optional[str] = None
+    language: Optional[str] = None
+    disposition: Optional[str] = None
     document_type: Optional[str] = None
-    treatment_status: str = "GOOD_LAW"
-    overruled: Optional[bool] = None
-    is_reported: Optional[bool] = None
-    reporting_status: Optional[str] = None
-    case_note_ai: Optional[str] = None
-    pdf_path: Optional[str] = None
-    pdf_url: Optional[str] = None
+    case_note: Optional[str] = None
+    conclusion: Optional[str] = None
+    judgement: Optional[str] = None
+    ocr_text: Optional[str] = None
+    blob_pdf_id: Optional[str] = None
+    blob_pdf_url: Optional[str] = None
+    source_pdf_url: Optional[str] = None
     court_name: str
     court_id: Optional[str] = None
+    judgment_by: Optional[str] = None
     parties: List[PartySummary] = []
     judges: List[JudgeSummary] = []
-    advocates: List[AdvocateSummary] = []
-    provisions: List[ProvisionSummary] = []
-    citations_made: List[CitationMade] = []
-    cited_by: List[CitedByItem] = []
+    # Split by provision kind (unified sections/rules/orders arrays -- not
+    # the LLM-classified _relevant/_other subsets, dropped 2026-09-13 since
+    # no frontend view rendered that split) so the detail page can show one
+    # row per kind instead of one flat "provisions" list.
+    sections: List[ProvisionSummary] = []
+    rules: List[ProvisionSummary] = []
+    orders: List[ProvisionSummary] = []
+    subject: Optional[str] = None
+    case_category: List[str] = []
+    ministries: List[str] = []
+    industries: List[str] = []
+    favouring_party: Optional[str] = None
+    needs_review: bool = False
+    filing_year: Optional[int] = None
 
 
 # ============================================================
-# HELPERS
+# SEARCH
 # ============================================================
-
-def _to_valid_uuid(case_id: str) -> Optional[str]:
-    """Returns a normalized UUID string if case_id is a real UUID, else None."""
-    try:
-        return str(uuid.UUID(case_id))
-    except (ValueError, AttributeError, TypeError):
-        return None
-
-
-def _fetch_related_for_cases(cur, case_ids: List[str]) -> Dict[str, Dict[str, list]]:
-    """
-    Batch-fetches parties/judges/provisions/citations for a whole page of case_ids in
-    4 queries total (instead of 4 queries PER case — the N+1 pattern this replaces).
-    Per-case truncation (parties<=4, provisions<=3, citations<=3, matching the previous
-    per-row LIMITs) is applied in Python after grouping.
-    """
-    related: Dict[str, Dict[str, list]] = defaultdict(lambda: {"parties": [], "judges": [], "provisions": [], "citations": []})
-    if not case_ids:
-        return related
-
-    cur.execute("SELECT case_id, name, role FROM parties WHERE case_id = ANY(%s::uuid[]);", (case_ids,))
-    for case_id, name, role in cur.fetchall():
-        if len(related[str(case_id)]["parties"]) < 4:
-            related[str(case_id)]["parties"].append({"name": name, "role": role})
-
-    cur.execute("""
-        SELECT cj.case_id, jm.canonical_name, cj.role
-        FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id
-        WHERE cj.case_id = ANY(%s::uuid[]);
-    """, (case_ids,))
-    for case_id, name, role in cur.fetchall():
-        related[str(case_id)]["judges"].append({"name": name, "role": role})
-
-    cur.execute("""
-        SELECT pr.case_id, COALESCE(am.canonical_name, pr.raw_act_name) AS act_name, pr.section, pr.provision_full
-        FROM provisions pr
-        LEFT JOIN act_master am ON pr.act_id = am.id
-        WHERE pr.case_id = ANY(%s::uuid[]);
-    """, (case_ids,))
-    for case_id, act_name, section, full_text in cur.fetchall():
-        if len(related[str(case_id)]["provisions"]) < 3:
-            related[str(case_id)]["provisions"].append({"act_name": act_name, "section": section, "full_text": full_text})
-
-    cur.execute("""
-        SELECT citing_case_id, raw_citation_text, treatment_type
-        FROM citations
-        WHERE citing_case_id = ANY(%s::uuid[]);
-    """, (case_ids,))
-    for case_id, citation, treatment in cur.fetchall():
-        if len(related[str(case_id)]["citations"]) < 3:
-            related[str(case_id)]["citations"].append({"citation": citation, "treatment": treatment})
-
-    return related
-
 
 def execute_case_search(
     text_query: Optional[str] = None,
@@ -234,239 +242,196 @@ def execute_case_search(
     sort_field: str = "date",
     sort_direction: str = "desc",
     page: int = 1,
-    limit: int = 20
+    limit: int = 20,
 ) -> Dict[str, Any]:
-    """Core parameterized SQL builder & executor."""
-    with db_manager.get_pooled_connection() as conn:
+    with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            where_clauses = []
+            where_clauses: List[str] = []
             params: List[Any] = []
 
-            # 1. Free Text / General Query
+            # 1. Free text — tsvector for prose fields, ILIKE for structured identifiers.
             if text_query and text_query.strip():
-                query_str = f"%{text_query.strip()}%"
-                text_condition = """(
-                    c.case_number ILIKE %s
-                    OR c.cnr ILIKE %s
-                    OR c.diary_number ILIKE %s
-                    OR c.neutral_citation ILIKE %s
-                    OR c.case_note_ai ILIKE %s
-                    OR EXISTS (SELECT 1 FROM parties p WHERE p.case_id = c.id AND p.name ILIKE %s)
-                    OR EXISTS (SELECT 1 FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id WHERE cj.case_id = c.id AND jm.canonical_name ILIKE %s)
-                    OR EXISTS (SELECT 1 FROM case_advocates ca JOIN advocates a ON ca.advocate_id = a.id WHERE ca.case_id = c.id AND a.name ILIKE %s)
-                    OR EXISTS (SELECT 1 FROM provisions pr JOIN act_master am ON pr.act_id = am.id WHERE pr.case_id = c.id AND (am.canonical_name ILIKE %s OR pr.raw_act_name ILIKE %s OR pr.section ILIKE %s))
-                    OR EXISTS (SELECT 1 FROM citations cit WHERE cit.citing_case_id = c.id AND cit.raw_citation_text ILIKE %s)
-                )"""
-                where_clauses.append(text_condition)
-                params.extend([query_str] * 12)
+                tsquery_str = text_query.strip()
+                ilike_str = f"%{tsquery_str}%"
+                where_clauses.append("""(
+                    v.search_vector @@ plainto_tsquery('english', %s)
+                    OR v.case_number ILIKE %s
+                    OR v.neutral_citation ILIKE %s
+                )""")
+                params.extend([tsquery_str, ilike_str, ilike_str])
 
-            # 2. Exact Phrase
             if exact_phrase and exact_phrase.strip():
-                p_str = f"%{exact_phrase.strip()}%"
-                where_clauses.append("(c.case_note_ai ILIKE %s OR c.case_number ILIKE %s)")
-                params.extend([p_str, p_str])
+                where_clauses.append("v.search_vector @@ phraseto_tsquery('english', %s)")
+                params.append(exact_phrase.strip())
 
-            # 3. All Terms (AND)
             if all_terms:
-                for term in all_terms:
-                    if term and str(term).strip():
-                        t_str = f"%{str(term).strip()}%"
-                        where_clauses.append("(c.case_note_ai ILIKE %s OR c.case_number ILIKE %s)")
-                        params.extend([t_str, t_str])
+                terms = [t.strip() for t in all_terms if t and t.strip()]
+                if terms:
+                    where_clauses.append("v.search_vector @@ plainto_tsquery('english', %s)")
+                    params.append(" ".join(terms))
 
-            # 4. Any Terms (OR)
             if any_terms:
                 any_clauses = []
                 for term in any_terms:
-                    if term and str(term).strip():
-                        t_str = f"%{str(term).strip()}%"
-                        any_clauses.append("(c.case_note_ai ILIKE %s)")
-                        params.append(t_str)
+                    if term and term.strip():
+                        any_clauses.append("v.search_vector @@ plainto_tsquery('english', %s)")
+                        params.append(term.strip())
                 if any_clauses:
                     where_clauses.append("(" + " OR ".join(any_clauses) + ")")
 
-            # 5. None Terms (NOT)
             if none_terms:
                 for term in none_terms:
-                    if term and str(term).strip():
-                        t_str = f"%{str(term).strip()}%"
-                        where_clauses.append("(c.case_note_ai NOT ILIKE %s OR c.case_note_ai IS NULL)")
-                        params.append(t_str)
+                    if term and term.strip():
+                        where_clauses.append("NOT (v.search_vector @@ plainto_tsquery('english', %s))")
+                        params.append(term.strip())
 
-            # 6. Apply Filter Dictionary (Safe Parameterized Mapping)
+            # 2. Filters
             if filters_dict:
                 for f_key, f_val in filters_dict.items():
                     if f_val is None or f_val == "" or (isinstance(f_val, list) and len(f_val) == 0):
                         continue
-
                     val_list = f_val if isinstance(f_val, list) else [f_val]
 
-                    if f_key in ["court", "court_id"]:
-                        expanded = set(val_list)
-                        if "SCIN" in val_list or "sc" in [str(x).lower() for x in val_list]:
-                            expanded.add("SUPREME_COURT_OF_INDIA")
-                            expanded.add("SCIN")
-                        if "SUPREME_COURT_OF_INDIA" in val_list:
-                            expanded.add("SCIN")
-                        where_clauses.append("(c.court_id = ANY(%s) OR UPPER(c.court_id) = ANY(%s))")
-                        params.extend([list(expanded), [str(x).upper() for x in expanded]])
+                    if f_key in ("court", "court_id"):
+                        int_ids = [int(v) for v in val_list if str(v).isdigit()]
+                        if int_ids:
+                            where_clauses.append("v.court_id = ANY(%s)")
+                            params.append(int_ids)
 
-                    elif f_key in ["treatment_status", "status"]:
-                        where_clauses.append("c.treatment_status = ANY(%s)")
-                        params.append(val_list)
-
-                    elif f_key in ["judgment_year", "year"]:
+                    elif f_key in ("judgment_year", "year"):
                         int_years = [int(y) for y in val_list if str(y).isdigit()]
                         if int_years:
-                            where_clauses.append("EXTRACT(YEAR FROM c.judgment_date)::INT = ANY(%s)")
+                            where_clauses.append("EXTRACT(YEAR FROM v.judgment_date)::INT = ANY(%s)")
                             params.append(int_years)
 
-                    elif f_key in ["judge", "judges"]:
+                    elif f_key in ("judge", "judges"):
                         judge_likes = [f"%{str(j).strip()}%" for j in val_list if str(j).strip()]
                         if judge_likes:
-                            where_clauses.append("""EXISTS (
-                                SELECT 1 FROM case_judges cj
-                                JOIN judge_master jm ON cj.judge_id = jm.id
-                                WHERE cj.case_id = c.id AND (jm.canonical_name ILIKE ANY(%s))
-                            )""")
+                            where_clauses.append("EXISTS (SELECT 1 FROM unnest(COALESCE(v.bench_names, ARRAY[]::text[])) bn WHERE bn ILIKE ANY(%s))")
                             params.append(judge_likes)
 
-                    elif f_key in ["act", "acts"]:
+                    elif f_key in ("act", "acts"):
                         act_likes = [f"%{str(a).strip()}%" for a in val_list if str(a).strip()]
                         if act_likes:
-                            where_clauses.append("""EXISTS (
-                                SELECT 1 FROM provisions pr
-                                LEFT JOIN act_master am ON pr.act_id = am.id
-                                WHERE pr.case_id = c.id AND (
-                                    am.canonical_name ILIKE ANY(%s)
-                                    OR pr.raw_act_name ILIKE ANY(%s)
-                                )
-                            )""")
-                            params.extend([act_likes, act_likes])
+                            where_clauses.append("EXISTS (SELECT 1 FROM unnest(COALESCE(v.act_names, ARRAY[]::text[])) an WHERE an ILIKE ANY(%s))")
+                            params.append(act_likes)
 
-                    elif f_key == "is_reported":
-                        is_reported_val = val_list[0] if isinstance(val_list, list) else val_list
-                        where_clauses.append("c.is_reported = %s")
-                        params.append(bool(is_reported_val))
+                    elif f_key == "disposition":
+                        # v.disposition is disposition_category_enum, not
+                        # text -- ANY() against a plain text[] param fails
+                        # with "operator does not exist" without this cast
+                        # (found via a real run, not just inspection).
+                        where_clauses.append("v.disposition::text = ANY(%s)")
+                        params.append(val_list)
 
-            # 7. Date Range
+                    elif f_key == "favouring_party":
+                        # Same enum-cast reasoning as disposition above.
+                        where_clauses.append("v.favouring_party::text = ANY(%s)")
+                        params.append(val_list)
+
+                    elif f_key in ("industry", "industries"):
+                        industry_likes = [f"%{str(i).strip()}%" for i in val_list if str(i).strip()]
+                        if industry_likes:
+                            where_clauses.append("EXISTS (SELECT 1 FROM unnest(COALESCE(v.industry_names, ARRAY[]::text[])) ind WHERE ind ILIKE ANY(%s))")
+                            params.append(industry_likes)
+
+                    elif f_key in ("ministry", "ministries"):
+                        ministry_likes = [f"%{str(m).strip()}%" for m in val_list if str(m).strip()]
+                        if ministry_likes:
+                            where_clauses.append("EXISTS (SELECT 1 FROM unnest(COALESCE(v.ministry_names, ARRAY[]::text[])) mn WHERE mn ILIKE ANY(%s))")
+                            params.append(ministry_likes)
+
+            # 3. Date range
             if from_date:
-                where_clauses.append("c.judgment_date >= %s")
+                where_clauses.append("v.judgment_date >= %s")
                 params.append(from_date)
             if to_date:
-                where_clauses.append("c.judgment_date <= %s")
+                where_clauses.append("v.judgment_date <= %s")
                 params.append(to_date)
 
             where_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
 
-            # Count total matching records
-            count_sql = f"SELECT COUNT(DISTINCT c.id) FROM cases c {where_sql};"
-            cur.execute(count_sql, params)
+            cur.execute(f"SELECT COUNT(*) FROM cr_case_search_view v {where_sql};", params)
             total_records = cur.fetchone()[0]
 
             offset = (page - 1) * limit
             total_pages = (total_records + limit - 1) // limit if total_records > 0 else 1
-
-            # Order by clause
             direction = "ASC" if str(sort_direction).lower() == "asc" else "DESC"
-            if sort_field == "date":
-                order_sql = f"ORDER BY c.judgment_date {direction} NULLS LAST, c.created_at DESC"
-            else:
-                order_sql = f"ORDER BY c.judgment_date DESC NULLS LAST, c.created_at DESC"
+            order_sql = f"ORDER BY v.judgment_date {direction} NULLS LAST"
 
-            # Fetch matching cases
-            query_sql = f"""
-                SELECT c.id, c.diary_number, c.case_number, c.cnr, c.neutral_citation,
-                       c.judgment_date, c.case_category, c.document_type,
-                       c.treatment_status, c.overruled, c.is_reported, c.reporting_status,
-                       c.case_note_ai, c.pdf_path, c.pdf_url,
-                       co.name AS court_name
-                FROM cases c
-                LEFT JOIN courts co ON c.court_id = co.court_id
+            cur.execute(f"""
+                SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
+                       v.language, v.disposition, v.document_type, v.subject_name, v.category_names,
+                       v.case_note, v.conclusion, v.blob_pdf_id, v.source_pdf_url, v.court_name,
+                       v.court_id, v.judgment_by_name, v.petitioner, v.respondent,
+                       v.petitioner_advocate, v.respondent_advocate, v.filing_year, v.bench_names,
+                       v.act_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review,
+                       v.provisions
+                FROM cr_case_search_view v
                 {where_sql}
                 {order_sql}
                 LIMIT %s OFFSET %s;
-            """
-            cur.execute(query_sql, params + [limit, offset])
+            """, params + [limit, offset])
             rows = cur.fetchall()
-
-            case_ids = [str(r[0]) for r in rows]
-            related = _fetch_related_for_cases(cur, case_ids)
 
             results = []
             for r in rows:
-                case_id = str(r[0])
-                rel = related[case_id]
+                (case_id, case_number, liznr_id, neutral_citation, judgment_date,
+                 language, disposition, document_type, subject_name, category_names,
+                 case_note, conclusion, blob_pdf_id, source_pdf_url, court_name,
+                 court_id, judgment_by_name, petitioner, respondent,
+                 petitioner_advocate, respondent_advocate, filing_year, bench_names,
+                 act_names, ministry_names, industry_names, favouring_party, needs_review,
+                 provisions) = r
+
+                parties = ([{"name": petitioner, "role": "PETITIONER", "advocate": petitioner_advocate}] if petitioner else []) + \
+                          ([{"name": respondent, "role": "RESPONDENT", "advocate": respondent_advocate}] if respondent else [])
+                judges = [{"name": j, "role": None} for j in (bench_names or [])]
+
                 results.append({
-                    "id": case_id,
-                    "diary_number": r[1],
-                    "case_number": r[2],
-                    "cnr": r[3],
-                    "neutral_citation": r[4],
-                    "judgment_date": r[5].strftime("%Y-%m-%d") if r[5] else None,
-                    "case_category": r[6],
-                    "document_type": r[7],
-                    "treatment_status": r[8] or "GOOD_LAW",
-                    "overruled": r[9],
-                    "is_reported": r[10],
-                    "reporting_status": r[11],
-                    "case_note_ai": r[12],
-                    "pdf_path": r[13],
-                    "pdf_url": r[14],
-                    "court_name": r[15] or "Supreme Court of India",
-                    "parties": rel["parties"],
-                    "judges": rel["judges"],
-                    "provisions": rel["provisions"],
-                    "citations": rel["citations"]
+                    "id": str(case_id),
+                    "case_number": case_number,
+                    "liznr_id": liznr_id,
+                    "neutral_citation": neutral_citation,
+                    "judgment_date": judgment_date.strftime("%Y-%m-%d") if judgment_date else None,
+                    "language": language,
+                    "disposition": disposition,
+                    "document_type": document_type,
+                    "subject": subject_name,
+                    "case_category": category_names or [],
+                    "case_note": case_note,
+                    "conclusion": conclusion,
+                    "favouring_party": favouring_party,
+                    "blob_pdf_id": blob_pdf_id,
+                    "blob_pdf_url": _build_blob_pdf_url(blob_pdf_id),
+                    "source_pdf_url": source_pdf_url,
+                    "court_name": court_name,
+                    "court_id": str(court_id) if court_id else None,
+                    "judgment_by": judgment_by_name,
+                    "parties": parties,
+                    "judges": judges,
+                    "acts": act_names or [],
+                    "provisions": provisions or [],
+                    "ministries": ministry_names or [],
+                    "industries": industry_names or [],
+                    "needs_review": needs_review,
+                    "filing_year": filing_year,
                 })
 
-            return {
-                "total": total_records,
-                "page": page,
-                "limit": limit,
-                "total_pages": total_pages,
-                "results": results
-            }
+            return {"total": total_records, "page": page, "limit": limit, "total_pages": total_pages, "results": results}
 
 
 @router.api_route(
-    "/api/cases",
-    methods=["QUERY"],
-    response_model=CaseSearchResponse,
+    "/api/cases", methods=["QUERY"], response_model=CaseSearchResponse,
     summary="Search & list cases (HTTP QUERY method, RFC 10008)",
-    description=(
-        "NOTE: Swagger UI (/docs) cannot render this operation yet - swagger-ui-dist "
-        "has no renderer for the QUERY method as of the RFC 10008 (June 2026) "
-        "standardization (tracked in fastapi/fastapi#15839 and upstream swagger-ui "
-        "issues). The route itself works correctly over real HTTP; inspect its full "
-        "request/response schema directly in /openapi.json under paths./api/cases.query, "
-        "or call it with e.g. `curl -X QUERY http://<host>/api/cases -H 'Content-Type: "
-        "application/json' -d '{...}'`."
-    ),
+    description="Not renderable in Swagger UI — see /openapi.json under paths./api/cases.query, or `curl -X QUERY`.",
 )
 def query_cases(req: SearchRequestModel):
-    """
-    Configuration-Driven JSON Search API (RFC 10008 QUERY method):
-    Accepts structured queries, filter maps, date ranges, and sorting in the
-    request body. Returns matching cases in a single round-trip. Filter/facet
-    metadata lives separately in GET /api/cases/filters.
-
-    Not visible in Swagger UI (/docs) - see the `description` above / /openapi.json.
-    """
-    text_q = None
-    all_terms = None
-    any_terms = None
-    exact_phrase = None
-    none_terms = None
-
+    text_q = all_terms = any_terms = exact_phrase = none_terms = None
     if isinstance(req.query, str):
         text_q = req.query
     elif isinstance(req.query, SearchQueryModel):
-        text_q = req.query.text
-        all_terms = req.query.all
-        any_terms = req.query.any
-        exact_phrase = req.query.exact
-        none_terms = req.query.none
+        text_q, all_terms, any_terms, exact_phrase, none_terms = req.query.text, req.query.all, req.query.any, req.query.exact, req.query.none
 
     from_d = req.date.from_date if req.date else None
     to_d = req.date.to_date if req.date else None
@@ -475,31 +440,20 @@ def query_cases(req: SearchRequestModel):
 
     try:
         return execute_case_search(
-            text_query=text_q,
-            all_terms=all_terms,
-            any_terms=any_terms,
-            exact_phrase=exact_phrase,
-            none_terms=none_terms,
-            filters_dict=req.filters,
-            from_date=from_d,
-            to_date=to_d,
-            sort_field=sort_f,
-            sort_direction=sort_d,
-            page=req.page,
-            limit=req.limit
+            text_query=text_q, all_terms=all_terms, any_terms=any_terms, exact_phrase=exact_phrase,
+            none_terms=none_terms, filters_dict=req.filters, from_date=from_d, to_date=to_d,
+            sort_field=sort_f, sort_direction=sort_d, page=req.page, limit=req.limit,
         )
     except psycopg2.OperationalError:
         logger.exception("Database connection failed during case search")
         raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except HTTPException:
-        raise
     except Exception:
         logger.exception("Unexpected error during case search")
         raise HTTPException(status_code=500, detail="Case search failed.")
 
 
 # ============================================================
-# SEARCH-FIELD DEFINITIONS (CRUD backing GET /api/cases/searches)
+# SEARCH-FIELD DEFINITIONS (unchanged shape from the old service — pure presentation config)
 # ============================================================
 
 class SearchFieldDefinition(BaseModel):
@@ -516,56 +470,22 @@ class SearchFieldsResponse(BaseModel):
     fields: List[SearchFieldDefinition]
 
 
-class SearchFieldCreate(BaseModel):
-    key: str
-    label: str
-    placeholder: str = "Search items..."
-    combinator: str
-    isActive: bool = True
-    displayOrder: int = 0
-
-
-class SearchFieldUpdate(BaseModel):
-    key: Optional[str] = None
-    label: Optional[str] = None
-    placeholder: Optional[str] = None
-    combinator: Optional[str] = None
-    isActive: Optional[bool] = None
-    displayOrder: Optional[int] = None
-
-
 def _row_to_search_field(row) -> SearchFieldDefinition:
     f_id, key, label, placeholder, combinator, is_active, display_order = row
-    return SearchFieldDefinition(
-        id=str(f_id), key=key, label=label, placeholder=placeholder,
-        combinator=combinator, isActive=is_active, displayOrder=display_order
-    )
+    return SearchFieldDefinition(id=str(f_id), key=key, label=label, placeholder=placeholder, combinator=combinator, isActive=is_active, displayOrder=display_order)
 
 
 @router.get("/api/cases/searches", response_model=SearchFieldsResponse)
-def get_configuration_driven_search_fields(
-    include_inactive: bool = Query(False, description="Admin use: also return inactive search-field definitions.")
-):
-    """
-    Configuration-Driven Search Builder Metadata API:
-    Describes the advanced boolean search fields (All/Any/Exact/None-of-these-words)
-    so the frontend can render the search builder form with zero hardcoding.
-    """
+def get_configuration_driven_search_fields(include_inactive: bool = Query(False)):
     try:
-        with db_manager.get_pooled_connection() as conn:
+        with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                if include_inactive:
-                    cur.execute("""
-                        SELECT id, key, label, placeholder, combinator, is_active, display_order
-                        FROM search_field_definitions ORDER BY display_order;
-                    """)
-                else:
-                    cur.execute("""
-                        SELECT id, key, label, placeholder, combinator, is_active, display_order
-                        FROM search_field_definitions WHERE is_active ORDER BY display_order;
-                    """)
-                fields = [_row_to_search_field(row) for row in cur.fetchall()]
-                return SearchFieldsResponse(fields=fields)
+                where = "" if include_inactive else "WHERE is_active"
+                cur.execute(f"""
+                    SELECT id, key, label, placeholder, combinator, is_active, display_order
+                    FROM cr_search_field_definitions {where} ORDER BY display_order;
+                """)
+                return SearchFieldsResponse(fields=[_row_to_search_field(r) for r in cur.fetchall()])
     except psycopg2.OperationalError:
         logger.exception("Database connection failed while loading search fields")
         raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
@@ -574,209 +494,103 @@ def get_configuration_driven_search_fields(
         raise HTTPException(status_code=500, detail="Failed to load search field metadata.")
 
 
-@router.post("/api/cases/searches", response_model=SearchFieldDefinition, status_code=201)
-def create_search_field(payload: SearchFieldCreate):
+# ============================================================
+# CASE DETAIL
+# ============================================================
+
+def _to_valid_int(case_id: str):
     try:
-        with db_manager.get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO search_field_definitions (key, label, placeholder, combinator, is_active, display_order)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    RETURNING id, key, label, placeholder, combinator, is_active, display_order;
-                """, (payload.key, payload.label, payload.placeholder, payload.combinator, payload.isActive, payload.displayOrder))
-                row = cur.fetchone()
-                conn.commit()
-                return _row_to_search_field(row)
-    except psycopg2.errors.UniqueViolation:
-        raise HTTPException(status_code=409, detail=f"A search field with key '{payload.key}' already exists.")
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while creating search field")
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while creating search field")
-        raise HTTPException(status_code=500, detail="Failed to create search field.")
-
-
-@router.get("/api/cases/searches/{field_id}", response_model=SearchFieldDefinition)
-def get_search_field(field_id: UUID):
-    try:
-        with db_manager.get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    SELECT id, key, label, placeholder, combinator, is_active, display_order
-                    FROM search_field_definitions WHERE id = %s;
-                """, (str(field_id),))
-                row = cur.fetchone()
-                if not row:
-                    raise HTTPException(status_code=404, detail="Search field not found.")
-                return _row_to_search_field(row)
-    except HTTPException:
-        raise
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while loading search field %s", field_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while loading search field %s", field_id)
-        raise HTTPException(status_code=500, detail="Failed to load search field.")
-
-
-@router.patch("/api/cases/searches/{field_id}", response_model=SearchFieldDefinition)
-def update_search_field(field_id: UUID, payload: SearchFieldUpdate):
-    """Partial update — only fields present in the request body are changed."""
-    updates = payload.model_dump(exclude_unset=True)
-    column_map = {
-        "key": "key", "label": "label", "placeholder": "placeholder",
-        "combinator": "combinator", "isActive": "is_active", "displayOrder": "display_order"
-    }
-    set_clauses = []
-    params: List = []
-    for field_name, column in column_map.items():
-        if field_name in updates:
-            set_clauses.append(f"{column} = %s")
-            params.append(updates[field_name])
-
-    try:
-        with db_manager.get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT id FROM search_field_definitions WHERE id = %s;", (str(field_id),))
-                if not cur.fetchone():
-                    raise HTTPException(status_code=404, detail="Search field not found.")
-
-                if set_clauses:
-                    set_clauses.append("updated_at = CURRENT_TIMESTAMP")
-                    params.append(str(field_id))
-                    cur.execute(f"UPDATE search_field_definitions SET {', '.join(set_clauses)} WHERE id = %s;", params)
-
-                conn.commit()
-                cur.execute("""
-                    SELECT id, key, label, placeholder, combinator, is_active, display_order
-                    FROM search_field_definitions WHERE id = %s;
-                """, (str(field_id),))
-                return _row_to_search_field(cur.fetchone())
-    except HTTPException:
-        raise
-    except psycopg2.errors.UniqueViolation:
-        raise HTTPException(status_code=409, detail="A search field with that key already exists.")
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while updating search field %s", field_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while updating search field %s", field_id)
-        raise HTTPException(status_code=500, detail="Failed to update search field.")
-
-
-@router.delete("/api/cases/searches/{field_id}", status_code=204)
-def delete_search_field(field_id: UUID):
-    try:
-        with db_manager.get_pooled_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("DELETE FROM search_field_definitions WHERE id = %s RETURNING id;", (str(field_id),))
-                deleted = cur.fetchone()
-                conn.commit()
-                if not deleted:
-                    raise HTTPException(status_code=404, detail="Search field not found.")
-                return None
-    except HTTPException:
-        raise
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while deleting search field %s", field_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-    except Exception:
-        logger.exception("Unexpected error while deleting search field %s", field_id)
-        raise HTTPException(status_code=500, detail="Failed to delete search field.")
+        return int(case_id)
+    except (ValueError, TypeError):
+        return None
 
 
 @router.get("/api/cases/{case_id:path}", response_model=CaseDetail)
 def get_case_detail(case_id: str):
-    """Retrieves full case details including parties, judges, advocates, acts, provisions, and citations."""
-    valid_uuid = _to_valid_uuid(case_id)
+    valid_int_id = _to_valid_int(case_id)
     try:
-        with db_manager.get_pooled_connection() as conn:
+        with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                id_clause = "c.id = %s::uuid OR " if valid_uuid else ""
-                id_params = [valid_uuid] if valid_uuid else []
+                id_clause = "v.case_id = %s OR " if valid_int_id is not None else ""
+                id_params = [valid_int_id] if valid_int_id is not None else []
                 cur.execute(f"""
-                    SELECT c.id, c.diary_number, c.case_number, c.cnr, c.neutral_citation,
-                           c.judgment_date, c.registration_date,
-                           c.case_category, c.document_type, c.treatment_status, c.overruled,
-                           c.is_reported, c.reporting_status, c.case_note_ai, c.pdf_path, c.pdf_url,
-                           co.name AS court_name, co.court_id
-                    FROM cases c
-                    LEFT JOIN courts co ON c.court_id = co.court_id
-                    WHERE {id_clause}c.diary_number = %s OR c.case_number = %s;
+                    SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
+                           v.language, v.disposition, v.document_type, v.case_note, v.conclusion,
+                           v.judgement, v.ocr_text,
+                           v.blob_pdf_id, v.source_pdf_url, v.court_name, v.court_id,
+                           v.judgment_by_name, v.petitioner, v.respondent,
+                           v.petitioner_advocate, v.respondent_advocate, v.filing_year,
+                           v.bench_names, v.subject_name,
+                           v.category_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review
+                    FROM cr_case_search_view v
+                    WHERE {id_clause}v.case_number = %s OR v.liznr_id = %s;
                 """, (*id_params, case_id, case_id))
-
                 row = cur.fetchone()
                 if not row:
-                    raise HTTPException(status_code=404, detail="Case judgment not found.")
+                    raise HTTPException(status_code=404, detail="Case not found.")
 
-                c_uuid = str(row[0])
+                (db_case_id, case_number, liznr_id, neutral_citation, judgment_date,
+                 language, disposition, document_type, case_note, conclusion,
+                 judgement, ocr_text,
+                 blob_pdf_id, source_pdf_url, court_name, court_id,
+                 judgment_by_name, petitioner, respondent,
+                 petitioner_advocate, respondent_advocate, filing_year,
+                 bench_names, subject_name,
+                 category_names, ministry_names, industry_names, favouring_party, needs_review) = row
 
-                cur.execute("SELECT name, role FROM parties WHERE case_id = %s;", (c_uuid,))
-                parties = [{"name": p[0], "role": p[1]} for p in cur.fetchall()]
+                parties = ([{"name": petitioner, "role": "PETITIONER", "advocate": petitioner_advocate}] if petitioner else []) + \
+                          ([{"name": respondent, "role": "RESPONDENT", "advocate": respondent_advocate}] if respondent else [])
+                judges = [{"name": j, "role": None} for j in (bench_names or [])]
+
+                # Sections/rules/orders reconstructed from the raw id arrays
+                # (not carried by cr_case_search_view), each resolved back to
+                # `cr_acts` for the act name that goes with each number. Kept
+                # as three separate queries (not the old UNION ALL "provisions"
+                # blob) so the detail page can render one row per kind.
+                cur.execute("""
+                    SELECT a.act_name, s.section_number
+                    FROM cr_cases c
+                    JOIN cr_sections s ON s.section_id = ANY(c.sections)
+                    JOIN cr_acts a ON a.act_id = s.act_id
+                    WHERE c.case_id = %s;
+                """, (db_case_id,))
+                sections = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
 
                 cur.execute("""
-                    SELECT jm.canonical_name, cj.role
-                    FROM case_judges cj JOIN judge_master jm ON cj.judge_id = jm.id
-                    WHERE cj.case_id = %s;
-                """, (c_uuid,))
-                judges = [{"name": j[0], "role": j[1]} for j in cur.fetchall()]
+                    SELECT a.act_name, r.rule_number
+                    FROM cr_cases c
+                    JOIN cr_rules r ON r.rule_id = ANY(c.rules)
+                    JOIN cr_acts a ON a.act_id = r.act_id
+                    WHERE c.case_id = %s;
+                """, (db_case_id,))
+                rules = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
 
                 cur.execute("""
-                    SELECT a.name, ca.party_role
-                    FROM case_advocates ca JOIN advocates a ON ca.advocate_id = a.id
-                    WHERE ca.case_id = %s;
-                """, (c_uuid,))
-                advocates = [{"name": a[0], "representing": a[1]} for a in cur.fetchall()]
-
-                cur.execute("""
-                    SELECT COALESCE(am.canonical_name, pr.raw_act_name) AS act_name, pr.section, pr.provision_full
-                    FROM provisions pr
-                    LEFT JOIN act_master am ON pr.act_id = am.id
-                    WHERE pr.case_id = %s;
-                """, (c_uuid,))
-                provisions = [{"act_name": p[0], "section": p[1], "full_text": p[2]} for p in cur.fetchall()]
-
-                cur.execute("""
-                    SELECT raw_citation_text, treatment_type, COALESCE(cited_case_id::text, '')
-                    FROM citations
-                    WHERE citing_case_id = %s;
-                """, (c_uuid,))
-                citations_made = [{"citation": c[0], "treatment": c[1], "cited_case_id": c[2]} for c in cur.fetchall()]
-
-                cur.execute("""
-                    SELECT c.case_number, c.neutral_citation, cit.treatment_type, c.id::text
-                    FROM citations cit
-                    JOIN cases c ON cit.citing_case_id = c.id
-                    WHERE cit.cited_case_id = %s;
-                """, (c_uuid,))
-                cited_by = [{"case_number": c[0], "citation": c[1], "treatment": c[2], "case_id": c[3]} for c in cur.fetchall()]
+                    SELECT a.act_name, o.order_number
+                    FROM cr_cases c
+                    JOIN cr_orders o ON o.order_id = ANY(c.orders)
+                    JOIN cr_acts a ON a.act_id = o.act_id
+                    WHERE c.case_id = %s;
+                """, (db_case_id,))
+                orders = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
 
                 return {
-                    "id": c_uuid,
-                    "diary_number": row[1],
-                    "case_number": row[2],
-                    "cnr": row[3],
-                    "neutral_citation": row[4],
-                    "judgment_date": row[5].strftime("%Y-%m-%d") if row[5] else None,
-                    "registration_date": row[6].strftime("%Y-%m-%d") if row[6] else None,
-                    "case_category": row[7],
-                    "document_type": row[8],
-                    "treatment_status": row[9] or "GOOD_LAW",
-                    "overruled": row[10],
-                    "is_reported": row[11],
-                    "reporting_status": row[12],
-                    "case_note_ai": row[13],
-                    "pdf_path": row[14],
-                    "pdf_url": row[15],
-                    "court_name": row[16] or "Supreme Court of India",
-                    "court_id": row[17],
-                    "parties": parties,
-                    "judges": judges,
-                    "advocates": advocates,
-                    "provisions": provisions,
-                    "citations_made": citations_made,
-                    "cited_by": cited_by
+                    "id": str(db_case_id), "case_number": case_number, "liznr_id": liznr_id,
+                    "neutral_citation": neutral_citation,
+                    "judgment_date": judgment_date.strftime("%Y-%m-%d") if judgment_date else None,
+                    "language": language, "disposition": disposition, "document_type": document_type,
+                    "case_note": case_note, "conclusion": conclusion,
+                    "judgement": judgement, "ocr_text": ocr_text,
+                    "blob_pdf_id": blob_pdf_id, "blob_pdf_url": _build_blob_pdf_url(blob_pdf_id),
+                    "source_pdf_url": source_pdf_url,
+                    "court_name": court_name, "court_id": str(court_id) if court_id else None,
+                    "judgment_by": judgment_by_name,
+                    "parties": parties, "judges": judges,
+                    "sections": sections, "rules": rules, "orders": orders,
+                    "subject": subject_name, "case_category": category_names or [],
+                    "ministries": ministry_names or [], "industries": industry_names or [],
+                    "favouring_party": favouring_party, "needs_review": needs_review,
+                    "filing_year": filing_year,
                 }
     except HTTPException:
         raise
@@ -786,5 +600,3 @@ def get_case_detail(case_id: str):
     except Exception:
         logger.exception("Unexpected error while loading case %s", case_id)
         raise HTTPException(status_code=500, detail="Failed to load case detail.")
-
-
