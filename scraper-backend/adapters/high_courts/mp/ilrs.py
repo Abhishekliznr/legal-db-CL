@@ -42,13 +42,13 @@ real search submitted, a real result clicked through to its detail pane):
   no separate derivation needed: the bench name is right there, plain text.
 - Confirmed real lag between decision date and ILR publication year in the
   one example pulled live: decided 10 August 2023, published under ILR
-  year 2024. The requested year is matched against each row's own decision
-  date (not the ILR year searched), exactly as originally specified --
-  this means a single ILR-year search can legitimately yield few or zero
-  rows whose OWN decision date matches that same year, since most of a
-  given ILR year's publications were decided the year before. Confirmed
-  intentional (not a bug to route around) -- flagging in case broader
-  year coverage is wanted later (e.g. also searching year+1).
+  year 2024. `discover_candidates` used to also require each row's OWN
+  decision date to fall in the searched year -- that's wrong: the ILR year
+  is a publication-year grouping, and most of a given ILR year's rows were
+  decided the year before, so that extra filter silently dropped the large
+  majority of real, correctly-published rows (confirmed: portal reports
+  143 rows for MP ILR 2026, this adapter was only yielding ~20). All rows
+  the search itself returns are now kept.
 """
 
 import logging
@@ -58,7 +58,6 @@ from typing import Any, Dict, List
 from bs4 import BeautifulSoup
 
 from adapters.captcha_ocr import solve_captcha_image
-from adapters.high_courts.mp.extraction import parse_ilrs_date
 
 logger = logging.getLogger("scraper_backend_v2.mp_ilrs")
 
@@ -221,11 +220,10 @@ def discover_candidates(page, year: int) -> List[Dict[str, Any]]:
     Runs the full ILR-year search for `year` and returns one dict per
     reported case, whatever _parse_detail_pane found: {bench, case_type,
     case_no, registration_year, neutral_citation, ilr_citation, bench_type,
-    judges, decision_date, petitioners, respondents, headnote} -- already
-    filtered to rows whose own decision date falls in `year` (see module
-    docstring: the ILR year searched is a publication-year grouping, not a
-    strict per-row filter, and can legitimately differ from a row's own
-    decision year). Returns [] if the captcha couldn't be solved after
+    judges, decision_date, petitioners, respondents, headnote} -- every row
+    the search itself returns (see module docstring: a row's own decision
+    date can legitimately differ from the ILR year searched, so it is not
+    used to drop rows here). Returns [] if the captcha couldn't be solved after
     MAX_CAPTCHA_RETRIES attempts (logged, not raised — an empty discovery
     result is a valid, if unfortunate, batch outcome, same as any other
     adapter's captcha-exhausted path).
@@ -275,11 +273,6 @@ def discover_candidates(page, year: int) -> List[Dict[str, Any]]:
             continue
         detail = _parse_detail_pane(page.locator("#third").inner_html())
         if not detail:
-            continue
-        parsed_date = parse_ilrs_date(detail.get("decision_date"))
-        if parsed_date and parsed_date.year != year:
-            # ILR year is a publication-year grouping, not a strict per-row
-            # filter -- keep only rows whose own decision date matches.
             continue
         candidates.append(detail)
 
