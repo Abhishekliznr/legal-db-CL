@@ -74,8 +74,17 @@ _ADAPTER_REGISTRY = {
     "high_court_mp": AdapterSpec(
         adapter_class=MPHighCourtAdapter,
         promote_fn=_mp_promote,
+        # MP's sections/acts come straight from case-status's own Act lines
+        # at promotion time (adapters/high_courts/mp/promotion.py) when
+        # present. find_provision_paragraphs is reused as-is from Supreme
+        # Court's own extraction module (its paragraph-finding logic isn't
+        # SC-specific) so pipeline/llm_enrichment.py's enrich_case() can
+        # fall back to the same LLM-based provision extraction Supreme
+        # Court uses -- but only actually WRITES sections/acts when MP's
+        # own promotion left them empty (see enrich_case()'s own
+        # existing_sections guard), never overwriting real case-status data.
+        find_provisions_fn=_sc_find_provisions,
         data_source="MPHC_WEBSITE",
-        run_enrichment=False,  # no LLM enrichment for MP yet — see adapters/high_courts/mp/promotion.py's own docstring
     ),
 }
 

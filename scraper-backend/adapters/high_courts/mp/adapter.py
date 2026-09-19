@@ -327,10 +327,23 @@ class MPHighCourtAdapter:
         record = RawJudgmentRecord(
             pdf_path=pdf_path,
             source_url=pdf_url,
-            case_number_raw=str(case_no),
+            # Full "<Bench>/<CaseType>/<Number>/<Year>" form, not just the
+            # bare number -- case_status's own "Case No." cell never carries
+            # the Establishment/bench name, only ILRS's case_label does.
+            case_number_raw=case_label,
             decision_date_raw=candidate.get("decision_date"),
             cnr_raw=details.get("cnr"),
+            neutral_citation_raw=candidate.get("neutral_citation"),
             extra={
+                # `candidate` (ILRS detail pane) was previously dropped
+                # entirely here -- only `details` (case-status) ever made it
+                # into `extra`, silently losing candidate's own
+                # neutral_citation/ilr_citation/judges/bench_type. `details`
+                # is spread second so case-status's own values win on any
+                # key collision (e.g. "judges": case-status's Last Listed On
+                # parse is the source of truth for cr_cases.bench, not
+                # ILRS's).
+                **candidate,
                 **details,
                 "headnote": clean_headnote(candidate.get("headnote")),
                 "registration_year": candidate.get("registration_year"),

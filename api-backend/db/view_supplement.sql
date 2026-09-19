@@ -18,6 +18,7 @@ SELECT
     c.case_id,
     c.liznr_id,
     c.case_number,
+    c.cnr,
     c.petitioner,
     c.respondent,
     c.petitioner_advocate,
@@ -63,23 +64,16 @@ SELECT
     (SELECT array_agg(DISTINCT i.industry_name)
        FROM cr_industries i WHERE i.industry_id = ANY(c.industries)) AS industry_names,
     -- act_names above is act-level only (c.acts, no section attached) --
-    -- this resolves the actual per-provision act+number pairs the same way
-    -- get_case_detail's `provisions` does (unified sections/rules/orders,
-    -- not the _relevant/_other LLM subsets), so the list/search endpoint can
-    -- show "Act — Section" instead of just bare act names.
+    -- this resolves the actual per-section act+number pairs the same way
+    -- get_case_detail's `sections` does, so the list/search endpoint can
+    -- show "Act — Section" instead of just bare act names. (Rules/Orders as
+    -- a distinct kind were dropped 2026-09-19, scraper-backend/db/migrations/0012
+    -- -- this used to UNION ALL cr_rules/cr_orders in here too.)
     (SELECT jsonb_agg(jsonb_build_object('act_name', prov.act_name, 'section', prov.section_number))
        FROM (
            SELECT a.act_name, s.section_number
            FROM cr_sections s JOIN cr_acts a ON a.act_id = s.act_id
            WHERE s.section_id = ANY(c.sections)
-           UNION ALL
-           SELECT a.act_name, r.rule_number
-           FROM cr_rules r JOIN cr_acts a ON a.act_id = r.act_id
-           WHERE r.rule_id = ANY(c.rules)
-           UNION ALL
-           SELECT a.act_name, o.order_number
-           FROM cr_orders o JOIN cr_acts a ON a.act_id = o.act_id
-           WHERE o.order_id = ANY(c.orders)
        ) prov
     ) AS provisions
 FROM cr_cases c

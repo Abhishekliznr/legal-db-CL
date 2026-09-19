@@ -1,10 +1,12 @@
 """
 PROMOTED -> enriched: fills the fields regex genuinely cannot get
-(cr_cases.case_note, cr_cases.industries, cr_cases.favouring_party) plus two
-low-coverage regex fallbacks (cr_cases.conclusion, cr_cases.disposition),
-plus a paragraph-filtered relevance classification of the provisions
-extract_provisions() already found (cr_cases.sections_relevant/_other etc.,
-2026-09-09 — see enrich_case()'s provision_block parameter below)
+(cr_cases.case_note, cr_cases.industries, cr_cases.favouring_party) plus
+low-coverage regex fallbacks (cr_cases.conclusion, cr_cases.disposition,
+cr_cases.subject), plus a paragraph-filtered fallback extraction of
+cr_cases.sections/acts for a case whose own adapter found none directly
+(2026-09-09, simplified 2026-09-19 when the sections_relevant/_other split
+and the separate rules/orders columns were dropped entirely — see
+enrich_case()'s provision_block parameter below)
 — all in one Azure OpenAI Structured Outputs call per case.
 
 Runs automatically right after promotion (orchestrator/batch_runner.py),
@@ -71,7 +73,7 @@ from typing import Any, Dict, List, NamedTuple, Optional, Tuple
 import requests
 
 from db.connection import get_pooled_connection
-from db.lookups import get_or_create_industry, get_or_create_ministry, resolve_provisions
+from db.lookups import get_or_create_industry, get_or_create_ministry, get_or_create_subject, resolve_provisions
 from normalization.acts import resolve_act
 from normalization.industries import CANONICAL_INDUSTRIES, resolve_industry
 from normalization.ministries import KNOWN_MINISTRIES, resolve_ministry
@@ -242,11 +244,12 @@ You will receive either the FULL text of a judgment, or its opening (facts) plus
 {{
   "case_note": "A single dash-separated digest in the dash-separated digest format used by Indian law reporters -- NOT a flowing prose paragraph. Structure: <broad subject area> - <narrower topic> - <specific sub-issue, if any> - <the key statutory provision(s), formatted like 'Section 302 of Indian Penal Code, 1860 (I.P.C.)'> - <one clause stating the procedural posture, i.e. how this matter reached this court> - Held, <the court's core holding> - <supporting reasoning clause> - <supporting reasoning clause> - ... - <the final disposition, in the terse form reporters use, e.g. 'Appeal dismissed' / 'Appeal allowed' / 'Petition disposed of' / 'Appeal partly allowed'>. Telegraphic style throughout: favor concise legal phrasing over full grammatical sentences, each dash-separated segment is its own proposition. Rules: (1) If several connected matters or parties have different outcomes, state each outcome separately in the disposition segment(s) -- never collapse a mixed result into one word. (2) Phrase prima facie or interim-stage findings as such (e.g. 'held there was a prima facie case') -- an allegation is not a finding. (3) Return null if the supplied text does not clearly show both the court's holding and its disposition. Use ONLY facts/reasoning actually present in the supplied text -- never invent a fact, provision, or outcome that isn't there.\n\nFORMAT EXAMPLE ONLY -- match this register and structure exactly, but NEVER copy its facts, subject, provisions, or outcome into your answer:\n{_CASE_NOTE_EXAMPLE}",
   "conclusion": "1-3 sentences of ORDINARY prose (not dash-separated, unlike case_note) capturing the court's final concluding reasoning that leads directly to the disposition -- or null if the supplied text doesn't clearly show this.",
+  "subject": "A short (1-4 word) coarse subject/jurisdiction tag for this case, in the style of a docket label -- e.g. 'Criminal', 'Civil', 'Writ - Service Matter', 'Constitutional', 'Arbitration'. Only used as a fallback when no subject was already determined by regex (see KNOWN FACTS) -- if one was already given there, return that same value. Return null if genuinely unclear.",
   "industries": ["0 to 3 tags from this EXACT closed list, choose only industries the case is CENTRALLY about (a party's business, the subject of the dispute), not one a name/word merely appears near: {json.dumps(CANONICAL_INDUSTRIES)}. Empty list if none clearly apply -- most criminal/service/constitutional matters have none."],
   "ministries": ["0 to 3 names from this EXACT closed list, naming a ministry ONLY when the case is substantively about that ministry's policy, regulation, or scheme -- not merely because a ministry is a named party (that's already handled separately): {json.dumps(KNOWN_MINISTRIES)}. Empty list if none apply."],
   "disposition_category": "one of Allowed, Dismissed, Partly Allowed, Disposed, Remanded, Withdrawn, Quashed, Set Aside, Other -- or null if genuinely unclear from the text. A judgment deciding connected matters with different outcomes for different parties is 'Partly Allowed'. A regex classifier already handles most documents; this is only used as a fallback when that classifier found nothing, so answer independently from the text rather than guessing to fill the field.",
   "favouring_party": "one of Petitioner, Respondent, Partly, Neither -- or null if genuinely unclear. 'Petitioner': the petitioner's plea was substantially granted (appeal/petition allowed, conviction set aside, relief granted). 'Respondent': the petitioner's plea was rejected/dismissed, respondent's position upheld. 'Partly': a mixed outcome, including connected matters with different outcomes for different parties. 'Neither': a procedural order with no substantive winner (adjournment, notice issued, interim direction, remand without a clear beneficiary).",
-  "provisions": "Extract every unique statutory provision referenced in the PARAGRAPHS CONTAINING STATUTORY REFERENCES block below (not from the judgment text above it), following these rules: (1) Extract ONLY from that block; if it is absent from the input, return an empty list. (2) List each unique (statute, number) pair once. (3) provision_type is 'section', 'rule', or 'order'. (4) A constitutional article uses provision_type 'section' and statute_name 'Constitution of India'; number is the article number only (e.g. '21', not 'Article 21'). (5) number is the bare provision number/designation only, e.g. '43D(5)', not the surrounding sentence. (6) Resolve the governing act from the surrounding paragraph text, not just the words immediately next to the number. (7) relevance is 'RELEVANT' for the operative provision(s) this case is actually charged/founded/appealed under -- the FIR/charge section, the writ-jurisdiction article, the appeal's own enabling section, i.e. what the petitioner's own case is brought under -- and 'OTHER' for every other section/rule/order/article mentioned in those paragraphs (precedent discussion, background/comparative statutes, procedural cross-references)."
+  "provisions": "Extract every unique statutory provision referenced in the PARAGRAPHS CONTAINING STATUTORY REFERENCES block below (not from the judgment text above it), following these rules: (1) Extract ONLY from that block; if it is absent from the input, return an empty list. (2) List each unique (statute, number) pair once. (3) A constitutional article's number is the article number only (e.g. '21', not 'Article 21'), statute_name 'Constitution of India'; a Rule/Order is still just a number+statute pair, e.g. 'Order XXI' -> number 'XXI' of the relevant Code. (4) number is the bare provision number/designation only, e.g. '43D(5)', not the surrounding sentence. (5) Resolve the governing act from the surrounding paragraph text, not just the words immediately next to the number."
 }}
 
 Use ONLY facts present in the supplied text and hints. Never invent a party, provision, date, or outcome that isn't there -- use null/empty instead."""
@@ -259,10 +262,11 @@ Use ONLY facts present in the supplied text and hints. Never invent a party, pro
 _JSON_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
-    "required": ["case_note", "conclusion", "industries", "ministries", "disposition_category", "favouring_party", "provisions"],
+    "required": ["case_note", "conclusion", "subject", "industries", "ministries", "disposition_category", "favouring_party", "provisions"],
     "properties": {
         "case_note": {"type": ["string", "null"]},
         "conclusion": {"type": ["string", "null"]},
+        "subject": {"type": ["string", "null"]},
         "industries": {
             "type": "array",
             "items": {"type": "string", "enum": CANONICAL_INDUSTRIES},
@@ -284,12 +288,10 @@ _JSON_SCHEMA = {
             "items": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["statute_name", "provision_type", "number", "relevance"],
+                "required": ["statute_name", "number"],
                 "properties": {
                     "statute_name": {"type": "string"},
-                    "provision_type": {"type": "string", "enum": ["section", "rule", "order"]},
                     "number": {"type": "string"},
-                    "relevance": {"type": "string", "enum": ["RELEVANT", "OTHER"]},
                 },
             },
         },
@@ -543,7 +545,7 @@ def _build_user_content(case_row: Dict[str, Any], provision_block: str = "") -> 
 
 def _fetch_case_row(cur, case_id: int) -> Optional[Dict[str, Any]]:
     cur.execute("""
-        SELECT c.case_number, c.ocr_text, c.disposition, c.ministries,
+        SELECT c.case_number, c.ocr_text, c.disposition, c.ministries, c.sections,
                subj.subject_name
         FROM cr_cases c
         LEFT JOIN cr_subjects subj ON subj.subject_id = c.subject
@@ -552,12 +554,13 @@ def _fetch_case_row(cur, case_id: int) -> Optional[Dict[str, Any]]:
     row = cur.fetchone()
     if row is None:
         return None
-    case_number, ocr_text, disposition, existing_ministry_ids, subject_name = row
+    case_number, ocr_text, disposition, existing_ministry_ids, existing_sections, subject_name = row
     return {
         "case_number": case_number,
         "ocr_text": ocr_text,
         "disposition": disposition,
         "existing_ministry_ids": existing_ministry_ids or [],
+        "existing_sections": existing_sections or [],
         "subject_name": subject_name,
     }
 
@@ -659,6 +662,7 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
         if "held," not in case_note.lower():
             logger.warning("[ENRICH] case_id=%s: case_note has no 'Held' segment — saving anyway", case_id)
     conclusion = llm_result.get("conclusion")
+    llm_subject = (llm_result.get("subject") or "").strip() or None
 
     industry_ids: List[int] = []
     ministry_ids = list(case_row["existing_ministry_ids"])  # keep regex-derived party-based ministries
@@ -678,6 +682,8 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
     try:
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
+                subject_id = get_or_create_subject(cur, llm_subject) if llm_subject else None
+
                 for raw in (llm_result.get("industries") or [])[:3]:
                     resolved = resolve_industry(raw)
                     if resolved:
@@ -690,41 +696,27 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
                         if new_id not in ministry_ids:
                             ministry_ids.append(new_id)
 
-                # Dedupe by (statute, year, provision_type, number) *after*
-                # resolve_act(), so two raw statute-name spellings that
-                # resolve to the same act aren't double-counted. If the
-                # same provision was tagged both RELEVANT and OTHER
-                # (a model inconsistency, not expected but not fatal),
-                # RELEVANT wins.
-                deduped: Dict[Tuple[Any, Any, str, str], Dict[str, Any]] = {}
+                # Dedupe by (statute, year, number) *after* resolve_act(), so
+                # two raw statute-name spellings that resolve to the same
+                # act aren't double-counted.
+                deduped: Dict[Tuple[Any, Any, str], Dict[str, Any]] = {}
                 for entry in raw_provisions:
                     number = str(entry.get("number") or "").strip()
                     if not number:
                         continue
-                    provision_type = entry.get("provision_type")
-                    if provision_type not in ("section", "rule", "order"):
-                        provision_type = "section"
                     statute_name, short_code, year = resolve_act(entry.get("statute_name") or "")
-                    relevance = "RELEVANT" if (entry.get("relevance") or "").upper() == "RELEVANT" else "OTHER"
-
-                    key = (statute_name, year, provision_type, number)
-                    existing = deduped.get(key)
-                    if existing is None or (relevance == "RELEVANT" and existing["relevance"] != "RELEVANT"):
-                        deduped[key] = {
-                            "statute_name": statute_name,
-                            "short_code": short_code,
-                            "statute_year": year,
-                            "section_number": number,
-                            "provision_type": provision_type,
-                            "relevance": relevance,
-                        }
-
-                relevant_provisions = [p for p in deduped.values() if p["relevance"] == "RELEVANT"]
-                other_provisions = [p for p in deduped.values() if p["relevance"] != "RELEVANT"]
+                    key = (statute_name, year, number)
+                    deduped[key] = {
+                        "statute_name": statute_name,
+                        "short_code": short_code,
+                        "statute_year": year,
+                        "section_number": number,
+                    }
 
                 set_clauses = [
                     "case_note = COALESCE(%s, case_note)",
                     "conclusion = COALESCE(conclusion, %s)",
+                    "subject = COALESCE(subject, %s)",
                     "industries = %s",
                     "ministries = %s",
                     "disposition = COALESCE(disposition, %s)",
@@ -734,33 +726,20 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
                     "enriched_at = now()",
                     "enrichment_attempts = enrichment_attempts + 1",
                 ]
-                params: List[Any] = [case_note, conclusion, industry_ids, ministry_ids, llm_disposition, favouring_party]
+                params: List[Any] = [case_note, conclusion, subject_id, industry_ids, ministry_ids, llm_disposition, favouring_party]
 
-                # Provision columns are only touched when a provision block
-                # was actually sent -- an absent block means "we didn't ask",
-                # not "there are none", and must never wipe existing data.
-                sections_relevant = sections_other = rules_relevant = rules_other = []
-                orders_relevant = orders_other = []
-                if has_provision_block:
-                    act_ids_relevant, sections_relevant, rules_relevant, orders_relevant = resolve_provisions(cur, relevant_provisions)
-                    act_ids_other, sections_other, rules_other, orders_other = resolve_provisions(cur, other_provisions)
-                    all_acts = list(dict.fromkeys(act_ids_relevant + act_ids_other))
-                    all_sections = sections_relevant + sections_other
-                    all_rules = rules_relevant + rules_other
-                    all_orders = orders_relevant + orders_other
-
-                    set_clauses += [
-                        "sections = %s", "acts = %s", "rules = %s", "orders = %s",
-                        "sections_relevant = %s", "sections_other = %s",
-                        "rules_relevant = %s", "rules_other = %s",
-                        "orders_relevant = %s", "orders_other = %s",
-                    ]
-                    params += [
-                        all_sections, all_acts, all_rules, all_orders,
-                        sections_relevant, sections_other,
-                        rules_relevant, rules_other,
-                        orders_relevant, orders_other,
-                    ]
+                # sections/acts are only touched when a provision block was
+                # actually sent AND nothing already found them directly
+                # (e.g. Madhya Pradesh's own case-status Act lines,
+                # adapters/high_courts/mp/promotion.py) -- this is the LLM
+                # fallback path for a court whose direct extraction came up
+                # empty, never allowed to clobber already-good data with a
+                # weaker LLM guess.
+                sections: List[int] = []
+                if has_provision_block and not case_row["existing_sections"]:
+                    acts, sections = resolve_provisions(cur, list(deduped.values()))
+                    set_clauses += ["sections = %s", "acts = %s"]
+                    params += [sections, acts]
 
                 params.append(case_id)
                 cur.execute(f"UPDATE cr_cases SET {', '.join(set_clauses)} WHERE case_id = %s;", tuple(params))
@@ -770,9 +749,7 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
         return False
 
     logger.info(
-        "[ENRICH] case_id=%s: done — case_note=%s industries=%d ministries=%d provisions_relevant=%d provisions_other=%d",
-        case_id, "set" if case_note else "unchanged", len(industry_ids), len(ministry_ids),
-        len(sections_relevant) + len(rules_relevant) + len(orders_relevant),
-        len(sections_other) + len(rules_other) + len(orders_other),
+        "[ENRICH] case_id=%s: done — case_note=%s industries=%d ministries=%d sections=%d",
+        case_id, "set" if case_note else "unchanged", len(industry_ids), len(ministry_ids), len(sections),
     )
     return True

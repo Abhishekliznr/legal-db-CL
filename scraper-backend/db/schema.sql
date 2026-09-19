@@ -166,33 +166,15 @@ CREATE TABLE IF NOT EXISTS cr_acts (
     CONSTRAINT uq_cr_acts_name_year UNIQUE NULLS NOT DISTINCT (act_name, act_year)
 );
 
--- Sections/Rules/Orders are kept as three separate lookup tables (matching
--- cr_cases.sections/rules/orders being three separate arrays) even though
--- they're structurally identical -- a "Section" (Section 302 IPC), a
--- "Rule" (Rule 5 of some Rules), and an "Order" (Order XXI of the CPC) are
--- different things a legal researcher filters by separately, not
--- interchangeable numbers under one bucket. All three resolve back to
--- `cr_acts` (see adapters/supreme_court/extraction.py's extract_provisions(), which
--- tags each match with which of the three it is).
+-- Rules/Orders (separate lookup tables + cr_cases.rules/orders arrays,
+-- alongside a rules_relevant/_other + orders_relevant/_other LLM-classified
+-- split) were dropped 2026-09-19 (db/migrations/0012) -- only Section-level
+-- provisions are tracked now, not Rules/Orders as a distinct kind.
 CREATE TABLE IF NOT EXISTS cr_sections (
     section_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT NOT NULL REFERENCES cr_acts(act_id),
     section_number  TEXT NOT NULL,               -- '308', '482', '2(l)', '226'
     CONSTRAINT uq_cr_sections_act_number UNIQUE (act_id, section_number)
-);
-
-CREATE TABLE IF NOT EXISTS cr_rules (
-    rule_id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable: standalone rules (e.g. a High Court's own Rules of Practice) may not resolve to a named Act
-    rule_number     TEXT NOT NULL,
-    CONSTRAINT uq_cr_rules_act_number UNIQUE (act_id, rule_number)
-);
-
-CREATE TABLE IF NOT EXISTS cr_orders (
-    order_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable, same reasoning as rules.act_id
-    order_number    TEXT NOT NULL,                    -- 'XXI' (CPC's Order XXI)
-    CONSTRAINT uq_cr_orders_act_number UNIQUE (act_id, order_number)
 );
 
 -- ---------------------------------------------------------------------
@@ -288,6 +270,8 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     court_id           BIGINT NOT NULL REFERENCES cr_courts(court_id),
 
     case_number        TEXT NOT NULL,
+    cnr                TEXT,                     -- pan-India eCourts case number record, when the source
+                                                  -- page exposes one (e.g. Madhya Pradesh's case-status page)
     petitioner         TEXT,
     respondent         TEXT,
     petitioner_advocate TEXT,  -- regex-parsed from the SCI results table's "Petitioner/Respondent
@@ -321,25 +305,8 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     neutral_citation   TEXT,
 
     sections           BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_sections.section_id
-    acts               BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_acts.act_id (every act referenced by any section/rule/order below)
-    rules              BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_rules.rule_id
-    orders             BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_orders.order_id
+    acts               BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_acts.act_id (every act referenced by any section below)
     subject            BIGINT REFERENCES cr_subjects(subject_id),  -- coarse Civil/Criminal/... tag
-
-    -- LLM-classified subsets of sections/rules/orders above (pipeline/llm_enrichment.py,
-    -- 2026-09-09), populated from paragraphs regex flagged as provision-bearing
-    -- (adapters.supreme_court.extraction.find_provision_paragraphs). "relevant" = the
-    -- operative provision(s) the case is actually charged/founded/appealed under;
-    -- "other" = everything else discussed (precedent, background, comparative
-    -- statutes). NOT guaranteed a strict partition of sections/rules/orders above —
-    -- the LLM resolves acts from wider context the regex-only extractor drops, so
-    -- these can contain provisions the unified columns above miss, and vice versa.
-    sections_relevant  BIGINT[] NOT NULL DEFAULT '{}',
-    sections_other     BIGINT[] NOT NULL DEFAULT '{}',
-    rules_relevant     BIGINT[] NOT NULL DEFAULT '{}',
-    rules_other        BIGINT[] NOT NULL DEFAULT '{}',
-    orders_relevant    BIGINT[] NOT NULL DEFAULT '{}',
-    orders_other       BIGINT[] NOT NULL DEFAULT '{}',
 
     case_note          TEXT,                     -- LLM-generated headnote (pipeline/llm_enrichment.py), Manupatra-style dash-separated digest
     conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading) -- see adapters/supreme_court/extraction.py
@@ -395,6 +362,7 @@ CREATE INDEX IF NOT EXISTS ix_cr_cases_number_trgm ON cr_cases USING GIN (case_n
 CREATE INDEX IF NOT EXISTS ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
 CREATE UNIQUE INDEX IF NOT EXISTS ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_cr_cases_cnr ON cr_cases(cnr) WHERE cnr IS NOT NULL;
 CREATE INDEX IF NOT EXISTS ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
 
 -- Atomic per-(court, year) counter backing cr_cases.liznr_id

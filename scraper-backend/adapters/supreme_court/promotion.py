@@ -40,7 +40,7 @@ def _validate_enum(value: Optional[str], allowed: set) -> Optional[str]:
     return value if value in allowed else None
 
 
-# get-or-create lookup helpers (judges, acts, sections/rules/orders,
+# get-or-create lookup helpers (judges, acts, sections,
 # subjects, ministries, industries, case categories) live in db/lookups.py
 # — schema-wide, shared with pipeline/llm_enrichment.py, not specific to
 # this court's promotion pipeline. Only the ministry resolution below
@@ -159,12 +159,14 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     routed to NEEDS_REVIEW (missing case_number) or PROMOTION_FAILED (an
     unexpected DB error).
 
-    sections/acts/rules/orders are deliberately left empty here (2026-09-09)
-    — regex's own act-name capture proved actively wrong at real production
-    scale (fragments like "Arbitrator Would Be Ineligible To Act" ending up
-    in cr_acts), not just low-recall, so those columns are now populated
+    sections/acts are deliberately left empty here (2026-09-09) — regex's
+    own act-name capture proved actively wrong at real production scale
+    (fragments like "Arbitrator Would Be Ineligible To Act" ending up in
+    cr_acts), not just low-recall, so those columns are now populated
     entirely by pipeline/llm_enrichment.py's paragraph-filtered LLM call
     after promotion, same treatment as case_note/industries already got.
+    (rules/orders as a distinct kind were dropped from the schema entirely,
+    2026-09-19, db/migrations/0012 — only sections are tracked now.)
 
     Unlike the old documents.judgment_date NOT NULL, a missing/unparseable
     judgment_date here does NOT block promotion — the row still gets
@@ -234,7 +236,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         liznr_id, court_id, case_number, petitioner, respondent,
                         petitioner_advocate, respondent_advocate, filing_year,
                         bench, judgment_by, judgment_date, language, neutral_citation,
-                        sections, acts, rules, orders, subject,
+                        sections, acts, subject,
                         conclusion, judgement, ocr_text,
                         source_pdf_url, blob_pdf_id,
                         ministries, industries,
@@ -244,7 +246,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         %s, %s, %s, %s, %s,
                         %s, %s, %s,
                         %s, %s, %s, %s, %s,
-                        '{}', '{}', '{}', '{}', %s,
+                        '{}', '{}', %s,
                         %s, %s, %s,
                         %s, %s,
                         %s, '{}',

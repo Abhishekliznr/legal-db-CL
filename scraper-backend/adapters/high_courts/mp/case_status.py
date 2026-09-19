@@ -16,6 +16,8 @@ from typing import Any, Dict, List, Optional
 
 from bs4 import BeautifulSoup
 
+from normalization.judges import clean_judge_name
+
 CASE_TYPE_CODES: Dict[str, str] = {
     "AA": "63", "AC": "64", "AR": "65", "ARBA": "61", "ARBC": "60",
     "CEA": "74", "CER": "27", "CESR": "30", "COMA": "69", "COMP": "21",
@@ -66,6 +68,50 @@ _ADVOCATE_RE = re.compile(
 _ACT_LINE_RE = re.compile(
     r"^(?P<act_code>\S+)\s*-\s*(?P<act_name>.+?)\s*\(Section\s*-\s*(?P<sections>.+?)\)\s*$"
 )
+
+# "CRIMINAL APPEAL (CRA) 6641/2024 Registered On 30-05-2024 CNR: MPHC010342172024"
+# -- confirmed off the real saved case-status page's own "Case No." cell
+# (adapters/high_courts/mp/references/mp.html): case type name, its short
+# code in parens, number/year, then the registration date and CNR appended
+# to the SAME cell with no separate <tr> of their own. Registered On/CNR
+# are optional groups -- not confirmed present on every case-status
+# response (e.g. a case with no CNR assigned yet).
+_CASE_NO_CELL_RE = re.compile(
+    r"^(?P<case_type_name>.+?)\s*\((?P<case_type_code>[A-Z]+)\)\s*(?P<case_no>\d+)\s*/\s*(?P<year>\d{4})"
+    r"(?:\s*Registered On\s*(?P<registered_on>\d{2}-\d{2}-\d{4}))?"
+    r"(?:\s*CNR\s*:\s*(?P<cnr>\S+))?",
+    re.IGNORECASE,
+)
+
+# The "Category" row is a DIFFERENT field from "Case No." above -- a
+# subject-matter tag, not the case type -- e.g. "CRIMINAL LAW &
+# PROCEDURE-12100<br/>Code of Criminal Procedure, 1973-12102<br/>SECTION
+# 389" (confirmed live: three <br>-separated lines, each "<name>-<code>").
+# Only the first line's name (before its own "-<code>" suffix) is taken, as
+# the coarse subject tag -- the remaining lines are the act/section this
+# case falls under, already covered separately by the Act row.
+_CATEGORY_SUBJECT_RE = re.compile(r"^(?P<subject>.+?)\s*-\s*\d+")
+
+# "10-11-2025 [ HON'BLE SHRI JUSTICE RAJENDRA KUMAR VANI ]" (confirmed live,
+# the "Last Listed On" cell) -- judge name(s) sit inside the [ ] bracket. A
+# Division Bench case is expected to list more than one "HON'BLE..."
+# segment inside that same bracket (unconfirmed live -- no real Division
+# Bench example was captured -- so this splits defensively on every
+# "HON'BLE" occurrence, same approach as Supreme Court's own bench-cell
+# splitting in adapters/supreme_court/extraction.py, rather than assuming
+# a single name).
+_BRACKETED_JUDGES_RE = re.compile(r"\[(.+?)\]")
+_JUDGE_NAME_SPLIT_RE = re.compile(r"(?=HON'?BLE)", re.IGNORECASE)
+
+
+def _parse_last_listed_judges(text: Optional[str]) -> List[str]:
+    if not text:
+        return []
+    match = _BRACKETED_JUDGES_RE.search(text)
+    if not match:
+        return []
+    names = [clean_judge_name(segment) for segment in _JUDGE_NAME_SPLIT_RE.split(match.group(1))]
+    return [name for name in names if name and len(name) > 3]
 
 
 def parse_advocate(text: str) -> Optional[Dict[str, Any]]:
@@ -159,12 +205,24 @@ def parse_case_details(html: str) -> Dict[str, Any]:
         td = rows.get(label)
         return _cell_text(td) or None
 
+    case_no_line = text_of("case no.")
+    case_no_match = _CASE_NO_CELL_RE.match(case_no_line) if case_no_line else None
+
+    category_line = text_of("category")
+    category_match = _CATEGORY_SUBJECT_RE.match(category_line) if category_line else None
+
     return {
-        "case_no_line": text_of("case no."),
+        "case_no_line": case_no_line,
+        "case_type_name": case_no_match.group("case_type_name").strip() if case_no_match else None,
+        "case_type_code": case_no_match.group("case_type_code") if case_no_match else None,
+        "registered_on": case_no_match.group("registered_on") if case_no_match else None,
+        "cnr": case_no_match.group("cnr") if case_no_match else None,
         "status_line": text_of("status"),
         "disposition_type": text_of("disp.type"),
         "bench_type": text_of("bench"),
-        "category": text_of("category"),
+        "category": category_line,
+        "subject_category": category_match.group("subject").strip() if category_match else None,
+        "judges": _parse_last_listed_judges(text_of("last listed on")),
         "acts": _parse_act_lines(str(rows["act"])) if "act" in rows else [],
         "petitioners": _parse_party_cell(rows.get("petitioner(s)")),
         "respondents": _parse_party_cell(rows.get("respondent(s)")),

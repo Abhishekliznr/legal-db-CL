@@ -1,12 +1,12 @@
 """
 get-or-create lookup helpers over cr_cases' array-column lookup tables
-(judges, acts, sections, rules, orders, subjects, ministries, industries,
-case categories) — schema-wide, not specific to any one court's promotion
+(judges, acts, sections, subjects, ministries, industries, case
+categories) — schema-wide, not specific to any one court's promotion
 pipeline. Shared by every court's own promotion.py and by
 pipeline/llm_enrichment.py (both need the same lookup tables).
 
-Array columns on `cr_cases` (bench, sections, acts, rules, orders,
-ministries, case_category) mean Postgres can't FK-constrain membership the
+Array columns on `cr_cases` (bench, sections, acts, ministries,
+case_category) mean Postgres can't FK-constrain membership the
 way normalized junction tables would — these helpers are where that
 integrity actually gets enforced instead.
 
@@ -60,30 +60,6 @@ def get_or_create_section(cur, act_id: int, section_number: str) -> int:
     if row:
         return row[0]
     cur.execute("SELECT section_id FROM cr_sections WHERE act_id = %s AND section_number = %s;", (act_id, section_number))
-    return cur.fetchone()[0]
-
-
-def get_or_create_rule(cur, act_id: int, rule_number: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_rules (act_id, rule_number) VALUES (%s, %s) ON CONFLICT (act_id, rule_number) DO NOTHING RETURNING rule_id;",
-        (act_id, rule_number),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT rule_id FROM cr_rules WHERE act_id = %s AND rule_number = %s;", (act_id, rule_number))
-    return cur.fetchone()[0]
-
-
-def get_or_create_order(cur, act_id: int, order_number: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_orders (act_id, order_number) VALUES (%s, %s) ON CONFLICT (act_id, order_number) DO NOTHING RETURNING order_id;",
-        (act_id, order_number),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT order_id FROM cr_orders WHERE act_id = %s AND order_number = %s;", (act_id, order_number))
     return cur.fetchone()[0]
 
 
@@ -158,12 +134,29 @@ def get_or_create_category(cur, case_number: Optional[str]) -> Optional[int]:
     return cur.fetchone()[0]
 
 
-def resolve_provisions(cur, provisions: List[Dict[str, Any]]) -> Tuple[List[int], List[int], List[int], List[int]]:
-    """Returns (act_ids, section_ids, rule_ids, order_ids), each de-duplicated, act_ids covering every act referenced by any of the other three."""
+def get_or_create_case_category(cur, category_code: str, category_name: str) -> int:
+    """
+    Same lookup table as get_or_create_category above, but for a source that
+    already names both the code and the category directly (e.g. Madhya
+    Pradesh's case-status page: "CRIMINAL APPEAL (CRA)") -- get_or_create_category
+    instead has to regex-guess the category from a bare case_number string,
+    which only works for the shapes classify_category() knows about.
+    """
+    cur.execute(
+        "INSERT INTO cr_case_categories (category_code, category_name) VALUES (%s, %s) ON CONFLICT (category_code) DO NOTHING RETURNING category_id;",
+        (category_code, category_name),
+    )
+    row = cur.fetchone()
+    if row:
+        return row[0]
+    cur.execute("SELECT category_id FROM cr_case_categories WHERE category_code = %s;", (category_code,))
+    return cur.fetchone()[0]
+
+
+def resolve_provisions(cur, provisions: List[Dict[str, Any]]) -> Tuple[List[int], List[int]]:
+    """Returns (act_ids, section_ids), each de-duplicated -- every provision is a section now (rules/orders as a distinct kind were dropped, db/migrations/0012)."""
     act_ids: List[int] = []
     section_ids: List[int] = []
-    rule_ids: List[int] = []
-    order_ids: List[int] = []
     seen_acts = set()
 
     for provision in provisions:
@@ -171,17 +164,9 @@ def resolve_provisions(cur, provisions: List[Dict[str, Any]]) -> Tuple[List[int]
         if act_id not in seen_acts:
             seen_acts.add(act_id)
             act_ids.append(act_id)
+        section_ids.append(get_or_create_section(cur, act_id, provision["section_number"]))
 
-        number = provision["section_number"]
-        provision_type = provision["provision_type"]
-        if provision_type == "rule":
-            rule_ids.append(get_or_create_rule(cur, act_id, number))
-        elif provision_type == "order":
-            order_ids.append(get_or_create_order(cur, act_id, number))
-        else:
-            section_ids.append(get_or_create_section(cur, act_id, number))
-
-    return act_ids, section_ids, rule_ids, order_ids
+    return act_ids, section_ids
 
 
 def resolve_bench(cur, judge_names: List[str]) -> List[int]:
