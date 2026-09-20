@@ -2,6 +2,7 @@
 Scraper control endpoints
 --------------------------
 - POST /api/scraper/start                        : launch a background scrape+ingest batch
+- POST /api/scraper/sc/start                      : same, for the Supreme Court specifically — takes {from_date, to_date, headless}, court_id/court_code resolved server-side
 - POST /api/scraper/mp/start                      : same, for MPHC specifically — takes {year} instead of {court_id, court_code, from_date, to_date}
 - GET  /api/scraper/batches                       : recent batch history
 - GET  /api/scraper/batches/{batch_id}             : one batch's header/summary fields
@@ -158,6 +159,28 @@ def start_scrape(req: ScraperStartRequest, background_tasks: BackgroundTasks):
     from_date = req.from_date or (date.today() - timedelta(days=7)).isoformat()
     to_date = req.to_date or date.today().isoformat()
     return _dispatch_batch(req.court_id, req.court_code, from_date, to_date, req.headless, background_tasks)
+
+
+class SCScraperStartRequest(BaseModel):
+    from_date: Optional[str] = Field(None, description="YYYY-MM-DD; defaults to 7 days ago")
+    to_date: Optional[str] = Field(None, description="YYYY-MM-DD; defaults to today")
+    headless: bool = Field(True, description="Set False for a supervised dry run against a real browser window")
+
+
+@router.post("/sc/start")
+def start_sc_scrape(req: SCScraperStartRequest, background_tasks: BackgroundTasks):
+    """
+    Convenience endpoint for the Supreme Court specifically — resolves
+    court_id/court_code from court_code='SCIN' (db/seed_courts.py) so the
+    caller doesn't need to know/pass them. Equivalent to POST /start with
+    court_id resolved for the Supreme Court.
+    """
+    court_id = court_config.get_court_id_by_code("SCIN")
+    if court_id is None:
+        raise HTTPException(status_code=404, detail="No court with court_code='SCIN' — seed it first (python -m db.seed_courts).")
+    from_date = req.from_date or (date.today() - timedelta(days=7)).isoformat()
+    to_date = req.to_date or date.today().isoformat()
+    return _dispatch_batch(court_id, "SCIN", from_date, to_date, req.headless, background_tasks)
 
 
 class MPScraperStartRequest(BaseModel):
