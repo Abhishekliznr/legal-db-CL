@@ -1,7 +1,7 @@
 """
 Schema initialization CLI for api-backend.
 
-Four commands, for the two real deployment shapes:
+Six commands, for the two real deployment shapes:
 
 - `init` applies schema.sql + supplement.sql + filters_supplement.sql +
   view_supplement.sql together, for a fully standalone database
@@ -14,6 +14,12 @@ Four commands, for the two real deployment shapes:
   cr_filter_options/cr_search_field_definitions), idempotently.
 - `ensure-view` applies ONLY view_supplement.sql (cr_case_search_view),
   idempotently (CREATE OR REPLACE VIEW is naturally safe to re-run).
+- `migrate` applies any unapplied db/migrations/*.sql, in order, each
+  exactly once (tracked in cr_api_schema_migrations). These exist because
+  cr_cases is created/owned by scraper-backend, and once it already exists
+  api-backend never re-runs schema.sql's CREATE TABLE — so a column
+  schema.sql/view_supplement.sql later starts assuming (like cr_cases.cnr)
+  never reaches an already-existing table without a migration to add it.
 
 All three `ensure-*` commands are the shared-DB shape: scraper-backend
 already ran its own `init` against the real database (which creates none of
@@ -27,8 +33,10 @@ shared database.
 whether the core `cr_cases` table already exists. If not (standalone, fresh
 database) it runs the full `init` path. If it does (shared-DB deployment,
 scraper-backend already applied schema.sql's core section) it skips that
-non-idempotent part and just runs the three ensure-* commands, which are
-each safe to re-run. Either way it can be called on every app startup.
+non-idempotent part, applies any unapplied db/migrations/*.sql to bring an
+already-existing cr_cases up to date, then runs the three ensure-* commands,
+which are each safe to re-run. Either way it can be called on every app
+startup.
 
 Usage:
     python -m db.init_db init                  # standalone: full schema + all three supplements
@@ -36,6 +44,7 @@ Usage:
     python -m db.init_db ensure-supplement     # shared-DB: just add cr_search_history
     python -m db.init_db ensure-filters        # shared-DB: just add filter/search metadata tables
     python -m db.init_db ensure-view           # shared-DB: just add/refresh cr_case_search_view
+    python -m db.init_db migrate               # shared-DB: apply any unapplied db/migrations/*.sql
     python -m db.init_db ensure-schema         # startup-safe: pick the right path automatically
 """
 
@@ -48,6 +57,7 @@ SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 SUPPLEMENT_PATH = Path(__file__).resolve().parent / "supplement.sql"
 FILTERS_SUPPLEMENT_PATH = Path(__file__).resolve().parent / "filters_supplement.sql"
 VIEW_SUPPLEMENT_PATH = Path(__file__).resolve().parent / "view_supplement.sql"
+MIGRATIONS_DIR = Path(__file__).resolve().parent / "migrations"
 
 # Reverse-dependency order so FK/type drops don't fail. Includes both the
 # current schema's own tables (cr_-prefixed, 2026-09-09 rename) AND every
@@ -177,6 +187,53 @@ def _core_schema_exists(conn) -> bool:
         return cur.fetchone()[0]
 
 
+def _ensure_migrations_table(conn) -> None:
+    # Deliberately its own table, not scraper-backend's cr_schema_migrations
+    # — these are two independent lists of migration files (each service
+    # ships its own db/migrations/ directory), even where both happen to
+    # ALTER the same shared cr_cases table.
+    with conn.cursor() as cur:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS cr_api_schema_migrations (
+                filename    TEXT PRIMARY KEY,
+                applied_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+            );
+        """)
+    conn.commit()
+
+
+def apply_migrations() -> None:
+    """
+    Applies each db/migrations/*.sql file, in filename order, exactly once
+    ever — recording it in cr_api_schema_migrations right after it runs, and
+    skipping any filename already recorded there. Mirrors scraper-backend's
+    own apply_migrations(); see this module's docstring for why api-backend
+    needs its own copy even though cr_cases itself belongs to scraper-backend.
+    """
+    conn = get_connection()
+    try:
+        _ensure_migrations_table(conn)
+        with conn.cursor() as cur:
+            cur.execute("SELECT filename FROM cr_api_schema_migrations;")
+            already_applied = {row[0] for row in cur.fetchall()}
+    finally:
+        conn.close()
+
+    for path in sorted(MIGRATIONS_DIR.glob("*.sql")):
+        if path.name in already_applied:
+            continue
+        sql = path.read_text(encoding="utf-8")
+        conn = get_connection()
+        try:
+            print(f"Applying migration {path.name} (first time)...")
+            with conn.cursor() as cur:
+                cur.execute(sql)
+                cur.execute("INSERT INTO cr_api_schema_migrations (filename) VALUES (%s);", (path.name,))
+            conn.commit()
+        finally:
+            conn.close()
+
+
 # Same fixed key as scraper-backend's db/init_db.py — deliberately NOT a
 # separate per-service key. Both services share one Postgres instance in
 # production (see connection.py's pool-sizing note), and both run this same
@@ -195,13 +252,17 @@ def ensure_schema() -> None:
     Startup-safe entry point: picks standalone vs shared-DB automatically.
 
     - Core `cr_cases` table missing (standalone, fresh database): runs the
-      full `init` path (schema.sql + all three supplements).
+      full `init` path (schema.sql + all three supplements), then applies
+      any migrations (a no-op the column/index already exists from schema.sql,
+      but keeps cr_api_schema_migrations in sync either way).
     - Core `cr_cases` table present (shared-DB, scraper-backend already ran
       its own `init`): skips schema.sql — its CREATE TYPE/CREATE TABLE
-      aren't idempotent — and just runs the three ensure-* commands, which
-      are each already safe to re-run, so this also self-heals a
-      shared-DB deployment where api-backend's own tables/view aren't
-      there yet.
+      aren't idempotent — applies any unapplied db/migrations/*.sql to bring
+      that already-existing cr_cases up to date with columns newer code
+      expects, THEN runs the three ensure-* commands (view_supplement.sql in
+      particular can reference those same columns), which are each already
+      safe to re-run. This also self-heals a shared-DB deployment where
+      api-backend's own tables/view aren't there yet.
 
     Holds a session-level Postgres advisory lock for the whole check+apply
     so that two instances starting concurrently against the same database
@@ -226,8 +287,10 @@ def ensure_schema() -> None:
             if not core_exists:
                 print("No schema detected — applying schema.sql + all supplements for the first time...")
                 init_database(drop_existing=False)
+                apply_migrations()
             else:
-                print("Core schema already present — ensuring api-backend's own supplement tables/view exist...")
+                print("Core schema already present — applying any pending migrations, then ensuring api-backend's own supplement tables/view exist...")
+                apply_migrations()
                 ensure_supplement()
                 ensure_filters()
                 ensure_view()
@@ -248,6 +311,7 @@ def main() -> None:
     subparsers.add_parser("ensure-supplement", help="Idempotently apply only supplement.sql (shared-DB deployment)")
     subparsers.add_parser("ensure-filters", help="Idempotently apply only filters_supplement.sql (shared-DB deployment)")
     subparsers.add_parser("ensure-view", help="Idempotently apply only view_supplement.sql (shared-DB deployment)")
+    subparsers.add_parser("migrate", help="Apply any unapplied db/migrations/*.sql, in order, each exactly once")
     subparsers.add_parser("ensure-schema", help="Startup-safe: pick standalone vs shared-DB path automatically")
 
     args = parser.parse_args()
@@ -259,6 +323,8 @@ def main() -> None:
         ensure_filters()
     elif args.command == "ensure-view":
         ensure_view()
+    elif args.command == "migrate":
+        apply_migrations()
     elif args.command == "ensure-schema":
         ensure_schema()
     else:

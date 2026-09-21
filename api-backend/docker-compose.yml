@@ -38,7 +38,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "8083:8000"
+      - "8002:3000"
     environment:
       - DATABASE_TYPE=postgres
       - DB_HOST=db
