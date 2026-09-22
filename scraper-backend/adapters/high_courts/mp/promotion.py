@@ -7,15 +7,19 @@ fields are entirely different: MP's own adapter.py's scrape() already did
 the case-status lookup (adapters/high_courts/mp/case_status.py) and stashed
 its parsed result on `record.extra`, plus the ILRS-sourced headnote/neutral
 citation. case_note comes straight from the ILRS headnote, and
-sections/acts are resolved directly from case-status's own Act lines, not
-from a paragraph-filtered LLM call the way Supreme Court's are -- rules/
-orders are deliberately left '{}' always (case-status's own Act lines never
-distinguish a rule/order from a section, and this court's spec only wants
-acts+sections tracked). LLM enrichment (pipeline/llm_enrichment.py) IS
-enabled for MP as of routers/scraper_router.py's registry entry -- it fills
+sections/acts are resolved primarily from case-status's own Act lines --
+rules/orders are deliberately left '{}' always (case-status's own Act lines
+never distinguish a rule/order from a section, and this court's spec only
+wants acts+sections tracked). When case-status has no Act row at all,
+_resolve_acts() is retried against pipeline/legal_ner_extraction.py's Legal
+NER output over the judgment's own OCR text before falling through any
+further -- LLM enrichment (pipeline/llm_enrichment.py, enabled for MP as of
+routers/scraper_router.py's registry entry) only ever touches sections/acts
+as a last resort, when both of these came up empty (its own
+`existing_sections` guard). Enrichment otherwise fills
 conclusion/industries/ministries/favouring_party/subject the same way it
 does for Supreme Court, COALESCE'd on top of whatever this module already
-set directly from case-status/ILRS data.
+set directly from case-status/ILRS/NER data.
 
 liznr_id assignment (_claim_citation_sequence/_build_liznr_id/
 _assign_liznr_id below) is a straight copy of
@@ -43,6 +47,7 @@ from db.lookups import (
 from normalization import parties
 from normalization.acts import resolve_act
 from normalization.dates import parse_date
+from pipeline.legal_ner_extraction import extract_acts_sections
 
 logger = logging.getLogger("scraper_backend_v2.mp_promotion")
 
@@ -192,6 +197,14 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                 petitioner_advocate_ids = _resolve_advocate_ids(cur, extra.get("petitioner_advocates") or [])
                 respondent_advocate_ids = _resolve_advocate_ids(cur, extra.get("respondent_advocates") or [])
                 act_ids, section_ids = _resolve_acts(cur, extra.get("acts") or [])
+                if not act_ids:
+                    # case-status had no Act row for this case (new/pending
+                    # filing, or the parser found nothing) -- run the local
+                    # Legal NER model (pipeline/legal_ner_extraction.py) over
+                    # the judgment's OCR text as a second, still-deterministic
+                    # source before this falls all the way through to LLM
+                    # enrichment's own provisions guess (pipeline/llm_enrichment.py).
+                    act_ids, section_ids = _resolve_acts(cur, extract_acts_sections(ocr_text))
 
                 # case-status's own "Case No." cell already names both the
                 # case-type code and its full name (e.g. "CRA"/"CRIMINAL

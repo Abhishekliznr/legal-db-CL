@@ -183,7 +183,7 @@ def ensure_view() -> None:
 
 def _core_schema_exists(conn) -> bool:
     with conn.cursor() as cur:
-        cur.execute("SELECT to_regclass('public.cr_cases') IS NOT NULL;")
+        cur.execute("SELECT to_regclass('cr_cases') IS NOT NULL;")
         return cur.fetchone()[0]
 
 
