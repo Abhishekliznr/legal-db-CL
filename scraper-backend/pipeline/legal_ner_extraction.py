@@ -24,6 +24,8 @@ from typing import Any, Dict, List
 
 import requests
 
+from orchestrator.log_context import plog
+
 logger = logging.getLogger("scraper_backend_v2.legal_ner_extraction")
 
 _SERVICE_URL = os.environ.get("LEGAL_NER_SERVICE_URL", "http://localhost:8004")
@@ -52,7 +54,8 @@ def extract_acts_sections(judgment_text: str) -> List[Dict[str, Any]]:
         resp.raise_for_status()
         return resp.json().get("acts") or []
     except Exception:
-        logger.exception(
+        plog(
+            logger, "exception",
             "[LEGAL_NER] request to %s failed for %d chars of text", _SERVICE_URL, len(judgment_text),
         )
         return []

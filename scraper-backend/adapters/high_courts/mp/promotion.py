@@ -47,6 +47,7 @@ from db.lookups import (
 from normalization import parties
 from normalization.acts import resolve_act
 from normalization.dates import parse_date
+from orchestrator.log_context import plog
 from pipeline.legal_ner_extraction import extract_acts_sections
 
 logger = logging.getLogger("scraper_backend_v2.mp_promotion")
@@ -166,7 +167,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     court_id = ingestion["court_id"]
     extra = record.extra or {}
 
-    logger.info("[MP PROMOTE] ingestion_id=%s: starting (case_number_raw=%r)", ingestion_id, record.case_number_raw)
+    plog(logger, "info", "[PROMOTE] ingestion_id=%s: starting (case_number_raw=%r)", ingestion_id, record.case_number_raw)
 
     try:
         case_number = (record.case_number_raw or "").strip()
@@ -205,6 +206,13 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                     # source before this falls all the way through to LLM
                     # enrichment's own provisions guess (pipeline/llm_enrichment.py).
                     act_ids, section_ids = _resolve_acts(cur, extract_acts_sections(ocr_text))
+                    plog(
+                        logger, "info",
+                        "[PROMOTE] ingestion_id=%s: legal_ner used (no case-status acts) — found %d section(s)",
+                        ingestion_id, len(section_ids),
+                    )
+                else:
+                    plog(logger, "info", "[PROMOTE] ingestion_id=%s: legal_ner not used — case-status acts found", ingestion_id)
 
                 # case-status's own "Case No." cell already names both the
                 # case-type code and its full name (e.g. "CRA"/"CRIMINAL
@@ -278,8 +286,9 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         error_message="case_number already exists for this court — likely a re-run",
                     )
                     conn.commit()
-                    logger.info(
-                        "[MP PROMOTE] ingestion_id=%s: case_number=%r already exists for court_id=%s — likely a re-run, routed to NEEDS_REVIEW",
+                    plog(
+                        logger, "info",
+                        "[PROMOTE] ingestion_id=%s: case_number=%r already exists for court_id=%s — likely a re-run, routed to NEEDS_REVIEW",
                         ingestion_id, case_number, court_id,
                     )
                     return None
@@ -291,17 +300,18 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
             conn.commit()
 
-        logger.info(
-            "[MP PROMOTE] ingestion_id=%s: done — case_id=%s liznr_id=%s disposition=%s needs_review=%s",
+        plog(
+            logger, "info",
+            "[PROMOTE] ingestion_id=%s: done — case_id=%s liznr_id=%s disposition=%s needs_review=%s",
             ingestion_id, case_id, liznr_id, disposition, needs_review,
         )
         return case_id
 
     except PromotionSkipped as e:
-        logger.warning("[MP PROMOTE] ingestion_id=%s: skipped — %s", ingestion_id, e)
+        plog(logger, "warning", "[PROMOTE] ingestion_id=%s: skipped — %s", ingestion_id, e)
         scrape_jobs.update_status(ingestion_id, status="NEEDS_REVIEW", error_message=str(e))
         return None
     except Exception as e:
-        logger.exception("[MP PROMOTE] ingestion_id=%s: failed", ingestion_id)
+        plog(logger, "exception", "[PROMOTE] ingestion_id=%s: failed", ingestion_id)
         scrape_jobs.update_status(ingestion_id, status="PROMOTION_FAILED", error_message=str(e))
         return None

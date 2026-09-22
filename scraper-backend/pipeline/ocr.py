@@ -24,6 +24,7 @@ from typing import Optional, Tuple
 import pymupdf as fitz
 
 from db import scrape_jobs
+from orchestrator.log_context import plog
 
 logger = logging.getLogger("scraper_backend_v2.ocr")
 
@@ -85,7 +86,7 @@ def process_ingestion_ocr(ingestion_id: int, local_pdf_path: Path) -> None:
     to OCR_DONE. Called synchronously by the orchestrator right after
     download, while the temp file still exists (spec §4.4's batch flow).
     """
-    logger.info("[OCR] ingestion_id=%s: starting (pdf=%s)", ingestion_id, local_pdf_path.name)
+    plog(logger, "info", "[OCR] ingestion_id=%s: starting (pdf=%s)", ingestion_id, local_pdf_path.name)
     try:
         pdf_bytes = local_pdf_path.read_bytes()
         text = extract_text_from_pdf_bytes(pdf_bytes)
@@ -93,7 +94,8 @@ def process_ingestion_ocr(ingestion_id: int, local_pdf_path: Path) -> None:
         confidence = None
 
         if len(text.strip()) < MIN_TEXT_LAYER_CHARS:
-            logger.info(
+            plog(
+                logger, "info",
                 "[OCR] ingestion_id=%s: text layer empty/near-empty (%d chars) — falling back to Tesseract",
                 ingestion_id, len(text.strip()),
             )
@@ -101,7 +103,8 @@ def process_ingestion_ocr(ingestion_id: int, local_pdf_path: Path) -> None:
             if ocr_text is not None:
                 text, engine, confidence = ocr_text, "tesseract", ocr_confidence
             else:
-                logger.warning(
+                plog(
+                    logger, "warning",
                     "[OCR] ingestion_id=%s: Tesseract unavailable — keeping the empty text-layer result rather than failing the row",
                     ingestion_id,
                 )
@@ -116,13 +119,14 @@ def process_ingestion_ocr(ingestion_id: int, local_pdf_path: Path) -> None:
             page_count=page_count,
             ocr_completed_at=datetime.now(timezone.utc),
         )
-        logger.info(
+        plog(
+            logger, "info",
             "[OCR] ingestion_id=%s: done — engine=%s pages=%s chars=%d%s",
             ingestion_id, engine, page_count, len(text),
             f" confidence={confidence}" if confidence is not None else "",
         )
     except Exception as e:
-        logger.exception("[OCR] ingestion_id=%s: failed", ingestion_id)
+        plog(logger, "exception", "[OCR] ingestion_id=%s: failed", ingestion_id)
         # error_message — renamed from extraction_error in the 2026-09-08
         # schema rewrite, which flattened raw_ingestions down to a single
         # error_message column shared by every failure status instead of a

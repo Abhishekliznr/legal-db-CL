@@ -78,6 +78,7 @@ from normalization.acts import resolve_act
 from normalization.industries import CANONICAL_INDUSTRIES, resolve_industry
 from normalization.ministries import KNOWN_MINISTRIES, resolve_ministry
 from normalization.ocr_artifacts import strip_ocr_noise as _strip_ocr_noise
+from orchestrator.log_context import plog
 from pipeline.azure_openai import azure_config, is_configured
 
 logger = logging.getLogger("scraper_backend_v2.llm_enrichment")
@@ -388,7 +389,7 @@ def _post_with_retries(config: dict, user_content: str, max_output_tokens: int) 
             response = _post_once(config, payload)
         except (requests.Timeout, requests.ConnectionError) as e:
             if attempt >= _MAX_HTTP_RETRIES:
-                logger.warning("Azure OpenAI enrichment call failed after %d retries: %s", attempt, e)
+                plog(logger, "warning", "Azure OpenAI enrichment call failed after %d retries: %s", attempt, e)
                 return None, str(e)
             _sleep_before_retry(attempt, None)
             attempt += 1
@@ -403,7 +404,8 @@ def _post_with_retries(config: dict, user_content: str, max_output_tokens: int) 
         if response.status_code == 400 and not _json_schema_unsupported:
             body_lower = response.text.lower()
             if "response_format" in body_lower or "json_schema" in body_lower:
-                logger.warning(
+                plog(
+                    logger, "warning",
                     "Azure OpenAI enrichment call: deployment %r rejected response_format=json_schema (HTTP 400) — "
                     "falling back to json_object for the rest of this process. Body: %s",
                     config["deployment"], response.text[:500],
@@ -417,7 +419,7 @@ def _post_with_retries(config: dict, user_content: str, max_output_tokens: int) 
             attempt += 1
             continue
 
-        logger.warning("Azure OpenAI enrichment call failed: HTTP %s — %s", response.status_code, response.text[:500])
+        plog(logger, "warning", "Azure OpenAI enrichment call failed: HTTP %s — %s", response.status_code, response.text[:500])
         return None, f"HTTP {response.status_code}: {response.text[:300]}"
 
 
@@ -585,7 +587,7 @@ def _write_status(case_id: int, status: str, error: Optional[str]) -> None:
                 )
             conn.commit()
     except Exception:
-        logger.exception("[ENRICH] case_id=%s: failed to record enrichment_status=%s", case_id, status)
+        plog(logger, "exception", "[ENRICH] case_id=%s: failed to record enrichment_status=%s", case_id, status)
 
 
 def find_cases_needing_enrichment(limit: int = 100) -> List[int]:
@@ -630,15 +632,15 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
                 case_row = _fetch_case_row(cur, case_id)
             conn.commit()
     except Exception:
-        logger.exception("[ENRICH] case_id=%s: failed to fetch case row", case_id)
+        plog(logger, "exception", "[ENRICH] case_id=%s: failed to fetch case row", case_id)
         return False
 
     if case_row is None:
-        logger.warning("[ENRICH] case_id=%s: no such case, skipping", case_id)
+        plog(logger, "warning", "[ENRICH] case_id=%s: no such case, skipping", case_id)
         return False
 
     if not case_row["ocr_text"]:
-        logger.info("[ENRICH] case_id=%s: no ocr_text, skipping", case_id)
+        plog(logger, "info", "[ENRICH] case_id=%s: no ocr_text, skipping", case_id)
         _write_status(case_id, "SKIPPED", "no ocr_text")
         return False
 
@@ -646,11 +648,11 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
     result = call_llm_enrichment(case_row, user_content=user_content)
 
     if result.status == "NOT_CONFIGURED":
-        logger.info("[ENRICH] case_id=%s: Azure OpenAI not configured, leaving enrichment_status=PENDING", case_id)
+        plog(logger, "info", "[ENRICH] case_id=%s: Azure OpenAI not configured, leaving enrichment_status=PENDING", case_id)
         return False
 
     if result.status in ("FAILED", "TRUNCATED"):
-        logger.warning("[ENRICH] case_id=%s: %s — %s", case_id, result.status, result.error)
+        plog(logger, "warning", "[ENRICH] case_id=%s: %s — %s", case_id, result.status, result.error)
         _write_status(case_id, result.status, result.error)
         return False
 
@@ -660,7 +662,7 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
     if case_note:
         case_note = re.sub(r"\s+", " ", case_note).strip()
         if "held," not in case_note.lower():
-            logger.warning("[ENRICH] case_id=%s: case_note has no 'Held' segment — saving anyway", case_id)
+            plog(logger, "warning", "[ENRICH] case_id=%s: case_note has no 'Held' segment — saving anyway", case_id)
     conclusion = llm_result.get("conclusion")
     llm_subject = (llm_result.get("subject") or "").strip() or None
 
@@ -676,7 +678,7 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
     raw_provisions = llm_result.get("provisions")
     if not isinstance(raw_provisions, list):
         if raw_provisions is not None:
-            logger.warning("[ENRICH] case_id=%s: 'provisions' was not a list (%r), treating as empty", case_id, type(raw_provisions))
+            plog(logger, "warning", "[ENRICH] case_id=%s: 'provisions' was not a list (%r), treating as empty", case_id, type(raw_provisions))
         raw_provisions = []
 
     try:
@@ -740,15 +742,27 @@ def enrich_case(case_id: int, provision_block: str = "") -> bool:
                     acts, sections = resolve_provisions(cur, list(deduped.values()))
                     set_clauses += ["sections = %s", "acts = %s"]
                     params += [sections, acts]
+                    plog(
+                        logger, "info",
+                        "[ENRICH] case_id=%s: LLM provisions fallback used (no sections found upstream) — found %d section(s)",
+                        case_id, len(sections),
+                    )
+                else:
+                    plog(
+                        logger, "info",
+                        "[ENRICH] case_id=%s: LLM provisions fallback not used (%s)",
+                        case_id, "sections already found upstream" if case_row["existing_sections"] else "no provision block for this court",
+                    )
 
                 params.append(case_id)
                 cur.execute(f"UPDATE cr_cases SET {', '.join(set_clauses)} WHERE case_id = %s;", tuple(params))
             conn.commit()
     except Exception:
-        logger.exception("[ENRICH] case_id=%s: DB write failed after a successful LLM call", case_id)
+        plog(logger, "exception", "[ENRICH] case_id=%s: DB write failed after a successful LLM call", case_id)
         return False
 
-    logger.info(
+    plog(
+        logger, "info",
         "[ENRICH] case_id=%s: done — case_note=%s industries=%d ministries=%d sections=%d",
         case_id, "set" if case_note else "unchanged", len(industry_ids), len(ministry_ids), len(sections),
     )
