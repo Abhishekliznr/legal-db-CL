@@ -1,17 +1,54 @@
 services:
-  # api-backend — case search, filters, stats & history (lightweight,
-  # read-only). Points at the shared external Postgres via DB_HOST/DB_PORT
-  # in .env instead of a bundled db container.
+  # 1. PostgreSQL Database Service — own instance for api-backend, for
+  #    local dev/standalone use. Exposed on host port 5435 so it can run
+  #    alongside api-backend's (5432), the old scraper-backend's (5433), and
+  #    scraper-backend's (5434) without a port clash. In a real
+  #    deployment where api-backend reads scraper-backend's data,
+  #    override DB_HOST/DB_PORT below to point at that instance instead and
+  #    drop this `db` service (see db/schema.sql's header on which service
+  #    should own schema init in that setup).
+  db:
+    image: postgres:15-alpine
+    container_name: legal_api_v2_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DB: ${DB_NAME:-liznrlegal}
+    ports:
+      - "5435:5432"
+    volumes:
+      - api_v2_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-liznrlegal}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. api-backend — case search, filters, stats & history (lightweight,
+  #    read-only). Standalone: no shared code or containers with
+  #    scraper-backend or the old api-backend/scraper-backend.
   api-backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: legal_api_v2_backend
     restart: always
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "8002:3000"
-    env_file:
-      - .env
+    environment:
+      - DATABASE_TYPE=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-liznrlegal}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-changeme}
     volumes:
       - .:/app
       - /app/__pycache__
+
+volumes:
+  api_v2_postgres_data:
