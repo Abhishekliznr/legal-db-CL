@@ -1,0 +1,11 @@
+services:
+  # legal-ner-service — local Legal NER (statute/section extraction), Python
+  # 3.10-pinned for en_legal_ner_sm compatibility. Stateless; no DB, no .env.
+  legal-ner-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal_ner_service
+    restart: always
+    ports:
+      - "8004:3000"
