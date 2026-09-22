@@ -1,53 +1,21 @@
 services:
-  # 1. PostgreSQL Database Service — own instance for scraper-backend.
-  #    Exposed on host port 5434 so it can run alongside the OLD
-  #    scraper-backend's Postgres (5433) and api-backend's (5432) without a
-  #    port clash — all three can run at once during the parallel build.
-  db:
-    image: postgres:15-alpine
-    container_name: legal_scraper_v2_postgres_db
-    restart: always
-    environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
-      POSTGRES_DB: ${DB_NAME:-liznrlegal}
-    ports:
-      - "5434:5432"
-    volumes:
-      - scraper_v2_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-liznrlegal}" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  # 2. scraper-backend — court scraping, AI metadata extraction & Azure
-  #    Blob sync (heavy: Playwright/Chromium). Standalone: no shared code
-  #    or containers with api-backend or the old scraper-backend.
+  # scraper-backend — court scraping, AI metadata extraction & Azure
+  # Blob sync (heavy: Playwright/Chromium). No docker-internal Postgres:
+  # DB_HOST/DB_NAME/etc come straight from .env (env_file below), so this
+  # always talks to whichever Postgres is configured there, on every
+  # environment — no divergent hardcoded overrides here.
   scraper-backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: legal_scraper_v2_backend
     restart: always
-    depends_on:
-      db:
-        condition: service_healthy
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8003:3000"
-    environment:
-      - DATABASE_TYPE=postgres
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=${DB_NAME:-liznrlegal}
-      - DB_USER=${DB_USER:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD:-changeme}
-      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
-      - AZURE_BLOB_CONTAINER_PDFS=${AZURE_BLOB_CONTAINER_PDFS}
-      - GROQ_API_KEY=${GROQ_API_KEY}
     volumes:
       - .:/app
       - /app/__pycache__
-
-volumes:
-  scraper_v2_postgres_data:

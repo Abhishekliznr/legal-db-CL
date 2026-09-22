@@ -129,7 +129,7 @@ def _dispatch_batch(
     # whatever adapters/high_courts/<code>/adapter.py needs beyond headless —
     # nothing generic depends on its shape, each adapter's scrape() reads
     # only the keys it defined.
-    adapter_kwargs = {"headless": headless, **(config.get("config") or {})}
+    adapter_kwargs = {**(config.get("config") or {}), "headless": headless}
 
     # Created here, synchronously, rather than inside the background task itself — so the
     # response below can hand batch_id straight back to the caller (the admin UI navigates to
