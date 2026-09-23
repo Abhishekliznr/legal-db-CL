@@ -3,9 +3,9 @@ Azure OpenAI config/auth helpers, shared by any pipeline stage that calls
 Azure OpenAI (currently pipeline/llm_enrichment.py only).
 
 Split out of the old pipeline/extraction.py (the Phase 3 LLM-extraction
-stage, superseded 2026-09-08 by regex_extraction.py + llm_enrichment.py and
-removed) so this reusable config/auth logic didn't get deleted along with
-the stage-specific code that used to live around it.
+stage, superseded 2026-09-08 by per-court regex extraction + llm_enrichment.py
+and removed) so this reusable config/auth logic didn't get deleted along
+with the stage-specific code that used to live around it.
 """
 
 import os

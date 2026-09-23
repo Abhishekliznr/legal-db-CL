@@ -3,7 +3,7 @@ Regex-only extraction for Supreme Court judgments — an LLM-free alternative
 source for the fields sci.gov.in's own results table and its judgments'
 formulaic structure already expose deterministically.
 
-Wired into pipeline/promotion.py as of the 2026-09-08 schema rewrite — this
+Wired into adapters/supreme_court/promotion.py as of the 2026-09-08 schema rewrite — this
 is the non-LLM extraction step (case number/parties/dates/coram/provisions),
 with pipeline/llm_enrichment.py filling in the handful of fields regex
 genuinely can't get (case_note, industries, ministries, and now provision
@@ -265,22 +265,6 @@ _PROVISION_PATTERN = re.compile(
     re.IGNORECASE | re.VERBOSE,
 )
 
-# Routes the matched trigger word to one of the three provision buckets the
-# new flattened `cases` schema keeps separate (cases.sections/rules/orders,
-# each an array of ids into its own lookup table, all pointing back to
-# `acts`). "Article" (Constitution references, e.g. "Article 226") has no
-# bucket of its own in that schema -- treated as a section, since it plays
-# the identical structural role (a numbered provision within one act/the
-# Constitution), just under a different word.
-def _provision_type(trigger: str) -> str:
-    trigger_lower = trigger.lower().strip(". ")
-    if trigger_lower in ("rule", "rules"):
-        return "rule"
-    if trigger_lower == "order":
-        return "order"
-    return "section"  # section/sections/sec./s./u/s/under section/article/articles
-
-
 # A judgment refers back to an act it already named earlier as "the Act" /
 # "the said Rules" / "the above said Act" -- this pattern's own capture
 # happily grabs those anaphoric references too, since they're still
@@ -304,11 +288,10 @@ def extract_provisions(ocr_text: str, max_results: int = 30) -> List[Dict[str, O
     reference ("the Act", "said Rules") rather than an actual statute name,
     are skipped rather than emitted with a null/fabricated-looking statute.
 
-    Each result carries a "provision_type" of "section", "rule", or "order"
-    (see _provision_type) so a caller populating the flattened `cases`
-    schema (separate sections/rules/orders id arrays, all resolving back to
-    `acts`) can route it to the right bucket without re-deriving the type
-    from the number/act text.
+    Every match (section/rule/order/article trigger alike) is emitted as a
+    section -- rules/orders as a distinct kind were dropped from the schema
+    (db/migrations/0012), so there's no other bucket for a caller to route
+    these into.
     """
     if not ocr_text:
         return []
@@ -326,8 +309,7 @@ def extract_provisions(ocr_text: str, max_results: int = 30) -> List[Dict[str, O
             continue
 
         statute_name, short_code, year = resolve_act(act_raw)
-        provision_type = _provision_type(match.group("trigger"))
-        key = (statute_name, provision_type, number)
+        key = (statute_name, number)
         if key in seen:
             continue
         seen.add(key)
@@ -336,7 +318,6 @@ def extract_provisions(ocr_text: str, max_results: int = 30) -> List[Dict[str, O
             "short_code": short_code,
             "statute_year": year,
             "section_number": number.strip(),
-            "provision_type": provision_type,
         })
         if len(results) >= max_results:
             break
@@ -696,86 +677,6 @@ def validate_page_count(ocr_text: str, actual_page_count: int) -> Optional[bool]
     return declared_total == actual_page_count
 
 
-# ---------------------------------------------------------------------
-# Ministry — scoped to a single already-identified party name, never the
-# whole document (see module docstring for why whole-document scanning is
-# a false-positive trap: a judgment merely CITING a past "Union of India,
-# Ministry of Railways" case would otherwise get mistagged even when no
-# ministry is a party to the current case at all).
-# ---------------------------------------------------------------------
-
-# Reused as reference data (names only, no matching logic) from the old
-# scraper-backend's MINISTRIES_LIST -- same treatment normalization/acts.py
-# already gives CANONICAL_STATUTES: a lookup table has no logic worth
-# rewriting, only the data is carried over. Trimmed to current-name entries
-# relevant to a party-name match (dropped historical/foreign entries like
-# "National Parliament of Bangladesh" that clearly don't belong here).
-KNOWN_MINISTRIES = [
-    "Ministry of Agriculture and Farmers Welfare", "Ministry of Ayush",
-    "Ministry of Chemicals and Fertilizers", "Ministry of Civil Aviation",
-    "Ministry of Coal", "Ministry of Commerce and Industry",
-    "Ministry of Communications", "Ministry of Corporate Affairs",
-    "Ministry of Culture", "Ministry of Defence", "Ministry of Education",
-    "Ministry of Electronics and Information Technology",
-    "Ministry of Environment, Forest and Climate Change",
-    "Ministry of External Affairs", "Ministry of Finance",
-    "Ministry of Fisheries, Animal Husbandry and Dairying",
-    "Ministry of Food Processing Industries",
-    "Ministry of Health and Family Welfare", "Ministry of Home Affairs",
-    "Ministry of Housing and Urban Affairs",
-    "Ministry of Information and Broadcasting", "Ministry of Jal Shakti",
-    "Ministry of Labour and Employment", "Ministry of Law and Justice",
-    "Ministry of Micro, Small and Medium Enterprises", "Ministry of Mines",
-    "Ministry of Minority Affairs",
-    "Ministry of Panchayati Raj",
-    "Ministry of Parliamentary Affairs",
-    "Ministry of Personnel, Public Grievances and Pensions",
-    "Ministry of Petroleum and Natural Gas", "Ministry of Power",
-    "Ministry of Railways", "Ministry of Road Transport and Highways",
-    "Ministry of Rural Development", "Ministry of Science and Technology",
-    "Ministry of Shipping", "Ministry of Skill Development and Entrepreneurship",
-    "Ministry of Social Justice and Empowerment",
-    "Ministry of Statistics and Programme Implementation",
-    "Ministry of Steel", "Ministry of Textiles",
-    "Ministry of Tourism", "Ministry of Tribal Affairs",
-    "Ministry of Urban Development", "Ministry of Water Resources",
-    "Ministry of Women and Child Development",
-    "Cabinet Division", "Reserve Bank of India",
-    "Securities and Exchange Board of India",
-    "Telecom Regulatory Authority of India",
-    "Election Commission of India",
-]
-
-_MINISTRY_LOOKUP = {m.lower(): m for m in KNOWN_MINISTRIES}
-
-
-def find_ministry_in_party_name(party_name: Optional[str]) -> Optional[str]:
-    """
-    Returns the canonical ministry name if `party_name` (a single already-
-    parsed party string, e.g. from parse_party_names()) names one exactly,
-    or None. Deliberately exact/substring match against a closed list
-    rather than a whole-document keyword scan -- see module docstring.
-    """
-    if not party_name:
-        return None
-    lowered = party_name.lower()
-    for ministry_lower, canonical in _MINISTRY_LOOKUP.items():
-        if ministry_lower in lowered:
-            return canonical
-    return None
-
-
-def resolve_ministry(raw_name: str) -> Optional[str]:
-    """
-    Case-insensitive EXACT match against KNOWN_MINISTRIES, for validating
-    pipeline/llm_enrichment.py's LLM output (which is prompted with this
-    same list as its only allowed subject-matter-ministry values) --
-    deliberately not substring matching like find_ministry_in_party_name
-    above, since the LLM is expected to return the canonical name verbatim,
-    not a longer string a ministry name happens to appear inside. Returns
-    None for anything outside the closed list, dropped rather than stored
-    as a fabricated-looking new ministry.
-    """
-    if not raw_name:
-        return None
-    return _MINISTRY_LOOKUP.get(raw_name.strip().lower())
+# Ministry lookup (KNOWN_MINISTRIES, find_ministry_in_party_name,
+# resolve_ministry) moved to normalization/ministries.py -- a fixed closed
+# list, not Supreme-Court-specific data, shared with pipeline/llm_enrichment.py.

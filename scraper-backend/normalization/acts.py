@@ -9,7 +9,7 @@ shape (act_name, act_year, short_code) — renamed from the earlier
 `statutes` in the 2026-09-08 schema rewrite, same table otherwise.
 
 Downstream of extraction, not the primary extraction mechanism — a caller
-(pipeline/regex_extraction.py's extract_provisions(), or an LLM call later)
+(adapters/supreme_court/extraction.py's extract_provisions(), or an LLM call later)
 identifies "Section 302 IPC" is invoked; this module only resolves "IPC"
 to the canonical "Indian Penal Code, 1860" act row.
 """

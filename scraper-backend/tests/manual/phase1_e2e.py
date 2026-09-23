@@ -22,6 +22,7 @@ from pathlib import Path
 import pymupdf
 
 from adapters.base import RawJudgmentRecord
+from adapters.supreme_court.promotion import promote_ingestion
 from db import scrape_jobs
 from db.connection import get_pooled_connection, init_connection_pool
 from orchestrator import batch_runner
@@ -78,7 +79,7 @@ def main():
 
         print("\n--- First run (expect: 1 found, 1 downloaded, 1 promoted) ---")
         batch_id1 = scrape_jobs.create_batch(court_id, batch_runner.to_date("2026-01-01"), batch_runner.to_date("2026-01-31"))
-        summary1 = batch_runner.run_batch(adapter, batch_id1, court_id, "SCIN", "2026-01-01", "2026-01-31", "SCI_WEBSITE")
+        summary1 = batch_runner.run_batch(adapter, promote_ingestion, batch_id1, court_id, "SCIN", "2026-01-01", "2026-01-31", "SCI_WEBSITE")
         print(summary1)
         assert summary1["total_found"] == 1
         assert summary1["total_downloaded"] == 1
@@ -86,7 +87,7 @@ def main():
 
         print("\n--- Second run, same PDF (expect: 1 found, 0 downloaded — checksum dedup) ---")
         batch_id2 = scrape_jobs.create_batch(court_id, batch_runner.to_date("2026-01-01"), batch_runner.to_date("2026-01-31"))
-        summary2 = batch_runner.run_batch(adapter, batch_id2, court_id, "SCIN", "2026-01-01", "2026-01-31", "SCI_WEBSITE")
+        summary2 = batch_runner.run_batch(adapter, promote_ingestion, batch_id2, court_id, "SCIN", "2026-01-01", "2026-01-31", "SCI_WEBSITE")
         print(summary2)
         assert summary2["total_found"] == 1
         assert summary2["total_downloaded"] == 0, "checksum dedup should have skipped this PDF"

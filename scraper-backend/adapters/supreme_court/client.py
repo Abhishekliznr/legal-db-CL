@@ -6,7 +6,7 @@ from typing import Optional
 import requests
 from playwright.sync_api import sync_playwright
 
-from .exceptions import (
+from adapters.base import (
     SourceAccessError,
     SourceRateLimitError,
     SourceUnavailableError,

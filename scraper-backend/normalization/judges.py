@@ -3,8 +3,8 @@ Judge name cleaning — strips honorifics ("HON'BLE MR. JUSTICE"), preserving
 initials like "B.V. NAGARATHNA". Same regex approach the old normalizer.py
 used, since it's genuinely just text cleanup with no logic worth redesigning.
 
-Text cleanup only, not extraction: callers (pipeline/regex_extraction.py's
-bench-cell parsing, pipeline/promotion.py for record.judge_raw) already have
+Text cleanup only, not extraction: callers (adapters/supreme_court/extraction.py's
+bench-cell parsing, adapters/supreme_court/promotion.py for record.judge_raw) already have
 a raw judge name string — straight from the court's own results table, no
 LLM involved — and just need it cleaned before it's resolved to a
 `cr_judges` row.

@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     tesseract-ocr \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -20,6 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN playwright install --with-deps chromium
 
 COPY . .
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 3000
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "3000"]

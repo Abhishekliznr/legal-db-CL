@@ -1,17 +1,21 @@
 services:
   # api-backend — case search, filters, stats & history (lightweight,
-  # read-only). Points at the shared external Postgres via DB_HOST/DB_PORT
-  # in .env instead of a bundled db container.
+  # read-only). No docker-internal Postgres: DB_HOST/DB_NAME/etc come
+  # straight from .env (env_file below), so this always talks to whichever
+  # Postgres is configured there, on every environment — no divergent
+  # hardcoded overrides here.
   api-backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: legal_api_v2_backend
     restart: always
-    ports:
-      - "8002:3000"
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8002:3000"
     volumes:
       - .:/app
       - /app/__pycache__

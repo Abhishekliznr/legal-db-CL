@@ -1,5 +1,5 @@
 """
-Manual check for pipeline/regex_extraction.py::find_provision_paragraphs()
+Manual check for adapters/supreme_court/extraction.py::find_provision_paragraphs()
 (2026-09-09) — NOT a pytest suite, run directly, no DB needed.
 
 Confirms:
@@ -27,7 +27,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from pipeline.regex_extraction import find_provision_paragraphs
+from adapters.supreme_court.extraction import find_provision_paragraphs
 
 _FAILURES = []
 

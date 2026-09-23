@@ -1,17 +1,21 @@
 services:
-  # scraper-backend — court scraping, AI metadata extraction & Azure Blob
-  # sync (heavy: Playwright/Chromium). Points at the shared external
-  # Postgres via DB_HOST/DB_PORT in .env instead of a bundled db container.
+  # scraper-backend — court scraping, AI metadata extraction & Azure
+  # Blob sync (heavy: Playwright/Chromium). No docker-internal Postgres:
+  # DB_HOST/DB_NAME/etc come straight from .env (env_file below), so this
+  # always talks to whichever Postgres is configured there, on every
+  # environment — no divergent hardcoded overrides here.
   scraper-backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: legal_scraper_v2_backend
     restart: always
-    ports:
-      - "8003:3000"
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8003:3000"
     volumes:
       - .:/app
       - /app/__pycache__

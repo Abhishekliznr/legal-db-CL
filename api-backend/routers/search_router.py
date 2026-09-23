@@ -67,6 +67,15 @@ replaced with `sections`/`rules`/`orders`, each already split by kind and
 carrying only the unified (non-_relevant/_other) set -- the detail page
 now renders one row per kind and dropped the relevant/other split, and nothing
 else read those fields.
+
+Updated 2026-09-19: Rules/Orders as a distinct provision kind, and the
+sections_relevant/_other + rules_/orders_ LLM-classified split, were
+dropped from `cr_cases` entirely (scraper-backend/db/migrations/0012) --
+only Section-level provisions are tracked now. `CaseDetail.rules`/`.orders`
+are gone; `CaseDetail.sections`/`CaseListItem.provisions` are unaffected
+(both already resolved from `cr_cases.sections` only). Both endpoints also
+gained `cnr` (Madhya Pradesh's case-status page exposes one; most other
+sources won't populate it, so expect null on those rows).
 """
 
 import logging
@@ -147,6 +156,7 @@ class ProvisionSummary(BaseModel):
 class CaseListItem(BaseModel):
     id: str
     case_number: Optional[str] = None
+    cnr: Optional[str] = None
     liznr_id: Optional[str] = None
     neutral_citation: Optional[str] = None
     judgment_date: Optional[str] = None
@@ -192,6 +202,7 @@ class CaseSearchResponse(BaseModel):
 class CaseDetail(BaseModel):
     id: str
     case_number: Optional[str] = None
+    cnr: Optional[str] = None
     liznr_id: Optional[str] = None
     neutral_citation: Optional[str] = None
     judgment_date: Optional[str] = None
@@ -210,13 +221,10 @@ class CaseDetail(BaseModel):
     judgment_by: Optional[str] = None
     parties: List[PartySummary] = []
     judges: List[JudgeSummary] = []
-    # Split by provision kind (unified sections/rules/orders arrays -- not
-    # the LLM-classified _relevant/_other subsets, dropped 2026-09-13 since
-    # no frontend view rendered that split) so the detail page can show one
-    # row per kind instead of one flat "provisions" list.
+    # Unified sections array (rules/orders as a distinct kind, and the
+    # LLM-classified _relevant/_other subsets, were both dropped 2026-09-19 --
+    # scraper-backend/db/migrations/0012).
     sections: List[ProvisionSummary] = []
-    rules: List[ProvisionSummary] = []
-    orders: List[ProvisionSummary] = []
     subject: Optional[str] = None
     case_category: List[str] = []
     ministries: List[str] = []
@@ -360,7 +368,7 @@ def execute_case_search(
             order_sql = f"ORDER BY v.judgment_date {direction} NULLS LAST"
 
             cur.execute(f"""
-                SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
+                SELECT v.case_id, v.case_number, v.cnr, v.liznr_id, v.neutral_citation, v.judgment_date,
                        v.language, v.disposition, v.document_type, v.subject_name, v.category_names,
                        v.case_note, v.conclusion, v.blob_pdf_id, v.source_pdf_url, v.court_name,
                        v.court_id, v.judgment_by_name, v.petitioner, v.respondent,
@@ -376,7 +384,7 @@ def execute_case_search(
 
             results = []
             for r in rows:
-                (case_id, case_number, liznr_id, neutral_citation, judgment_date,
+                (case_id, case_number, cnr, liznr_id, neutral_citation, judgment_date,
                  language, disposition, document_type, subject_name, category_names,
                  case_note, conclusion, blob_pdf_id, source_pdf_url, court_name,
                  court_id, judgment_by_name, petitioner, respondent,
@@ -391,6 +399,7 @@ def execute_case_search(
                 results.append({
                     "id": str(case_id),
                     "case_number": case_number,
+                    "cnr": cnr,
                     "liznr_id": liznr_id,
                     "neutral_citation": neutral_citation,
                     "judgment_date": judgment_date.strftime("%Y-%m-%d") if judgment_date else None,
@@ -514,7 +523,7 @@ def get_case_detail(case_id: str):
                 id_clause = "v.case_id = %s OR " if valid_int_id is not None else ""
                 id_params = [valid_int_id] if valid_int_id is not None else []
                 cur.execute(f"""
-                    SELECT v.case_id, v.case_number, v.liznr_id, v.neutral_citation, v.judgment_date,
+                    SELECT v.case_id, v.case_number, v.cnr, v.liznr_id, v.neutral_citation, v.judgment_date,
                            v.language, v.disposition, v.document_type, v.case_note, v.conclusion,
                            v.judgement, v.ocr_text,
                            v.blob_pdf_id, v.source_pdf_url, v.court_name, v.court_id,
@@ -529,7 +538,7 @@ def get_case_detail(case_id: str):
                 if not row:
                     raise HTTPException(status_code=404, detail="Case not found.")
 
-                (db_case_id, case_number, liznr_id, neutral_citation, judgment_date,
+                (db_case_id, case_number, cnr, liznr_id, neutral_citation, judgment_date,
                  language, disposition, document_type, case_note, conclusion,
                  judgement, ocr_text,
                  blob_pdf_id, source_pdf_url, court_name, court_id,
@@ -542,11 +551,11 @@ def get_case_detail(case_id: str):
                           ([{"name": respondent, "role": "RESPONDENT", "advocate": respondent_advocate}] if respondent else [])
                 judges = [{"name": j, "role": None} for j in (bench_names or [])]
 
-                # Sections/rules/orders reconstructed from the raw id arrays
-                # (not carried by cr_case_search_view), each resolved back to
-                # `cr_acts` for the act name that goes with each number. Kept
-                # as three separate queries (not the old UNION ALL "provisions"
-                # blob) so the detail page can render one row per kind.
+                # Sections reconstructed from the raw id array (not carried
+                # by cr_case_search_view), resolved back to `cr_acts` for the
+                # act name that goes with each number. (Used to also do this
+                # for rules/orders -- dropped 2026-09-19 along with those
+                # columns, scraper-backend/db/migrations/0012.)
                 cur.execute("""
                     SELECT a.act_name, s.section_number
                     FROM cr_cases c
@@ -556,26 +565,8 @@ def get_case_detail(case_id: str):
                 """, (db_case_id,))
                 sections = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
 
-                cur.execute("""
-                    SELECT a.act_name, r.rule_number
-                    FROM cr_cases c
-                    JOIN cr_rules r ON r.rule_id = ANY(c.rules)
-                    JOIN cr_acts a ON a.act_id = r.act_id
-                    WHERE c.case_id = %s;
-                """, (db_case_id,))
-                rules = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
-
-                cur.execute("""
-                    SELECT a.act_name, o.order_number
-                    FROM cr_cases c
-                    JOIN cr_orders o ON o.order_id = ANY(c.orders)
-                    JOIN cr_acts a ON a.act_id = o.act_id
-                    WHERE c.case_id = %s;
-                """, (db_case_id,))
-                orders = [{"act_name": p[0], "section": p[1]} for p in cur.fetchall()]
-
                 return {
-                    "id": str(db_case_id), "case_number": case_number, "liznr_id": liznr_id,
+                    "id": str(db_case_id), "case_number": case_number, "cnr": cnr, "liznr_id": liznr_id,
                     "neutral_citation": neutral_citation,
                     "judgment_date": judgment_date.strftime("%Y-%m-%d") if judgment_date else None,
                     "language": language, "disposition": disposition, "document_type": document_type,
@@ -586,7 +577,7 @@ def get_case_detail(case_id: str):
                     "court_name": court_name, "court_id": str(court_id) if court_id else None,
                     "judgment_by": judgment_by_name,
                     "parties": parties, "judges": judges,
-                    "sections": sections, "rules": rules, "orders": orders,
+                    "sections": sections,
                     "subject": subject_name, "case_category": category_names or [],
                     "ministries": ministry_names or [], "industries": industry_names or [],
                     "favouring_party": favouring_party, "needs_review": needs_review,

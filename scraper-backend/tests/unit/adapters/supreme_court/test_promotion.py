@@ -1,6 +1,6 @@
 """
 Pytest unit tests for the 2026-09-10 promote_ingestion() fixes in
-pipeline/promotion.py:
+adapters/supreme_court/promotion.py:
 
   Bug 1: a re-run hitting the cr_cases ON CONFLICT DO NOTHING branch used to
   still commit a citation sequence number claimed BEFORE the INSERT, and a
@@ -22,18 +22,18 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from adapters.base import RawJudgmentRecord
-from pipeline import promotion
+from adapters.supreme_court import promotion
 
 
 class FakeCursor:
     """
     Routes fetchone() results by matching against the executed SQL, so the
-    real _get_or_create_*/_build_liznr_id/_claim_citation_sequence/_resolve_*
-    helpers in promotion.py run unmodified against believable fake data.
-    Anything not specifically recognized (the various get-or-create lookups
-    for judge/subject/ministry/category) gets an auto-incrementing fake id --
-    these tests don't care what those ids are, only what happens to
-    cr_cases/cr_citation_sequences.
+    real db.lookups get-or-create helpers and this module's own
+    _build_liznr_id/_claim_citation_sequence/_resolve_* run unmodified
+    against believable fake data. Anything not specifically recognized (the
+    various get-or-create lookups for judge/subject/ministry/category) gets
+    an auto-incrementing fake id -- these tests don't care what those ids
+    are, only what happens to cr_cases/cr_citation_sequences.
     """
 
     def __init__(self, insert_returns_case_id, court_code="SCIN"):
