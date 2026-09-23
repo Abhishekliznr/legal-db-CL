@@ -100,7 +100,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
 DO $$ BEGIN
-    CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
+    CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'MPHC_WEBSITE', 'OTHER');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
 DO $$ BEGIN
@@ -129,6 +129,15 @@ CREATE TABLE IF NOT EXISTS cr_judges (
     full_name         TEXT NOT NULL,             -- 'Anil Kshetarpal'
     normalized_name   TEXT NOT NULL,             -- upper, honorifics/punctuation stripped
     CONSTRAINT uq_cr_judges_normalized UNIQUE (normalized_name)
+);
+
+-- See scraper-backend/db/schema.sql's copy for why (kept in sync by hand).
+CREATE TABLE IF NOT EXISTS cr_advocates (
+    advocate_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    advocate_name   TEXT NOT NULL,
+    enrollment_no   TEXT NOT NULL,
+    enrollment_year INTEGER,
+    CONSTRAINT uq_cr_advocates_enrollment_no UNIQUE (enrollment_no)
 );
 
 CREATE TABLE IF NOT EXISTS cr_case_categories (
@@ -171,32 +180,16 @@ CREATE TABLE IF NOT EXISTS cr_acts (
     CONSTRAINT uq_cr_acts_name_year UNIQUE NULLS NOT DISTINCT (act_name, act_year)
 );
 
--- Sections/Rules/Orders are kept as three separate lookup tables (matching
--- cr_cases.sections/rules/orders being three separate arrays) even though
--- they're structurally identical -- a "Section" (Section 302 IPC), a
--- "Rule" (Rule 5 of some Rules), and an "Order" (Order XXI of the CPC) are
--- different things a legal researcher filters by separately, not
--- interchangeable numbers under one bucket. All three resolve back to
--- `cr_acts`.
+-- Rules/Orders (separate lookup tables + cr_cases.rules/orders arrays,
+-- alongside a rules_relevant/_other + orders_relevant/_other LLM-classified
+-- split) were dropped 2026-09-19 (scraper-backend/db/migrations/0012) --
+-- only Section-level provisions are tracked now, not Rules/Orders as a
+-- distinct kind.
 CREATE TABLE IF NOT EXISTS cr_sections (
     section_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT NOT NULL REFERENCES cr_acts(act_id),
     section_number  TEXT NOT NULL,               -- '308', '482', '2(l)', '226'
     CONSTRAINT uq_cr_sections_act_number UNIQUE (act_id, section_number)
-);
-
-CREATE TABLE IF NOT EXISTS cr_rules (
-    rule_id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable: standalone rules may not resolve to a named Act
-    rule_number     TEXT NOT NULL,
-    CONSTRAINT uq_cr_rules_act_number UNIQUE (act_id, rule_number)
-);
-
-CREATE TABLE IF NOT EXISTS cr_orders (
-    order_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable, same reasoning as rules.act_id
-    order_number    TEXT NOT NULL,                    -- 'XXI' (CPC's Order XXI)
-    CONSTRAINT uq_cr_orders_act_number UNIQUE (act_id, order_number)
 );
 
 -- ---------------------------------------------------------------------
@@ -216,14 +209,19 @@ CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     total_downloaded INT DEFAULT 0,
     total_promoted  INT DEFAULT 0,
     cancel_requested BOOLEAN NOT NULL DEFAULT FALSE,
-    finished_at     TIMESTAMPTZ
+    finished_at     TIMESTAMPTZ,
+    -- See scraper-backend/db/schema.sql's copy for why (kept in sync by hand).
+    error_message   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS cr_raw_ingestions (
     ingestion_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     batch_id          BIGINT REFERENCES cr_scrape_batches(batch_id),
     court_id          BIGINT REFERENCES cr_courts(court_id),
-    data_source       data_source_enum NOT NULL DEFAULT 'ECOURTS',
+    -- No longer defaults to 'ECOURTS' -- see scraper-backend/db/schema.sql's
+    -- copy of this table for why (that adapter is retired; kept in sync by
+    -- hand across both copies per this repo's standing convention).
+    data_source       data_source_enum NOT NULL DEFAULT 'OTHER',
 
     source_pdf_url    TEXT NOT NULL,
     blob_pdf_id      TEXT,
@@ -258,21 +256,29 @@ CREATE INDEX IF NOT EXISTS ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batc
 -- replace what used to be separate junction tables — Postgres can't
 -- FK-constrain array contents, so referential integrity into judges/acts/
 -- sections/etc. is enforced in scraper-backend's application code
--- (pipeline/promotion.py's get-or-create helpers), not by the database.
+-- (adapters/supreme_court/promotion.py's get-or-create helpers), not by the database.
 CREATE TABLE IF NOT EXISTS cr_cases (
     case_id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     liznr_id           TEXT,                     -- our own citation, e.g. 'LIZNR/SCIN/0001/2026'
     court_id           BIGINT NOT NULL REFERENCES cr_courts(court_id),
 
     case_number        TEXT NOT NULL,
+    cnr                TEXT,                     -- pan-India eCourts case number record, when the source
+                                                  -- page exposes one (e.g. Madhya Pradesh's case-status page)
     petitioner         TEXT,
     respondent         TEXT,
     petitioner_advocate TEXT,  -- regex-parsed from the SCI results table's "Petitioner/Respondent
-                               -- Advocate" cell (pipeline/regex_extraction.parse_advocates) --
-                               -- reintroduces the advocate data the 2026-09-08 flattening dropped
+                               -- Advocate" cell (adapters.supreme_court.extraction.parse_advocates) --
+                               -- reintroduces the advocate data the 2026-09-08 flattening dropped.
+                               -- Supreme-Court-only: a bare name, no enrollment number -- see
+                               -- cr_advocates/petitioner_advocate_ids below for a source that has one
     respondent_advocate TEXT,  -- frequently NULL even when petitioner_advocate isn't -- see
                                -- parse_advocates' own docstring on why the respondent side is so
                                -- often simply missing from the source cell, not a parsing failure
+
+    -- See scraper-backend/db/schema.sql's copy for why (kept in sync by hand).
+    petitioner_advocate_ids BIGINT[] NOT NULL DEFAULT '{}',
+    respondent_advocate_ids BIGINT[] NOT NULL DEFAULT '{}',
 
     -- Filing year only (not a full filing DATE -- sci.gov.in's judgments-by-date
     -- search table has no such column; the real filing/registration date lives
@@ -291,25 +297,7 @@ CREATE TABLE IF NOT EXISTS cr_cases (
 
     sections           BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_sections.section_id
     acts               BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_acts.act_id
-    rules              BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_rules.rule_id
-    orders             BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_orders.order_id
     subject            BIGINT REFERENCES cr_subjects(subject_id),
-
-    -- LLM-classified subsets of sections/rules/orders above
-    -- (scraper-backend/pipeline/llm_enrichment.py), populated from
-    -- paragraphs regex flagged as provision-bearing. "relevant" = the
-    -- operative provision(s) the case is actually charged/founded/appealed
-    -- under; "other" = everything else discussed (precedent, background,
-    -- comparative statutes). NOT guaranteed a strict partition of
-    -- sections/rules/orders above -- the LLM resolves acts from wider
-    -- context the regex-only extractor drops, so these can contain
-    -- provisions the unified columns above miss, and vice versa.
-    sections_relevant  BIGINT[] NOT NULL DEFAULT '{}',
-    sections_other     BIGINT[] NOT NULL DEFAULT '{}',
-    rules_relevant     BIGINT[] NOT NULL DEFAULT '{}',
-    rules_other        BIGINT[] NOT NULL DEFAULT '{}',
-    orders_relevant    BIGINT[] NOT NULL DEFAULT '{}',
-    orders_other       BIGINT[] NOT NULL DEFAULT '{}',
 
     case_note          TEXT,                     -- LLM-generated headnote (llm_enrichment.py), Manupatra-style dash-separated digest
     conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading), LLM fallback if regex found nothing
@@ -361,6 +349,7 @@ CREATE INDEX IF NOT EXISTS ix_cr_cases_number_trgm ON cr_cases USING GIN (case_n
 CREATE INDEX IF NOT EXISTS ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
 CREATE UNIQUE INDEX IF NOT EXISTS ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_cr_cases_cnr ON cr_cases(cnr) WHERE cnr IS NOT NULL;
 CREATE INDEX IF NOT EXISTS ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
 
 CREATE TABLE IF NOT EXISTS cr_citation_sequences (
@@ -415,15 +404,18 @@ FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 --    service never writes to it).
 -- =====================================================================
 
+-- `adapter` names a key in scraper-backend's routers/scraper_router.py's
+-- `_ADAPTER_REGISTRY` (each court has its own adapter — no shared generic
+-- eCourts adapter) rather than a fixed SQL enum, since that registry grows
+-- one court at a time, in code. `config` is that adapter's own free-form
+-- settings (JSONB) — no adapter-specific columns here.
 CREATE TABLE IF NOT EXISTS cr_court_scrape_config (
     court_id        BIGINT PRIMARY KEY REFERENCES cr_courts(court_id),
     adapter         TEXT NOT NULL,
-    state_code      TEXT,
-    bench_code      TEXT,
+    config          JSONB NOT NULL DEFAULT '{}',
     is_active       BOOLEAN NOT NULL DEFAULT TRUE,
     last_scraped_to DATE,
-    notes           TEXT,
-    CONSTRAINT ck_cr_court_scrape_config_adapter CHECK (adapter IN ('supreme_court', 'ecourts'))
+    notes           TEXT
 );
 
 -- Section 8 (cr_search_history) lives in db/supplement.sql, and

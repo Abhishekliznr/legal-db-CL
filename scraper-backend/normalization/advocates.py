@@ -2,10 +2,10 @@
 Advocate name cleaning -- strips designations ("Sr. Adv.", "AOR", "Adv.")
 and honorifics, same treatment as normalization/judges.py's
 clean_judge_name (text cleanup only, no LLM). Callers already have a raw
-name string out of pipeline/regex_extraction.py's parse_advocates(), which
+name string out of adapters/supreme_court/extraction.py's parse_advocates(), which
 only splits sci.gov.in's advocate cell on its "__"/"-" separator(s) -- this
 is the second pass that turns that split-out fragment into a clean name
-before pipeline/promotion.py writes it to
+before adapters/supreme_court/promotion.py writes it to
 cr_cases.petitioner_advocate/respondent_advocate.
 """
 

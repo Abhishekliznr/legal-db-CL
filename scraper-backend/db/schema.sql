@@ -13,7 +13,7 @@
 -- acts, rules, orders, ministries, industries, case_category) instead of
 -- per-relationship junction tables. Driven by two decisions: (1) the
 -- extraction approach is moving from a single LLM structured-output call
--- to regex-first extraction (pipeline/regex_extraction.py) for everything
+-- to regex-first extraction (adapters/supreme_court/extraction.py) for everything
 -- that's pattern-shaped, with the LLM kept only for fields that need actual
 -- reading comprehension (case_note, and other fields not modeled here yet)
 -- — most of the old normalized structure existed to hold LLM-envelope
@@ -21,7 +21,7 @@
 -- iteration doesn't populate; (2) an explicit ask to trim the schema down
 -- to only the fields actually needed right now. LLM-sourced columns
 -- (case_note; industries, which has no reliable regex signal — see
--- pipeline/regex_extraction.py's module docstring) are populated by
+-- adapters/supreme_court/extraction.py's module docstring) are populated by
 -- pipeline/llm_enrichment.py (2026-09-08), which runs automatically right
 -- after promotion — see that module's own docstring for the token-economy
 -- design (compact head+tail excerpt + regex-derived hints, not the full
@@ -81,7 +81,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
 DO $$ BEGIN
-    CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'OTHER');
+    CREATE TYPE data_source_enum AS ENUM ('ECOURTS', 'MANUPATRA', 'INDIAN_KANOON', 'SCI_WEBSITE', 'MPHC_WEBSITE', 'OTHER');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
 DO $$ BEGIN
@@ -110,6 +110,20 @@ CREATE TABLE IF NOT EXISTS cr_judges (
     full_name         TEXT NOT NULL,             -- 'Anil Kshetarpal'
     normalized_name   TEXT NOT NULL,             -- upper, honorifics/punctuation stripped
     CONSTRAINT uq_cr_judges_normalized UNIQUE (normalized_name)
+);
+
+-- Real, stable advocate identity (enrollment_no) -- a source that gives one
+-- (e.g. Madhya Pradesh's case-status page, format "NAME[P-1] [3258/1996]")
+-- gets a proper cr_advocates row; a source that only gives a bare name (e.g.
+-- Supreme Court's results table) keeps using cr_cases.petitioner_advocate/
+-- respondent_advocate (plain TEXT, added in migration 0007) instead --
+-- there's nothing to normalize without an enrollment number.
+CREATE TABLE IF NOT EXISTS cr_advocates (
+    advocate_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    advocate_name   TEXT NOT NULL,
+    enrollment_no   TEXT NOT NULL,
+    enrollment_year INTEGER,
+    CONSTRAINT uq_cr_advocates_enrollment_no UNIQUE (enrollment_no)
 );
 
 CREATE TABLE IF NOT EXISTS cr_case_categories (
@@ -152,33 +166,15 @@ CREATE TABLE IF NOT EXISTS cr_acts (
     CONSTRAINT uq_cr_acts_name_year UNIQUE NULLS NOT DISTINCT (act_name, act_year)
 );
 
--- Sections/Rules/Orders are kept as three separate lookup tables (matching
--- cr_cases.sections/rules/orders being three separate arrays) even though
--- they're structurally identical -- a "Section" (Section 302 IPC), a
--- "Rule" (Rule 5 of some Rules), and an "Order" (Order XXI of the CPC) are
--- different things a legal researcher filters by separately, not
--- interchangeable numbers under one bucket. All three resolve back to
--- `cr_acts` (see pipeline/regex_extraction.py's extract_provisions(), which
--- tags each match with which of the three it is).
+-- Rules/Orders (separate lookup tables + cr_cases.rules/orders arrays,
+-- alongside a rules_relevant/_other + orders_relevant/_other LLM-classified
+-- split) were dropped 2026-09-19 (db/migrations/0012) -- only Section-level
+-- provisions are tracked now, not Rules/Orders as a distinct kind.
 CREATE TABLE IF NOT EXISTS cr_sections (
     section_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     act_id          BIGINT NOT NULL REFERENCES cr_acts(act_id),
     section_number  TEXT NOT NULL,               -- '308', '482', '2(l)', '226'
     CONSTRAINT uq_cr_sections_act_number UNIQUE (act_id, section_number)
-);
-
-CREATE TABLE IF NOT EXISTS cr_rules (
-    rule_id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable: standalone rules (e.g. a High Court's own Rules of Practice) may not resolve to a named Act
-    rule_number     TEXT NOT NULL,
-    CONSTRAINT uq_cr_rules_act_number UNIQUE (act_id, rule_number)
-);
-
-CREATE TABLE IF NOT EXISTS cr_orders (
-    order_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    act_id          BIGINT REFERENCES cr_acts(act_id),   -- nullable, same reasoning as rules.act_id
-    order_number    TEXT NOT NULL,                    -- 'XXI' (CPC's Order XXI)
-    CONSTRAINT uq_cr_orders_act_number UNIQUE (act_id, order_number)
 );
 
 -- ---------------------------------------------------------------------
@@ -201,7 +197,14 @@ CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     -- NULL while RUNNING; set once by finish_batch() alongside `status`. Without this there is
     -- no way to compute how long a finished batch actually took — only requested_at exists
     -- otherwise (see db/migrations/0004).
-    finished_at     TIMESTAMPTZ
+    finished_at     TIMESTAMPTZ,
+    -- Set by finish_batch() on a source-failure status (SOURCE_BLOCKED/RATE_LIMITED/
+    -- SOURCE_UNAVAILABLE/STRUCTURE_CHANGED) or a top-level adapter exception (FAILED) --
+    -- orchestrator/batch_runner.py's run_batch() has always tried to pass this, but
+    -- finish_batch() silently had no column/param for it until db/migrations/0009
+    -- (found live: a real sci.gov.in 403 crashed with an unhandled TypeError instead
+    -- of cleanly recording the batch as failed). NULL for a normal COMPLETED/CANCELLED batch.
+    error_message   TEXT
 );
 
 -- One row per PDF actually pulled off the court site, BEFORE it becomes a
@@ -215,7 +218,13 @@ CREATE TABLE IF NOT EXISTS cr_raw_ingestions (
     ingestion_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     batch_id          BIGINT REFERENCES cr_scrape_batches(batch_id),
     court_id          BIGINT REFERENCES cr_courts(court_id),
-    data_source       data_source_enum NOT NULL DEFAULT 'ECOURTS',
+    -- No longer defaults to 'ECOURTS' -- that adapter is retired (every
+    -- High Court now scrapes its own site via its own adapter) and every
+    -- insert already sets this explicitly (routers/scraper_router.py's
+    -- _ADAPTER_REGISTRY, threaded through orchestrator/batch_runner.py),
+    -- so the default is only ever a safety net, never a real value; a
+    -- prior real bug was exactly this default being silently relied upon.
+    data_source       data_source_enum NOT NULL DEFAULT 'OTHER',
 
     source_pdf_url    TEXT NOT NULL,              -- the court's own PDF URL
     blob_pdf_id      TEXT,                       -- our own blob-hosted copy
@@ -252,7 +261,7 @@ CREATE INDEX IF NOT EXISTS ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batc
 -- be separate junction tables. Trade-off accepted deliberately: Postgres
 -- can't FK-constrain the contents of an array column, so referential
 -- integrity into judges/acts/sections/etc. is enforced in application code
--- (pipeline/promotion.py's get-or-create helpers), not by the database.
+-- (adapters/supreme_court/promotion.py's get-or-create helpers), not by the database.
 CREATE TABLE IF NOT EXISTS cr_cases (
     case_id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     liznr_id           TEXT,                     -- our own citation, e.g. 'LIZNR/SCIN/0001/2026' -- generated
@@ -261,14 +270,24 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     court_id           BIGINT NOT NULL REFERENCES cr_courts(court_id),
 
     case_number        TEXT NOT NULL,
+    cnr                TEXT,                     -- pan-India eCourts case number record, when the source
+                                                  -- page exposes one (e.g. Madhya Pradesh's case-status page)
     petitioner         TEXT,
     respondent         TEXT,
     petitioner_advocate TEXT,  -- regex-parsed from the SCI results table's "Petitioner/Respondent
-                               -- Advocate" cell (pipeline/regex_extraction.parse_advocates) --
-                               -- reintroduces the advocate data the 2026-09-08 flattening dropped
+                               -- Advocate" cell (adapters.supreme_court.extraction.parse_advocates) --
+                               -- reintroduces the advocate data the 2026-09-08 flattening dropped.
+                               -- Supreme-Court-only: a bare name, no enrollment number to normalize --
+                               -- see cr_advocates/petitioner_advocate_ids below for a source that has one
     respondent_advocate TEXT,  -- frequently NULL even when petitioner_advocate isn't -- see
                                -- parse_advocates' own docstring on why the respondent side is so
                                -- often simply missing from the source cell, not a parsing failure
+
+    -- Normalized advocate identity (-> cr_advocates.advocate_id), for a source that gives a real
+    -- enrollment number (e.g. Madhya Pradesh's case-status page) -- independent of the flat
+    -- petitioner_advocate/respondent_advocate TEXT columns above, which stay Supreme-Court-only.
+    petitioner_advocate_ids BIGINT[] NOT NULL DEFAULT '{}',
+    respondent_advocate_ids BIGINT[] NOT NULL DEFAULT '{}',
 
     -- Filing year only (not a full filing DATE -- sci.gov.in's judgments-by-date
     -- search table has no such column; the real filing/registration date lives
@@ -286,28 +305,11 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     neutral_citation   TEXT,
 
     sections           BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_sections.section_id
-    acts               BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_acts.act_id (every act referenced by any section/rule/order below)
-    rules              BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_rules.rule_id
-    orders             BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_orders.order_id
+    acts               BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_acts.act_id (every act referenced by any section below)
     subject            BIGINT REFERENCES cr_subjects(subject_id),  -- coarse Civil/Criminal/... tag
 
-    -- LLM-classified subsets of sections/rules/orders above (pipeline/llm_enrichment.py,
-    -- 2026-09-09), populated from paragraphs regex flagged as provision-bearing
-    -- (pipeline/regex_extraction.find_provision_paragraphs). "relevant" = the
-    -- operative provision(s) the case is actually charged/founded/appealed under;
-    -- "other" = everything else discussed (precedent, background, comparative
-    -- statutes). NOT guaranteed a strict partition of sections/rules/orders above —
-    -- the LLM resolves acts from wider context the regex-only extractor drops, so
-    -- these can contain provisions the unified columns above miss, and vice versa.
-    sections_relevant  BIGINT[] NOT NULL DEFAULT '{}',
-    sections_other     BIGINT[] NOT NULL DEFAULT '{}',
-    rules_relevant     BIGINT[] NOT NULL DEFAULT '{}',
-    rules_other        BIGINT[] NOT NULL DEFAULT '{}',
-    orders_relevant    BIGINT[] NOT NULL DEFAULT '{}',
-    orders_other       BIGINT[] NOT NULL DEFAULT '{}',
-
     case_note          TEXT,                     -- LLM-generated headnote (pipeline/llm_enrichment.py), Manupatra-style dash-separated digest
-    conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading) -- see pipeline/regex_extraction.py
+    conclusion         TEXT,                     -- regex, low coverage (~1-3% of judgments have a literal heading) -- see adapters/supreme_court/extraction.py
     judgement          TEXT,                     -- full opinion text after the "J U D G M E N T"/"O R D E R" heading
     ocr_text           TEXT,                     -- final OCR text, source of truth for judgement/conclusion/provisions above -- NEVER overwritten by parsing/enrichment
 
@@ -315,7 +317,7 @@ CREATE TABLE IF NOT EXISTS cr_cases (
     blob_pdf_id       TEXT,
 
     ministries         BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_ministries.ministry_id, matched against petitioner/respondent only (see regex_extraction.find_ministry_in_party_name)
-    industries         BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_industries.industry_id -- LLM-classified (pipeline/llm_enrichment.py); no reliable regex signal exists for this field (see pipeline/regex_extraction.py's module docstring)
+    industries         BIGINT[] NOT NULL DEFAULT '{}',  -- -> cr_industries.industry_id -- LLM-classified (pipeline/llm_enrichment.py); no reliable regex signal exists for this field (see adapters/supreme_court/extraction.py's module docstring)
 
     disposition        disposition_category_enum,
     favouring_party    favouring_party_enum,       -- LLM-classified (pipeline/llm_enrichment.py) -- which side the outcome favoured
@@ -360,6 +362,7 @@ CREATE INDEX IF NOT EXISTS ix_cr_cases_number_trgm ON cr_cases USING GIN (case_n
 CREATE INDEX IF NOT EXISTS ix_cr_cases_petitioner_trgm ON cr_cases USING GIN (petitioner gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_respondent_trgm ON cr_cases USING GIN (respondent gin_trgm_ops);
 CREATE UNIQUE INDEX IF NOT EXISTS ux_cr_cases_liznr_id ON cr_cases(liznr_id) WHERE liznr_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_cr_cases_cnr ON cr_cases(cnr) WHERE cnr IS NOT NULL;
 CREATE INDEX IF NOT EXISTS ix_cr_cases_enrichment_pending ON cr_cases (case_id) WHERE enrichment_status IN ('PENDING', 'FAILED', 'TRUNCATED');
 
 -- Atomic per-(court, year) counter backing cr_cases.liznr_id
@@ -424,15 +427,17 @@ FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
 --    here added nothing scraper-backend itself needs.
 -- =====================================================================
 
--- One row per court that gets scraped. Turns "25 Python files" into
--- "25 rows".
+-- One row per court that gets scraped. Turns "one Python file per court"
+-- into "one row per court" -- each court has its own adapter (no shared
+-- generic eCourts adapter; see adapters/__init__.py), so `adapter` names a
+-- key in routers/scraper_router.py's `_ADAPTER_REGISTRY` rather than a
+-- fixed SQL enum -- that registry grows one court at a time, in code, not
+-- via a migration per court.
 CREATE TABLE IF NOT EXISTS cr_court_scrape_config (
     court_id        BIGINT PRIMARY KEY REFERENCES cr_courts(court_id),
-    adapter         TEXT NOT NULL,              -- 'supreme_court' | 'ecourts'
-    state_code      TEXT,                       -- eCourts state_code select value (e.g. '7~26' for Delhi)
-    bench_code      TEXT,                       -- eCourts dist_code select value
+    adapter         TEXT NOT NULL,              -- e.g. 'supreme_court' -- must match an _ADAPTER_REGISTRY key
+    config          JSONB NOT NULL DEFAULT '{}', -- that adapter's own free-form settings (e.g. a High Court's base URL) -- no adapter-specific columns here
     is_active       BOOLEAN NOT NULL DEFAULT TRUE,
     last_scraped_to DATE,                       -- watermark: resume from here on next run
-    notes           TEXT,
-    CONSTRAINT ck_cr_court_scrape_config_adapter CHECK (adapter IN ('supreme_court', 'ecourts'))
+    notes           TEXT
 );

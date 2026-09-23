@@ -2,14 +2,14 @@
 OCR_DONE -> PROMOTED.
 
 Rewritten 2026-09-08 for the flattened `cr_cases` schema and the regex-first
-extraction approach (pipeline/regex_extraction.py) — there is no separate
+extraction approach (adapters/supreme_court/extraction.py) — there is no separate
 LLM-extraction stage in this pipeline iteration, so this module reads
 straight from the scraper's own RawJudgmentRecord (table-cell fields) plus
 cr_raw_ingestions.ocr_text (OCR-text fields), not from a raw_ai_extraction
 JSON envelope the way the old LLM-driven promotion.py did.
 
 case_note and industries are left NULL/empty by THIS function (see
-cr_cases.industries' comment in db/schema.sql and pipeline/regex_extraction.py's
+cr_cases.industries' comment in db/schema.sql and adapters/supreme_court/extraction.py's
 module docstring for why industries specifically has no regex source) —
 pipeline/llm_enrichment.py fills both in immediately afterward
 (orchestrator/batch_runner.py calls it right after promote_ingestion()
@@ -17,19 +17,19 @@ returns a case_id), not as part of promotion's own transaction.
 """
 
 import logging
-import re
-from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Optional
 
 from adapters.base import RawJudgmentRecord
 from db import scrape_jobs
 from db.connection import get_pooled_connection
+from db.lookups import get_or_create_category, get_or_create_judge, get_or_create_ministry, get_or_create_subject, resolve_bench
 from normalization import advocates, case_numbers, judges, parties
-from pipeline import regex_extraction as rx
+from normalization.dates import parse_date
+from normalization.ministries import find_ministry_in_party_name
+from adapters.supreme_court import extraction as rx
+from orchestrator.log_context import plog
 
 logger = logging.getLogger("scraper_backend_v2.promotion")
-
-_DATE_FORMATS = ("%Y-%m-%d", "%d-%m-%Y", "%d.%m.%Y", "%d/%m/%Y", "%d-%b-%Y", "%d %B %Y", "%d %b %Y")
 
 _VALID_DISPOSITION_CATEGORIES = {
     "Allowed", "Dismissed", "Partly Allowed", "Disposed",
@@ -37,206 +37,26 @@ _VALID_DISPOSITION_CATEGORIES = {
 }
 
 
-def _parse_date(value: Optional[str]) -> Optional[date]:
-    if not value:
-        return None
-    cleaned = re.sub(r"(\d{1,2})(st|nd|rd|th)", r"\1", value, flags=re.IGNORECASE).replace(",", "").strip()
-    for fmt in _DATE_FORMATS:
-        try:
-            return datetime.strptime(cleaned, fmt).date()
-        except ValueError:
-            continue
-    return None
-
-
 def _validate_enum(value: Optional[str], allowed: set) -> Optional[str]:
     return value if value in allowed else None
 
 
-# ---------------------------------------------------------------------
-# get-or-create lookup helpers. Array columns on `cr_cases` (bench, sections,
-# acts, rules, orders, ministries, case_category) mean Postgres can't
-# FK-constrain membership the way the old junction tables did — these
-# helpers are where that integrity actually gets enforced instead.
-#
-# Each does INSERT ... ON CONFLICT (<natural key>) DO NOTHING RETURNING
-# <id>, falling back to a SELECT only when nothing came back (another
-# concurrent promotion won the race) — the same pattern
-# _claim_citation_sequence below already uses correctly. A plain
-# SELECT-then-INSERT (the previous shape here) lets two concurrent
-# promotions both pass the SELECT before either INSERTs, so the loser's
-# INSERT throws an unhandled UniqueViolation; INSERT ... ON CONFLICT
-# takes a row lock on the conflicting key, so the loser blocks until the
-# winner commits and then safely reads back the winner's row instead.
-# ---------------------------------------------------------------------
-
-def _get_or_create_judge(cur, cleaned_name: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_judges (full_name, normalized_name) VALUES (%s, %s) ON CONFLICT (normalized_name) DO NOTHING RETURNING judge_id;",
-        (cleaned_name, cleaned_name),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT judge_id FROM cr_judges WHERE normalized_name = %s;", (cleaned_name,))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_act(cur, act_name: str, short_code: Optional[str], act_year: Optional[int]) -> int:
-    cur.execute(
-        "INSERT INTO cr_acts (act_name, act_year, short_code) VALUES (%s, %s, %s) ON CONFLICT (act_name, act_year) DO NOTHING RETURNING act_id;",
-        (act_name, act_year, short_code),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute(
-        "SELECT act_id FROM cr_acts WHERE act_name = %s AND (act_year = %s OR (act_year IS NULL AND %s IS NULL));",
-        (act_name, act_year, act_year),
-    )
-    return cur.fetchone()[0]
-
-
-def _get_or_create_section(cur, act_id: int, section_number: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_sections (act_id, section_number) VALUES (%s, %s) ON CONFLICT (act_id, section_number) DO NOTHING RETURNING section_id;",
-        (act_id, section_number),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT section_id FROM cr_sections WHERE act_id = %s AND section_number = %s;", (act_id, section_number))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_rule(cur, act_id: int, rule_number: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_rules (act_id, rule_number) VALUES (%s, %s) ON CONFLICT (act_id, rule_number) DO NOTHING RETURNING rule_id;",
-        (act_id, rule_number),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT rule_id FROM cr_rules WHERE act_id = %s AND rule_number = %s;", (act_id, rule_number))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_order(cur, act_id: int, order_number: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_orders (act_id, order_number) VALUES (%s, %s) ON CONFLICT (act_id, order_number) DO NOTHING RETURNING order_id;",
-        (act_id, order_number),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT order_id FROM cr_orders WHERE act_id = %s AND order_number = %s;", (act_id, order_number))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_subject(cur, subject_name: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_subjects (subject_name) VALUES (%s) ON CONFLICT (subject_name) DO NOTHING RETURNING subject_id;",
-        (subject_name,),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT subject_id FROM cr_subjects WHERE subject_name = %s;", (subject_name,))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_ministry(cur, ministry_name: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_ministries (ministry_name) VALUES (%s) ON CONFLICT (ministry_name) DO NOTHING RETURNING ministry_id;",
-        (ministry_name,),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT ministry_id FROM cr_ministries WHERE ministry_name = %s;", (ministry_name,))
-    return cur.fetchone()[0]
-
-
-# Not called from anywhere in THIS module -- promotion never populates
-# cr_cases.industries (no regex signal exists for it, see
-# pipeline/regex_extraction.py's module docstring). Lives here anyway,
-# alongside every other get-or-create lookup helper, since
-# pipeline/llm_enrichment.py imports it rather than duplicating the same
-# lines a second time.
-def _get_or_create_industry(cur, industry_name: str) -> int:
-    cur.execute(
-        "INSERT INTO cr_industries (industry_name) VALUES (%s) ON CONFLICT (industry_name) DO NOTHING RETURNING industry_id;",
-        (industry_name,),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT industry_id FROM cr_industries WHERE industry_name = %s;", (industry_name,))
-    return cur.fetchone()[0]
-
-
-def _get_or_create_category(cur, case_number: Optional[str]) -> Optional[int]:
-    classified = case_numbers.classify_category(case_number)
-    if not classified:
-        return None
-    code, name = classified
-    cur.execute(
-        "INSERT INTO cr_case_categories (category_code, category_name) VALUES (%s, %s) ON CONFLICT (category_code) DO NOTHING RETURNING category_id;",
-        (code, name),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("SELECT category_id FROM cr_case_categories WHERE category_code = %s;", (code,))
-    return cur.fetchone()[0]
-
-
-def _resolve_provisions(cur, provisions: List[Dict[str, Any]]) -> Tuple[List[int], List[int], List[int], List[int]]:
-    """Returns (act_ids, section_ids, rule_ids, order_ids), each de-duplicated, act_ids covering every act referenced by any of the other three."""
-    act_ids: List[int] = []
-    section_ids: List[int] = []
-    rule_ids: List[int] = []
-    order_ids: List[int] = []
-    seen_acts = set()
-
-    for provision in provisions:
-        act_id = _get_or_create_act(cur, provision["statute_name"], provision["short_code"], provision["statute_year"])
-        if act_id not in seen_acts:
-            seen_acts.add(act_id)
-            act_ids.append(act_id)
-
-        number = provision["section_number"]
-        provision_type = provision["provision_type"]
-        if provision_type == "rule":
-            rule_ids.append(_get_or_create_rule(cur, act_id, number))
-        elif provision_type == "order":
-            order_ids.append(_get_or_create_order(cur, act_id, number))
-        else:
-            section_ids.append(_get_or_create_section(cur, act_id, number))
-
-    return act_ids, section_ids, rule_ids, order_ids
-
-
-def _resolve_bench(cur, bench_names: List[str]) -> List[int]:
-    judge_ids = []
-    seen = set()
-    for name in bench_names:
-        if name in seen:
-            continue
-        seen.add(name)
-        judge_ids.append(_get_or_create_judge(cur, name))
-    return judge_ids
-
+# get-or-create lookup helpers (judges, acts, sections,
+# subjects, ministries, industries, case categories) live in db/lookups.py
+# — schema-wide, shared with pipeline/llm_enrichment.py, not specific to
+# this court's promotion pipeline. Only the ministry resolution below
+# (which fields feed the lookup, using this court's own extracted party
+# names) is Supreme-Court-specific and stays here.
 
 def _resolve_ministries(cur, petitioner: Optional[str], respondent: Optional[str]) -> List[int]:
-    """Scoped to the parsed party names only, never the whole OCR text — see regex_extraction.find_ministry_in_party_name's own docstring on why."""
+    """Scoped to the parsed party names only, never the whole OCR text — see normalization.ministries.find_ministry_in_party_name's own docstring on why."""
     ministry_ids = []
     seen = set()
     for party_name in (petitioner, respondent):
-        ministry_name = rx.find_ministry_in_party_name(party_name)
+        ministry_name = find_ministry_in_party_name(party_name)
         if ministry_name and ministry_name not in seen:
             seen.add(ministry_name)
-            ministry_ids.append(_get_or_create_ministry(cur, ministry_name))
+            ministry_ids.append(get_or_create_ministry(cur, ministry_name))
     return ministry_ids
 
 
@@ -312,14 +132,14 @@ def assign_liznr_id_for_reviewed_case(case_id: int) -> Optional[str]:
             cur.execute("SELECT court_id, judgment_date, liznr_id FROM cr_cases WHERE case_id = %s;", (case_id,))
             row = cur.fetchone()
             if row is None:
-                logger.warning("[PROMOTE] case_id=%s: assign_liznr_id_for_reviewed_case — no such case", case_id)
+                plog(logger, "warning", "[PROMOTE] case_id=%s: assign_liznr_id_for_reviewed_case — no such case", case_id)
                 return None
             court_id, judgment_date, existing_liznr_id = row
             if existing_liznr_id is not None:
-                logger.info("[PROMOTE] case_id=%s: already has liznr_id=%s, not reassigning", case_id, existing_liznr_id)
+                plog(logger, "info", "[PROMOTE] case_id=%s: already has liznr_id=%s, not reassigning", case_id, existing_liznr_id)
                 return existing_liznr_id
             if judgment_date is None:
-                logger.info("[PROMOTE] case_id=%s: judgment_date still NULL, cannot assign a liznr_id yet", case_id)
+                plog(logger, "info", "[PROMOTE] case_id=%s: judgment_date still NULL, cannot assign a liznr_id yet", case_id)
                 return None
 
             liznr_id = _assign_liznr_id(cur, case_id, court_id, judgment_date.year)
@@ -335,17 +155,19 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     """
     Promotes one OCR_DONE cr_raw_ingestions row into a single `cr_cases` row,
     using RawJudgmentRecord (table-cell fields, already scraped) and
-    ocr_text (OCR-text fields, via pipeline/regex_extraction.py) — no LLM
+    ocr_text (OCR-text fields, via adapters/supreme_court/extraction.py) — no LLM
     call in this pipeline iteration. Returns the new case_id, or None if
     routed to NEEDS_REVIEW (missing case_number) or PROMOTION_FAILED (an
     unexpected DB error).
 
-    sections/acts/rules/orders are deliberately left empty here (2026-09-09)
-    — regex's own act-name capture proved actively wrong at real production
-    scale (fragments like "Arbitrator Would Be Ineligible To Act" ending up
-    in cr_acts), not just low-recall, so those columns are now populated
+    sections/acts are deliberately left empty here (2026-09-09) — regex's
+    own act-name capture proved actively wrong at real production scale
+    (fragments like "Arbitrator Would Be Ineligible To Act" ending up in
+    cr_acts), not just low-recall, so those columns are now populated
     entirely by pipeline/llm_enrichment.py's paragraph-filtered LLM call
     after promotion, same treatment as case_note/industries already got.
+    (rules/orders as a distinct kind were dropped from the schema entirely,
+    2026-09-19, db/migrations/0012 — only sections are tracked now.)
 
     Unlike the old documents.judgment_date NOT NULL, a missing/unparseable
     judgment_date here does NOT block promotion — the row still gets
@@ -370,14 +192,14 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     ocr_text = ingestion["ocr_text"] or ""
     court_id = ingestion["court_id"]
 
-    logger.info("[PROMOTE] ingestion_id=%s: starting (case_number_raw=%r)", ingestion_id, record.case_number_raw)
+    plog(logger, "info", "[PROMOTE] ingestion_id=%s: starting (case_number_raw=%r)", ingestion_id, record.case_number_raw)
 
     try:
         case_number = (record.case_number_raw or "").strip()
         if not case_number:
             raise PromotionSkipped("case_number_raw is missing/blank — required NOT NULL on cr_cases")
 
-        judgment_date = _parse_date(record.decision_date_raw)
+        judgment_date = parse_date(record.decision_date_raw)
         needs_review = judgment_date is None
 
         party_names = rx.parse_party_names(record.party_name_raw)
@@ -403,11 +225,11 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
-                judge_ids = _resolve_bench(cur, bench_names)
-                judgment_by_id = _get_or_create_judge(cur, judgment_by_name) if judgment_by_name else None
-                subject_id = _get_or_create_subject(cur, subject_word) if subject_word else None
+                judge_ids = resolve_bench(cur, bench_names)
+                judgment_by_id = get_or_create_judge(cur, judgment_by_name) if judgment_by_name else None
+                subject_id = get_or_create_subject(cur, subject_word) if subject_word else None
                 ministry_ids = _resolve_ministries(cur, petitioner, respondent)
-                category_ids = [_get_or_create_category(cur, case_number)] if classified_category else []
+                category_ids = [get_or_create_category(cur, case_number)] if classified_category else []
                 category_ids = [c for c in category_ids if c is not None]
 
                 cur.execute("""
@@ -415,7 +237,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         liznr_id, court_id, case_number, petitioner, respondent,
                         petitioner_advocate, respondent_advocate, filing_year,
                         bench, judgment_by, judgment_date, language, neutral_citation,
-                        sections, acts, rules, orders, subject,
+                        sections, acts, subject,
                         conclusion, judgement, ocr_text,
                         source_pdf_url, blob_pdf_id,
                         ministries, industries,
@@ -425,7 +247,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         %s, %s, %s, %s, %s,
                         %s, %s, %s,
                         %s, %s, %s, %s, %s,
-                        '{}', '{}', '{}', '{}', %s,
+                        '{}', '{}', %s,
                         %s, %s, %s,
                         %s, %s,
                         %s, '{}',
@@ -460,7 +282,8 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         error_message="case_number already exists for this court — likely a re-run",
                     )
                     conn.commit()
-                    logger.info(
+                    plog(
+                        logger, "info",
                         "[PROMOTE] ingestion_id=%s: case_number=%r already exists for court_id=%s — likely a re-run, routed to NEEDS_REVIEW",
                         ingestion_id, case_number, court_id,
                     )
@@ -482,17 +305,18 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
             conn.commit()
 
-        logger.info(
+        plog(
+            logger, "info",
             "[PROMOTE] ingestion_id=%s: done — case_id=%s liznr_id=%s disposition=%s needs_review=%s",
             ingestion_id, case_id, liznr_id, disposition, needs_review,
         )
         return case_id
 
     except PromotionSkipped as e:
-        logger.warning("[PROMOTE] ingestion_id=%s: skipped — %s", ingestion_id, e)
+        plog(logger, "warning", "[PROMOTE] ingestion_id=%s: skipped — %s", ingestion_id, e)
         scrape_jobs.update_status(ingestion_id, status="NEEDS_REVIEW", error_message=str(e))
         return None
     except Exception as e:
-        logger.exception("[PROMOTE] ingestion_id=%s: failed", ingestion_id)
+        plog(logger, "exception", "[PROMOTE] ingestion_id=%s: failed", ingestion_id)
         scrape_jobs.update_status(ingestion_id, status="PROMOTION_FAILED", error_message=str(e))
         return None

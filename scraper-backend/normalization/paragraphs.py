@@ -8,7 +8,7 @@ verbatim would burn tokens re-emitting text it already received, and risks
 it silently rephrasing a word here and there -- the numbering itself is a
 mechanical, unambiguous pattern a regex handles more reliably anyway.
 
-Used by pipeline/regex_extraction.py to scope disposition/facts/conclusion
+Used by adapters/supreme_court/extraction.py to scope disposition/facts/conclusion
 extraction to the tail of the judgment rather than the whole OCR text (see
 its _tail_windows()). cases.ocr_text stays the source of truth regardless:
 a judgment whose paragraphs aren't numbered, or use letters/roman numerals,

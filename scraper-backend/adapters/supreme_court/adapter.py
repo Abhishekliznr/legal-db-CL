@@ -10,10 +10,10 @@ from urllib.parse import urljoin
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 from adapters.base import RawJudgmentRecord
-from adapters.supreme_court.captcha import solve_captcha_image
+from adapters.captcha_ocr import solve_captcha_image
 
 from .client import BASE_URL, SupremeCourtBrowserClient
-from .exceptions import SourceStructureChangedError
+from adapters.base import SourceStructureChangedError
 
 logger = logging.getLogger("scraper_backend_v2.adapters.supreme_court")
 

@@ -20,9 +20,9 @@ class RawJudgmentRecord:
     One scraped judgment, PDF already downloaded to a local temp path.
     Nothing here is trusted as final metadata — these are whatever fields
     the court's results table exposes without extra clicks. Real structured
-    parsing happens later in the pipeline (pipeline/regex_extraction.py,
-    with pipeline/llm_enrichment.py filling the handful of fields regex
-    can't), not here.
+    parsing happens later, in that court's own extraction/promotion module
+    (e.g. adapters/supreme_court/extraction.py), with pipeline/llm_enrichment.py
+    filling the handful of fields regex can't — not here.
     """
 
     pdf_path: Path
@@ -38,8 +38,8 @@ class RawJudgmentRecord:
 
 class ScraperAdapter(Protocol):
     """
-    Implemented by adapters/supreme_court/adapter.py and (Phase 2)
-    adapters/ecourts/adapter.py.
+    Implemented by adapters/supreme_court/adapter.py and by each
+    adapters/high_courts/<code>/adapter.py.
     """
 
     def scrape(self, date_from: str, date_to: str, **kwargs) -> Iterator[RawJudgmentRecord]:
@@ -50,3 +50,29 @@ class ScraperAdapter(Protocol):
         to a crash partway through a long date range.
         """
         ...
+
+
+# Source-failure exceptions any adapter can raise — orchestrator/batch_runner.py
+# catches these generically (not per-adapter) to classify a batch's failure
+# status (SOURCE_BLOCKED/RATE_LIMITED/SOURCE_UNAVAILABLE/STRUCTURE_CHANGED).
+# Not specific to any one court's adapter, despite Supreme Court's being the
+# first (and so far only) adapter to actually raise them.
+
+class SourceAccessError(Exception):
+    """The source rejected the request or access is not authorized."""
+    pass
+
+
+class SourceRateLimitError(SourceAccessError):
+    """The source explicitly rate-limited the client."""
+    pass
+
+
+class SourceUnavailableError(SourceAccessError):
+    """The source returned a transient 5xx/server failure."""
+    pass
+
+
+class SourceStructureChangedError(Exception):
+    """The source page no longer matches the adapter contract."""
+    pass

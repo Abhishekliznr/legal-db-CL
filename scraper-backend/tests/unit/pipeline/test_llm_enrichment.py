@@ -66,6 +66,7 @@ def _error_response(status_code, text="", headers=None):
 _SAMPLE_RESULT = {
     "case_note": "Criminal - Bail - Section 439 of Code of Criminal Procedure, 1973 - Held, bail granted - Appeal dismissed",
     "conclusion": "The court found in favour of the applicant.",
+    "subject": None,
     "industries": [],
     "ministries": [],
     "disposition_category": "Allowed",
@@ -79,7 +80,7 @@ class FakeCursor:
     execute() just records calls and asserts %s-placeholder/param parity.
     fetchone() returns queued rows first (used to seed the one-time case
     row fetch in _fetch_case_row), then falls back to an auto-incrementing
-    fake id -- every get-or-create helper in pipeline/promotion.py does an
+    fake id -- every get-or-create helper in db/lookups.py does an
     INSERT...RETURNING (or a follow-up SELECT) expecting exactly one id
     back, and none of these tests care what the id actually is.
     """
@@ -336,7 +337,7 @@ def test_enrich_case_holds_no_connection_during_the_llm_call(azure_env, monkeypa
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "some ocr text with no provisions in it", None, [], None)],
+        fetchone_queue=[("Case No. 1", "some ocr text with no provisions in it", None, [], [], None)],
     )
 
     connection_open_during_post = {"value": None}
@@ -357,7 +358,7 @@ def test_enrich_case_success_writes_done(azure_env, monkeypatch):
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "some ocr text", None, [], None)],
+        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None)],
     )
     monkeypatch.setattr(le.requests, "post", MagicMock(return_value=_chat_response(json.dumps(_SAMPLE_RESULT))))
 
@@ -374,7 +375,7 @@ def test_enrich_case_http_failure_writes_failed(azure_env, monkeypatch):
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "some ocr text", None, [], None)],
+        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None)],
     )
     monkeypatch.setattr(le.requests, "post", MagicMock(return_value=_error_response(500, "server error")))
 
@@ -391,7 +392,7 @@ def test_enrich_case_no_provisions_sent_produces_update_with_no_provision_column
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "plain text judgment with no statutory references at all", None, [], None)],
+        fetchone_queue=[("Case No. 1", "plain text judgment with no statutory references at all", None, [], [], None)],
     )
     monkeypatch.setattr(le.requests, "post", MagicMock(return_value=_chat_response(json.dumps(_SAMPLE_RESULT))))
 
@@ -399,45 +400,46 @@ def test_enrich_case_no_provisions_sent_produces_update_with_no_provision_column
     assert ok is True
 
     update_sql, _ = cursor.executed[-1]
-    for column in ("sections", "acts", "rules", "orders", "sections_relevant", "sections_other"):
+    for column in ("sections", "acts"):
         assert f"{column} = %s" not in update_sql
 
 
-def test_enrich_case_provision_dedupe_relevant_wins(azure_env, monkeypatch):
+def test_enrich_case_provision_dedupe_by_statute_and_number(azure_env, monkeypatch):
     flag = {"open": False}
     cursor = FakeCursor(flag)
     ocr_text = "The accused was charged under Section 302 of the Indian Penal Code, 1860."
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", ocr_text, None, [], None)],
+        fetchone_queue=[("Case No. 1", ocr_text, None, [], [], None)],
     )
 
     result_with_dupe_provisions = dict(_SAMPLE_RESULT)
     result_with_dupe_provisions["provisions"] = [
-        {"statute_name": "IPC", "provision_type": "section", "number": "302", "relevance": "OTHER"},
-        {"statute_name": "Indian Penal Code, 1860", "provision_type": "section", "number": "302", "relevance": "RELEVANT"},
+        {"statute_name": "IPC", "number": "302"},
+        {"statute_name": "Indian Penal Code, 1860", "number": "302"},
     ]
     monkeypatch.setattr(le.requests, "post", MagicMock(return_value=_chat_response(json.dumps(result_with_dupe_provisions))))
 
-    ok = le.enrich_case(1)
+    # provision_block is supplied by the caller since 2026-09-17 (this
+    # module no longer extracts one itself -- see enrich_case's docstring);
+    # a real caller would build it from this court's own extraction module,
+    # here just the same ocr_text stands in for that.
+    ok = le.enrich_case(1, provision_block=ocr_text)
     assert ok is True
 
     update_sql, update_params = cursor.executed[-1]
     # Fixed column order matches enrich_case's own set_clauses/params construction:
-    # base columns, then (when a provision block was sent) the provision columns,
-    # then case_id as the final WHERE param.
-    base_columns = ["case_note", "conclusion", "industries", "ministries", "disposition", "favouring_party"]
-    provision_columns = [
-        "sections", "acts", "rules", "orders",
-        "sections_relevant", "sections_other",
-        "rules_relevant", "rules_other",
-        "orders_relevant", "orders_other",
-    ]
+    # base columns, then (when a provision block was sent AND the case had no
+    # sections yet) sections/acts, then case_id as the final WHERE param.
+    base_columns = ["case_note", "conclusion", "subject", "industries", "ministries", "disposition", "favouring_party"]
+    provision_columns = ["sections", "acts"]
     all_columns = base_columns + provision_columns
     values_by_column = dict(zip(all_columns, update_params[:-1]))
 
-    assert len(values_by_column["sections_relevant"]) == 1
-    assert len(values_by_column["sections_other"]) == 0
+    # Both raw entries resolve to the SAME (statute, number) after resolve_act()
+    # normalizes "IPC" and "Indian Penal Code, 1860" to the same statute name --
+    # only one section_id should be written, not two.
+    assert len(values_by_column["sections"]) == 1
 
 
 def test_enrich_case_no_ocr_text_is_skipped(azure_env, monkeypatch):
@@ -445,7 +447,7 @@ def test_enrich_case_no_ocr_text_is_skipped(azure_env, monkeypatch):
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", None, None, [], None)],
+        fetchone_queue=[("Case No. 1", None, None, [], [], None)],
     )
     mock_post = MagicMock()
     monkeypatch.setattr(le.requests, "post", mock_post)
@@ -466,7 +468,7 @@ def test_enrich_case_not_configured_leaves_pending_and_makes_no_call(monkeypatch
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "some ocr text", None, [], None)],
+        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None)],
     )
     mock_post = MagicMock()
     monkeypatch.setattr(le.requests, "post", mock_post)

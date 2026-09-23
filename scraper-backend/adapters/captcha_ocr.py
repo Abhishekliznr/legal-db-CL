@@ -1,14 +1,16 @@
 """
-Captcha solving for sci.gov.in's judgment search widget.
+Generic image-captcha solving, shared by every adapter that hits a
+distorted-text/math-expression captcha (originally written for
+sci.gov.in's judgment search widget, since reused by
+adapters/high_courts/mp/'s ILRS discovery — nothing here is site-specific).
 
-sci.gov.in's captcha is either a short alphanumeric string or a simple math
+The captcha is either a short alphanumeric string or a simple math
 expression ("4 + 3"). ddddocr is a general-purpose captcha OCR — not tuned
-to this specific site — so this module retries with a couple of image
+to any one site — so this module retries with a couple of image
 preprocessing variants before giving up on one attempt.
 
-Known open risk (spec §10): solve-rate here hasn't been measured at volume;
-this is the same approach the old service used successfully, rewritten
-fresh rather than copied.
+Known open risk (spec §10): solve-rate here hasn't been measured at volume
+for any site that uses it.
 """
 
 import io

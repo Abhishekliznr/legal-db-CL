@@ -1,10 +1,10 @@
 """
 Manual end-to-end check for the rewritten (2026-09-08) flattened `cases`
-schema + regex-only pipeline/promotion.py — NOT a pytest suite, run directly.
+schema + regex-only adapters/supreme_court/promotion.py — NOT a pytest suite, run directly.
 
 Pushes several REAL judgment PDFs (from the old scraper's own
 SUPREME_COURT_OF_INDIA_SCRAPER/pdf/ output, already used throughout the
-regex_extraction.py verification) through the actual OCR -> promotion path
+extraction.py verification) through the actual OCR -> promotion path
 against a real local Postgres, using synthetic-but-realistic RawJudgmentRecord
 table-cell values (real scraped party/bench/date/citation strings couldn't
 be re-obtained for this exact batch of PDFs — the OCR-text side is 100%
@@ -26,9 +26,10 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from adapters.base import RawJudgmentRecord
+from adapters.supreme_court import promotion
 from db import scrape_jobs
 from db.connection import get_pooled_connection, init_connection_pool
-from pipeline import ocr, promotion
+from pipeline import ocr
 
 _OLD_SCRAPER_DIR = _REPO_ROOT.parent / "scraper-backend" / "app" / "SUPREME_COURT_OF_INDIA_SCRAPER"
 _PDF_DIR = _OLD_SCRAPER_DIR / "pdf"

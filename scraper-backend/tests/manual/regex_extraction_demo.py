@@ -1,8 +1,8 @@
 """
 Manual demo — NOT a pytest suite, run directly. Prints every field
-pipeline/regex_extraction.py can produce WITHOUT calling the LLM, so it's
-easy to eyeball how much of a real judgment's metadata that module covers
-on its own.
+adapters/supreme_court/extraction.py can produce WITHOUT calling the LLM, so
+it's easy to eyeball how much of a real judgment's metadata that module
+covers on its own.
 
 Two sections:
 
@@ -44,7 +44,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 import pymupdf  # noqa: E402
 
-from pipeline import regex_extraction as rx  # noqa: E402
+from adapters.supreme_court import extraction as rx  # noqa: E402
 from pipeline.ocr import extract_text_from_pdf_bytes  # noqa: E402
 
 _OLD_SCRAPER_DIR = _REPO_ROOT.parent / "scraper-backend" / "app" / "SUPREME_COURT_OF_INDIA_SCRAPER"

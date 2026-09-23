@@ -31,14 +31,22 @@ def create_batch(court_id: int, date_from: date, date_to: date) -> int:
     return batch_id
 
 
-def finish_batch(batch_id: int, status: str, total_found: int, total_downloaded: int, total_promoted: int = 0) -> None:
+def finish_batch(
+    batch_id: int,
+    status: str,
+    total_found: int,
+    total_downloaded: int,
+    total_promoted: int = 0,
+    error_message: Optional[str] = None,
+) -> None:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
                 UPDATE cr_scrape_batches
-                SET status = %s, total_found = %s, total_downloaded = %s, total_promoted = %s, finished_at = now()
+                SET status = %s, total_found = %s, total_downloaded = %s, total_promoted = %s,
+                    finished_at = now(), error_message = %s
                 WHERE batch_id = %s;
-            """, (status, total_found, total_downloaded, total_promoted, batch_id))
+            """, (status, total_found, total_downloaded, total_promoted, error_message, batch_id))
         conn.commit()
 
 
@@ -48,7 +56,7 @@ def list_batches(limit: int = 50, offset: int = 0) -> Dict[str, Any]:
             cur.execute("""
                 SELECT sb.batch_id, sb.court_id, c.court_name, c.court_code, sb.date_from, sb.date_to,
                        sb.requested_at, sb.status, sb.total_found, sb.total_downloaded, sb.total_promoted,
-                       sb.finished_at
+                       sb.finished_at, sb.error_message
                 FROM cr_scrape_batches sb
                 LEFT JOIN cr_courts c ON c.court_id = sb.court_id
                 ORDER BY sb.requested_at DESC
@@ -77,7 +85,7 @@ def get_batch(batch_id: int) -> Optional[Dict[str, Any]]:
             cur.execute("""
                 SELECT sb.batch_id, sb.court_id, c.court_name, c.court_code, sb.date_from, sb.date_to,
                        sb.requested_at, sb.status, sb.total_found, sb.total_downloaded, sb.total_promoted,
-                       sb.cancel_requested, sb.finished_at
+                       sb.cancel_requested, sb.finished_at, sb.error_message
                 FROM cr_scrape_batches sb
                 LEFT JOIN cr_courts c ON c.court_id = sb.court_id
                 WHERE sb.batch_id = %s;
