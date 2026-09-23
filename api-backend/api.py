@@ -44,7 +44,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from db import connection
-from routers import filter_router, history_router, search_router, stats_router
+from routers import filter_router, history_router, pdf_router, search_router, stats_router
 
 app = FastAPI(
     title="Legal Judgment Intelligence API (v2)",
@@ -125,12 +125,14 @@ def on_shutdown():
     connection.close_connection_pool()
 
 
-# Filters/stats/history are static sub-paths of /api/cases and must be
-# mounted before search_router, or a request to e.g. /api/cases/stats would
-# be swallowed by search_router's /api/cases/{case_id} wildcard route.
+# Filters/stats/history/pdf are static (or /pdf-suffixed) sub-paths of
+# /api/cases and must be mounted before search_router, or a request to e.g.
+# /api/cases/stats or /api/cases/123/pdf would be swallowed by
+# search_router's /api/cases/{case_id:path} wildcard route.
 app.include_router(filter_router.router)
 app.include_router(stats_router.router)
 app.include_router(history_router.router)
+app.include_router(pdf_router.router)
 app.include_router(search_router.router)
 
 
