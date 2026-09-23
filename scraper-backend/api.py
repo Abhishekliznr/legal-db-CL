@@ -157,6 +157,19 @@ def on_startup():
     except Exception:
         logger.exception("Could not ensure courts are seeded at startup")
 
+    # Assumes a single uvicorn worker (true locally and in the Dockerfile):
+    # with several, one worker restarting would close batches another
+    # worker is still running.
+    try:
+        from db.scrape_jobs import fail_orphaned_batches
+        for batch in fail_orphaned_batches():
+            logger.warning(
+                "Batch %s was RUNNING when the server restarted — marked %s",
+                batch["batch_id"], batch["status"],
+            )
+    except Exception:
+        logger.exception("Could not close batches orphaned by a previous run at startup")
+
 
 @app.on_event("shutdown")
 def on_shutdown():

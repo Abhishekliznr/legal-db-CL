@@ -30,12 +30,13 @@ def _log(level: str, msg: str, *args) -> None:
 
 
 def _source_failure_status(exc: Exception) -> str:
-    if isinstance(exc, SourceAccessError):
-        return "SOURCE_BLOCKED"
+    # Subclasses before SourceAccessError, which both of them inherit from.
     if isinstance(exc, SourceRateLimitError):
         return "RATE_LIMITED"
     if isinstance(exc, SourceUnavailableError):
         return "SOURCE_UNAVAILABLE"
+    if isinstance(exc, SourceAccessError):
+        return "SOURCE_BLOCKED"
     if isinstance(exc, SourceStructureChangedError):
         return "STRUCTURE_CHANGED"
     return "FAILED"

@@ -50,6 +50,23 @@ def finish_batch(
         conn.commit()
 
 
+def fail_orphaned_batches() -> List[Dict[str, Any]]:
+    """Closes every RUNNING batch at startup — batches run in-process, so none can have survived a restart."""
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE cr_scrape_batches
+                SET status = CASE WHEN cancel_requested THEN 'CANCELLED' ELSE 'FAILED' END,
+                    finished_at = now(),
+                    error_message = 'Interrupted by server restart'
+                WHERE status = 'RUNNING'
+                RETURNING batch_id, status;
+            """)
+            rows = [{"batch_id": r[0], "status": r[1]} for r in cur.fetchall()]
+        conn.commit()
+    return rows
+
+
 def list_batches(limit: int = 50, offset: int = 0) -> Dict[str, Any]:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
@@ -175,6 +192,14 @@ def insert_raw_ingestion(
             row = cur.fetchone()
         conn.commit()
     return row[0] if row else None
+
+
+def get_promoted_case_numbers(court_id: int) -> set:
+    """Every cr_cases.case_number already promoted for this court — lets an adapter skip re-scraping them on a re-run."""
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT case_number FROM cr_cases WHERE court_id = %s;", (court_id,))
+            return {row[0] for row in cur.fetchall()}
 
 
 def get_ingestion(ingestion_id: int) -> Optional[Dict[str, Any]]:

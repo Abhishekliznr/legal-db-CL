@@ -50,21 +50,29 @@ of as an attachment.
 import logging
 import re
 import tempfile
+import time
 from datetime import date
 from pathlib import Path
 from typing import Dict, Iterator, Optional
 
+from playwright.sync_api import Error as PlaywrightError
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
 
-from adapters.base import RawJudgmentRecord
+from adapters.base import RawJudgmentRecord, SourceUnavailableError
 from adapters.high_courts.mp import case_status, ilrs
 from adapters.high_courts.mp.extraction import clean_headnote, normalize_case_no, normalize_case_type
+from db import court_config, scrape_jobs
 
 logger = logging.getLogger("scraper_backend_v2.mp_adapter")
 
 CASE_STATUS_URL = "https://mphc.gov.in/case-status"
 
 PDF_CAPTURE_WAIT_SECONDS = 20
+
+# Covers a laptop waking from sleep: Wi-Fi typically takes 10-30s to come
+# back, and every request in that window fails with net::ERR_*.
+NETWORK_RETRY_DELAYS_SECONDS = (5, 15, 30, 60)
 
 
 def _year_from_range(date_from: str, date_to: str) -> int:
@@ -198,6 +206,21 @@ def _select_bench(page, bench_code: str) -> None:
     page.wait_for_load_state("domcontentloaded")
 
 
+def _is_network_error(exc: Exception) -> bool:
+    return isinstance(exc, PlaywrightTimeoutError) or (
+        isinstance(exc, PlaywrightError) and "net::ERR_" in str(exc)
+    )
+
+
+def _case_label(candidate: Dict[str, object]) -> str:
+    # Same "<Bench>/<CaseType>/<Number>/<Year>" shape ILRS itself uses
+    # (see ilrs.py) -- case_no alone can collide across benches/years,
+    # this is what actually identifies a case uniquely. Also stored as
+    # cr_cases.case_number, which is what the re-run skip matches on.
+    case_no = normalize_case_no(candidate["case_no"])
+    return f"{candidate.get('bench')}/{candidate.get('case_type')}/{case_no}/{candidate.get('registration_year')}"
+
+
 def _submit_case_status_form(page, case_type_code: str, case_no: str, registration_year: str) -> None:
     page.locator("#case_type").select_option(case_type_code)
     page.locator("#case_no").fill(str(case_no))
@@ -217,6 +240,10 @@ class MPHighCourtAdapter:
         **kwargs,
     ) -> Iterator[RawJudgmentRecord]:
         year = _year_from_range(date_from, date_to)
+
+        court_id = court_config.get_court_id_by_code("MPHC")
+        already_promoted = scrape_jobs.get_promoted_case_numbers(court_id) if court_id is not None else set()
+        logger.info("[MP ADAPTER] %d case(s) already promoted for MPHC will be skipped", len(already_promoted))
 
         with tempfile.TemporaryDirectory(prefix="mphc_pdfs_") as tmp_dir:
             download_dir = Path(tmp_dir)
@@ -241,14 +268,46 @@ class MPHighCourtAdapter:
                     candidates = ilrs.discover_candidates(page, year)
 
                     current_bench_code: Optional[str] = None
+                    skipped_existing = 0
                     for candidate in candidates:
-                        record, current_bench_code = self._process_candidate(
+                        if _case_label(candidate) in already_promoted:
+                            skipped_existing += 1
+                            continue
+                        if skipped_existing:
+                            logger.info("[MP ADAPTER] skipped %d already-promoted case(s)", skipped_existing)
+                            skipped_existing = 0
+                        record, current_bench_code = self._process_candidate_with_retry(
                             context, page, candidate, download_dir, current_bench_code
                         )
                         if record is not None:
                             yield record
+                    if skipped_existing:
+                        logger.info("[MP ADAPTER] skipped %d already-promoted case(s)", skipped_existing)
                 finally:
                     browser.close()
+
+    def _process_candidate_with_retry(
+        self, context, page, candidate: Dict[str, object], download_dir: Path, current_bench_code: Optional[str]
+    ) -> tuple:
+        case_label = _case_label(candidate)
+        for attempt, delay in enumerate((*NETWORK_RETRY_DELAYS_SECONDS, None), start=1):
+            try:
+                return self._process_candidate(context, page, candidate, download_dir, current_bench_code)
+            except Exception as e:
+                if not _is_network_error(e):
+                    raise
+                if delay is None:
+                    raise SourceUnavailableError(
+                        f"mphc.gov.in unreachable after {attempt} attempts on {case_label}: {e}"
+                    ) from e
+                logger.warning(
+                    "[MP ADAPTER] %s: network error (attempt %d), retrying in %ds: %s",
+                    case_label, attempt, delay, e,
+                )
+                time.sleep(delay)
+                # Page state after a failed navigation is unknown, so force
+                # the bench-select POST again on the retry.
+                current_bench_code = None
 
     def _process_candidate(
         self, context, page, candidate: Dict[str, object], download_dir: Path, current_bench_code: Optional[str]
@@ -258,10 +317,7 @@ class MPHighCourtAdapter:
         # #case_no field and its own case-detail pages never do, so this
         # must be stripped before it's used to search, not just for display.
         case_no = normalize_case_no(candidate["case_no"])
-        # Same "<Bench>/<CaseType>/<Number>/<Year>" shape ILRS itself uses
-        # (see ilrs.py) -- case_no alone can collide across benches/years,
-        # this is what actually identifies a case uniquely in the logs.
-        case_label = f"{candidate.get('bench')}/{candidate.get('case_type')}/{case_no}/{candidate.get('registration_year')}"
+        case_label = _case_label(candidate)
 
         case_type_code = case_status.resolve_case_type_code(normalize_case_type(candidate["case_type"]))
         if case_type_code is None:
@@ -278,6 +334,8 @@ class MPHighCourtAdapter:
             try:
                 _select_bench(page, bench_code)
             except Exception as e:
+                if _is_network_error(e):
+                    raise
                 logger.warning(
                     "[MP ADAPTER] %s: couldn't switch Establishment to bench=%r (%s), skipping",
                     case_label, candidate.get("bench"), e,
