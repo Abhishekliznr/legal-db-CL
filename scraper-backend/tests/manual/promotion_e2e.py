@@ -99,7 +99,7 @@ def main() -> None:
             continue
 
         checksum = f"testfixture-{filename}"
-        ingestion_id = scrape_jobs.insert_raw_ingestion(
+        ingestion_id, _ = scrape_jobs.insert_raw_ingestion(
             batch_id=batch_id,
             court_id=court_id,
             source_pdf_url=f"https://www.sci.gov.in/fake/{filename}",
@@ -214,7 +214,7 @@ def main() -> None:
         if not pdf_path.exists():
             continue
         checksum = f"testfixture-{filename}"
-        ingestion_id = scrape_jobs.insert_raw_ingestion(
+        ingestion_id, _ = scrape_jobs.insert_raw_ingestion(
             batch_id=batch_id, court_id=court_id,
             source_pdf_url=f"https://www.sci.gov.in/fake/{filename}",
             file_checksum=checksum, data_source="SCI_WEBSITE",

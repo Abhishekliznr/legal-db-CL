@@ -51,19 +51,21 @@ import logging
 import re
 import tempfile
 import time
+from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Dict, Iterator, Optional
+from typing import Dict, Iterator, List, Optional
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
 
-from adapters.base import RawJudgmentRecord, SourceUnavailableError
+from adapters.base import BatchItem, ItemOutcome, RawJudgmentRecord, SourceUnavailableError
 from adapters.high_courts.mp import case_status, ilrs, stages
 from adapters.high_courts.mp.extraction import clean_headnote, normalize_case_no, normalize_case_type
 from db import court_config, scrape_jobs
-from orchestrator.log_context import case_scope, slog, tally
+from orchestrator.log_context import slog
 
 logger = logging.getLogger("scraper_backend_v2.mp_adapter")
 
@@ -178,17 +180,14 @@ def _download_pdf(context, page, pdf_url: str, download_dir: Path) -> Optional[P
             response = context.request.get(pdf_url, timeout=30000)
             if not response.ok:
                 slog(logger, stages.JUDGMENT, "warning", "PDF download failed (HTTP %s) → skipped", response.status)
-                tally("Skipped", "PDF download failed")
                 return None
             local_path.write_bytes(response.body())
         except Exception as fetch_err:
             slog(logger, stages.JUDGMENT, "warning", "PDF download failed (%s) → skipped", fetch_err)
-            tally("Skipped", "PDF download failed")
             return None
 
     if not local_path.exists() or not local_path.read_bytes().startswith(b"%PDF"):
         slog(logger, stages.JUDGMENT, "warning", "Downloaded file is not a valid PDF → skipped")
-        tally("Skipped", "PDF download failed")
         return None
     slog(logger, stages.JUDGMENT, "info", "PDF downloaded (%d KB, via %s)", local_path.stat().st_size // 1024, method)
     return local_path
@@ -236,65 +235,74 @@ def _submit_case_status_form(page, case_type_code: str, case_no: str, registrati
     page.wait_for_load_state("domcontentloaded")
 
 
+@dataclass
+class _Session:
+    context: object
+    page: object
+    download_dir: Path
+    current_bench_code: Optional[str] = None
+
+
+def _launch_browser(playwright, headless: bool):
+    """Returns (browser, context, page).
+
+    mphc.gov.in serves an incomplete intermediate cert chain -- confirmed from
+    a real run: the direct-fetch fallback in _download_pdf failed with "unable
+    to verify the first certificate". Real browsers paper over it; Playwright's
+    strict TLS verification doesn't, on page navigation OR the request-API
+    fallback, hence ignore_https_errors.
+    """
+    browser = playwright.chromium.launch(headless=headless)
+    context = browser.new_context(accept_downloads=True, ignore_https_errors=True)
+    return browser, context, context.new_page()
+
+
 class MPHighCourtAdapter:
-    """Implements ScraperAdapter (adapters/base.py) for Madhya Pradesh High Court."""
+    """Implements ResumableScraperAdapter (adapters/base.py) for Madhya Pradesh High Court."""
 
-    def scrape(
-        self,
-        date_from: str,
-        date_to: str,
-        headless: bool = True,
-        **kwargs,
-    ) -> Iterator[RawJudgmentRecord]:
+    def discover(self, date_from: str, date_to: str, headless: bool = True, **kwargs) -> List[BatchItem]:
         year = _year_from_range(date_from, date_to)
-
         court_id = court_config.get_court_id_by_code("MPHC")
         already_promoted = scrape_jobs.get_promoted_case_numbers(court_id) if court_id is not None else set()
 
+        with sync_playwright() as playwright:
+            browser, _, page = _launch_browser(playwright, headless)
+            try:
+                candidates = ilrs.discover_candidates(page, year)
+            finally:
+                browser.close()
+
+        items: Dict[str, BatchItem] = {}
+        for candidate in candidates:
+            label = _case_label(candidate)
+            if label not in items:
+                items[label] = BatchItem(
+                    key=label,
+                    payload=candidate,
+                    done_reason="already in database" if label in already_promoted else None,
+                )
+        return list(items.values())
+
+    @contextmanager
+    def session(self, headless: bool = True, **kwargs) -> Iterator[_Session]:
         with tempfile.TemporaryDirectory(prefix="mphc_pdfs_") as tmp_dir:
-            download_dir = Path(tmp_dir)
-
             with sync_playwright() as playwright:
-                browser = playwright.chromium.launch(headless=headless)
-                # mphc.gov.in serves an incomplete intermediate cert chain --
-                # confirmed from a real run: the direct-fetch fallback in
-                # _download_pdf failed with "unable to verify the first
-                # certificate", which is exactly that failure mode. Real
-                # browsers paper over it (AIA-fetch the missing intermediate /
-                # trust it via the OS store); Playwright's strict TLS
-                # verification doesn't, on the page navigation OR the
-                # request-API fallback. This most likely also explains why
-                # the primary browser-download path was timing out instead
-                # of firing a "download" event -- a goto() into a cert error
-                # shows a security interstitial, not a download.
-                context = browser.new_context(accept_downloads=True, ignore_https_errors=True)
-                page = context.new_page()
-
+                browser, context, page = _launch_browser(playwright, headless)
                 try:
-                    candidates = ilrs.discover_candidates(page, year)
-                    to_process = [c for c in candidates if _case_label(c) not in already_promoted]
-                    if candidates:
-                        slog(
-                            logger, stages.DISCOVER, "info",
-                            "%d already in database → skipped · %d to process",
-                            len(candidates) - len(to_process), len(to_process),
-                        )
-                        tally("Skipped", "already in database", len(candidates) - len(to_process))
-
-                    current_bench_code: Optional[str] = None
-                    total = len(to_process)
-                    for index, candidate in enumerate(to_process, start=1):
-                        # Exited before the yield: batch_runner re-enters its own
-                        # case_scope from record.position for the post-download stages.
-                        with case_scope(_case_label(candidate), index, total):
-                            record, current_bench_code = self._process_candidate_with_retry(
-                                context, page, candidate, download_dir, current_bench_code
-                            )
-                        if record is not None:
-                            record.position = (index, total)
-                            yield record
+                    yield _Session(context=context, page=page, download_dir=Path(tmp_dir))
                 finally:
                     browser.close()
+
+    def process_item(self, session: _Session, item: BatchItem) -> ItemOutcome:
+        try:
+            record, skip_reason, session.current_bench_code = self._process_candidate_with_retry(
+                session.context, session.page, item.payload, session.download_dir, session.current_bench_code
+            )
+        except Exception:
+            # Page state is unknown after a crash; force the bench-select POST on the next case.
+            session.current_bench_code = None
+            raise
+        return ItemOutcome(record=record, skip_reason=skip_reason)
 
     def _process_candidate_with_retry(
         self, context, page, candidate: Dict[str, object], download_dir: Path, current_bench_code: Optional[str]
@@ -323,7 +331,7 @@ class MPHighCourtAdapter:
     def _process_candidate(
         self, context, page, candidate: Dict[str, object], download_dir: Path, current_bench_code: Optional[str]
     ) -> tuple:
-        """Returns (record_or_None, bench_code_now_selected) -- the caller threads the second value back in as `current_bench_code` on the next call, so the bench-select POST only fires when the bench actually changes between consecutive candidates."""
+        """Returns (record, skip_reason, bench_code_now_selected) -- exactly one of record/skip_reason is set; the caller threads the bench code back in as `current_bench_code` on the next call, so the bench-select POST only fires when the bench actually changes between consecutive candidates."""
         # ILRS zero-pads some case numbers (e.g. "01598") -- case-status's
         # #case_no field and its own case-detail pages never do, so this
         # must be stripped before it's used to search, not just for display.
@@ -333,14 +341,12 @@ class MPHighCourtAdapter:
         case_type_code = case_status.resolve_case_type_code(normalize_case_type(candidate["case_type"]))
         if case_type_code is None:
             slog(logger, stages.CASE_STATUS, "warning", "Unknown case type %r → skipped", candidate["case_type"])
-            tally("Skipped", "unknown case type")
-            return None, current_bench_code
+            return None, "unknown case type", current_bench_code
 
         bench_code = case_status.BENCH_CODES.get(candidate.get("bench"))
         if bench_code is None:
             slog(logger, stages.CASE_STATUS, "warning", "Unknown bench %r → skipped", candidate.get("bench"))
-            tally("Skipped", "unknown bench")
-            return None, current_bench_code
+            return None, "unknown bench", current_bench_code
 
         page.goto(CASE_STATUS_URL, wait_until="domcontentloaded", timeout=30000)
         if bench_code != current_bench_code:
@@ -353,8 +359,7 @@ class MPHighCourtAdapter:
                     logger, stages.CASE_STATUS, "warning",
                     "Couldn't switch case-status to bench %r (%s) → skipped", candidate.get("bench"), e,
                 )
-                tally("Skipped", "bench switch failed")
-                return None, current_bench_code
+                return None, "bench switch failed", current_bench_code
             current_bench_code = bench_code
 
         _submit_case_status_form(page, case_type_code, case_no, str(candidate["registration_year"]))
@@ -383,8 +388,7 @@ class MPHighCourtAdapter:
                 logger, stages.CASE_STATUS, "debug",
                 "submitted case_type_code=%s bench_code=%s; page text: %s", case_type_code, bench_code, page_text,
             )
-            tally("Skipped", "not on case-status")
-            return None, current_bench_code
+            return None, "not on case-status", current_bench_code
         slog(logger, stages.CASE_STATUS, "info", "Case available")
 
         try:
@@ -394,13 +398,12 @@ class MPHighCourtAdapter:
         pdf_url = _find_judgment_pdf_url(page)
         if pdf_url is None:
             slog(logger, stages.JUDGMENT, "warning", "No judgment/order in Judgement/Orders tab → skipped")
-            tally("Skipped", "no judgment PDF")
-            return None, current_bench_code
+            return None, "no judgment PDF", current_bench_code
         slog(logger, stages.JUDGMENT, "info", "Latest order found in Judgement/Orders tab → downloading")
 
         pdf_path = _download_pdf(context, page, pdf_url, download_dir)
         if pdf_path is None:
-            return None, current_bench_code
+            return None, "PDF download failed", current_bench_code
 
         record = RawJudgmentRecord(
             pdf_path=pdf_path,
@@ -427,4 +430,4 @@ class MPHighCourtAdapter:
                 "registration_year": candidate.get("registration_year"),
             },
         )
-        return record, current_bench_code
+        return record, None, current_bench_code

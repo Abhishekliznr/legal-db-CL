@@ -52,8 +52,14 @@ _buffers: "OrderedDict[int, _Buffer]" = OrderedDict()
 
 
 def start_batch(batch_id: int) -> None:
+    # A resumed batch keeps its earlier run's lines (one log page per batch) when
+    # they're still in memory; after a server restart it starts a fresh buffer.
     with _lock:
-        _buffers[batch_id] = _Buffer()
+        buf = _buffers.get(batch_id)
+        if buf is None:
+            _buffers[batch_id] = _Buffer()
+        else:
+            buf.finished = False
         _buffers.move_to_end(batch_id)
         _evict_if_over_capacity()
 

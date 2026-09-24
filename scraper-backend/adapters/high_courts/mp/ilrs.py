@@ -57,6 +57,7 @@ from typing import Any, Dict, List, Optional
 
 from bs4 import BeautifulSoup
 
+from adapters.base import SourceUnavailableError
 from adapters.captcha_ocr import solve_captcha_image
 from adapters.high_courts.mp import stages
 from orchestrator.log_context import slog
@@ -225,10 +226,10 @@ def discover_candidates(page, year: int) -> List[Dict[str, Any]]:
     judges, decision_date, petitioners, respondents, headnote} -- every row
     the search itself returns (see module docstring: a row's own decision
     date can legitimately differ from the ILR year searched, so it is not
-    used to drop rows here). Returns [] if the captcha couldn't be solved after
-    MAX_CAPTCHA_RETRIES attempts (logged, not raised — an empty discovery
-    result is a valid, if unfortunate, batch outcome, same as any other
-    adapter's captcha-exhausted path).
+    used to drop rows here). Raises SourceUnavailableError if the captcha
+    never appears or can't be solved in MAX_CAPTCHA_RETRIES attempts: returning
+    [] would look like "no cases this year" and mark the batch discovered with
+    nothing to resume, while raising stops it as a resumable source failure.
     """
     slog(
         logger, stages.DISCOVER, "info",
@@ -248,13 +249,11 @@ def discover_candidates(page, year: int) -> List[Dict[str, Any]]:
     try:
         page.locator("#modal-default").wait_for(state="visible", timeout=10000)
     except Exception:
-        slog(logger, stages.DISCOVER, "warning", "Captcha never appeared after searching ILR year %s → no cases", year)
-        return []
+        raise SourceUnavailableError(f"ILRS captcha never appeared after searching ILR year {year}")
 
     solved_on = _solve_and_submit_captcha(page)
     if solved_on is None:
-        slog(logger, stages.DISCOVER, "warning", "Could not solve captcha after %d attempts → no cases", MAX_CAPTCHA_RETRIES)
-        return []
+        raise SourceUnavailableError(f"Could not solve the ILRS captcha after {MAX_CAPTCHA_RETRIES} attempts")
     slog(logger, stages.DISCOVER, "info", "Captcha solved (attempt %d of %d)", solved_on, MAX_CAPTCHA_RETRIES)
 
     # #content is present in the DOM from page load onward (this is the

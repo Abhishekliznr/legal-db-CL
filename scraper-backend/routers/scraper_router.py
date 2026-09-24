@@ -8,6 +8,7 @@ Scraper control endpoints
 - GET  /api/scraper/batches/{batch_id}             : one batch's header/summary fields
 - GET  /api/scraper/batches/{batch_id}/records      : per-record (cr_raw_ingestions) breakdown for one batch
 - POST /api/scraper/batches/{batch_id}/cancel       : request early stop of a RUNNING batch
+- POST /api/scraper/batches/{batch_id}/resume       : continue a stopped batch from where it stopped (resumable adapters only)
 - GET  /api/scraper/batches/{batch_id}/logs/stream  : SSE tail of that batch's in-memory log buffer
 - GET  /api/scraper/status                        : raw_ingestions counts per pipeline stage
 
@@ -107,29 +108,8 @@ def _dispatch_batch(
     background_tasks: BackgroundTasks,
 ) -> dict:
     """Shared by every /start-shaped endpoint: resolves court_scrape_config -> _ADAPTER_REGISTRY, creates the batch row, schedules the background run. Raises HTTPException on any resolution failure."""
-    try:
-        config = court_config.get_court_scrape_config(court_id)
-    except psycopg2.OperationalError:
-        logger.exception("Database connection failed while resolving court %s config", court_id)
-        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
-
-    if config is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No court_scrape_config for court_id={court_id}. Seed it first (PUT /api/courts/{{court_id}}/config or python -m db.seed_courts).",
-        )
-    if not config["is_active"]:
-        raise HTTPException(status_code=400, detail=f"court_id={court_id} is marked inactive in court_scrape_config.")
-
-    spec = _ADAPTER_REGISTRY.get(config["adapter"])
-    if spec is None:
-        raise HTTPException(status_code=500, detail=f"court_scrape_config has unknown adapter '{config['adapter']}' — not in _ADAPTER_REGISTRY.")
-
-    # config["config"] is that court's own free-form settings (JSONB), e.g.
-    # whatever adapters/high_courts/<code>/adapter.py needs beyond headless —
-    # nothing generic depends on its shape, each adapter's scrape() reads
-    # only the keys it defined.
-    adapter_kwargs = {**(config.get("config") or {}), "headless": headless}
+    config, spec = _resolve_court(court_id)
+    adapter_kwargs = _adapter_kwargs(config, headless)
 
     # Created here, synchronously, rather than inside the background task itself — so the
     # response below can hand batch_id straight back to the caller (the admin UI navigates to
@@ -152,6 +132,36 @@ def _dispatch_batch(
         "to_date": to_date,
         "message": "Batch running in the background — poll GET /api/scraper/batches for progress.",
     }
+
+
+def _adapter_kwargs(config: dict, headless: bool) -> dict:
+    # config["config"] is that court's own free-form settings (JSONB), e.g.
+    # whatever adapters/high_courts/<code>/adapter.py needs beyond headless —
+    # nothing generic depends on its shape, each adapter's scrape() reads
+    # only the keys it defined.
+    return {**(config.get("config") or {}), "headless": headless}
+
+
+def _resolve_court(court_id: int):
+    """court_scrape_config -> (config, AdapterSpec). Raises HTTPException on any resolution failure."""
+    try:
+        config = court_config.get_court_scrape_config(court_id)
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while resolving court %s config", court_id)
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+
+    if config is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No court_scrape_config for court_id={court_id}. Seed it first (PUT /api/courts/{{court_id}}/config or python -m db.seed_courts).",
+        )
+    if not config["is_active"]:
+        raise HTTPException(status_code=400, detail=f"court_id={court_id} is marked inactive in court_scrape_config.")
+
+    spec = _ADAPTER_REGISTRY.get(config["adapter"])
+    if spec is None:
+        raise HTTPException(status_code=500, detail=f"court_scrape_config has unknown adapter '{config['adapter']}' — not in _ADAPTER_REGISTRY.")
+    return config, spec
 
 
 @router.post("/start")
@@ -218,11 +228,12 @@ def _run_and_log(
     to_date: str,
     data_source: str,
     adapter_kwargs: dict,
+    run_number: int = 1,
 ):
     try:
         batch_runner.run_batch(
             adapter, promote_fn, batch_id, court_id, court_code, from_date, to_date, data_source,
-            find_provisions_fn=find_provisions_fn, run_enrichment=run_enrichment, **adapter_kwargs,
+            find_provisions_fn=find_provisions_fn, run_enrichment=run_enrichment, run_number=run_number, **adapter_kwargs,
         )
     except Exception:
         logger.exception("Batch %s failed for court_id=%s %s -> %s", batch_id, court_id, from_date, to_date)
@@ -252,7 +263,73 @@ def get_batch(batch_id: int):
         raise HTTPException(status_code=500, detail="Failed to read batch.")
     if batch is None:
         raise HTTPException(status_code=404, detail=f"No batch with batch_id={batch_id}.")
+    batch["resumable"] = _supports_resume(batch["court_id"]) and _has_work_to_resume(batch, retry_skipped=True)
     return batch
+
+
+def _supports_resume(court_id: int) -> bool:
+    try:
+        config = court_config.get_court_scrape_config(court_id)
+    except Exception:
+        logger.exception("Could not resolve court_scrape_config for court_id=%s", court_id)
+        return False
+    spec = _ADAPTER_REGISTRY.get(config["adapter"]) if config else None
+    return spec is not None and hasattr(spec.adapter_class, "discover")
+
+
+def _has_work_to_resume(batch: dict, retry_skipped: bool) -> bool:
+    if batch["status"] == "RUNNING":
+        return False
+    if not batch["discovered"]:
+        # Stopped before its case list was saved: resuming re-runs discovery. A COMPLETED
+        # batch without one predates resumable batches, so there's nothing to resume.
+        return batch["status"] != "COMPLETED"
+    counts = batch["item_counts"]
+    return bool(counts.get("PENDING") or counts.get("FAILED") or (retry_skipped and counts.get("SKIPPED")))
+
+
+class BatchResumeRequest(BaseModel):
+    retry_skipped: bool = Field(False, description="Also retry cases skipped in earlier runs (e.g. no judgment PDF yet)")
+    headless: bool = Field(True, description="Set False for a supervised run against a real browser window")
+
+
+@router.post("/batches/{batch_id}/resume")
+def resume_batch(batch_id: int, background_tasks: BackgroundTasks, req: Optional[BatchResumeRequest] = None):
+    req = req or BatchResumeRequest()
+    try:
+        batch = scrape_jobs.get_batch(batch_id)
+    except psycopg2.OperationalError:
+        logger.exception("Database connection failed while reading batch %s", batch_id)
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again shortly.")
+    if batch is None:
+        raise HTTPException(status_code=404, detail=f"No batch with batch_id={batch_id}.")
+
+    config, spec = _resolve_court(batch["court_id"])
+    if not hasattr(spec.adapter_class, "discover"):
+        raise HTTPException(status_code=400, detail=f"{config['court_name']} batches can't be resumed yet — use Run Again.")
+    if not _has_work_to_resume(batch, retry_skipped=req.retry_skipped):
+        raise HTTPException(status_code=409, detail="Nothing left to resume for this batch.")
+
+    claim = scrape_jobs.claim_batch_resume(batch_id, retry_skipped=req.retry_skipped)
+    if claim is None:
+        raise HTTPException(status_code=409, detail="This batch is already running.")
+
+    # Reopened before responding: the UI reconnects its log stream as soon as it sees the new
+    # run_count, which can beat the background task to live_logs.start_batch().
+    live_logs.start_batch(batch_id)
+
+    from_date, to_date = claim["date_from"].isoformat(), claim["date_to"].isoformat()
+    background_tasks.add_task(
+        _run_and_log, spec.adapter_class(), spec.promote_fn, spec.find_provisions_fn, spec.run_enrichment,
+        batch_id, batch["court_id"], batch["court_code"], from_date, to_date, spec.data_source,
+        _adapter_kwargs(config, req.headless), claim["run_count"],
+    )
+    return {
+        "status": "resumed",
+        "batch_id": batch_id,
+        "run_count": claim["run_count"],
+        "message": f"Resuming batch #{batch_id} (run {claim['run_count']}) in the background.",
+    }
 
 
 @router.get("/batches/{batch_id}/records")
