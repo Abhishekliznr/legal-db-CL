@@ -139,6 +139,19 @@ def on_startup():
             f"failed. Underlying error: {exc}"
         ) from exc
 
+    # Fatal: a missing model would otherwise make every promotion's NER
+    # fallback return [] per-call, indistinguishable from "no acts found".
+    try:
+        from pipeline.legal_ner_extraction import load_models
+        load_models()
+    except Exception as exc:
+        logger.exception("Could not load Legal NER models at startup")
+        raise RuntimeError(
+            "scraper-backend startup aborted: could not load en_legal_ner_sm/"
+            "en_core_web_sm. Run ./install_ner_models.sh in this environment. "
+            f"Underlying error: {exc}"
+        ) from exc
+
     # Seeds the Supreme Court + 25 High Courts only the first time cr_courts
     # is empty, so a fresh database is immediately usable (POST
     # /api/scraper/start needs a real court_id to dispatch against) without

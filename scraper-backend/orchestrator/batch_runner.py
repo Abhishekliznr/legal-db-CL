@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import time
 from typing import Callable, Optional
 
 from adapters.base import (
@@ -11,7 +12,7 @@ from adapters.base import (
     SourceUnavailableError,
 )
 from db import scrape_jobs
-from orchestrator import live_logs, log_context
+from orchestrator import live_logs, log_context, stages
 from pipeline import llm_enrichment, ocr
 from storage import azure_blob
 
@@ -25,8 +26,8 @@ def _checksum_file(path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _log(level: str, msg: str, *args) -> None:
-    log_context.plog(logger, level, msg, *args)
+def _log(stage: str, level: str, msg: str, *args) -> None:
+    log_context.slog(logger, stage, level, msg, *args)
 
 
 def _source_failure_status(exc: Exception) -> str:
@@ -74,17 +75,10 @@ def run_batch(
     pipeline.llm_enrichment.py changes to turn it on later.
     """
     live_logs.start_batch(batch_id)
+    started_at = time.monotonic()
 
     with log_context.scope(batch_id, court_code):
-        _log(
-            "info",
-            "[BATCH %s] started: court_id=%s %s -> %s (data_source=%s)",
-            batch_id,
-            court_id,
-            date_from,
-            date_to,
-            data_source,
-        )
+        _log(stages.BATCH, "info", "Started batch #%s · %s · %s → %s", batch_id, court_code, date_from, date_to)
 
         total_found = 0
         total_downloaded = 0
@@ -97,60 +91,42 @@ def run_batch(
         try:
             for record in adapter.scrape(date_from, date_to, **adapter_kwargs):
                 if scrape_jobs.is_cancel_requested(batch_id):
-                    _log(
-                        "warning",
-                        "[BATCH %s] cancel requested — stopping after %s record(s)",
-                        batch_id,
-                        total_found,
-                    )
+                    _log(stages.BATCH, "warning", "Cancel requested — stopping after %s case(s)", total_found)
                     cancelled = True
                     break
 
                 total_found += 1
                 case_label = record.case_number_raw or record.source_url
+                index, total = record.position or (None, None)
 
-                try:
-                    ingestion_id = _ingest_one_record(
-                        record, batch_id, court_id, court_code, data_source
-                    )
-                except Exception:
-                    _log(
-                        "exception",
-                        "[BATCH %s] [INGEST] %s: failed to ingest",
-                        batch_id,
-                        case_label,
-                    )
-                    total_errored += 1
-                    continue
+                with log_context.case_scope(case_label, index, total):
+                    try:
+                        ingestion_id = _ingest_one_record(
+                            record, batch_id, court_id, court_code, data_source
+                        )
+                    except Exception:
+                        _log(stages.INGEST, "exception", "Failed to save the judgment PDF")
+                        total_errored += 1
+                        continue
 
-                if ingestion_id is None:
-                    _log(
-                        "info",
-                        "[BATCH %s] [INGEST] %s: duplicate — skipped",
-                        batch_id,
-                        case_label,
-                    )
-                    total_skipped_duplicate += 1
-                    continue
+                    if ingestion_id is None:
+                        _log(stages.INGEST, "info", "Same PDF already ingested earlier → skipped")
+                        total_skipped_duplicate += 1
+                        continue
 
-                total_downloaded += 1
+                    total_downloaded += 1
 
-                try:
-                    case_id = _run_pipeline_for_one(batch_id, ingestion_id, record, promote_fn, find_provisions_fn, run_enrichment)
-                except Exception:
-                    _log(
-                        "exception",
-                        "[BATCH %s] [PIPELINE] ingestion_id=%s: unhandled exception",
-                        batch_id,
-                        ingestion_id,
-                    )
-                    scrape_jobs.update_status(
-                        ingestion_id,
-                        status="PROMOTION_FAILED",
-                        error_message="Unhandled pipeline exception — see server logs",
-                    )
-                    total_errored += 1
-                    continue
+                    try:
+                        case_id = _run_pipeline_for_one(batch_id, ingestion_id, record, promote_fn, find_provisions_fn, run_enrichment)
+                    except Exception:
+                        _log(stages.PROMOTE, "exception", "Unhandled pipeline error on ingestion #%s", ingestion_id)
+                        scrape_jobs.update_status(
+                            ingestion_id,
+                            status="PROMOTION_FAILED",
+                            error_message="Unhandled pipeline exception — see server logs",
+                        )
+                        total_errored += 1
+                        continue
 
                 if case_id is not None:
                     total_promoted += 1
@@ -177,7 +153,8 @@ def run_batch(
             SourceStructureChangedError,
         ) as exc:
             status = _source_failure_status(exc)
-            _log("error", "[BATCH %s] source failure: %s", batch_id, exc)
+            _log(stages.BATCH, "error", "Source failure: %s", exc)
+            _log_summary(status, started_at, total_found, total_promoted, total_needs_review, total_skipped_duplicate, total_errored)
             scrape_jobs.finish_batch(
                 batch_id,
                 status=status,
@@ -202,7 +179,8 @@ def run_batch(
             }
 
         except Exception:
-            _log("exception", "[BATCH %s] unexpected adapter-level failure", batch_id)
+            _log(stages.BATCH, "exception", "Unexpected scraper failure")
+            _log_summary("FAILED", started_at, total_found, total_promoted, total_needs_review, total_skipped_duplicate, total_errored)
             scrape_jobs.finish_batch(
                 batch_id,
                 status="FAILED",
@@ -224,9 +202,39 @@ def run_batch(
             "total_errored": total_errored,
             "cancelled": cancelled,
         }
-        _log("info", "[BATCH %s] finished: %s", batch_id, summary)
+        _log_summary(summary["status"], started_at, total_found, total_promoted, total_needs_review, total_skipped_duplicate, total_errored)
         live_logs.finish_batch(batch_id)
         return summary
+
+
+def _format_duration(seconds: float) -> str:
+    minutes, secs = divmod(int(seconds), 60)
+    hours, minutes = divmod(minutes, 60)
+    if hours:
+        return f"{hours}h {minutes}m"
+    return f"{minutes}m {secs}s" if minutes else f"{secs}s"
+
+
+def _format_counts(counts) -> str:
+    return " · ".join(f"{label} {count}" for label, count in counts.items() if count)
+
+
+def _log_summary(
+    status: str, started_at: float, processed: int, promoted: int, needs_review: int, duplicates: int, errored: int
+) -> None:
+    level = "info" if status == "COMPLETED" else "warning"
+    _log(stages.BATCH, level, "Finished in %s · %s", _format_duration(time.monotonic() - started_at), status.lower().replace("_", " "))
+
+    tallies = log_context.tallies()
+    if tallies.get("Skipped"):
+        _log(stages.BATCH, "info", "Skipped: %s", _format_counts(tallies["Skipped"]))
+
+    outcomes = _format_counts({"needs review": needs_review, "duplicate PDF": duplicates, "errors": errored})
+    _log(stages.BATCH, "info", "Processed %d: promoted %d%s", processed, promoted, f" · {outcomes}" if outcomes else "")
+
+    for group, counts in tallies.items():
+        if group != "Skipped" and counts:
+            _log(stages.BATCH, "info", "%s: %s", group, _format_counts(counts))
 
 
 def _ingest_one_record(
@@ -245,7 +253,7 @@ def _ingest_one_record(
             blob_name=f"{court_code}/{checksum}.pdf",
         )
 
-    return scrape_jobs.insert_raw_ingestion(
+    ingestion_id = scrape_jobs.insert_raw_ingestion(
         batch_id=batch_id,
         court_id=court_id,
         source_pdf_url=record.source_url,
@@ -253,6 +261,10 @@ def _ingest_one_record(
         data_source=data_source,
         blob_pdf_id=blob_pdf_id,
     )
+    if ingestion_id is not None:
+        where = "Uploaded to Azure Blob" if blob_pdf_id else "Saved (Azure Blob not configured)"
+        _log(stages.INGEST, "info", "%s · ingestion #%s", where, ingestion_id)
+    return ingestion_id
 
 
 def _run_pipeline_for_one(
@@ -276,21 +288,20 @@ def _run_pipeline_for_one(
         if find_provisions_fn is not None:
             try:
                 provision_block = find_provisions_fn(ingestion["ocr_text"] or "")
+                if provision_block:
+                    _log(
+                        stages.PROVISIONS, "info",
+                        "Regex found text citing provisions (%s chars) → sent to LLM", f"{len(provision_block):,}",
+                    )
+                else:
+                    _log(stages.PROVISIONS, "info", "No provision references in judgment text")
             except Exception:
-                _log(
-                    "exception",
-                    "[ENRICH] case_id=%s: find_provisions_fn raised; enriching without a provision block",
-                    case_id,
-                )
+                _log(stages.PROVISIONS, "exception", "Provision-paragraph search failed · enriching without it")
         try:
             llm_enrichment.enrich_case(case_id, provision_block=provision_block)
-            _log("info", "[ENRICH] case_id=%s: enrichment finished", case_id)
         except Exception:
-            _log(
-                "exception",
-                "[ENRICH] case_id=%s: enrichment raised; promotion remains valid",
-                case_id,
-            )
+            _log(stages.ENRICH, "exception", "Enrichment failed for case #%s · promotion still stands", case_id)
+            log_context.tally("Enrichment", "failed")
 
     return case_id
 

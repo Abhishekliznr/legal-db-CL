@@ -11,7 +11,7 @@ tested/run without a database at all.
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator, Optional, Protocol
+from typing import Iterator, Optional, Protocol, Tuple
 
 
 @dataclass
@@ -34,6 +34,7 @@ class RawJudgmentRecord:
     cnr_raw: Optional[str] = None
     neutral_citation_raw: Optional[str] = None
     extra: dict = field(default_factory=dict)  # anything adapter-specific worth keeping
+    position: Optional[Tuple[int, int]] = None  # (index, total) among cases this run processes -- for log context
 
 
 class ScraperAdapter(Protocol):

@@ -60,9 +60,10 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
 
 from adapters.base import RawJudgmentRecord, SourceUnavailableError
-from adapters.high_courts.mp import case_status, ilrs
+from adapters.high_courts.mp import case_status, ilrs, stages
 from adapters.high_courts.mp.extraction import clean_headnote, normalize_case_no, normalize_case_type
 from db import court_config, scrape_jobs
+from orchestrator.log_context import case_scope, slog, tally
 
 logger = logging.getLogger("scraper_backend_v2.mp_adapter")
 
@@ -132,13 +133,13 @@ def _find_judgment_pdf_url(page) -> Optional[str]:
     instead of guessing again.
     """
     if not _wait_for_judgement_content(page):
-        logger.info("[MP ADAPTER] #judgement pane never got real content (still empty after wait)")
+        slog(logger, stages.JUDGMENT, "debug", "#judgement pane never got real content (still empty after wait)")
         return None
 
     html = page.locator("#judgement").inner_html()
     match = re.search(r'href="(https://mphc\.gov\.in/order/[^"]+)"', html)
     if match is None:
-        logger.info("[MP ADAPTER] no order link found in #judgement; raw pane content follows: %s", html[:3000])
+        slog(logger, stages.JUDGMENT, "debug", "no order link found in #judgement; raw pane content follows: %s", html[:3000])
     return match.group(1) if match else None
 
 
@@ -161,6 +162,7 @@ def _download_pdf(context, page, pdf_url: str, download_dir: Path) -> Optional[P
     server chooses to serve it.
     """
     local_path = download_dir / f"{abs(hash(pdf_url))}.pdf"
+    method = "browser download"
 
     try:
         with page.expect_download(timeout=PDF_CAPTURE_WAIT_SECONDS * 1000) as download_info:
@@ -170,20 +172,25 @@ def _download_pdf(context, page, pdf_url: str, download_dir: Path) -> Optional[P
                 pass  # navigation aborting here is the normal/expected shape of a triggered download
         download_info.value.save_as(str(local_path))
     except Exception as e:
-        logger.info("[MP ADAPTER] browser download did not fire for %s (%s), falling back to direct fetch", pdf_url, e)
+        slog(logger, stages.JUDGMENT, "debug", "browser download did not fire for %s (%s), falling back to direct fetch", pdf_url, e)
+        method = "direct fetch"
         try:
             response = context.request.get(pdf_url, timeout=30000)
             if not response.ok:
-                logger.warning("[MP ADAPTER] direct fetch of %s failed: status=%s", pdf_url, response.status)
+                slog(logger, stages.JUDGMENT, "warning", "PDF download failed (HTTP %s) → skipped", response.status)
+                tally("Skipped", "PDF download failed")
                 return None
             local_path.write_bytes(response.body())
         except Exception as fetch_err:
-            logger.warning("[MP ADAPTER] direct fetch of %s raised: %s", pdf_url, fetch_err)
+            slog(logger, stages.JUDGMENT, "warning", "PDF download failed (%s) → skipped", fetch_err)
+            tally("Skipped", "PDF download failed")
             return None
 
     if not local_path.exists() or not local_path.read_bytes().startswith(b"%PDF"):
-        logger.warning("[MP ADAPTER] downloaded file for %s is not a valid PDF", pdf_url)
+        slog(logger, stages.JUDGMENT, "warning", "Downloaded file is not a valid PDF → skipped")
+        tally("Skipped", "PDF download failed")
         return None
+    slog(logger, stages.JUDGMENT, "info", "PDF downloaded (%d KB, via %s)", local_path.stat().st_size // 1024, method)
     return local_path
 
 
@@ -243,7 +250,6 @@ class MPHighCourtAdapter:
 
         court_id = court_config.get_court_id_by_code("MPHC")
         already_promoted = scrape_jobs.get_promoted_case_numbers(court_id) if court_id is not None else set()
-        logger.info("[MP ADAPTER] %d case(s) already promoted for MPHC will be skipped", len(already_promoted))
 
         with tempfile.TemporaryDirectory(prefix="mphc_pdfs_") as tmp_dir:
             download_dir = Path(tmp_dir)
@@ -266,23 +272,27 @@ class MPHighCourtAdapter:
 
                 try:
                     candidates = ilrs.discover_candidates(page, year)
+                    to_process = [c for c in candidates if _case_label(c) not in already_promoted]
+                    if candidates:
+                        slog(
+                            logger, stages.DISCOVER, "info",
+                            "%d already in database → skipped · %d to process",
+                            len(candidates) - len(to_process), len(to_process),
+                        )
+                        tally("Skipped", "already in database", len(candidates) - len(to_process))
 
                     current_bench_code: Optional[str] = None
-                    skipped_existing = 0
-                    for candidate in candidates:
-                        if _case_label(candidate) in already_promoted:
-                            skipped_existing += 1
-                            continue
-                        if skipped_existing:
-                            logger.info("[MP ADAPTER] skipped %d already-promoted case(s)", skipped_existing)
-                            skipped_existing = 0
-                        record, current_bench_code = self._process_candidate_with_retry(
-                            context, page, candidate, download_dir, current_bench_code
-                        )
+                    total = len(to_process)
+                    for index, candidate in enumerate(to_process, start=1):
+                        # Exited before the yield: batch_runner re-enters its own
+                        # case_scope from record.position for the post-download stages.
+                        with case_scope(_case_label(candidate), index, total):
+                            record, current_bench_code = self._process_candidate_with_retry(
+                                context, page, candidate, download_dir, current_bench_code
+                            )
                         if record is not None:
+                            record.position = (index, total)
                             yield record
-                    if skipped_existing:
-                        logger.info("[MP ADAPTER] skipped %d already-promoted case(s)", skipped_existing)
                 finally:
                     browser.close()
 
@@ -300,9 +310,10 @@ class MPHighCourtAdapter:
                     raise SourceUnavailableError(
                         f"mphc.gov.in unreachable after {attempt} attempts on {case_label}: {e}"
                     ) from e
-                logger.warning(
-                    "[MP ADAPTER] %s: network error (attempt %d), retrying in %ds: %s",
-                    case_label, attempt, delay, e,
+                slog(
+                    logger, stages.CASE_STATUS, "warning",
+                    "Network error (attempt %d of %d) · retrying from case-status lookup in %ds: %s",
+                    attempt, len(NETWORK_RETRY_DELAYS_SECONDS) + 1, delay, e,
                 )
                 time.sleep(delay)
                 # Page state after a failed navigation is unknown, so force
@@ -321,12 +332,14 @@ class MPHighCourtAdapter:
 
         case_type_code = case_status.resolve_case_type_code(normalize_case_type(candidate["case_type"]))
         if case_type_code is None:
-            logger.warning("[MP ADAPTER] %s: unrecognized case_type, skipping", case_label)
+            slog(logger, stages.CASE_STATUS, "warning", "Unknown case type %r → skipped", candidate["case_type"])
+            tally("Skipped", "unknown case type")
             return None, current_bench_code
 
         bench_code = case_status.BENCH_CODES.get(candidate.get("bench"))
         if bench_code is None:
-            logger.warning("[MP ADAPTER] %s: unrecognized bench, skipping", case_label)
+            slog(logger, stages.CASE_STATUS, "warning", "Unknown bench %r → skipped", candidate.get("bench"))
+            tally("Skipped", "unknown bench")
             return None, current_bench_code
 
         page.goto(CASE_STATUS_URL, wait_until="domcontentloaded", timeout=30000)
@@ -336,10 +349,11 @@ class MPHighCourtAdapter:
             except Exception as e:
                 if _is_network_error(e):
                     raise
-                logger.warning(
-                    "[MP ADAPTER] %s: couldn't switch Establishment to bench=%r (%s), skipping",
-                    case_label, candidate.get("bench"), e,
+                slog(
+                    logger, stages.CASE_STATUS, "warning",
+                    "Couldn't switch case-status to bench %r (%s) → skipped", candidate.get("bench"), e,
                 )
+                tally("Skipped", "bench switch failed")
                 return None, current_bench_code
             current_bench_code = bench_code
 
@@ -356,30 +370,36 @@ class MPHighCourtAdapter:
             # show whether this is a bad field value, a stale/misapplied
             # Establishment, or something else, instead of an unexplained
             # dead end.
-            logger.warning(
-                "[MP ADAPTER] %s: case-status returned no matching case, skipping "
-                "(submitted case_type_code=%s case_no=%s registration_year=%s bench_code=%s)",
-                case_label, case_type_code, case_no, candidate["registration_year"], bench_code,
+            slog(
+                logger, stages.CASE_STATUS, "warning",
+                "Case not available on case-status → skipped (searched %s %s/%s, bench %s)",
+                normalize_case_type(candidate["case_type"]), case_no, candidate["registration_year"], candidate.get("bench"),
             )
             try:
                 page_text = page.locator("body").inner_text()[:2000]
             except Exception as e:
                 page_text = f"<couldn't read page text: {e}>"
-            logger.info("[MP ADAPTER] %s: case-status page text: %s", case_label, page_text)
+            slog(
+                logger, stages.CASE_STATUS, "debug",
+                "submitted case_type_code=%s bench_code=%s; page text: %s", case_type_code, bench_code, page_text,
+            )
+            tally("Skipped", "not on case-status")
             return None, current_bench_code
+        slog(logger, stages.CASE_STATUS, "info", "Case available")
 
         try:
             page.locator("button[data-link-type='judgement']").click(timeout=5000)
         except Exception as e:
-            logger.info("[MP ADAPTER] %s: couldn't click Judgement/Orders tab button (%s)", case_label, e)
+            slog(logger, stages.JUDGMENT, "debug", "couldn't click Judgement/Orders tab button (%s)", e)
         pdf_url = _find_judgment_pdf_url(page)
         if pdf_url is None:
-            logger.warning("[MP ADAPTER] %s: no judgment PDF found in Judgement/Orders tab, skipping", case_label)
+            slog(logger, stages.JUDGMENT, "warning", "No judgment/order in Judgement/Orders tab → skipped")
+            tally("Skipped", "no judgment PDF")
             return None, current_bench_code
+        slog(logger, stages.JUDGMENT, "info", "Latest order found in Judgement/Orders tab → downloading")
 
         pdf_path = _download_pdf(context, page, pdf_url, download_dir)
         if pdf_path is None:
-            logger.warning("[MP ADAPTER] %s: judgment PDF link found but download failed, skipping", case_label)
             return None, current_bench_code
 
         record = RawJudgmentRecord(

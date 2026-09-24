@@ -337,7 +337,7 @@ def test_enrich_case_holds_no_connection_during_the_llm_call(azure_env, monkeypa
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "some ocr text with no provisions in it", None, [], [], None)],
+        fetchone_queue=[("Case No. 1", "some ocr text with no provisions in it", None, [], [], None, False, False, False)],
     )
 
     connection_open_during_post = {"value": None}
@@ -358,7 +358,7 @@ def test_enrich_case_success_writes_done(azure_env, monkeypatch):
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None)],
+        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None, False, False, False)],
     )
     monkeypatch.setattr(le.requests, "post", MagicMock(return_value=_chat_response(json.dumps(_SAMPLE_RESULT))))
 
@@ -375,7 +375,7 @@ def test_enrich_case_http_failure_writes_failed(azure_env, monkeypatch):
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None)],
+        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None, False, False, False)],
     )
     monkeypatch.setattr(le.requests, "post", MagicMock(return_value=_error_response(500, "server error")))
 
@@ -392,7 +392,7 @@ def test_enrich_case_no_provisions_sent_produces_update_with_no_provision_column
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "plain text judgment with no statutory references at all", None, [], [], None)],
+        fetchone_queue=[("Case No. 1", "plain text judgment with no statutory references at all", None, [], [], None, False, False, False)],
     )
     monkeypatch.setattr(le.requests, "post", MagicMock(return_value=_chat_response(json.dumps(_SAMPLE_RESULT))))
 
@@ -410,7 +410,7 @@ def test_enrich_case_provision_dedupe_by_statute_and_number(azure_env, monkeypat
     ocr_text = "The accused was charged under Section 302 of the Indian Penal Code, 1860."
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", ocr_text, None, [], [], None)],
+        fetchone_queue=[("Case No. 1", ocr_text, None, [], [], None, False, False, False)],
     )
 
     result_with_dupe_provisions = dict(_SAMPLE_RESULT)
@@ -447,7 +447,7 @@ def test_enrich_case_no_ocr_text_is_skipped(azure_env, monkeypatch):
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", None, None, [], [], None)],
+        fetchone_queue=[("Case No. 1", None, None, [], [], None, False, False, False)],
     )
     mock_post = MagicMock()
     monkeypatch.setattr(le.requests, "post", mock_post)
@@ -468,7 +468,7 @@ def test_enrich_case_not_configured_leaves_pending_and_makes_no_call(monkeypatch
     cursor = FakeCursor(flag)
     _make_pooled_connection_mock(
         monkeypatch, flag, cursor,
-        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None)],
+        fetchone_queue=[("Case No. 1", "some ocr text", None, [], [], None, False, False, False)],
     )
     mock_post = MagicMock()
     monkeypatch.setattr(le.requests, "post", mock_post)

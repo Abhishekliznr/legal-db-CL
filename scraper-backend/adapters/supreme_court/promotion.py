@@ -27,7 +27,8 @@ from normalization import advocates, case_numbers, judges, parties
 from normalization.dates import parse_date
 from normalization.ministries import find_ministry_in_party_name
 from adapters.supreme_court import extraction as rx
-from orchestrator.log_context import plog
+from orchestrator import stages
+from orchestrator.log_context import slog
 
 logger = logging.getLogger("scraper_backend_v2.promotion")
 
@@ -132,14 +133,14 @@ def assign_liznr_id_for_reviewed_case(case_id: int) -> Optional[str]:
             cur.execute("SELECT court_id, judgment_date, liznr_id FROM cr_cases WHERE case_id = %s;", (case_id,))
             row = cur.fetchone()
             if row is None:
-                plog(logger, "warning", "[PROMOTE] case_id=%s: assign_liznr_id_for_reviewed_case — no such case", case_id)
+                slog(logger, stages.PROMOTE, "warning", "case_id=%s: assign_liznr_id_for_reviewed_case — no such case", case_id)
                 return None
             court_id, judgment_date, existing_liznr_id = row
             if existing_liznr_id is not None:
-                plog(logger, "info", "[PROMOTE] case_id=%s: already has liznr_id=%s, not reassigning", case_id, existing_liznr_id)
+                slog(logger, stages.PROMOTE, "info", "case_id=%s: already has liznr_id=%s, not reassigning", case_id, existing_liznr_id)
                 return existing_liznr_id
             if judgment_date is None:
-                plog(logger, "info", "[PROMOTE] case_id=%s: judgment_date still NULL, cannot assign a liznr_id yet", case_id)
+                slog(logger, stages.PROMOTE, "info", "case_id=%s: judgment_date still NULL, cannot assign a liznr_id yet", case_id)
                 return None
 
             liznr_id = _assign_liznr_id(cur, case_id, court_id, judgment_date.year)
@@ -192,7 +193,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     ocr_text = ingestion["ocr_text"] or ""
     court_id = ingestion["court_id"]
 
-    plog(logger, "info", "[PROMOTE] ingestion_id=%s: starting (case_number_raw=%r)", ingestion_id, record.case_number_raw)
+    slog(logger, stages.PROMOTE, "info", "ingestion_id=%s: starting (case_number_raw=%r)", ingestion_id, record.case_number_raw)
 
     try:
         case_number = (record.case_number_raw or "").strip()
@@ -282,9 +283,9 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         error_message="case_number already exists for this court — likely a re-run",
                     )
                     conn.commit()
-                    plog(
-                        logger, "info",
-                        "[PROMOTE] ingestion_id=%s: case_number=%r already exists for court_id=%s — likely a re-run, routed to NEEDS_REVIEW",
+                    slog(
+                        logger, stages.PROMOTE, "info",
+                        "ingestion_id=%s: case_number=%r already exists for court_id=%s — likely a re-run, routed to NEEDS_REVIEW",
                         ingestion_id, case_number, court_id,
                     )
                     return None
@@ -305,18 +306,18 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
             conn.commit()
 
-        plog(
-            logger, "info",
-            "[PROMOTE] ingestion_id=%s: done — case_id=%s liznr_id=%s disposition=%s needs_review=%s",
+        slog(
+            logger, stages.PROMOTE, "info",
+            "ingestion_id=%s: done — case_id=%s liznr_id=%s disposition=%s needs_review=%s",
             ingestion_id, case_id, liznr_id, disposition, needs_review,
         )
         return case_id
 
     except PromotionSkipped as e:
-        plog(logger, "warning", "[PROMOTE] ingestion_id=%s: skipped — %s", ingestion_id, e)
+        slog(logger, stages.PROMOTE, "warning", "ingestion_id=%s: skipped — %s", ingestion_id, e)
         scrape_jobs.update_status(ingestion_id, status="NEEDS_REVIEW", error_message=str(e))
         return None
     except Exception as e:
-        plog(logger, "exception", "[PROMOTE] ingestion_id=%s: failed", ingestion_id)
+        slog(logger, stages.PROMOTE, "exception", "ingestion_id=%s: failed", ingestion_id)
         scrape_jobs.update_status(ingestion_id, status="PROMOTION_FAILED", error_message=str(e))
         return None

@@ -110,7 +110,8 @@ def create_precedent_clusters(precedent_breakup, threshold):
 
 def split_precedents(precedents):
     precedent_breakup = {}
-    regex_vs = r'\b(?i)((v(\.|/)*s*\.*)|versus)\s+'
+    # Upstream had `\b(?i)` -- a mid-pattern global flag is a hard re.error on Python 3.11+.
+    regex_vs = r'(?i)\b((v(\.|/)*s*\.*)|versus)\s+'
     regex_cit = '(\(\d+\)|\d+|\[\d+\])\s*(\(\d+\)|\d+|\[\d+\])*\s*[A-Z\.]+\s*(\(\d+\)|\d+|\[\d+\])*\s*'
 
     for entity in precedents:

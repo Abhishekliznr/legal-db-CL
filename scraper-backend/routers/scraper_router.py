@@ -307,9 +307,12 @@ async def stream_batch_logs(batch_id: int):
 
         cursor = 0
         while True:
-            lines, cursor, finished = live_logs.get_lines_since(batch_id, cursor)
-            for ts, level, message in lines:
-                yield _sse_event({"ts": ts, "level": level, "message": message})
+            lines, cursor, trimmed, finished = live_logs.get_lines_since(batch_id, cursor)
+            if trimmed:
+                # Not a "system" line: the UI closes the stream on those.
+                yield _sse_event({"type": "trimmed", "count": trimmed, "kept": live_logs.MAX_LINES_PER_BATCH})
+            for line in lines:
+                yield _sse_event(line._asdict())
             if finished and not lines:
                 yield _sse_event({"level": "system", "message": "Batch finished — log stream closed."})
                 return
