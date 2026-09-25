@@ -11,7 +11,7 @@ tested/run without a database at all.
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator, Optional, Protocol
+from typing import Any, ContextManager, Iterator, List, Optional, Protocol, Tuple
 
 
 @dataclass
@@ -34,6 +34,7 @@ class RawJudgmentRecord:
     cnr_raw: Optional[str] = None
     neutral_citation_raw: Optional[str] = None
     extra: dict = field(default_factory=dict)  # anything adapter-specific worth keeping
+    position: Optional[Tuple[int, int]] = None  # (index, total) among cases this run processes -- for log context
 
 
 class ScraperAdapter(Protocol):
@@ -49,6 +50,42 @@ class ScraperAdapter(Protocol):
         each record as it arrives instead of losing an entire run's progress
         to a crash partway through a long date range.
         """
+        ...
+
+
+@dataclass
+class BatchItem:
+    """One case a resumable adapter discovered; saved in cr_batch_items so a stopped batch can resume from it."""
+
+    key: str  # unique within the batch, e.g. MP's "<Bench>/<Type>/<No>/<Year>"
+    payload: dict  # whatever process_item() needs to handle this case again; must be JSON-serialisable
+    done_reason: Optional[str] = None  # set by discover() when there's nothing left to do, e.g. "already in database"
+    item_id: Optional[int] = None
+    position: Optional[int] = None
+
+
+@dataclass
+class ItemOutcome:
+    """Exactly one of record / skip_reason is set."""
+
+    record: Optional[RawJudgmentRecord] = None
+    skip_reason: Optional[str] = None
+
+
+class ResumableScraperAdapter(Protocol):
+    """
+    Adapter that splits discovery from per-case work, so batch_runner can save
+    the discovered case list and resume a stopped batch without discovering
+    again. batch_runner uses this path whenever an adapter has discover().
+    """
+
+    def discover(self, date_from: str, date_to: str, **kwargs) -> List[BatchItem]:
+        ...
+
+    def session(self, **kwargs) -> ContextManager[Any]:
+        ...
+
+    def process_item(self, session: Any, item: BatchItem) -> ItemOutcome:
         ...
 
 

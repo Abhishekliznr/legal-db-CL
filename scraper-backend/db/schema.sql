@@ -204,7 +204,11 @@ CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     -- finish_batch() silently had no column/param for it until db/migrations/0009
     -- (found live: a real sci.gov.in 403 crashed with an unhandled TypeError instead
     -- of cleanly recording the batch as failed). NULL for a normal COMPLETED/CANCELLED batch.
-    error_message   TEXT
+    error_message   TEXT,
+    -- Set once a resumable adapter's discovered case list is saved to cr_batch_items;
+    -- a resume skips discovery when set (db/migrations/0013).
+    discovered_at   TIMESTAMPTZ,
+    run_count       INT NOT NULL DEFAULT 1        -- 1 for the first run, +1 per resume
 );
 
 -- One row per PDF actually pulled off the court site, BEFORE it becomes a
@@ -249,6 +253,40 @@ CREATE TABLE IF NOT EXISTS cr_raw_ingestions (
 
 CREATE INDEX IF NOT EXISTS ix_cr_raw_ingestions_status ON cr_raw_ingestions(status);
 CREATE INDEX IF NOT EXISTS ix_cr_raw_ingestions_batch  ON cr_raw_ingestions(batch_id);
+
+-- The case list a resumable adapter discovered for a batch, with per-case
+-- progress, so a stopped batch resumes from where it stopped. A case is only
+-- marked DONE after promotion commits (db/migrations/0013).
+CREATE TABLE IF NOT EXISTS cr_batch_items (
+    item_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    batch_id      BIGINT NOT NULL REFERENCES cr_scrape_batches(batch_id) ON DELETE CASCADE,
+    position      INT NOT NULL,
+    item_key      TEXT NOT NULL,
+    payload       JSONB NOT NULL DEFAULT '{}',
+    status        TEXT NOT NULL DEFAULT 'PENDING',   -- PENDING / DONE / SKIPPED / FAILED
+    reason        TEXT,
+    ingestion_id  BIGINT REFERENCES cr_raw_ingestions(ingestion_id),
+    attempts      INT NOT NULL DEFAULT 0,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT uq_cr_batch_items_key UNIQUE (batch_id, item_key)
+);
+
+CREATE INDEX IF NOT EXISTS ix_cr_batch_items_batch_status ON cr_batch_items(batch_id, status);
+
+-- History of what happened to a batch across its runs (started, discovered,
+-- stop requested, resumed, interrupted, and one finish event per run named
+-- after its status), for the admin timeline (db/migrations/0014).
+CREATE TABLE IF NOT EXISTS cr_batch_events (
+    event_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    batch_id     BIGINT NOT NULL REFERENCES cr_scrape_batches(batch_id) ON DELETE CASCADE,
+    run_number   INT NOT NULL,
+    event_type   TEXT NOT NULL,
+    occurred_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    message      TEXT,
+    details      JSONB NOT NULL DEFAULT '{}'
+);
+
+CREATE INDEX IF NOT EXISTS ix_cr_batch_events_batch ON cr_batch_events(batch_id, occurred_at);
 
 -- ---------------------------------------------------------------------
 -- 4. CORE TABLE

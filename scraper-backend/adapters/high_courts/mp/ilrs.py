@@ -53,11 +53,14 @@ real search submitted, a real result clicked through to its detail pane):
 
 import logging
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from bs4 import BeautifulSoup
 
+from adapters.base import SourceUnavailableError
 from adapters.captcha_ocr import solve_captcha_image
+from adapters.high_courts.mp import stages
+from orchestrator.log_context import slog
 
 logger = logging.getLogger("scraper_backend_v2.mp_ilrs")
 
@@ -74,14 +77,14 @@ def _captcha_error_visible(page) -> bool:
         return False
 
 
-def _solve_and_submit_captcha(page) -> bool:
-    """Drives #modal-default to completion. Returns True once the site's own JS has accepted the code and closed the modal (a real search request is then already in flight/done), False if every retry was exhausted."""
+def _solve_and_submit_captcha(page) -> Optional[int]:
+    """Drives #modal-default to completion. Returns the 1-based attempt the site's own JS accepted the code on (modal closed, search already fired), None if every retry was exhausted."""
     for attempt in range(MAX_CAPTCHA_RETRIES):
         captcha_image = page.locator("#captcha")
         try:
             captcha_image.wait_for(state="visible", timeout=10000)
         except Exception:
-            return False
+            return None
 
         solved = solve_captcha_image(captcha_image.screenshot())
         if not solved:
@@ -94,13 +97,13 @@ def _solve_and_submit_captcha(page) -> bool:
         page.wait_for_timeout(1500)
 
         if not page.locator("#modal-default").is_visible():
-            return True  # modal closed -- code accepted, search already fired
+            return attempt + 1  # modal closed -- code accepted, search already fired
         if _captcha_error_visible(page):
-            logger.info("[MP ILRS] captcha attempt %d/%d rejected, retrying", attempt + 1, MAX_CAPTCHA_RETRIES)
+            slog(logger, stages.DISCOVER, "debug", "captcha attempt %d/%d rejected, retrying", attempt + 1, MAX_CAPTCHA_RETRIES)
             page.wait_for_timeout(500)
             continue
 
-    return False
+    return None
 
 
 def _select_ilr_year(page, year: int) -> None:
@@ -223,11 +226,15 @@ def discover_candidates(page, year: int) -> List[Dict[str, Any]]:
     judges, decision_date, petitioners, respondents, headnote} -- every row
     the search itself returns (see module docstring: a row's own decision
     date can legitimately differ from the ILR year searched, so it is not
-    used to drop rows here). Returns [] if the captcha couldn't be solved after
-    MAX_CAPTCHA_RETRIES attempts (logged, not raised — an empty discovery
-    result is a valid, if unfortunate, batch outcome, same as any other
-    adapter's captcha-exhausted path).
+    used to drop rows here). Raises SourceUnavailableError if the captcha
+    never appears or can't be solved in MAX_CAPTCHA_RETRIES attempts: returning
+    [] would look like "no cases this year" and mark the batch discovered with
+    nothing to resume, while raising stops it as a resumable source failure.
     """
+    slog(
+        logger, stages.DISCOVER, "info",
+        'Opening MP ILRS portal → "Search by ILR Details", ILR year %s (MP searches by whole year)', year,
+    )
     page.goto(ILRS_URL, wait_until="domcontentloaded", timeout=60000)
     # The page loads with the "Free Text" tab active (Bootstrap pills) --
     # "Search By ILR Details" is a separate, initially-hidden tab-pane
@@ -242,12 +249,12 @@ def discover_candidates(page, year: int) -> List[Dict[str, Any]]:
     try:
         page.locator("#modal-default").wait_for(state="visible", timeout=10000)
     except Exception:
-        logger.warning("[MP ILRS] captcha modal never appeared after searching year=%s", year)
-        return []
+        raise SourceUnavailableError(f"ILRS captcha never appeared after searching ILR year {year}")
 
-    if not _solve_and_submit_captcha(page):
-        logger.warning("[MP ILRS] could not solve ILRS captcha after %d attempts for year=%s", MAX_CAPTCHA_RETRIES, year)
-        return []
+    solved_on = _solve_and_submit_captcha(page)
+    if solved_on is None:
+        raise SourceUnavailableError(f"Could not solve the ILRS captcha after {MAX_CAPTCHA_RETRIES} attempts")
+    slog(logger, stages.DISCOVER, "info", "Captcha solved (attempt %d of %d)", solved_on, MAX_CAPTCHA_RETRIES)
 
     # #content is present in the DOM from page load onward (this is the
     # raw XMLHttpRequest's target, not something Playwright's networkidle
@@ -262,18 +269,28 @@ def discover_candidates(page, year: int) -> List[Dict[str, Any]]:
             timeout=30000,
         )
     except Exception:
-        logger.warning("[MP ILRS] #content still showing the loading placeholder after 30s for year=%s", year)
+        slog(logger, stages.DISCOVER, "warning", "Search results still loading after 30s · reading whatever is there")
 
     candidates: List[Dict[str, Any]] = []
+    unreadable = 0
     for row in _read_result_rows(page):
         try:
             row.click()
             page.wait_for_timeout(1000)
         except Exception:
+            unreadable += 1
             continue
         detail = _parse_detail_pane(page.locator("#third").inner_html())
         if not detail:
+            unreadable += 1
             continue
         candidates.append(detail)
 
+    if unreadable:
+        slog(
+            logger, stages.DISCOVER, "warning",
+            "%d reported case(s) found in ILR %s · %d result row(s) couldn't be read", len(candidates), year, unreadable,
+        )
+    else:
+        slog(logger, stages.DISCOVER, "info", "%d reported case(s) found in ILR %s", len(candidates), year)
     return candidates

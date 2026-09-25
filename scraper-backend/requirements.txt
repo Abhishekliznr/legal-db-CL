@@ -10,3 +10,5 @@ ddddocr
 PyMuPDF
 pytesseract
 azure-storage-blob
+spacy>=3.8,<3.9
+nltk
