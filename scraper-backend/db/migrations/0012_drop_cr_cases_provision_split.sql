@@ -22,6 +22,13 @@
 --
 -- DESTRUCTIVE: any rule/order provisions already stored in these columns
 -- are lost. NOT run against any real database as part of writing this file.
+--
+-- cr_case_search_view (api-backend's own view) selects cr_cases.rules, so
+-- it must be dropped BEFORE the ALTER TABLE below, same as 0006's
+-- structured_content drop. Recreate it afterwards from api-backend:
+--   python -m db.init_db ensure-view
+
+DROP VIEW IF EXISTS cr_case_search_view;
 
 ALTER TABLE cr_cases
     DROP COLUMN IF EXISTS rules,

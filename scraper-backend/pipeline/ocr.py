@@ -24,7 +24,8 @@ from typing import Optional, Tuple
 import pymupdf as fitz
 
 from db import scrape_jobs
-from orchestrator.log_context import plog
+from orchestrator import stages
+from orchestrator.log_context import slog
 
 logger = logging.getLogger("scraper_backend_v2.ocr")
 
@@ -86,7 +87,6 @@ def process_ingestion_ocr(ingestion_id: int, local_pdf_path: Path) -> None:
     to OCR_DONE. Called synchronously by the orchestrator right after
     download, while the temp file still exists (spec §4.4's batch flow).
     """
-    plog(logger, "info", "[OCR] ingestion_id=%s: starting (pdf=%s)", ingestion_id, local_pdf_path.name)
     try:
         pdf_bytes = local_pdf_path.read_bytes()
         text = extract_text_from_pdf_bytes(pdf_bytes)
@@ -94,19 +94,18 @@ def process_ingestion_ocr(ingestion_id: int, local_pdf_path: Path) -> None:
         confidence = None
 
         if len(text.strip()) < MIN_TEXT_LAYER_CHARS:
-            plog(
-                logger, "info",
-                "[OCR] ingestion_id=%s: text layer empty/near-empty (%d chars) — falling back to Tesseract",
-                ingestion_id, len(text.strip()),
+            slog(
+                logger, stages.OCR, "info",
+                "PDF has no usable text layer (%d chars) → running Tesseract OCR",
+                len(text.strip()),
             )
             ocr_text, ocr_confidence = _ocr_with_tesseract(pdf_bytes)
             if ocr_text is not None:
                 text, engine, confidence = ocr_text, "tesseract", ocr_confidence
             else:
-                plog(
-                    logger, "warning",
-                    "[OCR] ingestion_id=%s: Tesseract unavailable — keeping the empty text-layer result rather than failing the row",
-                    ingestion_id,
+                slog(
+                    logger, stages.OCR, "warning",
+                    "Tesseract not available → keeping the near-empty text layer",
                 )
 
         page_count = _count_pages(pdf_bytes)
@@ -119,14 +118,19 @@ def process_ingestion_ocr(ingestion_id: int, local_pdf_path: Path) -> None:
             page_count=page_count,
             ocr_completed_at=datetime.now(timezone.utc),
         )
-        plog(
-            logger, "info",
-            "[OCR] ingestion_id=%s: done — engine=%s pages=%s chars=%d%s",
-            ingestion_id, engine, page_count, len(text),
-            f" confidence={confidence}" if confidence is not None else "",
-        )
+        if engine == "tesseract":
+            slog(
+                logger, stages.OCR, "info",
+                "OCR'd with Tesseract · %s pages · %s chars%s",
+                page_count, f"{len(text):,}", f" · confidence {confidence}" if confidence is not None else "",
+            )
+        elif len(text.strip()) >= MIN_TEXT_LAYER_CHARS:
+            slog(
+                logger, stages.OCR, "info",
+                "Read text layer with PyMuPDF · %s pages · %s chars (no OCR needed)", page_count, f"{len(text):,}",
+            )
     except Exception as e:
-        plog(logger, "exception", "[OCR] ingestion_id=%s: failed", ingestion_id)
+        slog(logger, stages.OCR, "exception", "Couldn't read text from the PDF: %s", e)
         # error_message — renamed from extraction_error in the 2026-09-08
         # schema rewrite, which flattened raw_ingestions down to a single
         # error_message column shared by every failure status instead of a

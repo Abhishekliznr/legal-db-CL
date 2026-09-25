@@ -74,8 +74,11 @@ def main():
         assert r.json()["judges"] == 5
         assert r.json()["acts"] == 4
 
-        print("\n=== GET /api/cases/filters ===")
-        r = client.get("/api/cases/filters")
+        print("\n=== QUERY /api/cases/filters ===")
+        # Changed GET -> QUERY 2026-09-23 (routers/filter_router.py): option counts are now
+        # scoped to the request body's search instead of the whole database. Empty body here ==
+        # the old GET's unscoped whole-database counts, so the assertions below are unchanged.
+        r = client.request("QUERY", "/api/cases/filters", json={})
         body = r.json()
         assert r.status_code == 200
         filters_by_key = {f["key"]: f for f in body["filters"]}

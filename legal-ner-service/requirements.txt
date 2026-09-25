@@ -1,8 +1,0 @@
-flask
-gunicorn
-numpy<2.0
-spacy==3.2.6
-nltk
-wasabi
-https://huggingface.co/opennyaiorg/en_legal_ner_sm/resolve/main/en_legal_ner_sm-any-py3-none-any.whl
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.2.0/en_core_web_sm-3.2.0-py3-none-any.whl

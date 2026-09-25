@@ -5,13 +5,15 @@ upstream __main__ block (displacy visualization demo) and the unused
 get_text_from_indiankanoon_url import.
 """
 
+import logging
 import re
 
 import spacy
-from wasabi import msg
 
 from .data_preparation import seperate_and_clean_preamble, get_sentence_docs
 from .postprocessing_utils import postprocessing
+
+logger = logging.getLogger("scraper_backend_v2.legal_ner_lib")
 
 
 def extract_entities_from_judgment_text(txt, legal_nlp, nlp_preamble_splitting, text_type, do_postprocess):
@@ -33,5 +35,5 @@ def extract_entities_from_judgment_text(txt, legal_nlp, nlp_preamble_splitting, 
         if do_postprocess:
             combined_doc = postprocessing(combined_doc)
     except Exception:
-        msg.warn('There was some issue while performing postprocessing, skipping postprocessing...')
+        logger.exception("[LEGAL_NER] postprocessing failed on %d chars of text, returning unpostprocessed doc", len(txt))
     return combined_doc
