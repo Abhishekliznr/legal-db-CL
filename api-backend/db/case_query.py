@@ -31,7 +31,39 @@ def parse_search_request(req) -> Dict[str, Any]:
         "filters_dict": req.filters,
         "from_date": req.date.from_date if req.date else None,
         "to_date": req.date.to_date if req.date else None,
+        "provisions": [
+            {"act": p.act, "sections": p.sections or []} for p in (getattr(req, "provisions", None) or [])
+        ],
+        "provisions_match": getattr(req, "provisions_match", None) or "any",
     }
+
+
+def _provision_clause(act: str, sections: List[str]) -> Tuple[str, List[Any]]:
+    # Matched against cr_cases' raw id arrays -- cr_case_search_view only carries resolved
+    # names. Exact act_name match (not the old "act" facet's ILIKE substring), so picking
+    # "Indian Penal Code, 1860" can't also pull in every other act containing "Code".
+    if sections:
+        return ("""EXISTS (
+            SELECT 1 FROM cr_cases pc
+            WHERE pc.case_id = v.case_id
+              AND pc.sections && ARRAY(
+                  SELECT s.section_id FROM cr_sections s JOIN cr_acts a ON a.act_id = s.act_id
+                  WHERE a.act_name = %s AND s.section_number = ANY(%s)
+              )
+        )""", [act, sections])
+    # An act can be cited only through a section of it, so c.acts alone isn't trusted to be
+    # a superset of the acts behind c.sections.
+    return ("""EXISTS (
+        SELECT 1 FROM cr_cases pc
+        WHERE pc.case_id = v.case_id
+          AND (
+              pc.acts && ARRAY(SELECT a.act_id FROM cr_acts a WHERE a.act_name = %s)
+              OR pc.sections && ARRAY(
+                  SELECT s.section_id FROM cr_sections s JOIN cr_acts a ON a.act_id = s.act_id
+                  WHERE a.act_name = %s
+              )
+          )
+    )""", [act, act])
 
 
 def build_case_where(
@@ -43,6 +75,8 @@ def build_case_where(
     filters_dict: Optional[Dict[str, Any]] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
+    provisions: Optional[List[Dict[str, Any]]] = None,
+    provisions_match: str = "any",
     exclude_filter_keys: Optional[set] = None,
 ) -> Tuple[str, List[Any]]:
     """Builds a `WHERE ...` clause (or "") + its params against `cr_case_search_view v`.
@@ -149,7 +183,22 @@ def build_case_where(
                     where_clauses.append("EXISTS (SELECT 1 FROM unnest(COALESCE(v.ministry_names, ARRAY[]::text[])) mn WHERE mn ILIKE ANY(%s))")
                     params.append(ministry_likes)
 
-    # 3. Date range
+    # 3. Act / Section provisions -- one clause per selected act, OR'd ("any") or AND'd ("all").
+    if provisions:
+        prov_clauses = []
+        for prov in provisions:
+            act = str(prov.get("act") or "").strip()
+            if not act:
+                continue
+            sections = [str(s).strip() for s in (prov.get("sections") or []) if str(s).strip()]
+            clause, clause_params = _provision_clause(act, sections)
+            prov_clauses.append(clause)
+            params.extend(clause_params)
+        if prov_clauses:
+            joiner = " AND " if provisions_match == "all" else " OR "
+            where_clauses.append("(" + joiner.join(prov_clauses) + ")")
+
+    # 4. Date range
     if from_date:
         where_clauses.append("v.judgment_date >= %s")
         params.append(from_date)

@@ -10,7 +10,7 @@ Provides:
                                            options embedded.
 
 Two kinds of filters, distinguished by `dataSource`:
-- "database" (built-in filters: court, judge, act, judgment_year,
+- "database" (built-in filters: court, judge, judgment_year,
   disposition, favouring_party, industry, ministry — see
   db/seed_filters.py's `_FILTER_DEFINITIONS`) — options are always computed
   live via the fixed, whitelisted SQL in `_compute_database_options()`,
@@ -52,10 +52,16 @@ active filter (db/case_query.py's `exclude_filter_keys`), so picking one
 court doesn't make every other court vanish from the court filter -- only
 narrows sibling facets. "static" filters (admin-defined, no live count) are
 unaffected -- there's no case data to scope them by.
+
+2026-09-26: the "act" facet was removed -- superseded by the Act/Section
+picker (routers/provision_router.py + the request body's `provisions`),
+which matches acts exactly instead of by ILIKE substring. db/seed_filters.py
+self-heals the old cr_filter_definitions row away. build_case_where() still
+accepts an `act`/`acts` key in `filters` for existing API callers.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import psycopg2
 from fastapi import APIRouter, HTTPException, Query
@@ -63,7 +69,7 @@ from pydantic import BaseModel, Field
 
 from db.case_query import build_case_where, parse_search_request
 from db.connection import get_pooled_connection
-from routers.search_router import SearchDateRangeModel, SearchQueryModel
+from routers.search_router import ProvisionFilterModel, SearchDateRangeModel, SearchQueryModel
 
 logger = logging.getLogger("api_backend_v2.filters")
 
@@ -113,6 +119,8 @@ class FiltersRequestModel(BaseModel):
     query: Optional[Union[SearchQueryModel, str]] = None
     filters: Optional[Dict[str, Any]] = Field(default_factory=dict)
     date: Optional[SearchDateRangeModel] = None
+    provisions: List[ProvisionFilterModel] = Field(default_factory=list)
+    provisions_match: Literal["any", "all"] = "any"
 
 
 # ============================================================
@@ -127,7 +135,6 @@ class FiltersRequestModel(BaseModel):
 _FILTER_KEY_ALIASES = {
     "court": ("court", "court_id"),
     "judge": ("judge", "judges"),
-    "act": ("act", "acts"),
     "judgment_year": ("judgment_year", "year"),
     "disposition": ("disposition",),
     "favouring_party": ("favouring_party",),
@@ -162,19 +169,6 @@ def _compute_database_options(cur, key: str, search: Dict[str, Any]) -> List[dic
             JOIN cr_cases c ON j.judge_id = ANY(c.bench)
             JOIN matched m ON m.case_id = c.case_id
             GROUP BY j.full_name
-            ORDER BY COUNT(DISTINCT m.case_id) DESC
-            LIMIT 30;
-        """, params)
-        return [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
-
-    if key == "act":
-        cur.execute(f"""
-            WITH matched AS ({matched_cte})
-            SELECT a.act_name, COUNT(DISTINCT m.case_id)
-            FROM cr_acts a
-            JOIN cr_cases c ON a.act_id = ANY(c.acts)
-            JOIN matched m ON m.case_id = c.case_id
-            GROUP BY a.act_name
             ORDER BY COUNT(DISTINCT m.case_id) DESC
             LIMIT 30;
         """, params)

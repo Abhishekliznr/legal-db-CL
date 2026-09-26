@@ -80,7 +80,7 @@ sources won't populate it, so expect null on those rows).
 
 import logging
 import os
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any, Literal, Union
 
 import psycopg2
 from fastapi import APIRouter, HTTPException, Query
@@ -125,10 +125,17 @@ class SearchSortModel(BaseModel):
     direction: Optional[str] = "desc"
 
 
+class ProvisionFilterModel(BaseModel):
+    act: str = Field(..., min_length=1, description="Exact act_name, as returned by GET /api/cases/acts.")
+    sections: List[str] = Field(default_factory=list, description="Empty = any section of the act (or the act cited on its own).")
+
+
 class SearchRequestModel(BaseModel):
     query: Optional[Union[SearchQueryModel, str]] = None
     filters: Optional[Dict[str, Any]] = Field(default_factory=dict)
     date: Optional[SearchDateRangeModel] = None
+    provisions: List[ProvisionFilterModel] = Field(default_factory=list)
+    provisions_match: Literal["any", "all"] = "any"
     sort: Optional[SearchSortModel] = Field(default_factory=SearchSortModel)
     page: int = Field(1, ge=1)
     limit: int = Field(20, ge=1, le=100)
@@ -248,6 +255,8 @@ def execute_case_search(
     filters_dict: Optional[Dict[str, Any]] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
+    provisions: Optional[List[Dict[str, Any]]] = None,
+    provisions_match: str = "any",
     sort_field: str = "date",
     sort_direction: str = "desc",
     page: int = 1,
@@ -259,6 +268,7 @@ def execute_case_search(
                 text_query=text_query, all_terms=all_terms, any_terms=any_terms,
                 exact_phrase=exact_phrase, none_terms=none_terms, filters_dict=filters_dict,
                 from_date=from_date, to_date=to_date,
+                provisions=provisions, provisions_match=provisions_match,
             )
 
             cur.execute(f"SELECT COUNT(*) FROM cr_case_search_view v {where_sql};", params)
