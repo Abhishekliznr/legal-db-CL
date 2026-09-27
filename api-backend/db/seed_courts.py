@@ -1,20 +1,12 @@
 """
 Seeds `cr_courts` + `cr_court_scrape_config` for the Supreme Court and
-Madhya Pradesh High Court -- the only two courts with a real adapter
-registered in orchestrator/registry.py's `ADAPTER_REGISTRY` right now.
-api-backend seeds the same rows at its own startup (its db/seed_courts.py).
+Madhya Pradesh High Court -- the only two courts with a real adapter in
+scraper-backend's orchestrator/registry.py right now. Runs at api-backend
+startup: the scraper only exists as an on-demand Job, and POST
+/api/scraper/sc|mp/start needs these rows before any Job has ever run.
 
-High Courts are no longer scraped via a single generic eCourts adapter
-(retired — see adapters/__init__.py); each gets its own adapter under
-adapters/high_courts/<code>/, built one court at a time. Madhya Pradesh's
-adapter (adapters/high_courts/mp/) landed with three pieces still pending
-reference material (see its own docstring) but is safe to register: those
-gaps make it a no-op (yields zero records), not a crash.
-
-Every other High Court previously seeded here (Delhi, Bombay, Kerala, ...)
-was removed along with the eCourts adapter they were configured for — none
-of them are being scraped right now. Re-add a court to `_HIGH_COURTS` below
-once it has its own real adapter, following the Madhya Pradesh pattern.
+Add a High Court to `_HIGH_COURTS` only once scraper-backend has its own
+adapter for it (adapters/high_courts/<code>/).
 
 Usage:
     python -m db.seed_courts
@@ -24,7 +16,7 @@ from db.connection import get_pooled_connection
 
 # (court_name, state, court_code, adapter) -- court_code is our own short
 # code for cr_cases.liznr_id ('LIZNR/<court_code>/<seq>/<year>'); adapter
-# must match a key in orchestrator/registry.py's ADAPTER_REGISTRY.
+# must match a key in scraper/courts.py's SUPPORTED_ADAPTERS (and the worker's registry).
 _HIGH_COURTS = [
     ("Madhya Pradesh High Court", "Madhya Pradesh", "MPHC", "high_court_mp"),
 ]

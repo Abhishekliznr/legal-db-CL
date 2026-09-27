@@ -14,7 +14,7 @@ from adapters.base import (
     SourceUnavailableError,
 )
 from db import scrape_jobs
-from orchestrator import live_logs, log_context, stages
+from orchestrator import live_logs, log_context, shutdown, stages
 from pipeline import llm_enrichment, ocr
 from storage import azure_blob
 
@@ -78,7 +78,7 @@ def run_batch(
     `promote_fn` and `find_provisions_fn` are this court's own extraction/
     promotion pipeline (e.g. adapters.supreme_court.promotion.promote_ingestion
     and adapters.supreme_court.extraction.find_provision_paragraphs) —
-    resolved by the caller (routers/scraper_router.py's adapter registry)
+    resolved by the caller (orchestrator/registry.py, via worker.py)
     the same way `adapter` already is, so this orchestrator stays entirely
     court-agnostic. `find_provisions_fn` is optional: omit it for a court
     whose extraction module doesn't have one yet — enrichment simply runs
@@ -91,12 +91,12 @@ def run_batch(
 
     An adapter with discover() (adapters.base.ResumableScraperAdapter) runs
     through cr_batch_items so a stopped batch can be resumed: `run_number` > 1
-    is a resume of the same batch (routers/scraper_router.py's resume endpoint),
+    is a resume of the same batch (queued by api-backend's resume endpoint),
     which skips discovery when the case list was already saved. Adapters with
     only scrape() stream records as before and can't be resumed.
     """
     resumable = hasattr(adapter, "discover")
-    live_logs.start_batch(batch_id)
+    live_logs.start_batch(batch_id, run_number)
     started_at = time.monotonic()
     counts = _Counts()
 
@@ -155,6 +155,9 @@ def run_batch(
         except _SOURCE_ERRORS as exc:
             status, error_message = _source_failure_status(exc), str(exc)
             _log(stages.BATCH, "error", "Source failure: %s", exc)
+        except shutdown.WorkerTerminated as exc:
+            status, error_message = "FAILED", f"{exc} — resume to continue"
+            _log(stages.BATCH, "warning", "Worker stopping: %s", exc)
         except Exception as exc:
             status, error_message, unexpected = "FAILED", f"{type(exc).__name__}: {exc}", exc
             _log(stages.BATCH, "exception", "Unexpected scraper failure")
@@ -164,10 +167,11 @@ def run_batch(
             totals = scrape_jobs.batch_totals_from_items(batch_id)
         else:
             totals = {"total_found": counts.processed, "total_downloaded": counts.downloaded, "total_promoted": counts.promoted}
+        # Logs first: api-backend's SSE reader closes once the batch is finished and no rows are left.
+        live_logs.finish_batch(batch_id)
         scrape_jobs.finish_batch(
             batch_id, status=status, error_message=error_message, run_details=_run_details(started_at, counts, batch_id if resumable else None), **totals,
         )
-        live_logs.finish_batch(batch_id)
 
     if unexpected is not None:
         raise unexpected
@@ -186,6 +190,7 @@ def run_batch(
 def _run_stream(adapter: ScraperAdapter, batch_id: int, handle_record, date_from: str, date_to: str, adapter_kwargs: dict) -> bool:
     """Non-resumable adapters (scrape() only). Returns True if cancelled."""
     for record in adapter.scrape(date_from, date_to, **adapter_kwargs):
+        shutdown.check()
         if scrape_jobs.is_cancel_requested(batch_id):
             _log(stages.BATCH, "warning", "Cancel requested — stopping")
             return True
@@ -219,6 +224,7 @@ def _run_items(adapter, batch_id: int, handle_record, date_from: str, date_to: s
     consecutive_failures = 0
     with adapter.session(**adapter_kwargs) as session:
         for done_count, row in enumerate(open_items):
+            shutdown.check()
             if scrape_jobs.is_cancel_requested(batch_id):
                 _log(stages.BATCH, "warning", "Cancel requested — stopping · %d case(s) left to resume", len(open_items) - done_count)
                 return True

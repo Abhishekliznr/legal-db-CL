@@ -79,7 +79,7 @@ NETWORK_RETRY_DELAYS_SECONDS = (5, 15, 30, 60)
 
 
 def _year_from_range(date_from: str, date_to: str) -> int:
-    """MP is queried by a single year (the ILRS portal's own "ILR year" field), not a date range -- derive it from date_from/to, requiring both to fall in the same calendar year rather than changing /api/scraper/start's request shape."""
+    """MP is queried by a single year (the ILRS portal's own "ILR year" field), not a date range -- derive it from date_from/to, requiring both to fall in the same calendar year rather than changing the batch's date-range shape."""
     start = date.fromisoformat(date_from)
     end = date.fromisoformat(date_to)
     if start.year != end.year:

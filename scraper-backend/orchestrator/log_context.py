@@ -2,10 +2,10 @@
 Thread-local (contextvars) pipeline logging context.
 
 batch_runner.run_batch() enters scope(batch_id, court_code) once per batch,
-on the BackgroundTasks worker thread that runs it (one thread per batch, so
-a plain ContextVar is enough). Per-case work is wrapped in case_scope(), so
+in the worker process (one batch per process, so a plain ContextVar is
+enough). Per-case work is wrapped in case_scope(), so
 every slog() call several frames down (adapters, pipeline/*) is tagged with
-its court, case and position and mirrored into the batch's live SSE buffer
+its court, case and position and mirrored into cr_batch_logs
 (live_logs.py) without threading ids through every signature.
 
 tally() counts outcomes per batch (e.g. skip reasons, where acts came from) for

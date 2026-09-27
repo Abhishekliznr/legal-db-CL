@@ -14,7 +14,7 @@ wants acts+sections tracked). When case-status has no Act row at all,
 db.lookups.resolve_act_entries() is retried against pipeline/legal_ner_extraction.py's Legal
 NER output over the judgment's own OCR text before falling through any
 further -- LLM enrichment (pipeline/llm_enrichment.py, enabled for MP as of
-routers/scraper_router.py's registry entry) only ever touches sections/acts
+orchestrator/registry.py's entry) only ever touches sections/acts
 as a last resort, when both of these came up empty (its own
 `existing_sections` guard). Enrichment otherwise fills
 conclusion/industries/ministries/favouring_party/subject the same way it

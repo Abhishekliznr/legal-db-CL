@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     date_from       DATE NOT NULL,
     date_to         DATE NOT NULL,
     requested_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-    status          TEXT NOT NULL DEFAULT 'RUNNING',
+    status          TEXT NOT NULL DEFAULT 'QUEUED',    -- QUEUED / RUNNING / COMPLETED / FAILED / CANCELLED / SOURCE_*
     total_found     INT DEFAULT 0,
     total_downloaded INT DEFAULT 0,
     total_promoted  INT DEFAULT 0,
@@ -215,7 +215,13 @@ CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     -- Set once a resumable adapter's discovered case list is saved to cr_batch_items;
     -- a resume skips discovery when set (db/migrations/0013).
     discovered_at   TIMESTAMPTZ,
-    run_count       INT NOT NULL DEFAULT 1        -- 1 for the first run, +1 per resume
+    run_count       INT NOT NULL DEFAULT 1,       -- 1 for the first run, +1 per resume
+    -- On-demand worker bookkeeping (db/migrations/0015): the running pod bumps heartbeat_at
+    -- every 30s; queued_at/claimed_at/job_name describe the latest run's K8s Job.
+    heartbeat_at    TIMESTAMPTZ,
+    job_name        TEXT,
+    queued_at       TIMESTAMPTZ,
+    claimed_at      TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS cr_raw_ingestions (
@@ -284,6 +290,26 @@ CREATE TABLE IF NOT EXISTS cr_batch_events (
 );
 
 CREATE INDEX IF NOT EXISTS ix_cr_batch_events_batch ON cr_batch_events(batch_id, occurred_at);
+
+CREATE INDEX IF NOT EXISTS ix_cr_scrape_batches_active
+    ON cr_scrape_batches(court_id) WHERE status IN ('QUEUED', 'RUNNING');
+
+-- Live log lines written by the worker pod, tailed by api-backend's SSE endpoint (db/migrations/0015).
+CREATE TABLE IF NOT EXISTS cr_batch_logs (
+    log_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    batch_id     BIGINT NOT NULL REFERENCES cr_scrape_batches(batch_id) ON DELETE CASCADE,
+    run_number   INT NOT NULL,
+    logged_at    TIMESTAMPTZ NOT NULL,
+    level        TEXT NOT NULL,
+    stage        TEXT,
+    case_ref     TEXT,
+    item_index   INT,
+    item_total   INT,
+    message      TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS ix_cr_batch_logs_batch ON cr_batch_logs(batch_id, log_id);
+CREATE INDEX IF NOT EXISTS ix_cr_batch_logs_logged_at ON cr_batch_logs(logged_at);
 
 -- ---------------------------------------------------------------------
 -- 4. CORE TABLE
