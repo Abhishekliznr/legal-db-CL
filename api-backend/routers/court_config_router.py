@@ -6,8 +6,7 @@ Admin CRUD for `courts` + `court_scrape_config`
                                          (adapter, free-form config, active flag)
 
 No scraping happens through this router — it only manages the config rows
-that routers/scraper_router.py's `_ADAPTER_REGISTRY` reads once the
-adapters exist.
+that routers/scraper_router.py resolves a court's adapter from.
 """
 
 import logging
@@ -19,13 +18,13 @@ from pydantic import BaseModel, Field
 
 from db import court_config
 
-logger = logging.getLogger("scraper_backend_v2.court_config")
+logger = logging.getLogger("api_backend_v2.court_config")
 
 router = APIRouter(prefix="/api/courts", tags=["Court Scrape Config"])
 
 
 class CourtScrapeConfigUpdate(BaseModel):
-    adapter: str = Field(..., description="Adapter name, e.g. 'supreme_court' — must match a key in routers/scraper_router.py's _ADAPTER_REGISTRY")
+    adapter: str = Field(..., description="Adapter name, e.g. 'supreme_court' — must be in scraper/courts.py's SUPPORTED_ADAPTERS")
     config: Optional[Dict[str, Any]] = Field(None, description="That adapter's own free-form settings (stored as JSONB), e.g. whatever a High Court's own adapter needs beyond headless")
     is_active: bool = True
     notes: Optional[str] = None

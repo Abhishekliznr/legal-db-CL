@@ -38,10 +38,7 @@ class RawJudgmentRecord:
 
 
 class ScraperAdapter(Protocol):
-    """
-    Implemented by adapters/supreme_court/adapter.py and by each
-    adapters/high_courts/<code>/adapter.py.
-    """
+    """Streaming adapter without resume support -- Supreme Court and MP implement ResumableScraperAdapter below instead."""
 
     def scrape(self, date_from: str, date_to: str, **kwargs) -> Iterator[RawJudgmentRecord]:
         """

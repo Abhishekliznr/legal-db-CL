@@ -26,7 +26,6 @@ from db.connection import get_pooled_connection
 _FILTER_DEFINITIONS = [
     ("court", "Court", "select", "multi", "court_id", "database", False, 0),
     ("judge", "Judge / Bench", "select", "multi", None, "database", True, 1),
-    ("act", "Act / Law", "select", "multi", None, "database", True, 2),
     ("judgment_year", "Judgment Year", "select", "multi", None, "database", False, 3),
     ("disposition", "Disposition", "select", "multi", None, "database", False, 4),
     ("favouring_party", "Favouring Party", "select", "multi", None, "database", False, 5),
@@ -53,7 +52,9 @@ def seed() -> None:
             # all, so a pre-existing 'treatment_status' row would otherwise
             # linger forever and keep showing up (with permanently empty
             # options, since filter_router.py no longer computes it).
-            cur.execute("DELETE FROM cr_filter_definitions WHERE key = 'treatment_status';")
+            # 'act' (2026-09-26) was superseded by the Act/Section picker's `provisions` search
+            # field -- see routers/provision_router.py.
+            cur.execute("DELETE FROM cr_filter_definitions WHERE key IN ('treatment_status', 'act');")
 
             cur.executemany("""
                 INSERT INTO cr_filter_definitions (key, label, type, selection_mode, query_key, data_source, is_searchable, display_order)

@@ -1,21 +1,19 @@
 services:
-  # scraper-backend — court scraping, AI metadata extraction & Azure
-  # Blob sync (heavy: Playwright/Chromium). No docker-internal Postgres:
-  # DB_HOST/DB_NAME/etc come straight from .env (env_file below), so this
-  # always talks to whichever Postgres is configured there, on every
-  # environment — no divergent hardcoded overrides here.
-  scraper-backend:
+  # scraper-backend worker — runs one batch and exits (heavy: Playwright/Chromium,
+  # Tesseract, spaCy NER). No docker-internal Postgres: DB_HOST/DB_NAME/etc come
+  # straight from .env. Batches are normally queued and launched by api-backend;
+  # to run one by hand:
+  #   docker compose run --rm scraper-worker python -m worker --batch-id 123
+  #   docker compose run --rm scraper-worker python -m worker --court sc --from 2026-09-01 --to 2026-09-07
+  scraper-worker:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: legal_scraper_v2_backend
-    restart: always
+    profiles: ["worker"]
     env_file:
       - .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - "8003:3000"
     volumes:
       - .:/app
       - /app/__pycache__

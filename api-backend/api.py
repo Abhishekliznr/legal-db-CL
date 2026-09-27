@@ -44,7 +44,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from db import connection
-from routers import filter_router, history_router, pdf_router, search_router, stats_router
+from routers import (
+    court_config_router, filter_router, history_router, pdf_router, provision_router, scraper_router, search_router, stats_router,
+)
 
 app = FastAPI(
     title="Legal Judgment Intelligence API (v2)",
@@ -119,13 +121,22 @@ def on_startup():
     except Exception as e:
         print(f"WARNING: could not seed filter/search-field definitions at startup: {e}")
 
+    # Scraper-backend used to seed courts at its own startup; it now only runs as an
+    # on-demand Job, and POST /api/scraper/sc|mp/start needs SCIN/MPHC to exist first.
+    # Non-fatal like the filters seed: an empty cr_courts only breaks starting a scrape.
+    try:
+        from db.seed_courts import ensure_seeded
+        ensure_seeded()
+    except Exception as e:
+        print(f"WARNING: could not seed courts at startup: {e}")
+
 
 @app.on_event("shutdown")
 def on_shutdown():
     connection.close_connection_pool()
 
 
-# Filters/stats/history/pdf are static (or /pdf-suffixed) sub-paths of
+# Filters/stats/history/pdf/acts are static (or /pdf-suffixed) sub-paths of
 # /api/cases and must be mounted before search_router, or a request to e.g.
 # /api/cases/stats or /api/cases/123/pdf would be swallowed by
 # search_router's /api/cases/{case_id:path} wildcard route.
@@ -133,7 +144,10 @@ app.include_router(filter_router.router)
 app.include_router(stats_router.router)
 app.include_router(history_router.router)
 app.include_router(pdf_router.router)
+app.include_router(provision_router.router)
 app.include_router(search_router.router)
+app.include_router(scraper_router.router)
+app.include_router(court_config_router.router)
 
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"

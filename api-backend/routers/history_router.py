@@ -4,7 +4,11 @@ Search History Router: Per-User Case Research Search History
 POST /api/cases/history       : Record one search (upserts — re-searching an
                                  existing query bumps it to the top instead of
                                  duplicating it). History is kept indefinitely
-                                 (no per-user row cap).
+                                 (no per-user row cap). `params` is the
+                                 search's URL query string, so a search built
+                                 from structured fields (assisted search,
+                                 acts/sections) can be replayed exactly --
+                                 `query` alone is only a display label.
 GET  /api/cases/history        : Paginated searches for a user, newest first.
 
 user_id is opaque text supplied by the caller (legal-ui's Next.js server
@@ -39,11 +43,13 @@ SORT_COLUMNS = {
 class RecordSearchHistoryRequest(BaseModel):
     user_id: str = Field(..., min_length=1)
     query: str = Field(..., min_length=1)
+    params: Optional[str] = Field(None, max_length=8000)
 
 
 class SearchHistoryItem(BaseModel):
     id: str
     query: str
+    params: Optional[str] = None
     created_at: str
 
 
@@ -58,6 +64,7 @@ class SearchHistoryResponse(BaseModel):
 @router.post("/api/cases/history", status_code=204)
 def record_search_history(payload: RecordSearchHistoryRequest):
     query = payload.query.strip()
+    params = (payload.params or "").strip() or None
     if not query:
         raise HTTPException(status_code=400, detail="query must not be empty.")
 
@@ -69,8 +76,8 @@ def record_search_history(payload: RecordSearchHistoryRequest):
                     (payload.user_id, query),
                 )
                 cur.execute(
-                    "INSERT INTO cr_search_history (user_id, query) VALUES (%s, %s);",
-                    (payload.user_id, query),
+                    "INSERT INTO cr_search_history (user_id, query, params) VALUES (%s, %s, %s);",
+                    (payload.user_id, query, params),
                 )
                 conn.commit()
                 return None
@@ -118,7 +125,7 @@ def get_search_history(
 
                 cur.execute(
                     f"""
-                    SELECT id, query, created_at
+                    SELECT id, query, params, created_at
                     FROM cr_search_history
                     WHERE {where_sql}
                     ORDER BY {order_by}
@@ -127,7 +134,7 @@ def get_search_history(
                     params + [limit, offset],
                 )
                 items = [
-                    SearchHistoryItem(id=str(row[0]), query=row[1], created_at=row[2].isoformat())
+                    SearchHistoryItem(id=str(row[0]), query=row[1], params=row[2], created_at=row[3].isoformat())
                     for row in cur.fetchall()
                 ]
                 total_pages = max(1, -(-total // limit))

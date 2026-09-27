@@ -11,10 +11,10 @@ sections/acts are resolved primarily from case-status's own Act lines --
 rules/orders are deliberately left '{}' always (case-status's own Act lines
 never distinguish a rule/order from a section, and this court's spec only
 wants acts+sections tracked). When case-status has no Act row at all,
-_resolve_acts() is retried against pipeline/legal_ner_extraction.py's Legal
+db.lookups.resolve_act_entries() is retried against pipeline/legal_ner_extraction.py's Legal
 NER output over the judgment's own OCR text before falling through any
 further -- LLM enrichment (pipeline/llm_enrichment.py, enabled for MP as of
-routers/scraper_router.py's registry entry) only ever touches sections/acts
+orchestrator/registry.py's entry) only ever touches sections/acts
 as a last resort, when both of these came up empty (its own
 `existing_sections` guard). Enrichment otherwise fills
 conclusion/industries/ministries/favouring_party/subject the same way it
@@ -37,15 +37,13 @@ from adapters.base import RawJudgmentRecord
 from db import scrape_jobs
 from db.connection import get_pooled_connection
 from db.lookups import (
-    get_or_create_act,
     get_or_create_advocate,
     get_or_create_case_category,
-    get_or_create_section,
     get_or_create_subject,
+    resolve_act_entries,
     resolve_bench,
 )
 from normalization import parties
-from normalization.acts import resolve_act
 from normalization.dates import parse_date
 from orchestrator import stages
 from orchestrator.log_context import slog, tally
@@ -76,35 +74,6 @@ def _resolve_advocate_ids(cur, entries: List[Dict[str, Any]]) -> List[int]:
             continue
         ids.append(get_or_create_advocate(cur, entry.get("name") or "", enrollment_no, entry.get("enrollment_year")))
     return ids
-
-
-def _resolve_acts(cur, act_entries: List[Dict[str, Any]]) -> tuple:
-    """
-    Returns (act_ids, section_ids) -- MP's case-status Act lines are always
-    sections (never rules/orders), matching the "U/Section" field on the
-    same page. Dedupes on (act_id, section_number) defensively here, not
-    just relying on case_status.py's own _parse_act_lines dedup upstream —
-    the real saved page this was built against had the identical Act line
-    repeated six times, so a second, cheaper dedup layer at the DB-writing
-    stage is worth having regardless of whether the parser always catches it.
-    """
-    act_ids: List[int] = []
-    section_ids: List[int] = []
-    seen_acts = set()
-    seen_sections = set()
-    for entry in act_entries:
-        statute_name, short_code, year = resolve_act(entry["act_name"])
-        act_id = get_or_create_act(cur, statute_name, short_code, year)
-        if act_id not in seen_acts:
-            seen_acts.add(act_id)
-            act_ids.append(act_id)
-        for number in entry.get("sections") or []:
-            key = (act_id, number)
-            if key in seen_sections:
-                continue
-            seen_sections.add(key)
-            section_ids.append(get_or_create_section(cur, act_id, number))
-    return act_ids, section_ids
 
 
 # Our own citation scheme, independent of whether the court ever assigned a
@@ -196,7 +165,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
             with conn.cursor() as cur:
                 petitioner_advocate_ids = _resolve_advocate_ids(cur, extra.get("petitioner_advocates") or [])
                 respondent_advocate_ids = _resolve_advocate_ids(cur, extra.get("respondent_advocates") or [])
-                act_ids, section_ids = _resolve_acts(cur, extra.get("acts") or [])
+                act_ids, section_ids = resolve_act_entries(cur, extra.get("acts") or [])
                 acts_source = "case-status"
                 if not act_ids:
                     # case-status had no Act row for this case (new/pending
@@ -205,7 +174,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                     # the judgment's OCR text as a second, still-deterministic
                     # source before this falls all the way through to LLM
                     # enrichment's own provisions guess (pipeline/llm_enrichment.py).
-                    act_ids, section_ids = _resolve_acts(cur, extract_acts_sections(ocr_text))
+                    act_ids, section_ids = resolve_act_entries(cur, extract_acts_sections(ocr_text))
                     slog(
                         logger, stages.NER, "info",
                         "case-status had no acts → ran Legal NER on judgment text · found %d act(s), %d section(s)",

@@ -2,18 +2,28 @@ import logging
 import re
 import tempfile
 import time
+from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 from urllib.parse import urljoin
 
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
-from adapters.base import RawJudgmentRecord
+from adapters.base import (
+    BatchItem,
+    ItemOutcome,
+    RawJudgmentRecord,
+    SourceStructureChangedError,
+    SourceUnavailableError,
+)
 from adapters.captcha_ocr import solve_captcha_image
+from adapters.supreme_court import stages
+from db import court_config, scrape_jobs
+from orchestrator.log_context import slog, tally
 
-from .client import BASE_URL, SupremeCourtBrowserClient
-from adapters.base import SourceStructureChangedError
+from .client import BASE_URL, SupremeCourtBrowserClient, download_pdf
 
 logger = logging.getLogger("scraper_backend_v2.adapters.supreme_court")
 
@@ -67,7 +77,8 @@ def _split_into_batches(date_from: str, date_to: str) -> list[tuple[str, str]]:
     return batches
 
 
-def _solve_and_submit_captcha(page, from_input, to_input, batch_from: str, batch_to: str) -> bool:
+def _solve_and_submit_captcha(page, from_input, to_input, batch_from: str, batch_to: str) -> Tuple[bool, Optional[int]]:
+    """Returns (has_results, attempt): (True, N) results table shown, (False, N) "No Records Found", (False, None) captcha never solved."""
     from_input.fill(batch_from)
     to_input.fill(batch_to)
 
@@ -77,9 +88,10 @@ def _solve_and_submit_captcha(page, from_input, to_input, batch_from: str, batch
     submit_button = page.locator("input[type='submit'][name='submit']")
     captcha_image = page.locator("#siwp_captcha_image_0, .siwp_captcha_image")
 
-    for _ in range(MAX_CAPTCHA_RETRIES):
+    for attempt in range(1, MAX_CAPTCHA_RETRIES + 1):
         if captcha_image.count() == 0 or not captcha_image.first.is_visible():
-            return False
+            slog(logger, stages.DISCOVER, "debug", "captcha image not visible on attempt %d", attempt)
+            return False, None
 
         solved_value = solve_captcha_image(captcha_image.first.screenshot())
         if solved_value:
@@ -88,20 +100,56 @@ def _solve_and_submit_captcha(page, from_input, to_input, batch_from: str, batch
             page.wait_for_timeout(4000)
 
             if page.locator(".distTableContent table tbody tr").count() > 0:
-                return True
+                return True, attempt
             if page.locator(":has-text('No Records Found')").count() > 0:
-                return False
+                return False, attempt
+            slog(logger, stages.DISCOVER, "debug", "captcha attempt %d/%d rejected, retrying", attempt, MAX_CAPTCHA_RETRIES)
 
         refresh_button = page.locator("a[title='Refresh Image']")
         if refresh_button.count() > 0:
             refresh_button.first.click()
             page.wait_for_timeout(1500)
 
-    return False
+    return False, None
 
 
-def _scrape_one_batch(client, batch_from: str, batch_to: str, download_dir: Path) -> Iterator[RawJudgmentRecord]:
-    logger.info("[SCRAPE] %s -> %s: loading SCI search page", batch_from, batch_to)
+def _read_row(row, headers: List[Optional[str]]) -> Optional[Dict[str, Any]]:
+    """One results-table row as a JSON-serialisable cr_batch_items payload, None for a row with no cells."""
+    cells = row.locator("td")
+    if cells.count() == 0:
+        return None
+
+    data = {}
+    for col_index, cell in enumerate(cells.all()):
+        header = headers[col_index] if col_index < len(headers) else f"col_{col_index}"
+        data[header] = _clean_text(cell.inner_text())
+
+    pdf_links = [
+        urljoin(BASE_URL, href)
+        for href in [a.get_attribute("href") for a in row.locator("a").all()]
+        if href
+    ]
+    decision_date_raw, neutral_citation_raw, language = _parse_judgment_cell(data.get("Judgment"))
+
+    return {
+        "pdf_url": pdf_links[0] if pdf_links else None,
+        "case_number": data.get("Case Number"),
+        "diary_number": data.get("Diary Number"),
+        "party_name": data.get("Petitioner / Respondent"),
+        "judge": data.get("Judgment By") or data.get("Bench"),
+        "decision_date": decision_date_raw,
+        "neutral_citation": neutral_citation_raw,
+        "advocate_raw": data.get("Petitioner/Respondent Advocate"),
+        "bench_raw": data.get("Bench"),
+        "language": language,
+    }
+
+
+def _discover_window(client, batch_from: str, batch_to: str, window: int, windows: int) -> List[Dict[str, Any]]:
+    slog(
+        logger, stages.DISCOVER, "info",
+        "Searching sci.gov.in judgments %s → %s (window %d of %d)", batch_from, batch_to, window, windows,
+    )
     client.open_search_page()
     page = client.page
 
@@ -112,65 +160,32 @@ def _scrape_one_batch(client, batch_from: str, batch_to: str, download_dir: Path
             "SCI date input fields #from_date / #to_date were not found."
         )
 
-    if not _solve_and_submit_captcha(page, from_input, to_input, batch_from, batch_to):
-        logger.info("[SCRAPE] %s -> %s: no records or CAPTCHA was not solved", batch_from, batch_to)
-        return
+    has_results, attempt = _solve_and_submit_captcha(page, from_input, to_input, batch_from, batch_to)
+    if attempt is None:
+        # Raising (not returning []) keeps a captcha failure from looking like "no judgments"
+        # and stops the batch before its case list is saved, so Resume re-runs discovery.
+        raise SourceUnavailableError(
+            f"Could not solve the sci.gov.in captcha for {batch_from} → {batch_to} "
+            f"after {MAX_CAPTCHA_RETRIES} attempts"
+        )
+    slog(logger, stages.DISCOVER, "info", "Captcha solved (attempt %d of %d)", attempt, MAX_CAPTCHA_RETRIES)
+    if not has_results:
+        slog(logger, stages.DISCOVER, "info", "No judgments in this window")
+        return []
 
     headers = [
         _clean_text(h.inner_text())
         for h in page.locator(".distTableContent table thead th").all()
     ]
-    logger.info("[SCRAPE] SCI results headers: %s", headers)
+    slog(logger, stages.DISCOVER, "debug", "SCI results headers: %s", headers)
 
+    found: List[Dict[str, Any]] = []
+    page_number = 1
     while True:
         rows = page.locator(".distTableContent table tbody tr")
-
-        for row_index in range(rows.count()):
-            row = rows.nth(row_index)
-            cells = row.locator("td")
-            if cells.count() == 0:
-                continue
-
-            data = {}
-            for col_index, cell in enumerate(cells.all()):
-                header = headers[col_index] if col_index < len(headers) else f"col_{col_index}"
-                data[header] = _clean_text(cell.inner_text())
-
-            pdf_links = [
-                urljoin(BASE_URL, href)
-                for href in [
-                    a.get_attribute("href")
-                    for a in row.locator("a").all()
-                ]
-                if href
-            ]
-            if not pdf_links:
-                continue
-
-            pdf_path = download_dir / f"{abs(hash(pdf_links[0]))}.pdf"
-            if not client.download_pdf(pdf_links[0], pdf_path):
-                logger.warning("[SCRAPE] PDF download failed: %s", pdf_links[0])
-                continue
-
-            decision_date_raw, neutral_citation_raw, language = _parse_judgment_cell(
-                data.get("Judgment")
-            )
-
-            yield RawJudgmentRecord(
-                pdf_path=pdf_path,
-                source_url=pdf_links[0],
-                case_number_raw=data.get("Case Number"),
-                party_name_raw=data.get("Petitioner / Respondent"),
-                judge_raw=data.get("Judgment By") or data.get("Bench"),
-                decision_date_raw=decision_date_raw,
-                cnr_raw=data.get("Diary Number"),
-                neutral_citation_raw=neutral_citation_raw,
-                extra={
-                    "advocate_raw": data.get("Petitioner/Respondent Advocate"),
-                    "bench_raw": data.get("Bench"),
-                    "language": language,
-                },
-            )
+        page_rows = [r for r in (_read_row(rows.nth(i), headers) for i in range(rows.count())) if r is not None]
+        slog(logger, stages.DISCOVER, "info", "Page %d · %d judgment rows", page_number, len(page_rows))
+        found.extend(page_rows)
 
         next_button = page.locator("#paginationHtml a:has-text('Next')")
         if next_button.count() == 0 or not next_button.first.is_visible():
@@ -180,38 +195,107 @@ def _scrape_one_batch(client, batch_from: str, batch_to: str, download_dir: Path
             next_button.first.click()
             page.wait_for_timeout(3000)
         except PlaywrightTimeoutError:
+            slog(logger, stages.DISCOVER, "warning", "Next page didn't load after page %d · keeping rows read so far", page_number)
             break
+        page_number += 1
+
+    slog(logger, stages.DISCOVER, "info", "%d judgment row(s) found in this window", len(found))
+    return found
+
+
+def _item_key(row: Dict[str, Any]) -> Optional[str]:
+    # Case Number is what promotion stores as cr_cases.case_number, so the
+    # "already in database" skip matches on it.
+    return row.get("case_number") or row.get("diary_number") or row.get("pdf_url")
+
+
+@dataclass
+class _Session:
+    download_dir: Path
 
 
 class SupremeCourtAdapter:
-    """ScraperAdapter implementation for sci.gov.in."""
+    """Implements ResumableScraperAdapter (adapters/base.py) for sci.gov.in: one item per judgment row."""
 
-    def scrape(
+    def discover(
         self,
         date_from: str,
         date_to: str,
         headless: bool = True,
         source_delay_seconds: float = 2.0,
         **kwargs,
-    ) -> Iterator[RawJudgmentRecord]:
-        batches = _split_into_batches(date_from, date_to)
+    ) -> List[BatchItem]:
+        windows = _split_into_batches(date_from, date_to)
+        court_id = court_config.get_court_id_by_code("SCIN")
+        already_promoted = scrape_jobs.get_promoted_case_numbers(court_id) if court_id is not None else set()
 
+        rows: List[Dict[str, Any]] = []
+        with SupremeCourtBrowserClient(
+            headless=headless,
+            source_delay_seconds=source_delay_seconds,
+        ) as client:
+            client.check_access()
+            for index, (window_from, window_to) in enumerate(windows, start=1):
+                if index > 1:
+                    time.sleep(source_delay_seconds)
+                rows.extend(_discover_window(client, window_from, window_to, index, len(windows)))
+
+        items: Dict[str, BatchItem] = {}
+        unidentified = repeated = 0
+        for row in rows:
+            key = _item_key(row)
+            if key is None:
+                unidentified += 1
+                continue
+            if key in items:
+                repeated += 1
+                continue
+            items[key] = BatchItem(
+                key=key,
+                payload=row,
+                done_reason="already in database" if key in already_promoted else None,
+            )
+
+        if unidentified:
+            slog(logger, stages.DISCOVER, "warning", "%d row(s) with no case number, diary number or PDF link → skipped", unidentified)
+            tally("Skipped", "unidentifiable row", unidentified)
+        if repeated:
+            slog(logger, stages.DISCOVER, "info", "%d row(s) repeat a case already listed → skipped", repeated)
+            tally("Skipped", "repeated case row", repeated)
+        slog(logger, stages.DISCOVER, "info", "%d judgment row(s) found across %d window(s)", len(rows), len(windows))
+        return list(items.values())
+
+    @contextmanager
+    def session(self, **kwargs) -> Iterator[_Session]:
         with tempfile.TemporaryDirectory(prefix="scin_pdfs_") as tmp_dir:
-            download_dir = Path(tmp_dir)
+            yield _Session(download_dir=Path(tmp_dir))
 
-            with SupremeCourtBrowserClient(
-                headless=headless,
-                source_delay_seconds=source_delay_seconds,
-            ) as client:
-                client.check_access()
+    def process_item(self, session: _Session, item: BatchItem) -> ItemOutcome:
+        row = item.payload
+        pdf_url = row.get("pdf_url")
+        if not pdf_url:
+            slog(logger, stages.JUDGMENT, "warning", "No judgment PDF link in row → skipped")
+            return ItemOutcome(skip_reason="no PDF link")
 
-                for index, (batch_from, batch_to) in enumerate(batches):
-                    if index:
-                        time.sleep(source_delay_seconds)
+        pdf_path = session.download_dir / f"{abs(hash(pdf_url))}.pdf"
+        failure = download_pdf(pdf_url, pdf_path)
+        if failure is not None:
+            slog(logger, stages.JUDGMENT, "warning", "PDF download failed (%s) → skipped", failure)
+            return ItemOutcome(skip_reason="PDF download failed")
+        slog(logger, stages.JUDGMENT, "info", "PDF downloaded (%d KB)", pdf_path.stat().st_size // 1024)
 
-                    yield from _scrape_one_batch(
-                        client,
-                        batch_from,
-                        batch_to,
-                        download_dir,
-                    )
+        return ItemOutcome(record=RawJudgmentRecord(
+            pdf_path=pdf_path,
+            source_url=pdf_url,
+            case_number_raw=row.get("case_number"),
+            party_name_raw=row.get("party_name"),
+            judge_raw=row.get("judge"),
+            decision_date_raw=row.get("decision_date"),
+            cnr_raw=row.get("diary_number"),
+            neutral_citation_raw=row.get("neutral_citation"),
+            extra={
+                "advocate_raw": row.get("advocate_raw"),
+                "bench_raw": row.get("bench_raw"),
+                "language": row.get("language"),
+            },
+        ))

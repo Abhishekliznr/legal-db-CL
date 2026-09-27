@@ -5,7 +5,7 @@ Applies db/schema.sql (caselaw_schema.sql + the operational supplement) to
 PostgreSQL. Designed to run once against an empty database — see the note
 at the top of schema.sql about CREATE TYPE not being idempotent in Postgres.
 
-`ensure_schema()` is the startup-safe variant used by api.py: it checks
+`ensure_schema()` is the startup-safe variant used by worker.py: it checks
 whether the core `cr_cases` table already exists and only calls
 `init_database()` when it doesn't, so it can be called on every app
 startup without ever re-running schema.sql's non-idempotent CREATE
@@ -174,8 +174,7 @@ def ensure_schema() -> None:
     serialize instead of both racing schema.sql's non-idempotent CREATE
     TYPE/CREATE TABLE statements — that race previously left the database
     with zero cr_ tables when both transactions stepped on each other and
-    aborted, while the app still came up "healthy" (see api.py's on_startup,
-    which treats this as non-fatal).
+    aborted.
     """
     conn = get_connection()
     try:

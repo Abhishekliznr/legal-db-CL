@@ -26,12 +26,12 @@ def _record_event(cur, batch_id: int, event_type: str, message: Optional[str] = 
 
 
 def create_batch(court_id: int, date_from: date, date_to: date) -> int:
-    """Creates a cr_scrape_batches row and returns its batch_id."""
+    """Manual worker runs only (python -m worker --court ...): api-backend queues every UI-started batch itself."""
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO cr_scrape_batches (court_id, date_from, date_to)
-                VALUES (%s, %s, %s)
+                INSERT INTO cr_scrape_batches (court_id, date_from, date_to, status, queued_at)
+                VALUES (%s, %s, %s, 'QUEUED', now())
                 RETURNING batch_id;
             """, (court_id, date_from, date_to))
             batch_id = cur.fetchone()[0]
@@ -39,6 +39,54 @@ def create_batch(court_id: int, date_from: date, date_to: date) -> int:
         conn.commit()
     return batch_id
 
+
+def claim_queued_batch(batch_id: int, job_name: Optional[str]) -> Optional[Dict[str, Any]]:
+    """QUEUED -> RUNNING for this worker. None if the batch isn't QUEUED (cancelled first, already claimed, or missing)."""
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE cr_scrape_batches sb
+                SET status = 'RUNNING', claimed_at = now(), heartbeat_at = now(),
+                    job_name = COALESCE(sb.job_name, %s)
+                FROM cr_courts c
+                WHERE sb.batch_id = %s AND sb.status = 'QUEUED' AND c.court_id = sb.court_id
+                RETURNING sb.court_id, c.court_code, sb.date_from, sb.date_to, sb.run_count;
+            """, (job_name, batch_id))
+            row = cur.fetchone()
+        conn.commit()
+    if row is None:
+        return None
+    court_id, court_code, date_from, date_to, run_count = row
+    return {"court_id": court_id, "court_code": court_code, "date_from": date_from, "date_to": date_to, "run_count": run_count}
+
+
+def fail_queued_batch(batch_id: int, error_message: str) -> None:
+    """The worker couldn't start (e.g. NER models missing): record why instead of leaving the run QUEUED until it goes stale."""
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE cr_scrape_batches SET status = 'FAILED', finished_at = now(), error_message = %s
+                WHERE batch_id = %s AND status = 'QUEUED'
+                RETURNING batch_id;
+            """, (error_message, batch_id))
+            if cur.fetchone() is not None:
+                _record_event(cur, batch_id, "FAILED", error_message)
+        conn.commit()
+
+
+def get_batch_status(batch_id: int) -> Optional[str]:
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT status FROM cr_scrape_batches WHERE batch_id = %s;", (batch_id,))
+            row = cur.fetchone()
+    return row[0] if row else None
+
+
+def heartbeat(batch_id: int) -> None:
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE cr_scrape_batches SET heartbeat_at = now() WHERE batch_id = %s AND status = 'RUNNING';", (batch_id,))
+        conn.commit()
 
 def finish_batch(
     batch_id: int,
@@ -62,124 +110,12 @@ def finish_batch(
         conn.commit()
 
 
-def fail_orphaned_batches() -> List[Dict[str, Any]]:
-    """Closes every RUNNING batch at startup — batches run in-process, so none can have survived a restart."""
-    with get_pooled_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                UPDATE cr_scrape_batches
-                SET status = CASE WHEN cancel_requested THEN 'CANCELLED' ELSE 'FAILED' END,
-                    finished_at = now(),
-                    error_message = 'Interrupted by server restart'
-                WHERE status = 'RUNNING'
-                RETURNING batch_id, status;
-            """)
-            rows = [{"batch_id": r[0], "status": r[1]} for r in cur.fetchall()]
-            for row in rows:
-                _record_event(
-                    cur, row["batch_id"], "INTERRUPTED",
-                    "The server restarted while this batch was running" + (" (a stop had been requested)" if row["status"] == "CANCELLED" else ""),
-                    {"status": row["status"]},
-                )
-        conn.commit()
-    return rows
 
 
-def list_batches(limit: int = 50, offset: int = 0) -> Dict[str, Any]:
-    with get_pooled_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT sb.batch_id, sb.court_id, c.court_name, c.court_code, sb.date_from, sb.date_to,
-                       sb.requested_at, sb.status, sb.total_found, sb.total_downloaded, sb.total_promoted,
-                       sb.finished_at, sb.error_message
-                FROM cr_scrape_batches sb
-                LEFT JOIN cr_courts c ON c.court_id = sb.court_id
-                ORDER BY sb.requested_at DESC
-                LIMIT %s OFFSET %s;
-            """, (limit, offset))
-            columns = [desc[0] for desc in cur.description]
-            rows = [dict(zip(columns, row)) for row in cur.fetchall()]
-
-            cur.execute("SELECT COUNT(*) FROM cr_scrape_batches;")
-            total = cur.fetchone()[0]
-
-    return {"batches": rows, "total": total}
 
 
-def get_batch(batch_id: int) -> Optional[Dict[str, Any]]:
-    """
-    Single-batch fetch for GET /api/scraper/batches/{id} — same header fields as list_batches()
-    plus cancel_requested, a per-stage `counts_by_status` breakdown (cr_raw_ingestions.status,
-    scoped to this batch — the pipeline stepper's data), and `enrichment_counts` (cr_cases
-    .enrichment_status for the cases THIS batch promoted — the LLM Enrichment card's data).
-    Both aggregates are computed here, alongside the header row, rather than making the caller
-    page through GET .../records and tally client-side.
-    """
-    with get_pooled_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT sb.batch_id, sb.court_id, c.court_name, c.court_code, sb.date_from, sb.date_to,
-                       sb.requested_at, sb.status, sb.total_found, sb.total_downloaded, sb.total_promoted,
-                       sb.cancel_requested, sb.finished_at, sb.error_message,
-                       sb.run_count, sb.discovered_at IS NOT NULL AS discovered
-                FROM cr_scrape_batches sb
-                LEFT JOIN cr_courts c ON c.court_id = sb.court_id
-                WHERE sb.batch_id = %s;
-            """, (batch_id,))
-            row = cur.fetchone()
-            if row is None:
-                return None
-            columns = [desc[0] for desc in cur.description]
-            batch = dict(zip(columns, row))
-
-            cur.execute("SELECT status, COUNT(*) FROM cr_raw_ingestions WHERE batch_id = %s GROUP BY status;", (batch_id,))
-            batch["counts_by_status"] = {status: count for status, count in cur.fetchall()}
-
-            cur.execute("""
-                SELECT c.enrichment_status, COUNT(*)
-                FROM cr_cases c
-                JOIN cr_raw_ingestions ri ON ri.case_id = c.case_id
-                WHERE ri.batch_id = %s
-                GROUP BY c.enrichment_status;
-            """, (batch_id,))
-            batch["enrichment_counts"] = {status: count for status, count in cur.fetchall()}
-
-            cur.execute("SELECT status, COUNT(*) FROM cr_batch_items WHERE batch_id = %s GROUP BY status;", (batch_id,))
-            batch["item_counts"] = {status: count for status, count in cur.fetchall()}
-
-            cur.execute("""
-                SELECT event_id, run_number, event_type, occurred_at, message, details
-                FROM cr_batch_events WHERE batch_id = %s
-                ORDER BY occurred_at, event_id;
-            """, (batch_id,))
-            columns = [desc[0] for desc in cur.description]
-            batch["events"] = [dict(zip(columns, row)) for row in cur.fetchall()] or _derived_events(batch)
-
-    return batch
 
 
-def request_cancel(batch_id: int) -> bool:
-    """
-    Flags a RUNNING batch for cancellation — orchestrator/batch_runner.py's per-record loop polls
-    this between records (see is_cancel_requested()) and stops early once set, marking the batch
-    CANCELLED itself rather than this function touching `status` directly (the loop is the only
-    writer that knows how many records it actually got through before stopping).
-
-    Returns False (a no-op, not an error) if the batch isn't RUNNING — there is nothing to cancel
-    for a batch that has already finished.
-    """
-    with get_pooled_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT cancel_requested FROM cr_scrape_batches WHERE batch_id = %s AND status = 'RUNNING' FOR UPDATE;",
-                (batch_id,),
-            )
-            row = cur.fetchone()
-            if row is not None and not row[0]:
-                cur.execute("UPDATE cr_scrape_batches SET cancel_requested = TRUE WHERE batch_id = %s;", (batch_id,))
-                _record_event(cur, batch_id, "STOP_REQUESTED", "Stop requested from the admin panel")
-        conn.commit()
-    return row is not None
 
 
 def is_cancel_requested(batch_id: int) -> bool:
@@ -270,35 +206,6 @@ def get_ingestion(ingestion_id: int) -> Optional[Dict[str, Any]]:
             return dict(zip(columns, row))
 
 
-def list_ingestions_by_batch(batch_id: int, limit: int = 100, offset: int = 0) -> Dict[str, Any]:
-    """
-    Per-record listing for GET /api/scraper/batches/{id}/records — one row per cr_raw_ingestions
-    record in the batch, LEFT JOIN'd to cr_cases for the fields that only exist once a record is
-    actually PROMOTED (case_number/judgment_date/enrichment_status/enrichment_error/liznr_id).
-    A record that never reached promotion (still in flight, or *_FAILED/NEEDS_REVIEW) has
-    case_id IS NULL, so every joined column comes back NULL for it — that's the caller's signal
-    to fall back to source_pdf_url/status/error_message instead.
-    """
-    with get_pooled_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT ri.ingestion_id, ri.status, ri.source_pdf_url, ri.error_message,
-                       ri.downloaded_at, ri.ocr_completed_at, ri.case_id,
-                       c.liznr_id, c.case_number, c.judgment_date,
-                       c.enrichment_status, c.enrichment_error, c.enriched_at
-                FROM cr_raw_ingestions ri
-                LEFT JOIN cr_cases c ON c.case_id = ri.case_id
-                WHERE ri.batch_id = %s
-                ORDER BY ri.ingestion_id
-                LIMIT %s OFFSET %s;
-            """, (batch_id, limit, offset))
-            columns = [desc[0] for desc in cur.description]
-            rows = [dict(zip(columns, row)) for row in cur.fetchall()]
-
-            cur.execute("SELECT COUNT(*) FROM cr_raw_ingestions WHERE batch_id = %s;", (batch_id,))
-            total = cur.fetchone()[0]
-
-    return {"records": rows, "total": total}
 
 
 def list_by_status(status: str, limit: int = 100) -> List[Dict[str, Any]]:
@@ -358,8 +265,7 @@ def update_status(ingestion_id: int, status: str, **fields: Any) -> None:
 # Resumable batches (cr_batch_items, db/migrations/0013)
 # ---------------------------------------------------------------------
 
-# Statuses a resume picks up again; SKIPPED is added only when the caller asks
-# (claim_batch_resume(retry_skipped=True)).
+# Statuses a run picks up; api-backend's resume can reset SKIPPED items to PENDING first.
 OPEN_ITEM_STATUSES = ("PENDING", "FAILED")
 
 
@@ -435,49 +341,4 @@ def batch_totals_from_items(batch_id: int) -> Dict[str, int]:
     return {"total_found": found, "total_downloaded": downloaded, "total_promoted": promoted}
 
 
-def claim_batch_resume(batch_id: int, retry_skipped: bool = False) -> Optional[Dict[str, Any]]:
-    """
-    Atomically flips a stopped batch back to RUNNING for another run (run_count + 1).
-    Returns the batch's court_id/date_from/date_to/run_count, or None if it was already
-    RUNNING or doesn't exist — the single UPDATE ... WHERE status <> 'RUNNING' is what
-    stops two resume clicks from starting the batch twice.
-    """
-    with get_pooled_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                UPDATE cr_scrape_batches
-                SET status = 'RUNNING', cancel_requested = FALSE, finished_at = NULL,
-                    error_message = NULL, run_count = run_count + 1
-                WHERE batch_id = %s AND status <> 'RUNNING'
-                RETURNING court_id, date_from, date_to, run_count;
-            """, (batch_id,))
-            row = cur.fetchone()
-            if row is None:
-                conn.rollback()
-                return None
-            retried_skipped = 0
-            if retry_skipped:
-                cur.execute(
-                    "UPDATE cr_batch_items SET status = 'PENDING', updated_at = now() WHERE batch_id = %s AND status = 'SKIPPED';",
-                    (batch_id,),
-                )
-                retried_skipped = cur.rowcount
-            cur.execute(
-                "SELECT COUNT(*) FROM cr_batch_items WHERE batch_id = %s AND status = ANY(%s);",
-                (batch_id, list(OPEN_ITEM_STATUSES)),
-            )
-            cases_left = cur.fetchone()[0]
-            _record_event(cur, batch_id, "RESUMED", details={"cases_left": cases_left, "retried_skipped": retried_skipped})
-        conn.commit()
-    court_id, date_from, date_to, run_count = row
-    return {"court_id": court_id, "date_from": date_from, "date_to": date_to, "run_count": run_count}
 
-
-def _derived_events(batch: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """A minimal timeline for batches created before cr_batch_events existed, from the columns they do have."""
-    events = [{"event_id": None, "run_number": 1, "event_type": "STARTED", "occurred_at": batch["requested_at"], "message": None,
-               "details": {"date_from": batch["date_from"].isoformat(), "date_to": batch["date_to"].isoformat()}}]
-    if batch["finished_at"] is not None:
-        events.append({"event_id": None, "run_number": batch.get("run_count") or 1, "event_type": batch["status"],
-                       "occurred_at": batch["finished_at"], "message": batch["error_message"], "details": {}})
-    return events
