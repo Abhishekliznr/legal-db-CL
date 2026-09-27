@@ -18,8 +18,15 @@
 CREATE TABLE IF NOT EXISTS cr_search_history (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id     TEXT NOT NULL,      -- opaque caller-supplied id (legal-ui's NextAuth session), no users table here
-    query       TEXT NOT NULL,
+    query       TEXT NOT NULL,      -- display label only
+    -- The results page's URL query string (e.g. "all=bail&prov=..."), replayed as-is by
+    -- "search again". NULL on rows recorded before this column existed -- those replay `query`
+    -- as a plain text search instead.
+    params      TEXT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Tables created before `params` existed -- CREATE TABLE IF NOT EXISTS above won't add it.
+ALTER TABLE cr_search_history ADD COLUMN IF NOT EXISTS params TEXT;
 
 CREATE INDEX IF NOT EXISTS ix_cr_search_history_user ON cr_search_history(user_id, created_at DESC);
