@@ -26,7 +26,7 @@ _PREAMBLE_SPLITTING_MODEL = "en_core_web_sm"
 
 _load_lock = threading.Lock()
 # spaCy doesn't guarantee Language objects are safe to call concurrently, and
-# promotions run on several BackgroundTasks threads at once.
+# a worker process may run promotion from more than one thread.
 _infer_lock = threading.Lock()
 _legal_nlp = None
 _preamble_nlp = None

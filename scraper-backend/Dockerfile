@@ -26,6 +26,6 @@ RUN playwright install --with-deps chromium
 COPY . .
 RUN chmod +x docker-entrypoint.sh
 
-EXPOSE 3000
+# One batch per container: the K8s Job passes --batch-id (see worker.py).
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["python", "-m", "worker", "--help"]
