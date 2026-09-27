@@ -140,34 +140,40 @@ class SupremeCourtBrowserClient:
         self._classify_response(response.status if response else None, title)
         time.sleep(self.source_delay_seconds)
 
-    def download_pdf(self, pdf_url: str, dest_path) -> bool:
-        headers = {
-            "User-Agent": USER_AGENT,
-            "Referer": f"{BASE_URL}/",
-        }
-        try:
-            response = requests.get(
-                pdf_url,
-                headers=headers,
-                timeout=30,
-            )
-            if response.status_code == 403:
-                raise SourceAccessError(
-                    f"SCI PDF endpoint rejected access with HTTP 403: {pdf_url}"
-                )
-            if response.status_code == 429:
-                raise SourceRateLimitError(
-                    f"SCI PDF endpoint returned HTTP 429: {pdf_url}"
-                )
-            if 500 <= response.status_code <= 599:
-                raise SourceUnavailableError(
-                    f"SCI PDF endpoint returned HTTP {response.status_code}: {pdf_url}"
-                )
-            if response.status_code == 200 and response.content.startswith(b"%PDF"):
-                dest_path.write_bytes(response.content)
-                return True
-            return False
-        except requests.RequestException as exc:
-            raise SourceUnavailableError(
-                f"PDF download failed for {pdf_url}: {exc}"
-            ) from exc
+
+def download_pdf(pdf_url: str, dest_path) -> Optional[str]:
+    # Plain HTTP, no browser cookies: SCI PDF links work outside the search session.
+    # Returns None on success, else why the PDF was not saved.
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Referer": f"{BASE_URL}/",
+    }
+    try:
+        response = requests.get(
+            pdf_url,
+            headers=headers,
+            timeout=30,
+        )
+    except requests.RequestException as exc:
+        raise SourceUnavailableError(
+            f"PDF download failed for {pdf_url}: {exc}"
+        ) from exc
+
+    if response.status_code == 403:
+        raise SourceAccessError(
+            f"SCI PDF endpoint rejected access with HTTP 403: {pdf_url}"
+        )
+    if response.status_code == 429:
+        raise SourceRateLimitError(
+            f"SCI PDF endpoint returned HTTP 429: {pdf_url}"
+        )
+    if 500 <= response.status_code <= 599:
+        raise SourceUnavailableError(
+            f"SCI PDF endpoint returned HTTP {response.status_code}: {pdf_url}"
+        )
+    if response.status_code != 200:
+        return f"HTTP {response.status_code}"
+    if not response.content.startswith(b"%PDF"):
+        return "response is not a PDF"
+    dest_path.write_bytes(response.content)
+    return None

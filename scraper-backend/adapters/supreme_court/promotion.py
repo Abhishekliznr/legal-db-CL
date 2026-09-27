@@ -8,6 +8,11 @@ straight from the scraper's own RawJudgmentRecord (table-cell fields) plus
 cr_raw_ingestions.ocr_text (OCR-text fields), not from a raw_ai_extraction
 JSON envelope the way the old LLM-driven promotion.py did.
 
+acts/sections come from pipeline/legal_ner_extraction.py's Legal NER over the
+OCR text; when NER finds nothing, pipeline/llm_enrichment.py fills them from
+the provision paragraphs instead (its `existing_sections` guard keeps it from
+overwriting NER's result).
+
 case_note and industries are left NULL/empty by THIS function (see
 cr_cases.industries' comment in db/schema.sql and adapters/supreme_court/extraction.py's
 module docstring for why industries specifically has no regex source) —
@@ -22,13 +27,21 @@ from typing import List, Optional
 from adapters.base import RawJudgmentRecord
 from db import scrape_jobs
 from db.connection import get_pooled_connection
-from db.lookups import get_or_create_category, get_or_create_judge, get_or_create_ministry, get_or_create_subject, resolve_bench
+from db.lookups import (
+    get_or_create_category,
+    get_or_create_judge,
+    get_or_create_ministry,
+    get_or_create_subject,
+    resolve_act_entries,
+    resolve_bench,
+)
 from normalization import advocates, case_numbers, judges, parties
 from normalization.dates import parse_date
 from normalization.ministries import find_ministry_in_party_name
 from adapters.supreme_court import extraction as rx
 from orchestrator import stages
-from orchestrator.log_context import slog
+from orchestrator.log_context import slog, tally
+from pipeline.legal_ner_extraction import extract_acts_sections
 
 logger = logging.getLogger("scraper_backend_v2.promotion")
 
@@ -133,14 +146,14 @@ def assign_liznr_id_for_reviewed_case(case_id: int) -> Optional[str]:
             cur.execute("SELECT court_id, judgment_date, liznr_id FROM cr_cases WHERE case_id = %s;", (case_id,))
             row = cur.fetchone()
             if row is None:
-                slog(logger, stages.PROMOTE, "warning", "case_id=%s: assign_liznr_id_for_reviewed_case — no such case", case_id)
+                slog(logger, stages.PROMOTE, "warning", "Case #%s not found · can't assign a LIZNR id", case_id)
                 return None
             court_id, judgment_date, existing_liznr_id = row
             if existing_liznr_id is not None:
-                slog(logger, stages.PROMOTE, "info", "case_id=%s: already has liznr_id=%s, not reassigning", case_id, existing_liznr_id)
+                slog(logger, stages.PROMOTE, "info", "Case #%s already has LIZNR id %s · not reassigning", case_id, existing_liznr_id)
                 return existing_liznr_id
             if judgment_date is None:
-                slog(logger, stages.PROMOTE, "info", "case_id=%s: judgment_date still NULL, cannot assign a liznr_id yet", case_id)
+                slog(logger, stages.PROMOTE, "info", "Case #%s still has no judgment date · can't assign a LIZNR id yet", case_id)
                 return None
 
             liznr_id = _assign_liznr_id(cur, case_id, court_id, judgment_date.year)
@@ -161,14 +174,12 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
     routed to NEEDS_REVIEW (missing case_number) or PROMOTION_FAILED (an
     unexpected DB error).
 
-    sections/acts are deliberately left empty here (2026-09-09) — regex's
-    own act-name capture proved actively wrong at real production scale
-    (fragments like "Arbitrator Would Be Ineligible To Act" ending up in
-    cr_acts), not just low-recall, so those columns are now populated
-    entirely by pipeline/llm_enrichment.py's paragraph-filtered LLM call
-    after promotion, same treatment as case_note/industries already got.
-    (rules/orders as a distinct kind were dropped from the schema entirely,
-    2026-09-19, db/migrations/0012 — only sections are tracked now.)
+    sections/acts come from Legal NER over the OCR text (regex act-name
+    capture was dropped 2026-09-09 for storing fragments like "Arbitrator
+    Would Be Ineligible To Act" as acts). NER runs before the pooled
+    connection is taken, so a long judgment doesn't hold one open. When NER
+    finds nothing both columns stay empty and pipeline/llm_enrichment.py
+    fills them from the provision paragraphs.
 
     Unlike the old documents.judgment_date NOT NULL, a missing/unparseable
     judgment_date here does NOT block promotion — the row still gets
@@ -192,8 +203,6 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
     ocr_text = ingestion["ocr_text"] or ""
     court_id = ingestion["court_id"]
-
-    slog(logger, stages.PROMOTE, "info", "ingestion_id=%s: starting (case_number_raw=%r)", ingestion_id, record.case_number_raw)
 
     try:
         case_number = (record.case_number_raw or "").strip()
@@ -223,9 +232,11 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
         conclusion = rx.extract_conclusion(ocr_text)
         judgement_body = rx.extract_judgment_body(ocr_text)
         classified_category = case_numbers.classify_category(case_number) is not None
+        ner_acts = extract_acts_sections(ocr_text)
 
         with get_pooled_connection() as conn:
             with conn.cursor() as cur:
+                act_ids, section_ids = resolve_act_entries(cur, ner_acts)
                 judge_ids = resolve_bench(cur, bench_names)
                 judgment_by_id = get_or_create_judge(cur, judgment_by_name) if judgment_by_name else None
                 subject_id = get_or_create_subject(cur, subject_word) if subject_word else None
@@ -248,7 +259,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         %s, %s, %s, %s, %s,
                         %s, %s, %s,
                         %s, %s, %s, %s, %s,
-                        '{}', '{}', %s,
+                        %s, %s, %s,
                         %s, %s, %s,
                         %s, %s,
                         %s, '{}',
@@ -266,7 +277,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                     None, court_id, case_number, petitioner, respondent,
                     petitioner_advocate, respondent_advocate, filing_year,
                     judge_ids, judgment_by_id, judgment_date, record.extra.get("language"), record.neutral_citation_raw,
-                    subject_id,
+                    section_ids, act_ids, subject_id,
                     conclusion, judgement_body, ocr_text,
                     record.source_url, ingestion["blob_pdf_id"],
                     ministry_ids,
@@ -283,11 +294,7 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
                         error_message="case_number already exists for this court — likely a re-run",
                     )
                     conn.commit()
-                    slog(
-                        logger, stages.PROMOTE, "info",
-                        "ingestion_id=%s: case_number=%r already exists for court_id=%s — likely a re-run, routed to NEEDS_REVIEW",
-                        ingestion_id, case_number, court_id,
-                    )
+                    slog(logger, stages.PROMOTE, "warning", "Case already exists in database (likely a re-run) → needs review")
                     return None
                 case_id = row[0]
 
@@ -306,18 +313,25 @@ def promote_ingestion(ingestion_id: int, record: RawJudgmentRecord) -> Optional[
 
             conn.commit()
 
-        slog(
-            logger, stages.PROMOTE, "info",
-            "ingestion_id=%s: done — case_id=%s liznr_id=%s disposition=%s needs_review=%s",
-            ingestion_id, case_id, liznr_id, disposition, needs_review,
-        )
+        if act_ids:
+            slog(
+                logger, stages.NER, "info",
+                "Ran Legal NER on judgment text · found %d act(s), %d section(s)", len(act_ids), len(section_ids),
+            )
+        else:
+            slog(logger, stages.NER, "info", "Ran Legal NER · nothing found → LLM enrichment will extract provisions")
+        tally("Acts from", "Legal NER" if act_ids else "none found (left to LLM enrichment)")
+        if needs_review:
+            slog(logger, stages.PROMOTE, "warning", "Saved as case #%s · judgment date missing → needs review, no LIZNR id yet", case_id)
+        else:
+            slog(logger, stages.PROMOTE, "info", "Saved as case #%s · %s", case_id, liznr_id)
         return case_id
 
     except PromotionSkipped as e:
-        slog(logger, stages.PROMOTE, "warning", "ingestion_id=%s: skipped — %s", ingestion_id, e)
+        slog(logger, stages.PROMOTE, "warning", "Not saved: %s → needs review", e)
         scrape_jobs.update_status(ingestion_id, status="NEEDS_REVIEW", error_message=str(e))
         return None
     except Exception as e:
-        slog(logger, stages.PROMOTE, "exception", "ingestion_id=%s: failed", ingestion_id)
+        slog(logger, stages.PROMOTE, "exception", "Failed to save case (ingestion #%s)", ingestion_id)
         scrape_jobs.update_status(ingestion_id, status="PROMOTION_FAILED", error_message=str(e))
         return None

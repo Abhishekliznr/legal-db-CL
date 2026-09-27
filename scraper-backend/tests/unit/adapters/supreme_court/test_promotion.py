@@ -21,6 +21,8 @@ is replaced with a canned ingestion row (no real Postgres there either).
 from contextlib import contextmanager
 from pathlib import Path
 
+import pytest
+
 from adapters.base import RawJudgmentRecord
 from adapters.supreme_court import promotion
 
@@ -120,6 +122,11 @@ def _record(case_number="Civil Appeal No. 1 of 2026", decision_date_raw=None):
         neutral_citation_raw=None,
         extra={},
     )
+
+
+@pytest.fixture(autouse=True)
+def _no_ner(monkeypatch):
+    monkeypatch.setattr(promotion, "extract_acts_sections", lambda text: [])
 
 
 def _update_sql_for(cursor, needle):
@@ -253,3 +260,44 @@ def test_assign_liznr_id_for_reviewed_case_noop_while_date_still_null(monkeypatc
 
     assert liznr_id is None
     assert cursor.claim_count == 0
+
+
+# ---------------------------------------------------------------------
+# Legal NER fills acts/sections at promotion
+# ---------------------------------------------------------------------
+
+def _insert_params(cursor):
+    insert_calls = _update_sql_for(cursor, "INSERT INTO cr_cases")
+    assert len(insert_calls) == 1
+    sql, params = insert_calls[0]
+    columns = [c.strip() for c in sql.split("(", 1)[1].split(")", 1)[0].split(",")]
+    placeholder_columns = [c for c in columns if c not in ("industries", "document_type")]
+    return dict(zip(placeholder_columns, params))
+
+
+def test_ner_acts_and_sections_are_written_at_promotion(monkeypatch):
+    monkeypatch.setattr(promotion.scrape_jobs, "get_ingestion", lambda ingestion_id: _fake_ingestion())
+    monkeypatch.setattr(promotion, "extract_acts_sections", lambda text: [
+        {"act_name": "Indian Penal Code, 1860", "sections": ["302", "34"]},
+        {"act_name": "Code of Criminal Procedure, 1973", "sections": ["439"]},
+    ])
+    cursor = FakeCursor(insert_returns_case_id=11)
+    _patch_pooled_connection(monkeypatch, cursor)
+
+    assert promotion.promote_ingestion(99, _record(decision_date_raw="2026-03-01")) == 11
+
+    params = _insert_params(cursor)
+    assert len(params["acts"]) == 2
+    assert len(params["sections"]) == 3
+
+
+def test_ner_finding_nothing_leaves_acts_and_sections_empty(monkeypatch):
+    monkeypatch.setattr(promotion.scrape_jobs, "get_ingestion", lambda ingestion_id: _fake_ingestion())
+    cursor = FakeCursor(insert_returns_case_id=12)
+    _patch_pooled_connection(monkeypatch, cursor)
+
+    assert promotion.promote_ingestion(99, _record(decision_date_raw="2026-03-01")) == 12
+
+    params = _insert_params(cursor)
+    assert params["acts"] == []
+    assert params["sections"] == []

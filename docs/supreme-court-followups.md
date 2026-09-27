@@ -29,36 +29,38 @@ These run in shared code, so SC batches already get them:
 
 ### Needs SC-specific work
 
-- [ ] **Create `adapters/supreme_court/stages.py`** with SC's own scraping stages.
+- [x] **Create `adapters/supreme_court/stages.py`** with SC's own scraping stages.
       Suggested: `DISCOVER` (date window + captcha + results table + pagination)
       and `JUDGMENT` (PDF download). Reference: `adapters/high_courts/mp/stages.py`.
 
-- [ ] **Move `adapters/supreme_court/adapter.py` from `logger.*` to `slog()`.**
+- [x] **Move `adapters/supreme_court/adapter.py` from `logger.*` to `slog()`.**
       Today its 4 log lines only reach stdout, never the live panel:
-  - [ ] `_scrape_one_batch` start → DISCOVER: e.g.
+  - [x] `_scrape_one_batch` start → DISCOVER: e.g.
         `Searching sci.gov.in judgments 01-01-2025 → 30-01-2025 (window 1 of 12)`.
         Windows come from `_split_into_batches` (max 30 days each).
-  - [ ] `_solve_and_submit_captcha` → return the attempt number instead of `bool`
+  - [x] `_solve_and_submit_captcha` → return the attempt number instead of `bool`
         and log `Captcha solved (attempt N of 20)`. Today it returns `False` for both
         "captcha failed" and "No Records Found" — split these so the panel can say
         `No judgments in this window` vs `Could not solve captcha → window skipped`.
         Reference: MP `ilrs._solve_and_submit_captcha`.
-  - [ ] `SCI results headers: [...]` → `debug` (server log only).
-  - [ ] Per results page → DISCOVER: `Page N · M judgment rows`.
-  - [ ] `PDF download failed` → JUDGMENT warning `PDF download failed → skipped`;
+        Done: returns `(has_results, attempt)`; a captcha failure now raises
+        `SourceUnavailableError` (see Resume below) instead of skipping the window.
+  - [x] `SCI results headers: [...]` → `debug` (server log only).
+  - [x] Per results page → DISCOVER: `Page N · M judgment rows`.
+  - [x] `PDF download failed` → JUDGMENT warning `PDF download failed → skipped`;
         add a success line `PDF downloaded (N KB)`.
         Reference: MP `adapter._download_pdf`.
-  - [ ] Rows with no PDF link are currently skipped silently (`if not pdf_links:
+  - [x] Rows with no PDF link are currently skipped silently (`if not pdf_links:
         continue`) — log `No judgment PDF link in row → skipped`.
 
-- [ ] **Case scope + position.** If SC is made resumable first (see "Resume a
+- [x] **Case scope + position.** Not needed — SC is resumable now, so `_run_items` supplies it. If SC is made resumable first (see "Resume a
       stopped batch" below), `batch_runner._run_items` already wraps every case in
       `log_context.case_scope` with its `[i/total]` position — nothing to do here.
       Otherwise, in `scrape()`: wrap each row's work in
       `log_context.case_scope(case_number, index, total)` and set
       `record.position = (index, total)` before `yield`, exiting the scope before
       the yield.
-  - [ ] Decide how to handle `total`: SC streams rows page by page, so the total
+  - [x] ~~Decide how to handle `total`~~ — moot, discovery gives a real total: SC streams rows page by page, so the total
         isn't known up front. Options:
         (a) show index only (`[12] Crl.A. 123/2024`) — needs `_case_prefix` in
         `orchestrator/log_context.py` and `caseHeading` in the UI viewer to accept
@@ -66,20 +68,24 @@ These run in shared code, so SC batches already get them:
         (b) read every page's rows first, then download — gives a real total but
         changes when downloads start.
         Recommended: (a).
-  - [ ] Case label: `data.get("Case Number")`, falling back to the PDF URL (same
+  - [x] Case label: `data.get("Case Number")`, falling back to the PDF URL (same
         fallback `batch_runner` uses).
 
-- [ ] **Rewrite `adapters/supreme_court/promotion.py` messages.** Its `slog` calls
+- [x] **Rewrite `adapters/supreme_court/promotion.py` messages.** Its `slog` calls
       still use the old wording (`ingestion_id=%s: starting (case_number_raw=%r)`).
       Match whatever MP Phase 2 settles on, e.g. `Saved as case #1204 ·
       LIZNR/SCIN/0087/2025`. The three `assign_liznr_id_for_reviewed_case` lines run
       outside a batch (admin review) — keep them, wording only.
 
-- [ ] **Skip-reason counts for the batch summary.** MP Phase 2 adds a found /
+- [x] **Skip-reason counts for the batch summary.** MP Phase 2 adds a found /
       skipped-by-reason breakdown. SC needs its own counters: rows found per window,
       no PDF link, download failed, captcha failed windows.
+      Done: rows per page/window logged at DISCOVER; `no PDF link` / `PDF download
+      failed` come back as `process_item` skip reasons (tallied by `batch_runner`);
+      discovery tallies `repeated case row` / `unidentifiable row`. Captcha failure
+      stops the batch (resumable) instead of being counted.
 
-- [ ] **Optional — skip already-promoted cases.** MP skips cases already in
+- [x] **Optional — skip already-promoted cases.** (`done_reason="already in database"` in `discover()`.) MP skips cases already in
       `cr_cases` before downloading (`scrape_jobs.get_promoted_case_numbers`). SC
       currently re-downloads them and relies on the checksum duplicate check /
       `ON CONFLICT` at promotion. Adding the same skip saves downloads on re-runs;
@@ -96,10 +102,13 @@ Shared pieces already in place: `cr_batch_items` (db/migrations/0013),
 `orchestrator/batch_runner.py` (`_run_items`), and the UI Resume / Retry-skipped
 buttons. They only turn on for an adapter that has `discover()`.
 
-- [ ] **Split `SupremeCourtAdapter.scrape()` into `discover()` / `session()` /
+- [x] **Split `SupremeCourtAdapter.scrape()` into `discover()` / `session()` /
       `process_item()`** (`adapters.base.ResumableScraperAdapter`).
       Reference: `MPHighCourtAdapter` in `adapters/high_courts/mp/adapter.py`.
-  - [ ] Decide the unit of work. SC searches 30-day windows with a captcha per
+  - [x] Decide the unit of work. **Chose (a)**: PDFs were already fetched with
+        plain `requests.get` (no browser cookies), so links aren't session-bound;
+        `download_pdf` is now a module function in `client.py` and `session()` is
+        just a temp dir (no browser). SC searches 30-day windows with a captcha per
         window and paginated results, so either:
         (a) discover = every window + every results page up front, one item per
         judgment row (payload = the row's cells + PDF link) — exact resume, but
@@ -108,13 +117,14 @@ buttons. They only turn on for an adapter that has `discover()`.
         handles all its rows; resume restarts from the first unfinished window.
         Check whether SC PDF links still work from a new browser session before
         choosing (a).
-  - [ ] Return skip reasons from `process_item` (no PDF link, download failed)
+  - [x] Return skip reasons from `process_item` (no PDF link, download failed)
         instead of only logging them, so they land in `cr_batch_items.reason`.
-  - [ ] Captcha / "No Records Found": raise `SourceUnavailableError` when the
+  - [x] Captcha / "No Records Found": raise `SourceUnavailableError` when the
         captcha can't be solved (like MP's `ilrs.discover_candidates`), so the batch
         stops resumable instead of looking like "no judgments".
-- [ ] `item.key`: SC "Case Number" (or diary number), unique within the batch.
-- [ ] Remove `scrape()` once `discover()` exists — `batch_runner` prefers the
+- [x] `item.key`: SC "Case Number" (or diary number, then PDF URL), unique within the batch.
+      A repeated case number keeps its first row; the rest are logged + tallied.
+- [x] Remove `scrape()` once `discover()` exists — `batch_runner` prefers the
       resumable path whenever `discover` is present.
 - [ ] Verify: stop an SC batch (cancel, kill the server, source error), resume, and
       check only the remaining work runs.
@@ -141,39 +151,52 @@ guard, the LLM fallback should need no change — confirm this while implementin
 
 ### Checklist
 
-- [ ] **Measure NER quality on SC judgments first.** NER was checked against 13 MP
+- [x] **Measure NER quality on SC judgments first.** NER was checked against 13 MP
       High Court judgments only. Run `pipeline.legal_ner_extraction.extract_acts_sections`
       over a sample of real SC judgments (from `cr_cases.ocr_text` where
       `court_id` = SCIN and enrichment already filled sections) and compare with the
       LLM's acts/sections. Look for the same failure the regex had: fragments
       stored as act names. Go ahead only if NER is at least as clean as the LLM.
+      Done (2026-09-27) on the 2 SC cases in the local DB — a small sample, recheck
+      on a real batch. Act names were clean and matched the LLM (plus Limitation Act
+      §5-A on one). Section numbers were **not** clean (`sub-section (2) of Section
+      56`, `181(2)(r) and (s)`, and on the MP samples `302/34`, `85 of BNS`, `2023`,
+      `304 Part I/II, or cases of 4 CRA-1219-2018`). Fixed in shared
+      `pipeline/legal_ner_extraction._section_numbers` (splits compounds, drops
+      non-section tokens; affects MP too) — after that, SC case #1 matched the LLM's
+      sections exactly plus `56(1)`.
 
-- [ ] **Measure NER time on long SC judgments.** SC judgments can be ~300,000 chars
+- [x] **Measure NER time on long SC judgments.** SC judgments can be ~300,000 chars
       (the 142-page test case in `llm_enrichment.py`'s docstring). NER runs per
       sentence and is serialized by `_infer_lock` in `pipeline/legal_ner_extraction.py`
       — measure one long judgment. If it's slow, consider running NER on
       `find_provision_paragraphs` output instead of the full text.
+      Done: 0.4s for 11k chars, 1.0s for 36k chars (~linear → ~10s for 300k; a
+      synthetic 300k text took 12s). Kept full text: paragraphs-only missed CPC §100
+      on one case. NER runs before the pooled connection is taken.
 
-- [ ] **Share the act/section resolver.** MP turns NER output into ids with
+- [x] **Share the act/section resolver.** Now `db.lookups.resolve_act_entries`. MP turns NER output into ids with
       `_resolve_acts(cur, act_entries)` in `adapters/high_courts/mp/promotion.py`.
       SC needs identical logic (`resolve_act` + `get_or_create_act` +
       `get_or_create_section`, deduped). Either move it to a shared module
       (e.g. `db/lookups.py`) and import it from both courts, or copy it into SC
       promotion. It doesn't vary per court, so moving it is preferred.
 
-- [ ] **Call NER in `adapters/supreme_court/promotion.py`.** Inside the
+- [x] **Call NER in `adapters/supreme_court/promotion.py`.** Inside the
       `with conn.cursor()` block, before the INSERT:
       `act_ids, section_ids = _resolve_acts(cur, extract_acts_sections(ocr_text))`,
       then insert `section_ids` / `act_ids` instead of the literal `'{}', '{}'`.
 
-- [ ] **Log it at the NER stage** (counts only, never act names):
+- [x] **Log it at the NER stage** (counts only, never act names):
   - found: `Ran Legal NER on judgment text · found N act(s), M section(s)`
   - found nothing: `Ran Legal NER · nothing found → LLM enrichment will extract provisions`
 
-- [ ] **Update the `promote_ingestion` docstring** — the "sections/acts are
+- [x] **Update the `promote_ingestion` docstring** — the "sections/acts are
       deliberately left empty" paragraph stops being true.
 
-- [ ] **Check the enrichment fallback end to end:** a case where NER finds nothing
+- [ ] **Check the enrichment fallback end to end:** (code-read confirmed:
+      `enrich_case` only writes sections/acts when `existing_sections` is empty,
+      and NER never returns an act without sections — still needs a real run) a case where NER finds nothing
       still gets provisions from the LLM; a case where NER found acts keeps them and
       the LLM doesn't overwrite them.
 

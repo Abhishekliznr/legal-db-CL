@@ -22,6 +22,7 @@ commits and then safely reads back the winner's row instead.
 from typing import Any, Dict, List, Optional, Tuple
 
 from normalization import case_numbers
+from normalization.acts import resolve_act
 
 
 def get_or_create_judge(cur, cleaned_name: str) -> int:
@@ -166,6 +167,27 @@ def resolve_provisions(cur, provisions: List[Dict[str, Any]]) -> Tuple[List[int]
             act_ids.append(act_id)
         section_ids.append(get_or_create_section(cur, act_id, provision["section_number"]))
 
+    return act_ids, section_ids
+
+
+def resolve_act_entries(cur, act_entries: List[Dict[str, Any]]) -> Tuple[List[int], List[int]]:
+    """(act_ids, section_ids) for [{"act_name", "sections"}] entries -- MP case-status Act lines or pipeline.legal_ner_extraction output."""
+    act_ids: List[int] = []
+    section_ids: List[int] = []
+    seen_acts = set()
+    seen_sections = set()
+    for entry in act_entries:
+        statute_name, short_code, year = resolve_act(entry["act_name"])
+        act_id = get_or_create_act(cur, statute_name, short_code, year)
+        if act_id not in seen_acts:
+            seen_acts.add(act_id)
+            act_ids.append(act_id)
+        for number in entry.get("sections") or []:
+            key = (act_id, number)
+            if key in seen_sections:
+                continue
+            seen_sections.add(key)
+            section_ids.append(get_or_create_section(cur, act_id, number))
     return act_ids, section_ids
 
 
