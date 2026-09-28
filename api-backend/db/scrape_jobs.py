@@ -28,15 +28,18 @@ _HEARTBEAT_TIMEOUT = "5 minutes"
 _LOG_RETENTION = "7 days"
 _SWEEP_INTERVAL_SECONDS = 60
 
-# Serializes "is this court already busy?" + insert/claim across concurrent requests.
+# Serializes "does this range overlap an active batch?" + insert/claim across concurrent requests.
 _COURT_LOCK_NAMESPACE = 41_207
 
 _last_sweep = 0.0
 
 
 class CourtBusyError(Exception):
-    def __init__(self, batch_id: int):
-        super().__init__(f"Batch #{batch_id} is already queued or running for this court.")
+    def __init__(self, batch_id: int, date_from: date, date_to: date):
+        super().__init__(
+            f"Batch #{batch_id} ({date_from.isoformat()} to {date_to.isoformat()}) is already queued or running "
+            f"for this court with an overlapping date range."
+        )
         self.batch_id = batch_id
 
 
@@ -47,23 +50,24 @@ def _record_event(cur, batch_id: int, event_type: str, message: Optional[str] = 
     """, (batch_id, event_type, message, Json(details or {}), batch_id))
 
 
-def _lock_court_and_check_idle(cur, court_id: int, exclude_batch_id: Optional[int] = None) -> None:
+def _lock_court_and_check_no_overlap(cur, court_id: int, date_from: date, date_to: date, exclude_batch_id: Optional[int] = None) -> None:
     cur.execute("SELECT pg_advisory_xact_lock(%s, %s);", (_COURT_LOCK_NAMESPACE, court_id))
     cur.execute("""
-        SELECT batch_id FROM cr_scrape_batches
+        SELECT batch_id, date_from, date_to FROM cr_scrape_batches
         WHERE court_id = %s AND status = ANY(%s) AND batch_id IS DISTINCT FROM %s
+          AND date_from <= %s AND date_to >= %s
         ORDER BY batch_id LIMIT 1;
-    """, (court_id, list(ACTIVE_STATUSES), exclude_batch_id))
+    """, (court_id, list(ACTIVE_STATUSES), exclude_batch_id, date_to, date_from))
     row = cur.fetchone()
     if row is not None:
-        raise CourtBusyError(row[0])
+        raise CourtBusyError(row[0], row[1], row[2])
 
 
 def create_queued_batch(court_id: int, date_from: date, date_to: date) -> int:
-    """Raises CourtBusyError if the court already has a QUEUED/RUNNING batch."""
+    """Raises CourtBusyError if an active batch for this court overlaps the date range."""
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            _lock_court_and_check_idle(cur, court_id)
+            _lock_court_and_check_no_overlap(cur, court_id, date_from, date_to)
             cur.execute("""
                 INSERT INTO cr_scrape_batches (court_id, date_from, date_to, status, queued_at)
                 VALUES (%s, %s, %s, 'QUEUED', now())
@@ -76,15 +80,15 @@ def create_queued_batch(court_id: int, date_from: date, date_to: date) -> int:
 
 
 def claim_batch_resume(batch_id: int, retry_skipped: bool = False) -> Optional[Dict[str, Any]]:
-    """Queues another run of a stopped batch (run_count + 1). None if it's already QUEUED/RUNNING or missing; CourtBusyError if another batch holds the court."""
+    """Queues another run of a stopped batch (run_count + 1). None if it's already QUEUED/RUNNING or missing; CourtBusyError if another active batch overlaps its date range."""
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT court_id FROM cr_scrape_batches WHERE batch_id = %s;", (batch_id,))
+            cur.execute("SELECT court_id, date_from, date_to FROM cr_scrape_batches WHERE batch_id = %s;", (batch_id,))
             row = cur.fetchone()
             if row is None:
                 conn.rollback()
                 return None
-            _lock_court_and_check_idle(cur, row[0], exclude_batch_id=batch_id)
+            _lock_court_and_check_no_overlap(cur, row[0], row[1], row[2], exclude_batch_id=batch_id)
 
             cur.execute("""
                 UPDATE cr_scrape_batches
