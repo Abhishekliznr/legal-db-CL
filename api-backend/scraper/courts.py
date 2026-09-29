@@ -13,3 +13,7 @@ def is_supported(adapter: str) -> bool:
 
 def is_resumable(adapter: str) -> bool:
     return SUPPORTED_ADAPTERS.get(adapter, {}).get("resumable", False)
+
+
+def resumable_adapters() -> list:
+    return [adapter for adapter, info in SUPPORTED_ADAPTERS.items() if info.get("resumable")]

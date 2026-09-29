@@ -221,7 +221,11 @@ CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     heartbeat_at    TIMESTAMPTZ,
     job_name        TEXT,
     queued_at       TIMESTAMPTZ,
-    claimed_at      TIMESTAMPTZ
+    claimed_at      TIMESTAMPTZ,
+    -- The admin who started the batch, snapshotted (db/migrations batch_actors).
+    requested_by_id    TEXT,
+    requested_by_name  TEXT,
+    requested_by_email TEXT
 );
 
 CREATE TABLE IF NOT EXISTS cr_raw_ingestions (
@@ -286,13 +290,19 @@ CREATE TABLE IF NOT EXISTS cr_batch_events (
     event_type   TEXT NOT NULL,
     occurred_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     message      TEXT,
-    details      JSONB NOT NULL DEFAULT '{}'
+    details      JSONB NOT NULL DEFAULT '{}',
+    -- Admin behind STARTED / STOP_REQUESTED / RESUMED; NULL for worker/sweep events.
+    actor_id     TEXT,
+    actor_name   TEXT,
+    actor_email  TEXT
 );
 
 CREATE INDEX IF NOT EXISTS ix_cr_batch_events_batch ON cr_batch_events(batch_id, occurred_at);
 
 CREATE INDEX IF NOT EXISTS ix_cr_scrape_batches_active
     ON cr_scrape_batches(court_id) WHERE status IN ('QUEUED', 'RUNNING');
+CREATE INDEX IF NOT EXISTS ix_cr_scrape_batches_court_requested ON cr_scrape_batches(court_id, requested_at DESC);
+CREATE INDEX IF NOT EXISTS ix_cr_scrape_batches_requested_by ON cr_scrape_batches(requested_by_id) WHERE requested_by_id IS NOT NULL;
 
 -- Live log lines written by the worker pod, tailed by api-backend's SSE endpoint (db/migrations/0015).
 CREATE TABLE IF NOT EXISTS cr_batch_logs (
@@ -407,6 +417,7 @@ EXCEPTION WHEN duplicate_object THEN null;
 END $$;
 
 CREATE INDEX IF NOT EXISTS ix_cr_cases_court_date ON cr_cases(court_id, judgment_date);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_created_at ON cr_cases(created_at);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_disposition ON cr_cases(disposition);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_search ON cr_cases USING GIN (search_vector);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_number_trgm ON cr_cases USING GIN (case_number gin_trgm_ops);
