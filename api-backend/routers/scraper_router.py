@@ -4,26 +4,30 @@ Scraper control endpoints (moved here from scraper-backend, which is now an on-d
 - POST /api/scraper/start                         : queue a batch for any court_id and launch its worker Job
 - POST /api/scraper/sc/start                      : same, Supreme Court — {from_date, to_date, headless}
 - POST /api/scraper/mp/start                      : same, MPHC — {year, headless}
-- GET  /api/scraper/batches                       : recent batch history
+- GET  /api/scraper/batches                       : batch history (filterable) + summary counts
 - GET  /api/scraper/batches/{batch_id}            : one batch's header/summary fields
 - GET  /api/scraper/batches/{batch_id}/records    : per-record (cr_raw_ingestions) breakdown
 - POST /api/scraper/batches/{batch_id}/cancel     : stop a QUEUED/RUNNING batch
 - POST /api/scraper/batches/{batch_id}/resume     : queue another run of a stopped batch (new Job)
 - GET  /api/scraper/batches/{batch_id}/logs/stream: SSE tail of cr_batch_logs
-- GET  /api/scraper/status                        : raw_ingestions counts per pipeline stage
+- GET  /api/scraper/courts/summary                : configured courts with case + batch counts
+- GET  /api/scraper/cases/daily                   : cases added per day (all courts or one)
 
 Every start/resume creates a new K8s Job (one pod) through scraper/job_launcher.py; this
 service never talks to a running worker, only to Postgres (db/scrape_jobs.py).
+
+Start/cancel/resume accept an optional `actor` (the admin doing it). This service has no auth
+of its own: legal-ui's server actions fill it from their verified admin session.
 """
 
 import asyncio
 import json
 import logging
 from datetime import date, timedelta
-from typing import Callable, Optional, TypeVar
+from typing import Callable, List, Literal, Optional, TypeVar
 
 import psycopg2
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -100,14 +104,24 @@ def _launch_or_fail(batch_id: int, run_number: int, headless: bool) -> str:
     return job_name
 
 
-def _queue_and_launch(court_id: int, from_date: str, to_date: str, headless: bool) -> dict:
+class Actor(BaseModel):
+    id: str = Field(..., min_length=1, description="The admin's user id")
+    name: Optional[str] = None
+    email: Optional[str] = None
+
+
+def _actor_dict(actor: Optional[Actor]) -> Optional[dict]:
+    return actor.model_dump() if actor else None
+
+
+def _queue_and_launch(court_id: int, from_date: str, to_date: str, headless: bool, actor: Optional[Actor] = None) -> dict:
     config = _resolve_court(court_id)
     date_from, date_to = _parse_date(from_date, "from_date"), _parse_date(to_date, "to_date")
     if date_from > date_to:
         raise HTTPException(status_code=400, detail="from_date must be on or before to_date.")
 
     try:
-        batch_id = _db("creating batch", lambda: scrape_jobs.create_queued_batch(court_id, date_from, date_to))
+        batch_id = _db("creating batch", lambda: scrape_jobs.create_queued_batch(court_id, date_from, date_to, actor=_actor_dict(actor)))
     except scrape_jobs.CourtBusyError as exc:
         raise HTTPException(status_code=409, detail=f"{config['court_name']}: {exc}")
 
@@ -131,43 +145,70 @@ class ScraperStartRequest(BaseModel):
     from_date: Optional[str] = Field(None, description="YYYY-MM-DD; defaults to 7 days ago")
     to_date: Optional[str] = Field(None, description="YYYY-MM-DD; defaults to today")
     headless: bool = Field(True, description="Set False for a supervised local run against a real browser window")
+    actor: Optional[Actor] = None
 
 
 @router.post("/start")
 def start_scrape(req: ScraperStartRequest):
     from_date = req.from_date or (date.today() - timedelta(days=7)).isoformat()
     to_date = req.to_date or date.today().isoformat()
-    return _queue_and_launch(req.court_id, from_date, to_date, req.headless)
+    return _queue_and_launch(req.court_id, from_date, to_date, req.headless, req.actor)
 
 
 class SCScraperStartRequest(BaseModel):
     from_date: Optional[str] = Field(None, description="YYYY-MM-DD; defaults to 7 days ago")
     to_date: Optional[str] = Field(None, description="YYYY-MM-DD; defaults to today")
     headless: bool = Field(True, description="Set False for a supervised local run against a real browser window")
+    actor: Optional[Actor] = None
 
 
 @router.post("/sc/start")
 def start_sc_scrape(req: SCScraperStartRequest):
     from_date = req.from_date or (date.today() - timedelta(days=7)).isoformat()
     to_date = req.to_date or date.today().isoformat()
-    return _queue_and_launch(_court_id_by_code("SCIN"), from_date, to_date, req.headless)
+    return _queue_and_launch(_court_id_by_code("SCIN"), from_date, to_date, req.headless, req.actor)
 
 
 class MPScraperStartRequest(BaseModel):
     year: int = Field(..., ge=1956, le=date.today().year, description="ILR year to search on portal.mphc.gov.in/ilrs, e.g. 2024")
     headless: bool = Field(True, description="Set False for a supervised local run against a real browser window")
+    actor: Optional[Actor] = None
 
 
 @router.post("/mp/start")
 def start_mp_scrape(req: MPScraperStartRequest):
     # MP is queried by ILR year; the worker's MP adapter reads the year back out of this range.
-    return _queue_and_launch(_court_id_by_code("MPHC"), f"{req.year}-01-01", f"{req.year}-12-31", req.headless)
+    return _queue_and_launch(_court_id_by_code("MPHC"), f"{req.year}-01-01", f"{req.year}-12-31", req.headless, req.actor)
 
 
 @router.get("/batches")
-def list_batches(limit: int = 25, offset: int = 0):
+def list_batches(
+    limit: int = Query(25, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    court_id: Optional[List[int]] = Query(None, description="Repeatable: only these courts"),
+    status_group: Optional[Literal["running", "completed", "cancelled", "stopped"]] = None,
+    requested_within_hours: Optional[int] = Query(None, ge=1),
+    q: Optional[str] = Query(None, description="Batch id prefix (e.g. 21 or #21), or a court name/code"),
+    sort: Literal["newest", "oldest", "promoted", "duration"] = "newest",
+    started_by: Optional[str] = Query(None, description="An admin's user id, or 'none' for batches with no recorded starter"),
+):
     _sweep()
-    return _db("listing batches", lambda: scrape_jobs.list_batches(limit=limit, offset=offset))
+    return _db("listing batches", lambda: scrape_jobs.list_batches(
+        limit=limit, offset=offset, court_ids=court_id, status_group=status_group,
+        requested_within_hours=requested_within_hours, q=q, sort=sort, started_by=started_by,
+        resumable_adapters=courts.resumable_adapters(),
+    ))
+
+
+@router.get("/courts/summary")
+def courts_summary():
+    _sweep()
+    return _db("summarizing courts", scrape_jobs.courts_summary)
+
+
+@router.get("/cases/daily")
+def cases_daily(days: int = Query(14, ge=1, le=90), court_id: Optional[int] = None):
+    return {"days": _db("counting cases per day", lambda: scrape_jobs.cases_daily(days=days, court_id=court_id))}
 
 
 @router.get("/batches/{batch_id}")
@@ -203,6 +244,7 @@ def _has_work_to_resume(batch: dict, retry_skipped: bool) -> bool:
 class BatchResumeRequest(BaseModel):
     retry_skipped: bool = Field(False, description="Also retry cases skipped in earlier runs (e.g. no judgment PDF yet)")
     headless: bool = Field(True, description="Set False for a supervised local run against a real browser window")
+    actor: Optional[Actor] = None
 
 
 @router.post("/batches/{batch_id}/resume")
@@ -219,7 +261,8 @@ def resume_batch(batch_id: int, req: Optional[BatchResumeRequest] = None):
         raise HTTPException(status_code=409, detail="Nothing left to resume for this batch.")
 
     try:
-        claim = _db(f"queueing a resume of batch {batch_id}", lambda: scrape_jobs.claim_batch_resume(batch_id, retry_skipped=req.retry_skipped))
+        claim = _db(f"queueing a resume of batch {batch_id}", lambda: scrape_jobs.claim_batch_resume(
+            batch_id, retry_skipped=req.retry_skipped, actor=_actor_dict(req.actor)))
     except scrape_jobs.CourtBusyError as exc:
         raise HTTPException(status_code=409, detail=f"{config['court_name']}: {exc}")
     if claim is None:
@@ -236,8 +279,14 @@ def resume_batch(batch_id: int, req: Optional[BatchResumeRequest] = None):
 
 
 @router.get("/batches/{batch_id}/records")
-def list_batch_records(batch_id: int, limit: int = 100, offset: int = 0):
-    return _db(f"listing records for batch {batch_id}", lambda: scrape_jobs.list_ingestions_by_batch(batch_id, limit=limit, offset=offset))
+def list_batch_records(
+    batch_id: int,
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    status_group: Optional[Literal["promoted", "in_progress", "needs_review", "failed"]] = None,
+):
+    return _db(f"listing records for batch {batch_id}", lambda: scrape_jobs.list_ingestions_by_batch(
+        batch_id, limit=limit, offset=offset, status_group=status_group))
 
 
 _CANCEL_MESSAGES = {
@@ -247,9 +296,14 @@ _CANCEL_MESSAGES = {
 }
 
 
+class BatchCancelRequest(BaseModel):
+    actor: Optional[Actor] = None
+
+
 @router.post("/batches/{batch_id}/cancel")
-def cancel_batch(batch_id: int):
-    result = _db(f"cancelling batch {batch_id}", lambda: scrape_jobs.request_cancel(batch_id))
+def cancel_batch(batch_id: int, req: Optional[BatchCancelRequest] = None):
+    actor = _actor_dict(req.actor) if req else None
+    result = _db(f"cancelling batch {batch_id}", lambda: scrape_jobs.request_cancel(batch_id, actor=actor))
     return {"status": result, "batch_id": batch_id, "message": _CANCEL_MESSAGES[result]}
 
 
@@ -295,8 +349,3 @@ async def stream_batch_logs(batch_id: int):
 
 def _sse_event(payload: dict) -> str:
     return f"data: {json.dumps(payload)}\n\n"
-
-
-@router.get("/status")
-def pipeline_status():
-    return {"counts_by_status": _db("reading pipeline status", scrape_jobs.pipeline_status_counts)}
