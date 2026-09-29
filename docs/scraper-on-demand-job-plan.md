@@ -2,13 +2,13 @@
 
 Status (2026-09-27): **Phases 0-4 built and verified locally. Phase 5 (cutover) not done.**
 
-Decisions made: logs are stored in a DB table and pruned after 7 days. One active batch per court (QUEUED or RUNNING), enforced with a Postgres advisory lock. In-place refactor. Spot nodes stay. api-backend auth on the scraper routes is deferred.
+Decisions made: logs are stored in a DB table and pruned after 7 days. Parallel batches for the same court are allowed only when their date ranges don't overlap (inclusive) with an active (QUEUED or RUNNING) batch; the check is serialized per court with a Postgres advisory lock. In-place refactor. Spot nodes stay. api-backend auth on the scraper routes is deferred.
 
 What differs from the text below: `cr_scrape_batches.queued_at` was added, so a resumed run's QUEUED timeout doesn't use the old `requested_at`. The api-backend companion migration is `db/migrations/0002_on_demand_worker.sql`. The sweeper runs lazily at most once a minute on `GET /batches` and `GET /batches/{id}`.
 
 Verified locally (throwaway Postgres; real api-backend and worker; fake court adapter, so no court sites or Azure were touched):
 - start → QUEUED → RUNNING → COMPLETED, with the SSE stream following the logs live
-- a second start for the same court → 409
+- a start whose date range overlaps an active batch of the same court → 409
 - cancel while RUNNING → CANCELLED → resume starts a new process (run 2), and the logs of both runs replay on one stream
 - SIGTERM → FAILED with the reason, and the batch can be resumed
 - `kill -9` → the heartbeat sweeper marks it FAILED with an INTERRUPTED event
