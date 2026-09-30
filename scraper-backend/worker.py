@@ -165,7 +165,8 @@ def main(argv=None) -> int:
             spec.adapter_class(), spec.promote_fn, batch_id, claim["court_id"], claim["court_code"],
             claim["date_from"].isoformat(), claim["date_to"].isoformat(), spec.data_source,
             find_provisions_fn=spec.find_provisions_fn, run_enrichment=spec.run_enrichment,
-            run_number=claim["run_count"], **adapter_kwargs(config, headless),
+            run_number=claim["run_count"], save_without_judgment_fn=spec.save_without_judgment_fn,
+            **adapter_kwargs(config, headless),
         )
     except Exception:
         # run_batch has already recorded the batch as FAILED with the reason before re-raising.

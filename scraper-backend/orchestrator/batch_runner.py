@@ -19,6 +19,8 @@ from pipeline import llm_enrichment, ocr
 from storage import azure_blob
 
 PromoteFn = Callable[[int, RawJudgmentRecord], Optional[int]]
+# (court_id, record, judgment_status, reason) -> case_id, or None if the case already has a judgment.
+SaveWithoutJudgmentFn = Callable[[int, RawJudgmentRecord, str, str], Optional[int]]
 FindProvisionsFn = Callable[[str], str]
 
 logger = logging.getLogger("scraper_backend_v2.orchestrator")
@@ -46,7 +48,7 @@ def _source_failure_status(exc: Exception) -> str:
 
 
 class _Counts:
-    __slots__ = ("processed", "downloaded", "promoted", "duplicates", "needs_review", "errored")
+    __slots__ = ("processed", "downloaded", "promoted", "no_judgment", "duplicates", "needs_review", "errored")
 
     def __init__(self) -> None:
         for name in self.__slots__:
@@ -72,6 +74,7 @@ def run_batch(
     find_provisions_fn: Optional[FindProvisionsFn] = None,
     run_enrichment: bool = True,
     run_number: int = 1,
+    save_without_judgment_fn: Optional[SaveWithoutJudgmentFn] = None,
     **adapter_kwargs,
 ) -> dict:
     """
@@ -94,26 +97,30 @@ def run_batch(
     is a resume of the same batch (queued by api-backend's resume endpoint),
     which skips discovery when the case list was already saved. Adapters with
     only scrape() stream records as before and can't be resumed.
+
+    `save_without_judgment_fn` saves a case whose PDF is missing or won't
+    download (ItemOutcome.judgment_missing) from its metadata alone; its item
+    becomes NO_JUDGMENT. Without one, such cases are skipped as before.
     """
     resumable = hasattr(adapter, "discover")
     live_logs.start_batch(batch_id, run_number)
     started_at = time.monotonic()
     counts = _Counts()
 
-    def handle_record(record: RawJudgmentRecord) -> Tuple[str, Optional[int], Optional[str]]:
-        """Ingest + OCR + promote (+ enrich) one record. Returns (batch item status, ingestion_id, reason)."""
+    def handle_record(record: RawJudgmentRecord) -> Tuple[str, Optional[int], Optional[int], Optional[str]]:
+        """Ingest + OCR + promote (+ enrich) one record. Returns (batch item status, ingestion_id, case_id, reason)."""
         counts.processed += 1
         try:
             ingestion_id = _ingest_one_record(record, batch_id, court_id, court_code, data_source)
         except Exception:
             _log(stages.INGEST, "exception", "Failed to save the judgment PDF")
             counts.errored += 1
-            return "FAILED", None, "couldn't save the judgment PDF"
+            return "FAILED", None, None, "couldn't save the judgment PDF"
 
         if ingestion_id is None:
             _log(stages.INGEST, "info", "Same PDF was already saved as a case earlier → skipped")
             counts.duplicates += 1
-            return "DONE", None, "duplicate PDF"
+            return "DONE", None, None, "duplicate PDF"
 
         counts.downloaded += 1
         try:
@@ -126,17 +133,35 @@ def run_batch(
                 error_message="Unhandled pipeline exception — see server logs",
             )
             counts.errored += 1
-            return "FAILED", ingestion_id, "unhandled pipeline error"
+            return "FAILED", ingestion_id, None, "unhandled pipeline error"
 
         if case_id is not None:
             counts.promoted += 1
-            return "DONE", ingestion_id, None
+            return "DONE", ingestion_id, case_id, None
         final_status = scrape_jobs.get_ingestion(ingestion_id)["status"]
         if final_status == "NEEDS_REVIEW":
             counts.needs_review += 1
-            return "DONE", ingestion_id, "needs review"
+            return "DONE", ingestion_id, None, "needs review"
         counts.errored += 1
-        return "FAILED", ingestion_id, final_status.lower()
+        return "FAILED", ingestion_id, None, final_status.lower()
+
+    def handle_missing_judgment(record: RawJudgmentRecord, judgment_status: str, reason: str) -> Tuple[str, Optional[int], str]:
+        """Saves a case's metadata when its judgment PDF isn't available. Returns (batch item status, case_id, reason)."""
+        counts.processed += 1
+        if save_without_judgment_fn is None:
+            log_context.tally("Skipped", reason)
+            return "SKIPPED", None, reason
+        try:
+            case_id = save_without_judgment_fn(court_id, record, judgment_status, reason)
+        except Exception as exc:
+            _log(stages.PROMOTE, "exception", "Couldn't save case details without judgment: %s", exc)
+            counts.errored += 1
+            return "FAILED", None, f"couldn't save case details: {exc}"[:500]
+        if case_id is None:
+            return "DONE", None, "already in database"
+        counts.no_judgment += 1
+        log_context.tally("Saved without judgment", reason)
+        return "NO_JUDGMENT", case_id, reason
 
     with log_context.scope(batch_id, court_code):
         if run_number > 1:
@@ -148,7 +173,7 @@ def run_batch(
         unexpected: Optional[Exception] = None
         try:
             if resumable:
-                cancelled = _run_items(adapter, batch_id, handle_record, date_from, date_to, adapter_kwargs)
+                cancelled = _run_items(adapter, batch_id, handle_record, handle_missing_judgment, date_from, date_to, adapter_kwargs)
             else:
                 cancelled = _run_stream(adapter, batch_id, handle_record, date_from, date_to, adapter_kwargs)
             status = "CANCELLED" if cancelled else "COMPLETED"
@@ -200,7 +225,7 @@ def _run_stream(adapter: ScraperAdapter, batch_id: int, handle_record, date_from
     return False
 
 
-def _run_items(adapter, batch_id: int, handle_record, date_from: str, date_to: str, adapter_kwargs: dict) -> bool:
+def _run_items(adapter, batch_id: int, handle_record, handle_missing_judgment, date_from: str, date_to: str, adapter_kwargs: dict) -> bool:
     """Resumable adapters: discover once into cr_batch_items, then work through the open items. Returns True if cancelled."""
     discovered_earlier = scrape_jobs.is_batch_discovered(batch_id)
     if not discovered_earlier:
@@ -252,8 +277,13 @@ def _run_items(adapter, batch_id: int, handle_record, date_from: str, date_to: s
                     continue
 
                 outcome.record.position = (item.position, total)
-                item_status, ingestion_id, reason = handle_record(outcome.record)
-                scrape_jobs.mark_batch_item(item.item_id, item_status, reason, ingestion_id)
+                if outcome.judgment_missing:
+                    item_status, case_id, reason = handle_missing_judgment(outcome.record, *outcome.judgment_missing)
+                    scrape_jobs.mark_batch_item(item.item_id, item_status, reason, case_id=case_id)
+                    continue
+
+                item_status, ingestion_id, case_id, reason = handle_record(outcome.record)
+                scrape_jobs.mark_batch_item(item.item_id, item_status, reason, ingestion_id, case_id)
     return False
 
 
@@ -290,7 +320,10 @@ def _log_summary(status: str, started_at: float, counts: _Counts, resumable_batc
     if tallies.get("Skipped"):
         _log(stages.BATCH, "info", "Skipped: %s", _format_counts(tallies["Skipped"]))
 
-    outcomes = _format_counts({"needs review": counts.needs_review, "duplicate PDF": counts.duplicates, "errors": counts.errored})
+    outcomes = _format_counts({
+        "saved without judgment": counts.no_judgment, "needs review": counts.needs_review,
+        "duplicate PDF": counts.duplicates, "errors": counts.errored,
+    })
     _log(stages.BATCH, "info", "Processed %d: promoted %d%s", counts.processed, counts.promoted, f" · {outcomes}" if outcomes else "")
 
     for group, group_counts in tallies.items():
@@ -302,7 +335,7 @@ def _log_summary(status: str, started_at: float, counts: _Counts, resumable_batc
     item_counts = scrape_jobs.batch_item_counts(resumable_batch_id)
     if not item_counts:
         return
-    overall = {status_name.lower(): item_counts.get(status_name, 0) for status_name in ("DONE", "SKIPPED", "FAILED", "PENDING")}
+    overall = {status_name.lower().replace("_", " "): item_counts.get(status_name, 0) for status_name in ("DONE", "NO_JUDGMENT", "SKIPPED", "FAILED", "PENDING")}
     _log(stages.BATCH, "info", "Overall: %d cases · %s", sum(item_counts.values()), _format_counts(overall))
     left = overall["pending"] + overall["failed"]
     if left:

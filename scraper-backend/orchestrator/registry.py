@@ -9,10 +9,12 @@ from typing import Optional
 
 from adapters.high_courts.mp.adapter import MPHighCourtAdapter
 from adapters.high_courts.mp.promotion import promote_ingestion as _mp_promote
+from adapters.high_courts.mp.promotion import save_case_without_judgment as _mp_save_without_judgment
 from adapters.supreme_court.adapter import SupremeCourtAdapter
 from adapters.supreme_court.extraction import find_provision_paragraphs as _sc_find_provisions
 from adapters.supreme_court.promotion import promote_ingestion as _sc_promote
-from orchestrator.batch_runner import FindProvisionsFn, PromoteFn
+from adapters.supreme_court.promotion import save_case_without_judgment as _sc_save_without_judgment
+from orchestrator.batch_runner import FindProvisionsFn, PromoteFn, SaveWithoutJudgmentFn
 
 
 @dataclass(frozen=True)
@@ -22,18 +24,21 @@ class AdapterSpec:
     data_source: str  # data_source_enum value new records get tagged with — resolved here, never left to a DB column DEFAULT (a prior real bug: every source silently landed as 'ECOURTS')
     find_provisions_fn: Optional[FindProvisionsFn] = None  # optional: this court's OCR-text provision-paragraph finder, fed to pipeline.llm_enrichment.enrich_case
     run_enrichment: bool = True  # False for a court whose pipeline doesn't use LLM enrichment yet — see batch_runner.run_batch's own docstring
+    save_without_judgment_fn: Optional[SaveWithoutJudgmentFn] = None  # saves a case's metadata when its PDF is missing; without one those cases are skipped
 
 
 ADAPTER_REGISTRY = {
     "supreme_court": AdapterSpec(
         adapter_class=SupremeCourtAdapter,
         promote_fn=_sc_promote,
+        save_without_judgment_fn=_sc_save_without_judgment,
         find_provisions_fn=_sc_find_provisions,
         data_source="SCI_WEBSITE",
     ),
     "high_court_mp": AdapterSpec(
         adapter_class=MPHighCourtAdapter,
         promote_fn=_mp_promote,
+        save_without_judgment_fn=_mp_save_without_judgment,
         # MP's sections/acts come straight from case-status's own Act lines
         # at promotion time (adapters/high_courts/mp/promotion.py) when
         # present. find_provision_paragraphs is reused as-is from Supreme
