@@ -270,9 +270,10 @@ CREATE TABLE IF NOT EXISTS cr_batch_items (
     position      INT NOT NULL,
     item_key      TEXT NOT NULL,
     payload       JSONB NOT NULL DEFAULT '{}',
-    status        TEXT NOT NULL DEFAULT 'PENDING',   -- PENDING / DONE / SKIPPED / FAILED
+    status        TEXT NOT NULL DEFAULT 'PENDING',   -- PENDING / DONE / NO_JUDGMENT / SKIPPED / FAILED
     reason        TEXT,
     ingestion_id  BIGINT REFERENCES cr_raw_ingestions(ingestion_id),
+    case_id       BIGINT,                             -- -> cr_cases, FK added after cr_cases below
     attempts      INT NOT NULL DEFAULT 0,
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT uq_cr_batch_items_key UNIQUE (batch_id, item_key)
@@ -391,6 +392,13 @@ CREATE TABLE IF NOT EXISTS cr_cases (
 
     needs_review       BOOLEAN NOT NULL DEFAULT FALSE,
 
+    -- AVAILABLE, or why this case has no judgment yet (db/migrations 0017 / api 0004): metadata-only
+    -- cases are saved rather than skipped, and filled in by a later run that gets the PDF.
+    judgment_status          TEXT NOT NULL DEFAULT 'AVAILABLE'
+                             CONSTRAINT ck_cr_cases_judgment_status CHECK (judgment_status IN ('AVAILABLE', 'NOT_PUBLISHED', 'DOWNLOAD_FAILED')),
+    judgment_missing_reason  TEXT,
+    judgment_checked_at      TIMESTAMPTZ,
+
     -- Enrichment status tracking (llm_enrichment.py, 2026-09-10 rewrite) --
     -- makes an LLM enrichment failure queryable/retryable instead of
     -- indistinguishable from "case genuinely has no provisions". Internal
@@ -416,7 +424,16 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
 
+DO $$ BEGIN
+    ALTER TABLE cr_batch_items
+        ADD CONSTRAINT fk_cr_batch_items_case
+        FOREIGN KEY (case_id) REFERENCES cr_cases(case_id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+CREATE INDEX IF NOT EXISTS ix_cr_batch_items_case ON cr_batch_items(case_id) WHERE case_id IS NOT NULL;
+
 CREATE INDEX IF NOT EXISTS ix_cr_cases_court_date ON cr_cases(court_id, judgment_date);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_missing_judgment ON cr_cases(court_id, judgment_status) WHERE judgment_status <> 'AVAILABLE';
 CREATE INDEX IF NOT EXISTS ix_cr_cases_created_at ON cr_cases(created_at);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_disposition ON cr_cases(disposition);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_search ON cr_cases USING GIN (search_vector);

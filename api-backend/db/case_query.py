@@ -177,6 +177,13 @@ def build_case_where(
                     where_clauses.append("EXISTS (SELECT 1 FROM unnest(COALESCE(v.industry_names, ARRAY[]::text[])) ind WHERE ind ILIKE ANY(%s))")
                     params.append(industry_likes)
 
+            elif f_key == "judgment":
+                wanted = {str(v) for v in val_list}
+                if wanted == {"available"}:
+                    where_clauses.append("v.judgment_status = 'AVAILABLE'")
+                elif wanted == {"missing"}:
+                    where_clauses.append("v.judgment_status <> 'AVAILABLE'")
+
             elif f_key in ("ministry", "ministries"):
                 ministry_likes = [f"%{str(m).strip()}%" for m in val_list if str(m).strip()]
                 if ministry_likes:

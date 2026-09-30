@@ -7,9 +7,11 @@ Scraper control endpoints (moved here from scraper-backend, which is now an on-d
 - GET  /api/scraper/batches                       : batch history (filterable) + summary counts
 - GET  /api/scraper/batches/{batch_id}            : one batch's header/summary fields
 - GET  /api/scraper/batches/{batch_id}/records    : per-record (cr_raw_ingestions) breakdown
-- POST /api/scraper/batches/{batch_id}/cancel     : stop a QUEUED/RUNNING batch
+- GET  /api/scraper/batches/{batch_id}/items      : discovered cases (cr_batch_items) in one status, e.g. SKIPPED
+- POST /api/scraper/batches/{batch_id}/cancel    : stop a QUEUED/RUNNING batch
 - POST /api/scraper/batches/{batch_id}/resume     : queue another run of a stopped batch (new Job)
 - GET  /api/scraper/batches/{batch_id}/logs/stream: SSE tail of cr_batch_logs
+- GET  /api/scraper/missing-judgments             : cases saved without a judgment (tracker), filterable
 - GET  /api/scraper/courts/summary                : configured courts with case + batch counts
 - GET  /api/scraper/cases/daily                   : cases added per day (all courts or one)
 
@@ -200,6 +202,18 @@ def list_batches(
     ))
 
 
+@router.get("/missing-judgments")
+def list_missing_judgments(
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    court_id: Optional[List[int]] = Query(None, description="Repeatable: only these courts"),
+    judgment_status: Optional[Literal["NOT_PUBLISHED", "DOWNLOAD_FAILED"]] = None,
+    q: Optional[str] = Query(None, description="Case number, LIZNR id or party name"),
+):
+    return _db("listing cases without a judgment", lambda: scrape_jobs.list_missing_judgments(
+        limit=limit, offset=offset, court_ids=court_id, judgment_status=judgment_status, q=q))
+
+
 @router.get("/courts/summary")
 def courts_summary():
     _sweep()
@@ -217,7 +231,7 @@ def get_batch(batch_id: int):
     batch = _db(f"reading batch {batch_id}", lambda: scrape_jobs.get_batch(batch_id))
     if batch is None:
         raise HTTPException(status_code=404, detail=f"No batch with batch_id={batch_id}.")
-    batch["resumable"] = _supports_resume(batch["court_id"]) and _has_work_to_resume(batch, retry_skipped=True)
+    batch["resumable"] = _supports_resume(batch["court_id"]) and _has_work_to_resume(batch, retry_skipped=True, retry_no_judgment=True)
     return batch
 
 
@@ -230,7 +244,7 @@ def _supports_resume(court_id: int) -> bool:
     return config is not None and courts.is_resumable(config["adapter"])
 
 
-def _has_work_to_resume(batch: dict, retry_skipped: bool) -> bool:
+def _has_work_to_resume(batch: dict, retry_skipped: bool, retry_no_judgment: bool = False) -> bool:
     if batch["status"] in scrape_jobs.ACTIVE_STATUSES:
         return False
     if not batch["discovered"]:
@@ -238,11 +252,16 @@ def _has_work_to_resume(batch: dict, retry_skipped: bool) -> bool:
         # batch without one predates resumable batches, so there's nothing to resume.
         return batch["status"] != "COMPLETED"
     counts = batch["item_counts"]
-    return bool(counts.get("PENDING") or counts.get("FAILED") or (retry_skipped and counts.get("SKIPPED")))
+    return bool(
+        counts.get("PENDING") or counts.get("FAILED")
+        or (retry_skipped and counts.get("SKIPPED"))
+        or (retry_no_judgment and counts.get("NO_JUDGMENT"))
+    )
 
 
 class BatchResumeRequest(BaseModel):
-    retry_skipped: bool = Field(False, description="Also retry cases skipped in earlier runs (e.g. no judgment PDF yet)")
+    retry_skipped: bool = Field(False, description="Also retry cases skipped in earlier runs (e.g. not found on the court's case-status page)")
+    retry_no_judgment: bool = Field(False, description="Also retry cases saved without a judgment (PDF missing or failed to download)")
     headless: bool = Field(True, description="Set False for a supervised local run against a real browser window")
     actor: Optional[Actor] = None
 
@@ -257,12 +276,12 @@ def resume_batch(batch_id: int, req: Optional[BatchResumeRequest] = None):
     config = _resolve_court(batch["court_id"])
     if not courts.is_resumable(config["adapter"]):
         raise HTTPException(status_code=400, detail=f"{config['court_name']} batches can't be resumed yet — use Run Again.")
-    if not _has_work_to_resume(batch, retry_skipped=req.retry_skipped):
+    if not _has_work_to_resume(batch, retry_skipped=req.retry_skipped, retry_no_judgment=req.retry_no_judgment):
         raise HTTPException(status_code=409, detail="Nothing left to resume for this batch.")
 
     try:
         claim = _db(f"queueing a resume of batch {batch_id}", lambda: scrape_jobs.claim_batch_resume(
-            batch_id, retry_skipped=req.retry_skipped, actor=_actor_dict(req.actor)))
+            batch_id, retry_skipped=req.retry_skipped, actor=_actor_dict(req.actor), retry_no_judgment=req.retry_no_judgment))
     except scrape_jobs.CourtBusyError as exc:
         raise HTTPException(status_code=409, detail=f"{config['court_name']}: {exc}")
     if claim is None:
@@ -287,6 +306,17 @@ def list_batch_records(
 ):
     return _db(f"listing records for batch {batch_id}", lambda: scrape_jobs.list_ingestions_by_batch(
         batch_id, limit=limit, offset=offset, status_group=status_group))
+
+
+@router.get("/batches/{batch_id}/items")
+def list_batch_items(
+    batch_id: int,
+    status: Literal["PENDING", "DONE", "NO_JUDGMENT", "SKIPPED", "FAILED"],
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+):
+    return _db(f"listing {status} items for batch {batch_id}", lambda: scrape_jobs.list_batch_items(
+        batch_id, status, limit=limit, offset=offset))
 
 
 _CANCEL_MESSAGES = {

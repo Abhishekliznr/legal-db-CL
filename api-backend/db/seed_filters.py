@@ -31,6 +31,7 @@ _FILTER_DEFINITIONS = [
     ("favouring_party", "Favouring Party", "select", "multi", None, "database", False, 5),
     ("industry", "Industry", "select", "multi", None, "database", True, 6),
     ("ministry", "Ministry / Department", "select", "multi", None, "database", True, 7),
+    ("judgment", "Judgment", "select", "multi", None, "database", False, 8),
 ]
 
 # (key, label, placeholder, combinator, display_order)

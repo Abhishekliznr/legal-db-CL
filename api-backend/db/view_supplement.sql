@@ -75,7 +75,10 @@ SELECT
            FROM cr_sections s JOIN cr_acts a ON a.act_id = s.act_id
            WHERE s.section_id = ANY(c.sections)
        ) prov
-    ) AS provisions
+    ) AS provisions,
+    -- Appended last: CREATE OR REPLACE VIEW can only add columns at the end.
+    c.judgment_status,
+    c.judgment_missing_reason
 FROM cr_cases c
 JOIN cr_courts crt ON crt.court_id = c.court_id
 LEFT JOIN cr_judges jb ON jb.judge_id = c.judgment_by

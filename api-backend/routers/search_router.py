@@ -197,6 +197,10 @@ class CaseListItem(BaseModel):
     # Filing year only, parsed from case_number -- see db/schema.sql's
     # cr_cases.filing_year comment for why this isn't a full filing date.
     filing_year: Optional[int] = None
+    # AVAILABLE, or NOT_PUBLISHED / DOWNLOAD_FAILED for a case saved from the court's
+    # listing alone (no judgment text or PDF yet).
+    judgment_status: str = "AVAILABLE"
+    judgment_missing_reason: Optional[str] = None
 
 
 class CaseSearchResponse(BaseModel):
@@ -240,6 +244,8 @@ class CaseDetail(BaseModel):
     favouring_party: Optional[str] = None
     needs_review: bool = False
     filing_year: Optional[int] = None
+    judgment_status: str = "AVAILABLE"
+    judgment_missing_reason: Optional[str] = None
 
 
 # ============================================================
@@ -286,7 +292,7 @@ def execute_case_search(
                        v.court_id, v.judgment_by_name, v.petitioner, v.respondent,
                        v.petitioner_advocate, v.respondent_advocate, v.filing_year, v.bench_names,
                        v.act_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review,
-                       v.provisions
+                       v.provisions, v.judgment_status, v.judgment_missing_reason
                 FROM cr_case_search_view v
                 {where_sql}
                 {order_sql}
@@ -302,7 +308,7 @@ def execute_case_search(
                  court_id, judgment_by_name, petitioner, respondent,
                  petitioner_advocate, respondent_advocate, filing_year, bench_names,
                  act_names, ministry_names, industry_names, favouring_party, needs_review,
-                 provisions) = r
+                 provisions, judgment_status, judgment_missing_reason) = r
 
                 parties = ([{"name": petitioner, "role": "PETITIONER", "advocate": petitioner_advocate}] if petitioner else []) + \
                           ([{"name": respondent, "role": "RESPONDENT", "advocate": respondent_advocate}] if respondent else [])
@@ -337,6 +343,8 @@ def execute_case_search(
                     "industries": industry_names or [],
                     "needs_review": needs_review,
                     "filing_year": filing_year,
+                    "judgment_status": judgment_status,
+                    "judgment_missing_reason": judgment_missing_reason,
                 })
 
             return {"total": total_records, "page": page, "limit": limit, "total_pages": total_pages, "results": results}
@@ -433,7 +441,8 @@ def get_case_detail(case_id: str):
                            v.judgment_by_name, v.petitioner, v.respondent,
                            v.petitioner_advocate, v.respondent_advocate, v.filing_year,
                            v.bench_names, v.subject_name,
-                           v.category_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review
+                           v.category_names, v.ministry_names, v.industry_names, v.favouring_party, v.needs_review,
+                           v.judgment_status, v.judgment_missing_reason
                     FROM cr_case_search_view v
                     WHERE {id_clause}v.case_number = %s OR v.liznr_id = %s;
                 """, (*id_params, case_id, case_id))
@@ -448,7 +457,8 @@ def get_case_detail(case_id: str):
                  judgment_by_name, petitioner, respondent,
                  petitioner_advocate, respondent_advocate, filing_year,
                  bench_names, subject_name,
-                 category_names, ministry_names, industry_names, favouring_party, needs_review) = row
+                 category_names, ministry_names, industry_names, favouring_party, needs_review,
+                 judgment_status, judgment_missing_reason) = row
 
                 parties = ([{"name": petitioner, "role": "PETITIONER", "advocate": petitioner_advocate}] if petitioner else []) + \
                           ([{"name": respondent, "role": "RESPONDENT", "advocate": respondent_advocate}] if respondent else [])
@@ -485,6 +495,7 @@ def get_case_detail(case_id: str):
                     "ministries": ministry_names or [], "industries": industry_names or [],
                     "favouring_party": favouring_party, "needs_review": needs_review,
                     "filing_year": filing_year,
+                    "judgment_status": judgment_status, "judgment_missing_reason": judgment_missing_reason,
                 }
     except HTTPException:
         raise
