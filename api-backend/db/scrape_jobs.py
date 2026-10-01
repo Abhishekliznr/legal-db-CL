@@ -438,6 +438,14 @@ def get_batch(batch_id: int) -> Optional[Dict[str, Any]]:
             cur.execute("SELECT status, COUNT(*) FROM cr_batch_items WHERE batch_id = %s GROUP BY status;", (batch_id,))
             batch["item_counts"] = {status: count for status, count in cur.fetchall()}
 
+            # The worker only writes the total_* columns when a run finishes, so derive them live
+            # the same way scraper-backend's batch_totals_from_items() does. Batches with no case
+            # list (never discovered, or pre-resume) keep the stored columns.
+            if batch["item_counts"]:
+                cur.execute("SELECT COUNT(*), COUNT(ingestion_id) FROM cr_batch_items WHERE batch_id = %s;", (batch_id,))
+                batch["total_found"], batch["total_downloaded"] = cur.fetchone()
+                batch["total_promoted"] = batch["counts_by_status"].get("PROMOTED", 0)
+
             cur.execute("""
                 SELECT event_id, run_number, event_type, occurred_at, message, details, actor_id, actor_name, actor_email
                 FROM cr_batch_events WHERE batch_id = %s
