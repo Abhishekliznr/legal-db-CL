@@ -12,6 +12,8 @@ from urllib.parse import urljoin
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 from adapters.base import (
+    JUDGMENT_DOWNLOAD_FAILED,
+    JUDGMENT_NOT_PUBLISHED,
     BatchItem,
     ItemOutcome,
     RawJudgmentRecord,
@@ -273,29 +275,36 @@ class SupremeCourtAdapter:
     def process_item(self, session: _Session, item: BatchItem) -> ItemOutcome:
         row = item.payload
         pdf_url = row.get("pdf_url")
+        record = _record_from_row(row)
         if not pdf_url:
-            slog(logger, stages.JUDGMENT, "warning", "No judgment PDF link in row → skipped")
-            return ItemOutcome(skip_reason="no PDF link")
+            slog(logger, stages.JUDGMENT, "warning", "No judgment PDF link in row → saving case details without judgment")
+            return ItemOutcome(record=record, judgment_missing=(JUDGMENT_NOT_PUBLISHED, "no PDF link"))
 
         pdf_path = session.download_dir / f"{abs(hash(pdf_url))}.pdf"
         failure = download_pdf(pdf_url, pdf_path)
         if failure is not None:
-            slog(logger, stages.JUDGMENT, "warning", "PDF download failed (%s) → skipped", failure)
-            return ItemOutcome(skip_reason="PDF download failed")
+            slog(logger, stages.JUDGMENT, "warning", "PDF download failed (%s) → saving case details without judgment", failure)
+            record.source_url = pdf_url
+            return ItemOutcome(record=record, judgment_missing=(JUDGMENT_DOWNLOAD_FAILED, f"PDF download failed: {failure}"[:500]))
         slog(logger, stages.JUDGMENT, "info", "PDF downloaded (%d KB)", pdf_path.stat().st_size // 1024)
 
-        return ItemOutcome(record=RawJudgmentRecord(
-            pdf_path=pdf_path,
-            source_url=pdf_url,
-            case_number_raw=row.get("case_number"),
-            party_name_raw=row.get("party_name"),
-            judge_raw=row.get("judge"),
-            decision_date_raw=row.get("decision_date"),
-            cnr_raw=row.get("diary_number"),
-            neutral_citation_raw=row.get("neutral_citation"),
-            extra={
-                "advocate_raw": row.get("advocate_raw"),
-                "bench_raw": row.get("bench_raw"),
-                "language": row.get("language"),
-            },
-        ))
+        record.pdf_path, record.source_url = pdf_path, pdf_url
+        return ItemOutcome(record=record)
+
+
+def _record_from_row(row: Dict[str, Any]) -> RawJudgmentRecord:
+    return RawJudgmentRecord(
+        pdf_path=None,
+        source_url=None,
+        case_number_raw=row.get("case_number"),
+        party_name_raw=row.get("party_name"),
+        judge_raw=row.get("judge"),
+        decision_date_raw=row.get("decision_date"),
+        cnr_raw=row.get("diary_number"),
+        neutral_citation_raw=row.get("neutral_citation"),
+        extra={
+            "advocate_raw": row.get("advocate_raw"),
+            "bench_raw": row.get("bench_raw"),
+            "language": row.get("language"),
+        },
+    )

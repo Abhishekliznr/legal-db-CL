@@ -214,7 +214,11 @@ CREATE TABLE IF NOT EXISTS cr_scrape_batches (
     heartbeat_at    TIMESTAMPTZ,
     job_name        TEXT,
     queued_at       TIMESTAMPTZ,
-    claimed_at      TIMESTAMPTZ
+    claimed_at      TIMESTAMPTZ,
+    -- The admin who started the batch, snapshotted (db/migrations batch_actors).
+    requested_by_id    TEXT,
+    requested_by_name  TEXT,
+    requested_by_email TEXT
 );
 
 -- One row per PDF actually pulled off the court site, BEFORE it becomes a
@@ -269,9 +273,10 @@ CREATE TABLE IF NOT EXISTS cr_batch_items (
     position      INT NOT NULL,
     item_key      TEXT NOT NULL,
     payload       JSONB NOT NULL DEFAULT '{}',
-    status        TEXT NOT NULL DEFAULT 'PENDING',   -- PENDING / DONE / SKIPPED / FAILED
+    status        TEXT NOT NULL DEFAULT 'PENDING',   -- PENDING / DONE / NO_JUDGMENT / SKIPPED / FAILED
     reason        TEXT,
     ingestion_id  BIGINT REFERENCES cr_raw_ingestions(ingestion_id),
+    case_id       BIGINT,                             -- -> cr_cases, FK added after cr_cases below
     attempts      INT NOT NULL DEFAULT 0,
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT uq_cr_batch_items_key UNIQUE (batch_id, item_key)
@@ -289,13 +294,19 @@ CREATE TABLE IF NOT EXISTS cr_batch_events (
     event_type   TEXT NOT NULL,
     occurred_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     message      TEXT,
-    details      JSONB NOT NULL DEFAULT '{}'
+    details      JSONB NOT NULL DEFAULT '{}',
+    -- Admin behind STARTED / STOP_REQUESTED / RESUMED; NULL for worker/sweep events.
+    actor_id     TEXT,
+    actor_name   TEXT,
+    actor_email  TEXT
 );
 
 CREATE INDEX IF NOT EXISTS ix_cr_batch_events_batch ON cr_batch_events(batch_id, occurred_at);
 
 CREATE INDEX IF NOT EXISTS ix_cr_scrape_batches_active
     ON cr_scrape_batches(court_id) WHERE status IN ('QUEUED', 'RUNNING');
+CREATE INDEX IF NOT EXISTS ix_cr_scrape_batches_court_requested ON cr_scrape_batches(court_id, requested_at DESC);
+CREATE INDEX IF NOT EXISTS ix_cr_scrape_batches_requested_by ON cr_scrape_batches(requested_by_id) WHERE requested_by_id IS NOT NULL;
 
 -- Live log lines written by the worker pod, tailed by api-backend's SSE endpoint (db/migrations/0015).
 CREATE TABLE IF NOT EXISTS cr_batch_logs (
@@ -390,6 +401,13 @@ CREATE TABLE IF NOT EXISTS cr_cases (
 
     needs_review       BOOLEAN NOT NULL DEFAULT FALSE,  -- set when judgment_date couldn't be parsed or another required signal was missing
 
+    -- AVAILABLE, or why this case has no judgment yet (db/migrations 0017 / api 0004): metadata-only
+    -- cases are saved rather than skipped, and filled in by a later run that gets the PDF.
+    judgment_status          TEXT NOT NULL DEFAULT 'AVAILABLE'
+                             CONSTRAINT ck_cr_cases_judgment_status CHECK (judgment_status IN ('AVAILABLE', 'NOT_PUBLISHED', 'DOWNLOAD_FAILED')),
+    judgment_missing_reason  TEXT,
+    judgment_checked_at      TIMESTAMPTZ,
+
     -- Enrichment status tracking (pipeline/llm_enrichment.py, 2026-09-10
     -- rewrite; see db/migrations/0001_add_case_enrichment_status.sql for
     -- the ALTER-based version of this against an already-populated DB) --
@@ -419,7 +437,17 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
 
+DO $$ BEGIN
+    ALTER TABLE cr_batch_items
+        ADD CONSTRAINT fk_cr_batch_items_case
+        FOREIGN KEY (case_id) REFERENCES cr_cases(case_id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+CREATE INDEX IF NOT EXISTS ix_cr_batch_items_case ON cr_batch_items(case_id) WHERE case_id IS NOT NULL;
+
 CREATE INDEX IF NOT EXISTS ix_cr_cases_court_date ON cr_cases(court_id, judgment_date);
+CREATE INDEX IF NOT EXISTS ix_cr_cases_missing_judgment ON cr_cases(court_id, judgment_status) WHERE judgment_status <> 'AVAILABLE';
+CREATE INDEX IF NOT EXISTS ix_cr_cases_created_at ON cr_cases(created_at);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_disposition ON cr_cases(disposition);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_search ON cr_cases USING GIN (search_vector);
 CREATE INDEX IF NOT EXISTS ix_cr_cases_number_trgm ON cr_cases USING GIN (case_number gin_trgm_ops);

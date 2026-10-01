@@ -25,8 +25,10 @@ class RawJudgmentRecord:
     filling the handful of fields regex can't — not here.
     """
 
-    pdf_path: Path
-    source_url: str
+    # Both None when the court listed the case but its judgment PDF is missing or wouldn't
+    # download -- see ItemOutcome.judgment_missing.
+    pdf_path: Optional[Path]
+    source_url: Optional[str]
     case_number_raw: Optional[str] = None
     party_name_raw: Optional[str] = None
     judge_raw: Optional[str] = None
@@ -61,12 +63,18 @@ class BatchItem:
     position: Optional[int] = None
 
 
+JUDGMENT_NOT_PUBLISHED = "NOT_PUBLISHED"
+JUDGMENT_DOWNLOAD_FAILED = "DOWNLOAD_FAILED"
+
+
 @dataclass
 class ItemOutcome:
     """Exactly one of record / skip_reason is set."""
 
     record: Optional[RawJudgmentRecord] = None
     skip_reason: Optional[str] = None
+    # (JUDGMENT_NOT_PUBLISHED | JUDGMENT_DOWNLOAD_FAILED, reason) when `record` has metadata but no PDF.
+    judgment_missing: Optional[Tuple[str, str]] = None
 
 
 class ResumableScraperAdapter(Protocol):

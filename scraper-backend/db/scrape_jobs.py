@@ -182,10 +182,10 @@ def insert_raw_ingestion(
 
 
 def get_promoted_case_numbers(court_id: int) -> set:
-    """Every cr_cases.case_number already promoted for this court — lets an adapter skip re-scraping them on a re-run."""
+    """Case numbers already saved WITH a judgment for this court — a re-run skips these but retries cases still missing one."""
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT case_number FROM cr_cases WHERE court_id = %s;", (court_id,))
+            cur.execute("SELECT case_number FROM cr_cases WHERE court_id = %s AND judgment_status = 'AVAILABLE';", (court_id,))
             return {row[0] for row in cur.fetchall()}
 
 
@@ -265,7 +265,7 @@ def update_status(ingestion_id: int, status: str, **fields: Any) -> None:
 # Resumable batches (cr_batch_items, db/migrations/0013)
 # ---------------------------------------------------------------------
 
-# Statuses a run picks up; api-backend's resume can reset SKIPPED items to PENDING first.
+# Statuses a run picks up; api-backend's resume can reset SKIPPED / NO_JUDGMENT items to PENDING first.
 OPEN_ITEM_STATUSES = ("PENDING", "FAILED")
 
 
@@ -309,15 +309,17 @@ def list_open_batch_items(batch_id: int) -> List[Dict[str, Any]]:
             return [dict(zip(columns, row)) for row in cur.fetchall()]
 
 
-def mark_batch_item(item_id: int, status: str, reason: Optional[str] = None, ingestion_id: Optional[int] = None) -> None:
+def mark_batch_item(
+    item_id: int, status: str, reason: Optional[str] = None, ingestion_id: Optional[int] = None, case_id: Optional[int] = None,
+) -> None:
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
                 UPDATE cr_batch_items
-                SET status = %s, reason = %s, ingestion_id = COALESCE(%s, ingestion_id),
+                SET status = %s, reason = %s, ingestion_id = COALESCE(%s, ingestion_id), case_id = COALESCE(%s, case_id),
                     attempts = attempts + 1, updated_at = now()
                 WHERE item_id = %s;
-            """, (status, reason, ingestion_id, item_id))
+            """, (status, reason, ingestion_id, case_id, item_id))
         conn.commit()
 
 

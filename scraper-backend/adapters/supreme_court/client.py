@@ -173,7 +173,13 @@ def download_pdf(pdf_url: str, dest_path) -> Optional[str]:
         )
     if response.status_code != 200:
         return f"HTTP {response.status_code}"
-    if not response.content.startswith(b"%PDF"):
-        return "response is not a PDF"
-    dest_path.write_bytes(response.content)
+    # Older /jonew/judis/ files carry a few junk bytes before %PDF; the spec allows the header anywhere in the first 1024.
+    header_at = response.content.find(b"%PDF", 0, 1024)
+    if header_at == -1:
+        snippet = " ".join(response.content[:200].decode("utf-8", "replace").split())
+        return (
+            f"response is not a PDF · content-type={response.headers.get('content-type')} · "
+            f"{len(response.content)} bytes · body starts: {snippet!r}"
+        )
+    dest_path.write_bytes(response.content[header_at:])
     return None

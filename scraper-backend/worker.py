@@ -41,6 +41,9 @@ from orchestrator import batch_runner, shutdown  # noqa: E402
 
 logger = logging.getLogger("scraper_backend_v2.worker")
 
+# Bump on each deploy you need to confirm; the startup log line shows which build a pod is running.
+BUILD_MARKER = "2026-10-01 pdf-download-fix"
+
 _HEARTBEAT_SECONDS = 30
 _COURT_CODES = {"sc": "SCIN", "mp": "MPHC"}
 
@@ -118,6 +121,7 @@ def _install_signal_handlers(job_name: Optional[str]) -> None:
 
 def main(argv=None) -> int:
     args = _parse_args(argv)
+    logger.info("Scraper worker build: %s", BUILD_MARKER)
     headless = _env_bool("HEADLESS", True)
     job_name = os.environ.get("HOSTNAME")  # the pod name inside K8s
     _install_signal_handlers(job_name)
@@ -165,7 +169,8 @@ def main(argv=None) -> int:
             spec.adapter_class(), spec.promote_fn, batch_id, claim["court_id"], claim["court_code"],
             claim["date_from"].isoformat(), claim["date_to"].isoformat(), spec.data_source,
             find_provisions_fn=spec.find_provisions_fn, run_enrichment=spec.run_enrichment,
-            run_number=claim["run_count"], **adapter_kwargs(config, headless),
+            run_number=claim["run_count"], save_without_judgment_fn=spec.save_without_judgment_fn,
+            **adapter_kwargs(config, headless),
         )
     except Exception:
         # run_batch has already recorded the batch as FAILED with the reason before re-raising.

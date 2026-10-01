@@ -21,21 +21,26 @@ def _row(**overrides):
     return row
 
 
-def test_process_item_skips_row_without_pdf_link(tmp_path):
+def test_process_item_keeps_metadata_of_row_without_pdf_link(tmp_path):
     outcome = adapter.SupremeCourtAdapter().process_item(
         adapter._Session(download_dir=tmp_path), BatchItem(key="k", payload=_row(pdf_url=None)),
     )
-    assert outcome.record is None
-    assert outcome.skip_reason == "no PDF link"
+    assert outcome.skip_reason is None
+    assert outcome.judgment_missing == ("NOT_PUBLISHED", "no PDF link")
+    assert outcome.record.pdf_path is None
+    assert outcome.record.source_url is None
+    assert outcome.record.case_number_raw == "C.A. No. 1/2025"
 
 
-def test_process_item_skips_failed_download(monkeypatch, tmp_path):
+def test_process_item_keeps_metadata_when_download_fails(monkeypatch, tmp_path):
     monkeypatch.setattr(adapter, "download_pdf", lambda url, dest: "HTTP 404")
     outcome = adapter.SupremeCourtAdapter().process_item(
         adapter._Session(download_dir=tmp_path), BatchItem(key="k", payload=_row()),
     )
-    assert outcome.record is None
-    assert outcome.skip_reason == "PDF download failed"
+    assert outcome.skip_reason is None
+    assert outcome.judgment_missing == ("DOWNLOAD_FAILED", "PDF download failed: HTTP 404")
+    assert outcome.record.pdf_path is None
+    assert outcome.record.source_url == "https://www.sci.gov.in/view-pdf/?diary_no=1"
 
 
 def test_process_item_builds_record_from_payload(monkeypatch, tmp_path):
@@ -49,6 +54,7 @@ def test_process_item_builds_record_from_payload(monkeypatch, tmp_path):
     )
     record = outcome.record
     assert outcome.skip_reason is None
+    assert outcome.judgment_missing is None
     assert record.pdf_path.exists()
     assert record.case_number_raw == "C.A. No. 1/2025"
     assert record.cnr_raw == "1/2025"

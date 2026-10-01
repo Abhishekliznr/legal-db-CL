@@ -38,9 +38,11 @@ class FakeCursor:
     are, only what happens to cr_cases/cr_citation_sequences.
     """
 
-    def __init__(self, insert_returns_case_id, court_code="SCIN"):
+    def __init__(self, insert_returns_case_id, court_code="SCIN", existing_liznr_id=None, inserted=True):
         self.executed = []
         self.insert_returns_case_id = insert_returns_case_id
+        self.existing_liznr_id = existing_liznr_id
+        self.inserted = inserted
         self.court_code = court_code
         self.claim_count = 0
         self._next_seq = 0
@@ -52,7 +54,10 @@ class FakeCursor:
         sql_upper = sql.upper()
 
         if "INSERT INTO CR_CASES" in sql_upper and "RETURNING CASE_ID" in sql_upper:
-            self._last_result = (self.insert_returns_case_id,) if self.insert_returns_case_id is not None else None
+            self._last_result = (
+                (self.insert_returns_case_id, self.existing_liznr_id, self.inserted)
+                if self.insert_returns_case_id is not None else None
+            )
         elif "SELECT COURT_CODE FROM CR_COURTS" in sql_upper:
             self._last_result = (self.court_code,) if self.court_code is not None else (None,)
         elif "INSERT INTO CR_CITATION_SEQUENCES" in sql_upper:
@@ -147,7 +152,7 @@ def _liznr_update_calls(cursor):
 
 def test_rerun_conflict_does_not_claim_a_citation_sequence(monkeypatch):
     monkeypatch.setattr(promotion.scrape_jobs, "get_ingestion", lambda ingestion_id: _fake_ingestion())
-    cursor = FakeCursor(insert_returns_case_id=None)  # simulates ON CONFLICT DO NOTHING (a re-run)
+    cursor = FakeCursor(insert_returns_case_id=None)  # simulates the case already saved with a judgment (a re-run)
     _patch_pooled_connection(monkeypatch, cursor)
 
     result = promotion.promote_ingestion(99, _record(decision_date_raw="2026-01-15"))
@@ -301,3 +306,75 @@ def test_ner_finding_nothing_leaves_acts_and_sections_empty(monkeypatch):
     params = _insert_params(cursor)
     assert params["acts"] == []
     assert params["sections"] == []
+
+
+# ---------------------------------------------------------------------
+# Cases saved without a judgment (judgment_status <> 'AVAILABLE')
+# ---------------------------------------------------------------------
+
+def _insert_call(cursor):
+    calls = _update_sql_for(cursor, "INSERT INTO cr_cases")
+    assert len(calls) == 1
+    return calls[0]
+
+
+def test_save_without_judgment_stores_metadata_and_assigns_liznr_id(monkeypatch):
+    cursor = FakeCursor(insert_returns_case_id=11)
+    _patch_pooled_connection(monkeypatch, cursor)
+    monkeypatch.setattr(promotion, "extract_acts_sections", lambda text: pytest.fail("NER must not run without judgment text"))
+
+    record = _record(decision_date_raw="2026-02-10")
+    record.pdf_path = None
+    result = promotion.save_case_without_judgment(1, record, "DOWNLOAD_FAILED", "PDF download failed: HTTP 404")
+
+    assert result == 11
+    assert cursor.claim_count == 1
+    sql, params = _insert_call(cursor)
+    assert params[-2:] == ("DOWNLOAD_FAILED", "PDF download failed: HTTP 404")
+    assert params[18] is None  # ocr_text
+    # only the "still missing" fields may overwrite an existing metadata-only row
+    assert "judgment_missing_reason = EXCLUDED.judgment_missing_reason" in sql
+    assert "ocr_text = EXCLUDED.ocr_text" not in sql
+    assert "WHERE cr_cases.judgment_status <> 'AVAILABLE'" in sql
+    assert not _update_sql_for(cursor, "UPDATE CR_RAW_INGESTIONS")
+
+
+def test_save_without_judgment_leaves_case_that_has_judgment(monkeypatch):
+    cursor = FakeCursor(insert_returns_case_id=None)
+    _patch_pooled_connection(monkeypatch, cursor)
+
+    result = promotion.save_case_without_judgment(1, _record(decision_date_raw="2026-02-10"), "NOT_PUBLISHED", "no PDF link")
+
+    assert result is None
+    assert cursor.claim_count == 0
+    assert not _update_sql_for(cursor, "UPDATE CR_RAW_INGESTIONS")
+
+
+def test_save_without_judgment_requires_case_number(monkeypatch):
+    with pytest.raises(promotion.PromotionSkipped):
+        promotion.save_case_without_judgment(1, _record(case_number=" "), "NOT_PUBLISHED", "no PDF link")
+
+
+def test_judgment_fills_in_metadata_only_case_and_keeps_liznr_id(monkeypatch):
+    monkeypatch.setattr(promotion.scrape_jobs, "get_ingestion", lambda ingestion_id: _fake_ingestion())
+    cursor = FakeCursor(insert_returns_case_id=11, existing_liznr_id="LIZNR/SCIN/0005/2026", inserted=False)
+    _patch_pooled_connection(monkeypatch, cursor)
+
+    result = promotion.promote_ingestion(99, _record(decision_date_raw="2026-02-10"))
+
+    assert result == 11
+    assert cursor.claim_count == 0
+    assert not _liznr_update_calls(cursor)
+    sql, _ = _insert_call(cursor)
+    assert "ocr_text = EXCLUDED.ocr_text" in sql
+    assert "judgment_status = 'AVAILABLE'" in sql
+    assert _update_sql_for(cursor, "UPDATE CR_RAW_INGESTIONS")
+
+
+def test_judgment_fill_in_assigns_liznr_id_when_missing(monkeypatch):
+    monkeypatch.setattr(promotion.scrape_jobs, "get_ingestion", lambda ingestion_id: _fake_ingestion())
+    cursor = FakeCursor(insert_returns_case_id=11, existing_liznr_id=None, inserted=False)
+    _patch_pooled_connection(monkeypatch, cursor)
+
+    assert promotion.promote_ingestion(99, _record(decision_date_raw="2026-02-10")) == 11
+    assert cursor.claim_count == 1

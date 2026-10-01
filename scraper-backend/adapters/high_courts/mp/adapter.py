@@ -55,13 +55,20 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, Iterator, List, Optional, Tuple
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
 
-from adapters.base import BatchItem, ItemOutcome, RawJudgmentRecord, SourceUnavailableError
+from adapters.base import (
+    JUDGMENT_DOWNLOAD_FAILED,
+    JUDGMENT_NOT_PUBLISHED,
+    BatchItem,
+    ItemOutcome,
+    RawJudgmentRecord,
+    SourceUnavailableError,
+)
 from adapters.high_courts.mp import case_status, ilrs, stages
 from adapters.high_courts.mp.extraction import clean_headnote, normalize_case_no, normalize_case_type
 from db import court_config, scrape_jobs
@@ -145,7 +152,7 @@ def _find_judgment_pdf_url(page) -> Optional[str]:
     return match.group(1) if match else None
 
 
-def _download_pdf(context, page, pdf_url: str, download_dir: Path) -> Optional[Path]:
+def _download_pdf(context, page, pdf_url: str, download_dir: Path) -> Tuple[Optional[Path], Optional[str]]:
     """
     The Download link's own label/icon ("Download <i class='bi bi-download'>")
     suggests the server responds with Content-Disposition: attachment (a
@@ -179,18 +186,21 @@ def _download_pdf(context, page, pdf_url: str, download_dir: Path) -> Optional[P
         try:
             response = context.request.get(pdf_url, timeout=30000)
             if not response.ok:
-                slog(logger, stages.JUDGMENT, "warning", "PDF download failed (HTTP %s) → skipped", response.status)
-                return None
+                return None, f"HTTP {response.status}"
             local_path.write_bytes(response.body())
         except Exception as fetch_err:
-            slog(logger, stages.JUDGMENT, "warning", "PDF download failed (%s) → skipped", fetch_err)
-            return None
+            return None, str(fetch_err)
 
-    if not local_path.exists() or not local_path.read_bytes().startswith(b"%PDF"):
-        slog(logger, stages.JUDGMENT, "warning", "Downloaded file is not a valid PDF → skipped")
-        return None
+    content = local_path.read_bytes() if local_path.exists() else b""
+    # Some court PDFs carry a few junk bytes before %PDF; the spec allows the header anywhere in the first 1024.
+    header_at = content.find(b"%PDF", 0, 1024)
+    if header_at == -1:
+        snippet = " ".join(content[:200].decode("utf-8", "replace").split())
+        return None, f"response is not a PDF · {len(content)} bytes · body starts: {snippet!r}"
+    if header_at:
+        local_path.write_bytes(content[header_at:])
     slog(logger, stages.JUDGMENT, "info", "PDF downloaded (%d KB, via %s)", local_path.stat().st_size // 1024, method)
-    return local_path
+    return local_path, None
 
 
 def _select_bench(page, bench_code: str) -> None:
@@ -295,14 +305,14 @@ class MPHighCourtAdapter:
 
     def process_item(self, session: _Session, item: BatchItem) -> ItemOutcome:
         try:
-            record, skip_reason, session.current_bench_code = self._process_candidate_with_retry(
+            outcome, session.current_bench_code = self._process_candidate_with_retry(
                 session.context, session.page, item.payload, session.download_dir, session.current_bench_code
             )
         except Exception:
             # Page state is unknown after a crash; force the bench-select POST on the next case.
             session.current_bench_code = None
             raise
-        return ItemOutcome(record=record, skip_reason=skip_reason)
+        return outcome
 
     def _process_candidate_with_retry(
         self, context, page, candidate: Dict[str, object], download_dir: Path, current_bench_code: Optional[str]
@@ -331,7 +341,7 @@ class MPHighCourtAdapter:
     def _process_candidate(
         self, context, page, candidate: Dict[str, object], download_dir: Path, current_bench_code: Optional[str]
     ) -> tuple:
-        """Returns (record, skip_reason, bench_code_now_selected) -- exactly one of record/skip_reason is set; the caller threads the bench code back in as `current_bench_code` on the next call, so the bench-select POST only fires when the bench actually changes between consecutive candidates."""
+        """Returns (outcome, bench_code_now_selected); the caller threads the bench code back in as `current_bench_code` on the next call, so the bench-select POST only fires when the bench actually changes between consecutive candidates."""
         # ILRS zero-pads some case numbers (e.g. "01598") -- case-status's
         # #case_no field and its own case-detail pages never do, so this
         # must be stripped before it's used to search, not just for display.
@@ -341,12 +351,12 @@ class MPHighCourtAdapter:
         case_type_code = case_status.resolve_case_type_code(normalize_case_type(candidate["case_type"]))
         if case_type_code is None:
             slog(logger, stages.CASE_STATUS, "warning", "Unknown case type %r → skipped", candidate["case_type"])
-            return None, "unknown case type", current_bench_code
+            return ItemOutcome(skip_reason="unknown case type"), current_bench_code
 
         bench_code = case_status.BENCH_CODES.get(candidate.get("bench"))
         if bench_code is None:
             slog(logger, stages.CASE_STATUS, "warning", "Unknown bench %r → skipped", candidate.get("bench"))
-            return None, "unknown bench", current_bench_code
+            return ItemOutcome(skip_reason="unknown bench"), current_bench_code
 
         page.goto(CASE_STATUS_URL, wait_until="domcontentloaded", timeout=30000)
         if bench_code != current_bench_code:
@@ -359,7 +369,7 @@ class MPHighCourtAdapter:
                     logger, stages.CASE_STATUS, "warning",
                     "Couldn't switch case-status to bench %r (%s) → skipped", candidate.get("bench"), e,
                 )
-                return None, "bench switch failed", current_bench_code
+                return ItemOutcome(skip_reason="bench switch failed"), current_bench_code
             current_bench_code = bench_code
 
         _submit_case_status_form(page, case_type_code, case_no, str(candidate["registration_year"]))
@@ -388,8 +398,9 @@ class MPHighCourtAdapter:
                 logger, stages.CASE_STATUS, "debug",
                 "submitted case_type_code=%s bench_code=%s; page text: %s", case_type_code, bench_code, page_text,
             )
-            return None, "not on case-status", current_bench_code
+            return ItemOutcome(skip_reason="not on case-status"), current_bench_code
         slog(logger, stages.CASE_STATUS, "info", "Case available")
+        record = _build_record(candidate, details, case_label)
 
         try:
             page.locator("button[data-link-type='judgement']").click(timeout=5000)
@@ -397,37 +408,43 @@ class MPHighCourtAdapter:
             slog(logger, stages.JUDGMENT, "debug", "couldn't click Judgement/Orders tab button (%s)", e)
         pdf_url = _find_judgment_pdf_url(page)
         if pdf_url is None:
-            slog(logger, stages.JUDGMENT, "warning", "No judgment/order in Judgement/Orders tab → skipped")
-            return None, "no judgment PDF", current_bench_code
+            slog(logger, stages.JUDGMENT, "warning", "No judgment/order in Judgement/Orders tab → saving case details without judgment")
+            return ItemOutcome(record=record, judgment_missing=(JUDGMENT_NOT_PUBLISHED, "no judgment/order listed")), current_bench_code
         slog(logger, stages.JUDGMENT, "info", "Latest order found in Judgement/Orders tab → downloading")
 
-        pdf_path = _download_pdf(context, page, pdf_url, download_dir)
+        pdf_path, failure = _download_pdf(context, page, pdf_url, download_dir)
         if pdf_path is None:
-            return None, "PDF download failed", current_bench_code
+            slog(logger, stages.JUDGMENT, "warning", "PDF download failed (%s) → saving case details without judgment", failure)
+            record.source_url = pdf_url
+            return ItemOutcome(record=record, judgment_missing=(JUDGMENT_DOWNLOAD_FAILED, f"PDF download failed: {failure}"[:500])), current_bench_code
 
-        record = RawJudgmentRecord(
-            pdf_path=pdf_path,
-            source_url=pdf_url,
-            # Full "<Bench>/<CaseType>/<Number>/<Year>" form, not just the
-            # bare number -- case_status's own "Case No." cell never carries
-            # the Establishment/bench name, only ILRS's case_label does.
-            case_number_raw=case_label,
-            decision_date_raw=candidate.get("decision_date"),
-            cnr_raw=details.get("cnr"),
-            neutral_citation_raw=candidate.get("neutral_citation"),
-            extra={
-                # `candidate` (ILRS detail pane) was previously dropped
-                # entirely here -- only `details` (case-status) ever made it
-                # into `extra`, silently losing candidate's own
-                # neutral_citation/ilr_citation/judges/bench_type. `details`
-                # is spread second so case-status's own values win on any
-                # key collision (e.g. "judges": case-status's Last Listed On
-                # parse is the source of truth for cr_cases.bench, not
-                # ILRS's).
-                **candidate,
-                **details,
-                "headnote": clean_headnote(candidate.get("headnote")),
-                "registration_year": candidate.get("registration_year"),
-            },
-        )
-        return record, None, current_bench_code
+        record.pdf_path, record.source_url = pdf_path, pdf_url
+        return ItemOutcome(record=record), current_bench_code
+
+
+def _build_record(candidate: Dict[str, object], details: Dict[str, object], case_label: str) -> RawJudgmentRecord:
+    return RawJudgmentRecord(
+        pdf_path=None,
+        source_url=None,
+        # Full "<Bench>/<CaseType>/<Number>/<Year>" form, not just the
+        # bare number -- case_status's own "Case No." cell never carries
+        # the Establishment/bench name, only ILRS's case_label does.
+        case_number_raw=case_label,
+        decision_date_raw=candidate.get("decision_date"),
+        cnr_raw=details.get("cnr"),
+        neutral_citation_raw=candidate.get("neutral_citation"),
+        extra={
+            # `candidate` (ILRS detail pane) was previously dropped
+            # entirely here -- only `details` (case-status) ever made it
+            # into `extra`, silently losing candidate's own
+            # neutral_citation/ilr_citation/judges/bench_type. `details`
+            # is spread second so case-status's own values win on any
+            # key collision (e.g. "judges": case-status's Last Listed On
+            # parse is the source of truth for cr_cases.bench, not
+            # ILRS's).
+            **candidate,
+            **details,
+            "headnote": clean_headnote(candidate.get("headnote")),
+            "registration_year": candidate.get("registration_year"),
+        },
+    )

@@ -128,7 +128,9 @@ def create_queued_batch(court_id: int, date_from: date, date_to: date, actor: Op
     return batch_id
 
 
-def claim_batch_resume(batch_id: int, retry_skipped: bool = False, actor: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+def claim_batch_resume(
+    batch_id: int, retry_skipped: bool = False, actor: Optional[Dict[str, Any]] = None, retry_no_judgment: bool = False,
+) -> Optional[Dict[str, Any]]:
     """Queues another run of a stopped batch (run_count + 1). None if it's already QUEUED/RUNNING or missing; CourtBusyError if another active batch overlaps its date range."""
     with get_pooled_connection() as conn:
         with conn.cursor() as cur:
@@ -150,19 +152,27 @@ def claim_batch_resume(batch_id: int, retry_skipped: bool = False, actor: Option
             if row is None:
                 conn.rollback()
                 return None
-            retried_skipped = 0
+            retried_skipped = retried_no_judgment = 0
             if retry_skipped:
                 cur.execute(
                     "UPDATE cr_batch_items SET status = 'PENDING', updated_at = now() WHERE batch_id = %s AND status = 'SKIPPED';",
                     (batch_id,),
                 )
                 retried_skipped = cur.rowcount
+            if retry_no_judgment:
+                cur.execute(
+                    "UPDATE cr_batch_items SET status = 'PENDING', updated_at = now() WHERE batch_id = %s AND status = 'NO_JUDGMENT';",
+                    (batch_id,),
+                )
+                retried_no_judgment = cur.rowcount
             cur.execute(
                 "SELECT COUNT(*) FROM cr_batch_items WHERE batch_id = %s AND status = ANY(%s);",
                 (batch_id, list(OPEN_ITEM_STATUSES)),
             )
             cases_left = cur.fetchone()[0]
-            _record_event(cur, batch_id, "RESUMED", details={"cases_left": cases_left, "retried_skipped": retried_skipped}, actor=actor)
+            _record_event(cur, batch_id, "RESUMED", details={
+                "cases_left": cases_left, "retried_skipped": retried_skipped, "retried_no_judgment": retried_no_judgment,
+            }, actor=actor)
         conn.commit()
     return {"run_count": row[0]}
 
@@ -428,6 +438,14 @@ def get_batch(batch_id: int) -> Optional[Dict[str, Any]]:
             cur.execute("SELECT status, COUNT(*) FROM cr_batch_items WHERE batch_id = %s GROUP BY status;", (batch_id,))
             batch["item_counts"] = {status: count for status, count in cur.fetchall()}
 
+            # The worker only writes the total_* columns when a run finishes, so derive them live
+            # the same way scraper-backend's batch_totals_from_items() does. Batches with no case
+            # list (never discovered, or pre-resume) keep the stored columns.
+            if batch["item_counts"]:
+                cur.execute("SELECT COUNT(*), COUNT(ingestion_id) FROM cr_batch_items WHERE batch_id = %s;", (batch_id,))
+                batch["total_found"], batch["total_downloaded"] = cur.fetchone()
+                batch["total_promoted"] = batch["counts_by_status"].get("PROMOTED", 0)
+
             cur.execute("""
                 SELECT event_id, run_number, event_type, occurred_at, message, details, actor_id, actor_name, actor_email
                 FROM cr_batch_events WHERE batch_id = %s
@@ -474,6 +492,98 @@ def list_ingestions_by_batch(batch_id: int, limit: int = 100, offset: int = 0, s
             total = cur.fetchone()[0]
 
     return {"records": rows, "total": total}
+
+
+def list_batch_items(batch_id: int, status: str, limit: int = 100, offset: int = 0) -> Dict[str, Any]:
+    params = {"batch_id": batch_id, "status": status, "limit": limit, "offset": offset}
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT bi.item_id, bi.position, bi.item_key, bi.reason, bi.attempts, bi.updated_at,
+                       COALESCE(bi.payload->>'pdf_url', c.source_pdf_url) AS pdf_url,
+                       bi.case_id, c.liznr_id, c.case_number
+                FROM cr_batch_items bi
+                LEFT JOIN cr_cases c ON c.case_id = bi.case_id
+                WHERE bi.batch_id = %(batch_id)s AND bi.status = %(status)s
+                ORDER BY bi.position
+                LIMIT %(limit)s OFFSET %(offset)s;
+            """, params)
+            columns = [desc[0] for desc in cur.description]
+            rows = [dict(zip(columns, row)) for row in cur.fetchall()]
+
+            cur.execute("SELECT COUNT(*) FROM cr_batch_items WHERE batch_id = %(batch_id)s AND status = %(status)s;", params)
+            total = cur.fetchone()[0]
+
+    return {"items": rows, "total": total}
+
+
+# Newest batch that handled each case, so the admin tracker can link to it and retry through it.
+_MISSING_JUDGMENTS_FROM = """
+    FROM cr_cases c
+    JOIN cr_courts crt ON crt.court_id = c.court_id
+    LEFT JOIN LATERAL (
+        SELECT bi.batch_id, bi.attempts FROM cr_batch_items bi WHERE bi.case_id = c.case_id ORDER BY bi.item_id DESC LIMIT 1
+    ) last_item ON TRUE
+    LEFT JOIN cr_scrape_batches sb ON sb.batch_id = last_item.batch_id
+"""
+
+
+def list_missing_judgments(limit: int = 50, offset: int = 0, court_ids: Optional[Sequence[int]] = None,
+                           judgment_status: Optional[str] = None, q: Optional[str] = None) -> Dict[str, Any]:
+    """Cases saved without a judgment (NOT_PUBLISHED / DOWNLOAD_FAILED), newest check first, plus per-court/status counts."""
+    clauses, params = ["c.judgment_status <> 'AVAILABLE'"], {"limit": limit, "offset": offset}
+    if court_ids:
+        clauses.append("c.court_id = ANY(%(court_ids)s)")
+        params["court_ids"] = list(court_ids)
+    q = (q or "").strip()
+    if q:
+        clauses.append("(c.case_number ILIKE %(q_like)s OR c.liznr_id ILIKE %(q_like)s OR c.petitioner ILIKE %(q_like)s OR c.respondent ILIKE %(q_like)s)")
+        params["q_like"] = f"%{q}%"
+    base_where = " AND ".join(clauses)
+    where = base_where
+    if judgment_status:
+        where += " AND c.judgment_status = %(judgment_status)s"
+        params["judgment_status"] = judgment_status
+
+    with get_pooled_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                SELECT c.case_id, c.liznr_id, c.case_number, c.court_id, crt.court_name, crt.court_code,
+                       c.petitioner, c.respondent, c.judgment_date, c.judgment_status, c.judgment_missing_reason,
+                       c.judgment_checked_at, c.source_pdf_url, c.created_at,
+                       last_item.batch_id, last_item.attempts, sb.status AS batch_status
+                {_MISSING_JUDGMENTS_FROM}
+                WHERE {where}
+                ORDER BY c.judgment_checked_at DESC NULLS LAST, c.case_id DESC
+                LIMIT %(limit)s OFFSET %(offset)s;
+            """, params)
+            columns = [desc[0] for desc in cur.description]
+            rows = [dict(zip(columns, row)) for row in cur.fetchall()]
+
+            cur.execute(f"SELECT COUNT(*) {_MISSING_JUDGMENTS_FROM} WHERE {where};", params)
+            total = cur.fetchone()[0]
+
+            # Ignores the status filter on purpose: the status chips show every status's count.
+            cur.execute(f"""
+                SELECT c.court_id, crt.court_name, crt.court_code, c.judgment_status, COUNT(*)
+                FROM cr_cases c JOIN cr_courts crt ON crt.court_id = c.court_id
+                WHERE {base_where}
+                GROUP BY c.court_id, crt.court_name, crt.court_code, c.judgment_status
+                ORDER BY crt.court_name;
+            """, params)
+            summary_rows = cur.fetchall()
+
+    by_court: Dict[int, Dict[str, Any]] = {}
+    counts_by_status: Dict[str, int] = {}
+    for court_id, court_name, court_code, status, count in summary_rows:
+        court = by_court.setdefault(court_id, {"court_id": court_id, "court_name": court_name, "court_code": court_code, "counts_by_status": {}})
+        court["counts_by_status"][status] = count
+        counts_by_status[status] = counts_by_status.get(status, 0) + count
+    return {
+        "cases": rows,
+        "total": total,
+        "summary": {"total": sum(counts_by_status.values()), "counts_by_status": counts_by_status, "courts": list(by_court.values())},
+    }
 
 
 def get_logs_since(batch_id: int, after_log_id: int, limit: int = 500) -> List[Dict[str, Any]]:

@@ -140,6 +140,7 @@ _FILTER_KEY_ALIASES = {
     "favouring_party": ("favouring_party",),
     "industry": ("industry", "industries"),
     "ministry": ("ministry", "ministries"),
+    "judgment": ("judgment",),
 }
 
 
@@ -238,6 +239,21 @@ def _compute_database_options(cur, key: str, search: Dict[str, Any]) -> List[dic
             LIMIT 30;
         """, params)
         return [{"value": r[0], "label": r[0], "count": r[1]} for r in cur.fetchall()]
+
+    if key == "judgment":
+        cur.execute(f"""
+            WITH matched AS ({matched_cte})
+            SELECT (c.judgment_status = 'AVAILABLE') AS available, COUNT(*)
+            FROM cr_cases c
+            JOIN matched m ON m.case_id = c.case_id
+            GROUP BY available
+            ORDER BY available DESC;
+        """, params)
+        return [
+            {"value": "available", "label": "Judgment available", "count": r[1]} if r[0]
+            else {"value": "missing", "label": "Judgment not available yet", "count": r[1]}
+            for r in cur.fetchall()
+        ]
 
     return []
 
