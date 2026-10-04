@@ -79,6 +79,76 @@ class CSISClient:
 
         return response
 
+    def get_case_type_map(self) -> dict[str, int]:
+        """Fetch all official case types from CSIS endpoint."""
+        mapping = {
+            "WP": 63,
+            "CRLA": 19,
+            "CRLP": 21,
+            "CRLRC": 22,
+            "CRP": 23,
+            "CC": 6,
+        }
+        try:
+            resp = self.session.get(f"{BASE_URL}/getMaincasetype", timeout=self.timeout)
+            if resp.ok and resp.text:
+                import base64
+                data = json.loads(base64.b64decode(resp.text))
+                for item in data:
+                    c_id = item.get("caseType")
+                    name = str(item.get("typeName") or "").strip().upper()
+                    if c_id and name:
+                        mapping[name] = int(c_id)
+                        mapping[name.replace(".", "")] = int(c_id)
+        except Exception:
+            pass
+        return mapping
+
+    def fetch_case_details(
+        self,
+        case_type: int,
+        case_number: str | int,
+        case_year: int,
+        max_retries: int = 5,
+    ) -> Optional[CSISCaseResult]:
+        """Fetch case details headlessly using automated captcha solving."""
+        import tempfile
+        import time
+        from adapters.captcha_ocr import solve_captcha_image
+
+        for attempt in range(max_retries):
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                tmp_path = Path(tmp.name)
+            try:
+                captcha_id = self.get_captcha(save_path=str(tmp_path))
+                solved = solve_captcha_image(tmp_path.read_bytes())
+            except Exception:
+                time.sleep(1)
+                continue
+            finally:
+                if tmp_path.exists():
+                    tmp_path.unlink()
+
+            if not solved:
+                time.sleep(0.5)
+                continue
+
+            try:
+                res = self.submit_case(
+                    case_type=case_type,
+                    case_number=case_number,
+                    case_year=case_year,
+                    captcha=solved,
+                    captcha_id=captcha_id,
+                )
+                if res and res.raw_response and not res.raw_response.get("error"):
+                    return res
+            except Exception:
+                time.sleep(1)
+                continue
+
+        return None
+
     def get_captcha(self, save_path: str = "csis_captcha.jpg") -> str:
         """
         Generate a fresh CAPTCHA.

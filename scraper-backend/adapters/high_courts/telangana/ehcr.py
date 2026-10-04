@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import re
 import time
+import tempfile
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any, Optional
@@ -25,6 +26,8 @@ from urllib.parse import urljoin
 import requests
 import urllib3
 from bs4 import BeautifulSoup
+
+from adapters.captcha_ocr import solve_captcha_image
 
 
 # ----------------------------------------------------------------------
@@ -71,6 +74,48 @@ class EHCRRecord:
 
 class EHCRClient:
     """Client for Telangana High Court EHCR Order Date search."""
+
+    def search_with_auto_captcha(
+        self,
+        from_date: str,
+        to_date: str,
+        max_retries: int = 5,
+    ) -> list:
+        """
+        Search EHCR for reported judgments, automatically solving the CAPTCHA image
+        using the project's captcha solver.
+        """
+        for attempt in range(max_retries):
+            try:
+                self.open_order_date_page()
+                with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                    tmp_path = Path(tmp.name)
+                try:
+                    self.download_captcha(tmp_path)
+                    captcha_bytes = tmp_path.read_bytes()
+                finally:
+                    if tmp_path.exists():
+                        tmp_path.unlink()
+
+                solved_text = solve_captcha_image(captcha_bytes)
+                if not solved_text:
+                    time.sleep(0.5)
+                    continue
+
+                html = self.search_reported_cases(
+                    from_date=from_date,
+                    to_date=to_date,
+                    captcha=solved_text,
+                )
+                if re.search(r"invalid\s+captcha", html, re.IGNORECASE):
+                    time.sleep(1)
+                    continue
+
+                return self.parse_reported_cases(html)
+            except Exception:
+                time.sleep(2)
+                continue
+        return []
 
     def __init__(
         self,

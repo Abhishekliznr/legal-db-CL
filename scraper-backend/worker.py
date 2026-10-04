@@ -45,7 +45,7 @@ logger = logging.getLogger("scraper_backend_v2.worker")
 BUILD_MARKER = "2026-10-01 pdf-download-fix"
 
 _HEARTBEAT_SECONDS = 30
-_COURT_CODES = {"sc": "SCIN", "mp": "MPHC"}
+_COURT_CODES = {"sc": "SCIN", "mp": "MPHC", "telangana": "TSHC"}
 
 
 def _parse_args(argv):

@@ -1,23 +1,18 @@
 """
 Generic image-captcha solving, shared by every adapter that hits a
-distorted-text/math-expression captcha (originally written for
-sci.gov.in's judgment search widget, since reused by
-adapters/high_courts/mp/'s ILRS discovery — nothing here is site-specific).
+distorted-text/math-expression captcha.
 
-The captcha is either a short alphanumeric string or a simple math
-expression ("4 + 3"). ddddocr is a general-purpose captcha OCR — not tuned
-to any one site — so this module retries with a couple of image
-preprocessing variants before giving up on one attempt.
-
-Known open risk (spec §10): solve-rate here hasn't been measured at volume
-for any site that uses it.
+Handles:
+- Automatic background inversion (for dark-background captchas like TSHC).
+- Alphanumeric and basic math evaluations.
+- 2x upscale with contrast enhancement for distorted characters.
 """
 
 import io
 import re
 from typing import Optional
 
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageOps
 
 _MATH_PATTERN = re.compile(r"(\d+)\s*([+\-*xX/])\s*(\d+)")
 
@@ -53,37 +48,69 @@ def _clean_alphanumeric(text: str) -> str:
     return re.sub(r"[^a-zA-Z0-9]", "", text or "").strip()
 
 
+def _get_image_variants(raw_png_bytes: bytes) -> list[bytes]:
+    """
+    Generates preprocessing variants:
+    1. Inverted if dark background (light text on dark background -> dark text on light).
+    2. Upscaled 2x + contrast enhanced.
+    3. Original bytes as fallback.
+    """
+    variants = []
+    try:
+        image = Image.open(io.BytesIO(raw_png_bytes)).convert("RGB")
+
+        # Check average pixel brightness
+        grayscale = image.convert("L")
+        pixels = list(grayscale.getdata())
+        avg_brightness = sum(pixels) / len(pixels)
+
+        # Invert if the image is predominantly dark (avg brightness < 128)
+        if avg_brightness < 128:
+            processed_img = ImageOps.invert(image)
+        else:
+            processed_img = image
+
+        # Variant A: Inverted/Normalized
+        buf_norm = io.BytesIO()
+        processed_img.save(buf_norm, format="PNG")
+        variants.append(buf_norm.getvalue())
+
+        # Variant B: 2x Upscale + Contrast Boost
+        w, h = processed_img.size
+        upscaled = processed_img.resize((w * 2, h * 2), Image.Resampling.BICUBIC)
+        contrasted = ImageEnhance.Contrast(upscaled).enhance(1.8)
+        buf_contrasted = io.BytesIO()
+        contrasted.save(buf_contrasted, format="PNG")
+        variants.append(buf_contrasted.getvalue())
+
+    except Exception:
+        pass
+
+    # Always include original raw bytes as last resort
+    variants.append(raw_png_bytes)
+    return variants
+
+
 def solve_captcha_image(raw_png_bytes: bytes) -> Optional[str]:
     """
-    Solves one captcha image, trying the raw bytes first and a
-    contrast-enhanced 2x upscale second. Returns None if nothing plausible
-    came out of either attempt — caller is responsible for retrying against
-    a freshly refreshed captcha image.
+    Solves CAPTCHA by testing preprocessed image variants against OCR.
     """
     ocr = _get_ocr_engine()
 
-    for candidate_bytes in (raw_png_bytes, _enhance(raw_png_bytes)):
-        if candidate_bytes is None:
+    for candidate_bytes in _get_image_variants(raw_png_bytes):
+        if not candidate_bytes:
             continue
-        raw_result = ocr.classification(candidate_bytes)
+        try:
+            raw_result = ocr.classification(candidate_bytes)
+        except Exception:
+            continue
+
         math_result = _evaluate_if_math_expression(raw_result)
         if math_result:
             return math_result
+
         cleaned = _clean_alphanumeric(raw_result)
         if cleaned:
             return cleaned
 
     return None
-
-
-def _enhance(raw_png_bytes: bytes) -> Optional[bytes]:
-    try:
-        image = Image.open(io.BytesIO(raw_png_bytes))
-        width, height = image.size
-        upscaled = image.resize((width * 2, height * 2), Image.Resampling.BICUBIC)
-        contrasted = ImageEnhance.Contrast(upscaled).enhance(2.0)
-        buffer = io.BytesIO()
-        contrasted.save(buffer, format="PNG")
-        return buffer.getvalue()
-    except Exception:
-        return None

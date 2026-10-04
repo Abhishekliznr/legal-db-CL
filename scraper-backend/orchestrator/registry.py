@@ -10,6 +10,9 @@ from typing import Optional
 from adapters.high_courts.mp.adapter import MPHighCourtAdapter
 from adapters.high_courts.mp.promotion import promote_ingestion as _mp_promote
 from adapters.high_courts.mp.promotion import save_case_without_judgment as _mp_save_without_judgment
+from adapters.high_courts.telangana.adapter import TelanganaHighCourtAdapter
+from adapters.high_courts.telangana.promotion import promote_ingestion as _tg_promote
+from adapters.high_courts.telangana.promotion import save_case_without_judgment as _tg_save_without_judgment
 from adapters.supreme_court.adapter import SupremeCourtAdapter
 from adapters.supreme_court.extraction import find_provision_paragraphs as _sc_find_provisions
 from adapters.supreme_court.promotion import promote_ingestion as _sc_promote
@@ -50,6 +53,13 @@ ADAPTER_REGISTRY = {
         # existing_sections guard), never overwriting real case-status data.
         find_provisions_fn=_sc_find_provisions,
         data_source="MPHC_WEBSITE",
+    ),
+    "high_court_telangana": AdapterSpec(
+        adapter_class=TelanganaHighCourtAdapter,
+        promote_fn=_tg_promote,
+        save_without_judgment_fn=_tg_save_without_judgment,
+        find_provisions_fn=_sc_find_provisions,
+        data_source="TSHC_WEBSITE",
     ),
 }
 
